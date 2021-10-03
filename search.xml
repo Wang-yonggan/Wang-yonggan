@@ -1,0 +1,1208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title></title>
+    <url>/2021/09/17/db/mysql_base/</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2021/09/17/db/mysql_base_sql/</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2021/09/17/db/mysql_other/</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2021/09/17/db/mysql_principle/</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2021/09/17/db/redis/</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2021/09/17/distribute/hadoop/</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2021/09/17/distribute/spark/</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2021/09/17/os/linuxCmdPlus/</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2021/09/17/os/linuxCmd/</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2021/09/17/java/webBack/mybatis/</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2021/09/17/java/webBack/spring/</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2021/09/17/java/webBack/springBoot/</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2021/09/17/java/webBack/springCloud/</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2021/09/17/db/mysql_details/</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title>数据库事务</title>
+    <url>/2021/09/24/db/%E4%BA%8B%E5%8A%A1/</url>
+    <content><![CDATA[<p>ACID</p>
+<p><a href="https://www.cnblogs.com/takumicx/p/9998844.html">数据库事务cnblog</a></p>
+<ol>
+<li><p>Atomicity 原子性</p>
+<ol>
+<li>begin</li>
+<li>sql1</li>
+<li>sql2</li>
+<li>commit</li>
+<li>构成逻辑整体的这些数据库操作,要么全部执行成功,要么全部不执行。基于以事务为单位执行</li>
+</ol>
+</li>
+</ol>
+<span id="more"></span>
+
+<ol start="2">
+<li><p>Consistency一致性：正确性，一个一致性转移到另一个一致性，并且拥有完整性约束。</p>
+</li>
+<li><p>Isolation隔离性：可串行化，即并发执行和串行执行结果一样。</p>
+</li>
+<li><p>Durability持久性：事务一旦提交，其对数据库的更新是永久的。</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20210924130355472.png" alt="image-20210924130355472"></p>
+</li>
+</ol>
+<h3 id="—"><a href="#—" class="headerlink" title="—"></a>—</h3><ol>
+<li>在事务的ACID特性中,C即一致性是事务的根本追求,而对数据一致性的破坏主要来自两个方面<ol>
+<li>事务的并发执行</li>
+<li>事务故障或系统故障</li>
+</ol>
+</li>
+<li>数据库系统是通过并发控制技术和日志恢复技术来避免这种情况发生的。</li>
+</ol>
+<h3 id="各种错误"><a href="#各种错误" class="headerlink" title="各种错误"></a>各种错误</h3><ol>
+<li><p>脏读:事务读取了其他事务还没提交的事务</p>
+</li>
+<li><p>丢失更新:两个事务对相同的值进行更改，造成了一个更改失败。：a=10   q:a=a-10</p>
+<p>p:a=a+10  结果a=10</p>
+</li>
+<li><p>不可重复度读：读了一次A=1，另一个事务对A改变，第二次在读是A=2.</p>
+</li>
+<li><p>幻读:事务前后数量发生变化。a删除了，另一个事务有插入了一个a，这样数量变了，造成了幻觉。</p>
+</li>
+</ol>
+<h3 id="隔离级别"><a href="#隔离级别" class="headerlink" title="隔离级别"></a>隔离级别</h3><ol>
+<li><p>四种隔离级别从高到低依次是：</p>
+<ol>
+<li><p>读未提交</p>
+</li>
+<li><p>读已提交</p>
+</li>
+<li><p>可重复读 mysql 默认rr</p>
+</li>
+<li><p>创行化</p>
+<p><img src="E:\data-ana\ana-notes\experience\db\隔离级别" alt="image-20210924131844559"></p>
+</li>
+</ol>
+</li>
+<li><p>事务隔离实现：并发控制</p>
+<ol>
+<li>基于封锁</li>
+<li>基于时间戳</li>
+<li>基于有效检查</li>
+<li>基于快照</li>
+<li></li>
+</ol>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>数据库</category>
+        <category>mysql</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>数据库规范</title>
+    <url>/2021/09/24/db/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%A7%84%E8%8C%83/</url>
+    <content><![CDATA[<h3 id="外键"><a href="#外键" class="headerlink" title="外键"></a>外键</h3><ol>
+<li>每次delete update都需要考虑外键。</li>
+<li>阿里巴巴开发规范禁用外键。</li>
+<li>每次考虑外键都要检查主外键表，造成了效率低下。</li>
+<li>级联删除造成数据不可控（不可追溯）</li>
+<li></li>
+</ol>
+]]></content>
+      <categories>
+        <category>数据库</category>
+        <category>mysql</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>java2</title>
+    <url>/2021/09/24/java/java2/</url>
+    <content><![CDATA[<h3 id="接口"><a href="#接口" class="headerlink" title="接口"></a>接口</h3><ol>
+<li>接口继承接口，方法重复只需要重写一个就ok</li>
+<li>接口可以有default方法</li>
+<li>接口可以有static方法</li>
+</ol>
+<span id="more"></span>
+
+<h3 id="static"><a href="#static" class="headerlink" title="static"></a>static</h3><ol>
+<li><p>类的所有方法都能访问static方法</p>
+</li>
+<li><p>类的所有方法都能访问static变量</p>
+</li>
+<li><p>static方法不能访问非static方法</p>
+</li>
+<li><p>static方法不能访问非static变量</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">这就好像static的东西都无私奉献出来了，但他却置身事外，不过问q</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><ol>
+<li></li>
+</ol>
+]]></content>
+      <categories>
+        <category>java</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>java8新特性</title>
+    <url>/2021/09/29/java/java8%E6%96%B0%E7%89%B9%E6%80%A7/</url>
+    <content><![CDATA[<h1 id="java8新特性"><a href="#java8新特性" class="headerlink" title="java8新特性"></a>java8新特性</h1><span id="more"></span>
+
+<h3 id="一、lambda-参数式函数-代码更少"><a href="#一、lambda-参数式函数-代码更少" class="headerlink" title="一、lambda(参数式函数) 代码更少"></a>一、lambda(参数式函数) 代码更少</h3><p>fun1(fun2())</p>
+<ol>
+<li><p>参数式函数，参数式lambda。</p>
+</li>
+<li><p>java中 lambda是实现了函数的对象，而不像其他语言一样是一个函数。一般用于接口，这个接口只有一个函数需要重写。这个接口的实例就是lambda。</p>
+</li>
+<li><p>但是用到的lambda还是写的那个重写的函数，也就是说我们需要某个功能的时候，我们可以根据四大函数式接口写出自己的函数，将这个接口传入，就完成了一个功能器。</p>
+</li>
+<li><p>为了完成多功能，所以lambda对象应该是以参数的身份传入到指定函数，以为创建Lambda很简单，代码很少，这样在不改变原函数的情况下就能根据传入的lambda不同而拥有不同的功能，目的就是多态。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"> <span class="function"><span class="keyword">public</span> List <span class="title">filter</span><span class="params">(<span class="keyword">int</span> []nums,Predicate&lt;Integer&gt;predicate)</span></span>&#123;</span><br><span class="line">filter(nums,o-&gt;o&gt;<span class="number">6</span>);</span><br><span class="line">filter(nums,o-&gt;<span class="number">2</span>*o&gt;<span class="number">6</span>);</span><br><span class="line">filter(nums,o-&gt;o*o&gt;<span class="number">6</span>);</span><br><span class="line">filter(nums,o-&gt;<span class="number">1</span>&gt;<span class="number">6</span>);</span><br></pre></td></tr></table></figure></li>
+<li><p>创建比较器</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//lambda</span></span><br><span class="line">        Comparator&lt;Integer&gt;comparator2=(o1,o2)-&gt;o1.compareTo(o2);</span><br><span class="line">        <span class="comment">//方法引用  lambda 传fun</span></span><br><span class="line">        Comparator&lt;Integer&gt;comparator3= Integer::compareTo;</span><br><span class="line">Arrays.sort(nums,comparator3);</span><br></pre></td></tr></table></figure></li>
+<li><p>创建进程</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Runnable runnable2=()-&gt; System.out.println(<span class="string">&quot;rrrr2&quot;</span>);</span><br></pre></td></tr></table></figure></li>
+<li><p>lambda优化</p>
+<ol>
+<li><p>去掉形参类型(类型推断)</p>
+<ol>
+<li><p>直接传入o1,而不用在前面加integer</p>
+</li>
+<li><p>int[]nums=new int[]{1,2,3}–&gt;</p>
+<p>int[]nums={1,2,3}</p>
+</li>
+</ol>
+</li>
+<li><p>去掉return和{} 只有一句的情况</p>
+</li>
+<li><p>只有一个参数，可以去掉小括号</p>
+</li>
+</ol>
+</li>
+<li><p>格式</p>
+<ol>
+<li>一个参数没返回:obj=x-&gt;fun(x)</li>
+<li>无参无返回: obj=()-&gt;fun()</li>
+<li>两个参数: obj=(x,y)-&gt;fun(x,y)</li>
+<li>有返回: obj=(x,y)-&gt;{fun(x,y) return}</li>
+</ol>
+</li>
+</ol>
+<h3 id="二、函数式接口"><a href="#二、函数式接口" class="headerlink" title="二、函数式接口"></a>二、函数式接口</h3><ol>
+<li><p>@FuntionalInterface</p>
+</li>
+<li><p>面向函数范式编程(FOP)(SQL)</p>
+</li>
+<li><p>面向接口编程</p>
+</li>
+<li><p><strong>面向过程编程（<code>Procedure Oriented</code>、简称<code>PO</code>）</strong> 和 <strong>面向对象编程（<code>Object Oriented</code>、简称<code>OO</code>）</strong> 我们一定听过，然而实际企业级开发里受用更多的一种编程思想那就是：<strong>面向接口编程（<code>Interface-Oriented</code>）</strong>！</p>
+</li>
+<li><p>四大函数式接口</p>
+<ol>
+<li><p>Consumer<T> </p>
+<p>​    消费型：有参无返回 </p>
+<p>​    void accept(T t)</p>
+</li>
+<li><p>Suppiier<T></p>
+<p>​    供给型：无参有返回</p>
+<p>​    T get()</p>
+</li>
+<li><p>Functional&lt;T,R&gt;</p>
+<p>​    函数型：处理参数</p>
+<p>​    R apply(T t)</p>
+</li>
+<li><p>Prediate<T></p>
+<p>​    断定型：有参判定返回bool</p>
+<p>​    boolean test(T t)</p>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="三、方法引用-构造器引用"><a href="#三、方法引用-构造器引用" class="headerlink" title="三、方法引用 构造器引用"></a>三、方法引用 构造器引用</h3><ol>
+<li><p>当要传递给lambda操作，已经有实现方法，就可以使用方法引用。</p>
+</li>
+<li><p>基于lambda</p>
+</li>
+<li><p>关键：传入的方法的返回类型和参数相同</p>
+</li>
+<li><p>就好像现在不用自己写函数传入Lambda体了，而是有现成的函数，那么直接传入</p>
+<p>类::方法名就ok了。</p>
+</li>
+<li><p>三种情况+一种构造器</p>
+<ol>
+<li>类::非静态方法</li>
+<li>对象::静态方法</li>
+<li>类::非静态方法</li>
+<li>构造器引用<ol>
+<li>类::new</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p>要求：两个函数除了名字不一样，其他都一样</p>
+</li>
+<li><p>细节</p>
+<ol>
+<li>不用写入形参，因为类型与参数推断，且要求两函数是一样的，所以没必要写形参。</li>
+</ol>
+</li>
+</ol>
+<h3 id="四、stream-api-并行计算"><a href="#四、stream-api-并行计算" class="headerlink" title="四、stream api 并行计算"></a>四、stream api 并行计算</h3><ol>
+<li><p>stream:运算 cpu打交道</p>
+<p>Collection:集合  内存打交道</p>
+</li>
+<li><p>类似于SQL语句</p>
+</li>
+<li><p>作用：</p>
+<ol>
+<li>查询数据不能用sql的情况,如nosql需要把查询到的数据在java里面进行处理</li>
+</ol>
+</li>
+<li><p>特点：</p>
+<ol>
+<li>自己不储存(视图)</li>
+<li>不会改变原对象，也就是inplace=False</li>
+<li>操作延迟，直到终止操作才会执行</li>
+</ol>
+</li>
+<li><p>步骤</p>
+<ol>
+<li><p>创建</p>
+<ol>
+<li><p>可迭代对象(即实现迭代接口).stream()</p>
+</li>
+<li><p>并行：parallelstream()</p>
+</li>
+<li><p>Arrays.stream(T[]arr)</p>
+</li>
+<li><p>Stream.of(T..)</p>
+</li>
+<li><p>生成器</p>
+<ol>
+<li><p>```java<br>public static<T> iterate(T t,计算器)<br>//例如 生成偶数流<br>Stream.iterate(0,t-&gt;t+2)</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">   </span><br><span class="line"></span><br><span class="line">2. ```</span><br><span class="line">   //生成随机数流</span><br><span class="line">   Stream.generate(Math::random)</span><br></pre></td></tr></table></figure></li>
+<li></li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p>中间操作{数据处理：}</p>
+<ol>
+<li><p>筛选与切片</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//筛选</span></span><br><span class="line">stream.filter(a-&gt;a&gt;<span class="number">2</span>)</span><br><span class="line"><span class="comment">//跳过 跳过前三个</span></span><br><span class="line">stream.skip(<span class="number">3</span>)</span><br><span class="line"><span class="comment">//截断 前三个</span></span><br><span class="line">stream.limit(<span class="number">3</span>)</span><br><span class="line"><span class="comment">//去重</span></span><br><span class="line">stream.distinct()</span><br></pre></td></tr></table></figure></li>
+<li><p>映射map  (数据转换)</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//转换成大写</span></span><br><span class="line">stream.map(s&gt;s.toUpperCase())</span><br><span class="line"><span class="comment">//选出名字长度大于三的数据</span></span><br><span class="line">stream.map(User::getname).filter(name-&gt;name.leangth&gt;<span class="number">3</span>)</span><br><span class="line"><span class="comment">//摊平</span></span><br><span class="line">stream.flatMap(mapToStream)</span><br><span class="line"><span class="comment">//其中mapToStream能够把stream里面的单个对象转换成stream的函数</span></span><br></pre></td></tr></table></figure></li>
+<li><p>排序</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">stream.sorted((o1,o2)-&gt;o1.value-o2.value)</span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+<li><p>终止操作</p>
+<ol>
+<li><p>匹配查找</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//所有匹配-&gt;bool</span></span><br><span class="line">stream.addMatch(o-&gt;o.age&gt;<span class="number">18</span>)    </span><br><span class="line"><span class="comment">//任意匹配-&gt;bool</span></span><br><span class="line">stream.anyMatch(o-&gt;o.age&gt;<span class="number">18</span>)</span><br><span class="line"><span class="comment">//第一个元素-&gt;Optional&lt;T&gt;</span></span><br><span class="line">stream.fidFirst()</span><br></pre></td></tr></table></figure></li>
+<li><p>其他</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//数量-&gt;long</span></span><br><span class="line">stream.count()</span><br><span class="line"><span class="comment">//最大值-&gt;Optional&lt;T&gt;</span></span><br><span class="line">stream.max((o1,o2)-&gt;o1.value-o2.value)</span><br><span class="line"><span class="comment">//内部迭代</span></span><br><span class="line">stream.foreach(System.out:println)</span><br></pre></td></tr></table></figure></li>
+<li><p>规约 reduce</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//</span></span><br><span class="line">stream.reduce(<span class="number">0</span>,(o1,o2)-&gt;o1+o2)</span><br></pre></td></tr></table></figure></li>
+<li><p>收集collect(Collector c)</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">//list</span><br><span class="line">stream.collect(Collectors.toList())</span><br><span class="line">//set</span><br><span class="line">stream.collect(Collectors.toSet())</span><br><span class="line">//不确定性collection</span><br><span class="line">stream.collect(Collectors.toCollection())</span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="optional类-最大减少空指针异常"><a href="#optional类-最大减少空指针异常" class="headerlink" title="optional类 最大减少空指针异常"></a>optional类 最大减少空指针异常</h3><ol>
+<li><p>of</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//of 不能空    Optional&lt;Student&gt;optionalStudent=Optional.of(student);//of必须非空</span></span><br><span class="line"><span class="comment">//ofNullable 可空，为empty    Optional&lt;Student&gt;optionalStudent2=Optional.ofNullable(student);</span></span><br></pre></td></tr></table></figure></li>
+<li><p>orElse</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">value != <span class="keyword">null</span> ? value : other</span><br></pre></td></tr></table></figure></li>
+<li></li>
+</ol>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><ol>
+<li><p>接口默认方法</p>
+</li>
+<li><p>DateTime api</p>
+</li>
+<li><p>nashorn javascript引擎</p>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>java</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>java-web</title>
+    <url>/2021/09/27/java/java_web/</url>
+    <content><![CDATA[<h3 id="web-网页"><a href="#web-网页" class="headerlink" title="web(网页)"></a>web(网页)</h3><ol>
+<li> 静态web </li>
+<li>html css</li>
+<li>静态文件</li>
+<li>模板引擎</li>
+<li>即所有的数据都不变化</li>
+</ol>
+   <span id="more"></span>
+<ol start="2">
+<li><p>动态web 这个叫javaWeb</p>
+<ol>
+<li>提供给人的数据会根据用户的请求而会变化</li>
+</ol>
+</li>
+<li><p>web的组成</p>
+<ol>
+<li>html css js</li>
+<li>jsp servlet</li>
+<li>java</li>
+<li>jar</li>
+<li>配置文件</li>
+<li>服务器</li>
+</ol>
+</li>
+</ol>
+<h3 id="tomacat"><a href="#tomacat" class="headerlink" title="tomacat"></a>tomacat</h3><ol>
+<li><p>下载</p>
+</li>
+<li><p>日志换成中文乱码解决</p>
+<p>conf/logging.properties:</p>
+<p>encoding = UTF-8–&gt;GBK</p>
+</li>
+<li><p>文件结构</p>
+<ol>
+<li>bin 可执行文件</li>
+<li>conf 配置文件</li>
+<li>lib jar依赖</li>
+<li>log日志</li>
+<li>webapps web项目</li>
+<li>运行时数据</li>
+</ol>
+</li>
+<li><p>配置java_home </p>
+</li>
+<li><p>启动: start-up.bat</p>
+</li>
+<li><p>关闭: shut-down.bat || ctrl+c || 叉掉</p>
+</li>
+<li><p>路径：webapps=localhost:8080</p>
+</li>
+<li><p>tomcat部署web项目的几种方法</p>
+<ol>
+<li><p>直接将web项目放在webapps下</p>
+</li>
+<li><p>简化：将web项目压缩成zip并改后缀为war包，这个war包会自动解压缩</p>
+<p>缺点：每次都要移动文件，无法配置虚拟目录</p>
+</li>
+<li><p>servlet.xml–&gt; &lt;host&gt;&lt;Context docBase:”实际目录” path”虚拟地址”/&gt;&lt;/host&gt;</p>
+<p>缺点：配置servlet.xml不安全。</p>
+</li>
+<li><p>热部署：conf\Catalina\localhost下创建bbb.xml，并添加</p>
+<p>&lt;Context docBase:”path” path”url”/&gt;</p>
+<p>访问bbb就ok</p>
+</li>
+</ol>
+</li>
+<li><p>两个jar</p>
+<ol>
+<li>jsp-api.jar</li>
+<li>servlet-api.jar</li>
+</ol>
+</li>
+</ol>
+<h3 id="javaWeb项目结构"><a href="#javaWeb项目结构" class="headerlink" title="javaWeb项目结构"></a>javaWeb项目结构</h3><ol>
+<li><p>文件结构</p>
+<ol>
+<li>根目录(parent)<ol>
+<li>WEN-INF目录<ol>
+<li>web.xml:web核心配置</li>
+<li>Classes:字节码文件（java编译后）</li>
+<li>lib:依赖jar包</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p>web+idea</p>
+<ol>
+<li><p>启动idea,配置启 添加本地tomcat</p>
+<p>配置</p>
+<ol>
+<li>虚拟目录</li>
+<li>端口</li>
+</ol>
+</li>
+<li><p>添加facet的Web</p>
+<ol>
+<li>配置文件path:web.xml</li>
+<li>资源目录 path:webapp</li>
+</ol>
+</li>
+<li><p>在启动配置的tomcat的部署下方配置上下文以配置路径</p>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="tomcat-其他"><a href="#tomcat-其他" class="headerlink" title="tomcat 其他"></a>tomcat 其他</h3><ol>
+<li>index.html优先级高于jsp</li>
+</ol>
+<h3 id="Servlet"><a href="#Servlet" class="headerlink" title="Servlet"></a>Servlet</h3><ol>
+<li><p>server applet——&gt;运行在服务器的小程序</p>
+</li>
+<li><p>动态资源：java类若要运行在tomcat，那么它就得实现servlet规范(接口)，这样才能被tomcat识别。</p>
+</li>
+<li><p>servlet接口方法</p>
+<ol>
+<li><p>init: serlvet创建的时候运行，只运行一次,不是启动的时候，而是第一次访问的时候。</p>
+</li>
+<li><p>service:提供服务的方法，运行多次</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">访问mapping的</span><br><span class="line">8080+虚拟目录+url-pattern</span><br><span class="line">就会运行该函数</span><br></pre></td></tr></table></figure></li>
+<li><p>getServletInfo：获取serlvet版本信息</p>
+</li>
+<li><p>getServletConfig</p>
+</li>
+<li><p>destroy:正常关闭时运行一次</p>
+</li>
+</ol>
+</li>
+<li><p>配置</p>
+<ol>
+<li><p>servlet.class</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">service</span><span class="params">(ServletRequest ,ServletResponse )</span></span></span><br><span class="line"><span class="function"></span>&#123;System.out.println(<span class="string">&quot;servlet启动&quot;</span>);&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>web.xml</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">servlet</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>serveletName<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span><span class="comment">&lt;!--名字--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">servlet-class</span>&gt;</span>com.wyg.web.servlet.ServletDemo<span class="tag">&lt;/<span class="name">servlet-class</span>&gt;</span><span class="comment">&lt;!--servlet类--&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">servlet</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">servlet-mapping</span>&gt;</span><span class="comment">&lt;!--映射--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>serveletName<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>/demox1<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span><span class="comment">&lt;!--路径--&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">servlet-mapping</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+<li><p>原理步骤</p>
+<ol>
+<li>访问url</li>
+<li>扫描mapping找到对应servlet.name进而找到servlet.class的全限定类名</li>
+<li>反射class.forname(servlet.class).newInstance创建出对象servlet</li>
+<li>调用servlet.service</li>
+</ol>
+</li>
+<li><p>servlet生命周期</p>
+<ol>
+<li><p>被创建加载：init 加载资源</p>
+<p>默认第一次访问url</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">web.xml-&gt;指定启动时加载并赋予优先级，值为2表示可能是依赖其他servlet启动才能启动。</span><br><span class="line">&lt;load-on-startup&gt;2&lt;/load-on-startup&gt;</span><br></pre></td></tr></table></figure></li>
+<li><p>被调用–&gt;service</p>
+</li>
+<li><p>被销毁–&gt;destory 释放资源</p>
+</li>
+</ol>
+</li>
+<li><p>注意:</p>
+<ol>
+<li>servlet是容易并发的对象(单例)，所以尽量不要定义成员变量，确保线程安全。</li>
+<li>url-pattern必须前缀”/“</li>
+</ol>
+</li>
+<li><p>servlet配置项地址：CATALINA_BASE(tomcat启动的时候输出)</p>
+</li>
+<li><p>servlet(&gt;=3.0) 注解型配置</p>
+<ol>
+<li><p>servlet类上加@WebServlet(urlPatterns=”/demo”)</p>
+</li>
+<li><p>urlPatterns可省略</p>
+</li>
+<li><p>可以加入映射数组</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&quot;user/demo&quot;</span><br><span class="line">&quot;user/*&quot; 通配符任意</span><br><span class="line">&quot;/*&quot; 任意，优先级最低</span><br><span class="line">&quot;*.do&quot;任意.do结尾 </span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+</ol>
+<h3 id="servlet体系结构"><a href="#servlet体系结构" class="headerlink" title="servlet体系结构"></a>servlet体系结构</h3><ol>
+<li><p>父子关系：接口Servlet–&gt;抽象GenericServlet–&gt;抽象HttpServlet</p>
+</li>
+<li><p>genericServlet</p>
+<ol>
+<li>其他方法默认空实现</li>
+<li>只需实现service方法</li>
+</ol>
+</li>
+<li><p>httpServlet:</p>
+<ol>
+<li><p>url请求</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">String method=req.<span class="function">getMethod</span></span><br><span class="line"><span class="function"><span class="title">if</span><span class="params">(method.eq(<span class="string">&quot;get&quot;</span>)</span>)...</span></span><br><span class="line"><span class="function"><span class="keyword">else</span>...</span></span><br></pre></td></tr></table></figure></li>
+<li><p>这样每次都判断很麻烦，所以httpServlet对它进行了一个封装，只需重写doGet/doPost方法</p>
+</li>
+<li><p>默认deGet方法</p>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="Http"><a href="#Http" class="headerlink" title="Http"></a>Http</h3><ol>
+<li><p>Hyper Text Transfer Protocol 超文本传输协议，客户端&lt;—&gt;服务端 数据交换格式</p>
+<ol>
+<li> 基于TCP/IP的高级协议</li>
+<li>默认端口80</li>
+<li>一次请求对应一次响应</li>
+<li>无状态，每个请求独立，不能数据交换</li>
+<li>各个版本<ol>
+<li>1.0 每个请求都要一次建立连接，断开连接</li>
+<li>1.1 请求复用，请求完等一会，等其他的请求复用这个连接</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p>请求消息格式</p>
+<ol>
+<li><p>请求行</p>
+<ol>
+<li><p>组成请求方式 请求url 请求协议</p>
+</li>
+<li><p>GET /login.html HTTP/1.1</p>
+</li>
+<li><p>请求方式</p>
+<ol>
+<li>Get：请求参数在请求行中,url有限制，不安全（参数可见）</li>
+<li>Post: 请求参数在请求体中，url可无限大，安全。</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p>请求头</p>
+<p>k:v</p>
+<p>请求名称：请求头值</p>
+<p>get:</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211003214231021.png" alt="image-20211003214231021"></p>
+<p>post:</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211003214506976.png" alt="image-20211003214506976"></p>
+<p>user-agent：浏览器版本信息（解决浏览器兼容）。</p>
+<p>accept:可接受的文件格式</p>
+<p>referer: 告诉服务器我从哪里来，</p>
+<ol>
+<li>防盗链，防止别人盗取链接。</li>
+<li>访问统计。</li>
+<li>如果直接访问而不是通过连接访问，那么这个值就是null</li>
+</ol>
+<p>connection: keep-live 1.1版本的请求复用</p>
+</li>
+<li><p>请求空行，分割请求体和请求头的</p>
+</li>
+<li><p>请求体(正文,post才有)，封装post请求参数的</p>
+</li>
+</ol>
+</li>
+<li><p>响应消息格式</p>
+</li>
+<li><p>url:统一资源定位符:<a href="http://localhost:8080/d2%E4%B8%AD%E5%8D%8E%E4%BA%BA%E6%B0%91%E5%85%B1%E5%92%8C%E5%9B%BD">http://localhost:8080/d2中华人民共和国</a></p>
+<p>uri:统一资源标识符:/d2 共和国</p>
+</li>
+</ol>
+<h3 id="Request-Response原理："><a href="#Request-Response原理：" class="headerlink" title="Request,Response原理："></a>Request,Response原理：</h3><ol>
+<li><p>一次请求响应步骤</p>
+<ol>
+<li>tomcat会根据请求url的路径创建servlet对象</li>
+<li>tomcat创建Request和Response对象，并且request封装请求消息数据</li>
+<li>tomcat将request和response两个对象传给service，并调用service方法</li>
+<li>service根据request获取请求消息，使用response设置响应消息</li>
+<li>服务器再给浏览器响应之前，会从response获取响应消息</li>
+</ol>
+</li>
+<li><p>Request功能</p>
+<ol>
+<li><p>获取请求消息</p>
+<ol>
+<li><p>获取请求行</p>
+<p>GET /login.html HTTP/1.1</p>
+<ol>
+<li><p>获取虚拟目录</p>
+<p>String getContextPath</p>
+</li>
+<li><p>获取请求URL</p>
+<p>getRequestURL </p>
+<p><a href="http://localhost:8080/d2">http://localhost:8080/d2</a></p>
+</li>
+<li><p>获取请求URI</p>
+<p>getRequestURI</p>
+<p>d2</p>
+</li>
+<li><p>获取请求方式：</p>
+<p>String getMethod</p>
+<p>GET</p>
+</li>
+<li><p>获取请求参数</p>
+<p>String getQueryString</p>
+<p>username=aaa</p>
+</li>
+<li><p>获取Servlet路径</p>
+<p>getServletPath</p>
+<p>/d2</p>
+</li>
+<li><p>获取Ip地址</p>
+<p>getRemoteAddr</p>
+<p>0:0:0:0:0:0:0:1</p>
+</li>
+</ol>
+</li>
+<li><p>获取请求头数据</p>
+<ol>
+<li><p>通过请求头获取请求头值</p>
+<p>getHeader(string name)</p>
+</li>
+<li><p>获取所有请求头名称</p>
+<p>Enumeration getHeaderNames</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211003223205963.png" alt="image-20211003223205963"></p>
+</li>
+</ol>
+</li>
+<li><p>获取请求体信息(只有Post才有)</p>
+<ol>
+<li><p>获取字符流/字节流</p>
+<p>getReader/getInputStream</p>
+</li>
+<li><p>从流中解析得数据</p>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p>其他功能</p>
+<ol>
+<li><p>获取请求参数通用方式(无论get/post，优点：方法统一)</p>
+<ol>
+<li><p>根据参数名称获取参数值</p>
+<p>getParameter(string name)</p>
+</li>
+<li><p>根据参数名称获取数组getParameterValues(string name)</p>
+</li>
+<li><p>获取所有参数名称</p>
+<p>getParamaterNames</p>
+</li>
+<li><p>获取参数map集合</p>
+<p>getParameterMap</p>
+</li>
+</ol>
+</li>
+<li><p>请求转发</p>
+</li>
+<li><p>共享数据</p>
+</li>
+<li><p>获取ServletContext</p>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="Request体系结构"><a href="#Request体系结构" class="headerlink" title="Request体系结构"></a>Request体系结构</h3><ol>
+<li><p>接口ServletRequest—&gt;接口HttpServletRequest</p>
+</li>
+<li><p>实现类</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">request:</span><br><span class="line">org.apache.catalina.connector.RequestFacade@121102ad</span><br><span class="line">response:</span><br><span class="line">org.apache.catalina.connector.ResponseFacade@21fac426</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="cookie"><a href="#cookie" class="headerlink" title="cookie"></a>cookie</h3><h3 id="session"><a href="#session" class="headerlink" title="session"></a>session</h3>]]></content>
+      <categories>
+        <category>java</category>
+        <category>javaWeb</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>jvm</title>
+    <url>/2021/09/28/java/jvm/</url>
+    <content><![CDATA[<h3 id=""><a href="#" class="headerlink" title=""></a></h3><ol>
+<li>OOM，栈溢出</li>
+<li>jvm常用调优</li>
+<li>内存快照</li>
+<li>怎么分析dump文件</li>
+<li>类加载器</li>
+<li>jar包</li>
+<li></li>
+</ol>
+<span id="more"></span>
+
+<h3 id="-1"><a href="#-1" class="headerlink" title=""></a></h3><ol>
+<li>对jvm理解<ol>
+<li>javac a.java –&gt;java.class–&gt;类加载器—-&gt;运行区–<ol>
+<li>方法区 垃圾回收</li>
+<li>java栈</li>
+<li>本地方法栈&lt;—本地方法接口&lt;–本地方法库</li>
+<li>native method</li>
+<li>堆heap 垃圾回收</li>
+<li>程序技术器pc</li>
+<li></li>
+</ol>
+</li>
+<li>jvm位置<ol>
+<li>硬件体系(intel)–&gt;操作系统(win)–&gt;jre（jvm）–&gt;java</li>
+</ol>
+</li>
+<li>jvm结构</li>
+</ol>
+</li>
+<li>类加载器<ol>
+<li>class是模板，抽象的，object是实体，具象的</li>
+<li>作用:加载class文件</li>
+<li>a.class–&gt;jvm–&gt;new-&gt;实例</li>
+</ol>
+</li>
+<li>双亲委派模式</li>
+<li>沙箱安全模式</li>
+<li>native</li>
+<li>方法去</li>
+<li>pc寄存器</li>
+<li>栈</li>
+<li>方法区</li>
+<li>三种jvm</li>
+<li>堆</li>
+<li>新生区，老年区，用就去</li>
+<li>GC算法</li>
+<li></li>
+</ol>
+]]></content>
+      <categories>
+        <category>java</category>
+        <category>java高阶</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>spring解析</title>
+    <url>/2021/09/22/java/spring/</url>
+    <content><![CDATA[<h2 id="3、IOC-控制反转"><a href="#3、IOC-控制反转" class="headerlink" title="3、IOC(控制反转)"></a>3、IOC(控制反转)</h2><ol>
+<li><p>平常</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Person s=<span class="keyword">new</span> Person();<span class="comment">//耦合度太高</span></span><br></pre></td></tr></table></figure></li>
+<li><p>现在：引入Ioc，将创建对象的控制权交给spring的ioc，如果需要使用，就用DI(依赖注入)@Autowired.</p>
+</li>
+</ol>
+<span id="more"></span>
+
+<ol>
+<li><p>优点：集中管理对象，方便维护，降低了耦合度。</p>
+</li>
+<li><p>IOC和DI区别</p>
+<ol>
+<li>ioc控制了对象创建的权力。</li>
+<li>di是ioc的实现的一步骤。</li>
+</ol>
+</li>
+<li><p>配置bean的方法，bean是ioc创建的对象</p>
+<ol>
+<li>xml.&lt;bean class:path&gt;</li>
+<li>注解@Component(@Controller,@Service,@Repostory)</li>
+<li>javaConfig:@Configtursion+@Bean，这像是自己实现的ioc，更灵活。</li>
+<li>@import</li>
+</ol>
+</li>
+<li><p>ioc实现机制</p>
+<ol>
+<li>简单工厂+反射</li>
+<li>code:beanfactory.getBean+(强制类型转换+Class.forName) </li>
+<li>xml配置：&lt;bean class:path&gt;</li>
+</ol>
+</li>
+<li><p>ioc实现原理DI技术–&gt;map.put(name,new)</p>
+</li>
+<li><p>ioc扩展点</p>
+<ol>
+<li>ioc</li>
+</ol>
+</li>
+<li><p>ioc创建Bean</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;bean id=&quot;aa&quot; class=&quot;com.example.spring_tech.entity.user&quot;&gt;</span><br><span class="line">&lt;property name=&quot;age&quot;value=&quot;11222&quot;&gt;&lt;/property&gt;</span><br><span class="line">    &lt;/bean&gt;</span><br></pre></td></tr></table></figure></li>
+<li><p>哪些类放入ioc</p>
+<ol>
+<li>放入：工具类，dao,service,controller</li>
+<li>不放人：实体类，servlet,listener,filter</li>
+</ol>
+</li>
+<li><p>放入ioc方法</p>
+<ol>
+<li>xml &lt;bean&gt;</li>
+<li>注解</li>
+</ol>
+</li>
+<li><p>ioc的对象是创建ioc的时候一起同时创建的，不是启动时创建的，也不是使用的时候创建的。</p>
+</li>
+<li><p>属性</p>
+<ol>
+<li>set +&lt;properity name value&gt;</li>
+<li>set+&lt;properity name ref&gt;</li>
+<li>构造注入：&lt;constructor-arg&gt;+inde</li>
+</ol>
+</li>
+</ol>
+<h3 id="4、紧耦合-松耦合-DIP"><a href="#4、紧耦合-松耦合-DIP" class="headerlink" title="4、紧耦合 松耦合(DIP)"></a>4、紧耦合 松耦合(DIP)</h3><ol>
+<li>紧耦合：类之间的高度依赖</li>
+<li>松耦合：单一职责原则–&gt;接口分离原则–&gt;依赖倒置原则。</li>
+</ol>
+<h3 id="Bean"><a href="#Bean" class="headerlink" title="Bean"></a>Bean</h3><ol>
+<li>java bean 和spring bean的区别<ol>
+<li>由spring ioc实例化，管理的对象叫做bean.</li>
+<li>s</li>
+<li>java bean 是new出来的</li>
+</ol>
+</li>
+</ol>
+<h3 id="spring使用步骤"><a href="#spring使用步骤" class="headerlink" title="spring使用步骤"></a>spring使用步骤</h3><ol>
+<li>依赖denpendcy</li>
+<li>创建类，dao,service,controller</li>
+<li>创建配置文件<bean></li>
+<li>创建容器对象ClassPathXmlAppicationContext.getBean()</li>
+</ol>
+<h3 id="AOP（基于jdk动态代理）"><a href="#AOP（基于jdk动态代理）" class="headerlink" title="AOP（基于jdk动态代理）"></a>AOP（基于jdk动态代理）</h3><h4 id="动态代理"><a href="#动态代理" class="headerlink" title="动态代理"></a>动态代理</h4><ol>
+<li><p>作用：创建对象，不改变类的情况下实现功能增强。</p>
+</li>
+<li><p>两种实现方式：</p>
+<ol>
+<li>JDK<ol>
+<li>要求目标类有接口</li>
+<li>若没有接口。可用CGlib，</li>
+</ol>
+</li>
+<li>Proxy</li>
+</ol>
+<h4 id="AOP"><a href="#AOP" class="headerlink" title="AOP"></a>AOP</h4><p>aop就是将动态代理规范化，约定大于配置。</p>
+<ol>
+<li><p> 四要素</p>
+</li>
+<li><p>aspect:切面，增强的功能的代码。</p>
+<p>三要素：</p>
+<ol>
+<li>功能代码函数def doLog()</li>
+<li>代码位置(切入点)，一般就是业务代码函数。execution(path.def)</li>
+<li>执行时间（before/after）</li>
+</ol>
+</li>
+<li><p>joinpoint:连接点，业务代码。</p>
+</li>
+<li><p>pointCut切入点,连接点的结合</p>
+</li>
+<li><p>advice 通知，表示切面功能执行的时间</p>
+</li>
+<li><p>aop实现</p>
+<ol>
+<li>spring,事务处理常用aop（代码多，不常用）</li>
+<li>aspectJ:专业aop框架。spring集成了这个框架。<ol>
+<li>xml实现：用于事务</li>
+<li>注解实现：常见环境下都用注解。<ol>
+<li>@Before</li>
+<li>@AfterReturn</li>
+<li>@Around</li>
+<li>@AfterThrowing</li>
+<li>@After</li>
+</ol>
+</li>
+<li>切入点表达式execution(public pString]* [com.wyg.user.]getName(..)* exception)</li>
+<li>步骤:<ol>
+<li>加入依赖spring,aspect</li>
+<li>创建目标类(接口，实现)</li>
+<li>创建切面类<ol>
+<li>加如@aspect</li>
+<li>定义增强功能方法，并在方法上加入注解</li>
+</ol>
+</li>
+<li>创建spring配置文件：声明对象，交予ioc管理  加入aop标志生成代理类<a href="aop:aspectj-autoproxy/">aop:aspectj-autoproxy/</a>。</li>
+<li>xml配最后的<strong>自动代理生成器</strong>标志还是牵线人进行切面类和目标类.业务函数的联系。</li>
+</ol>
+</li>
+<li>execution简化<ol>
+<li>去掉public</li>
+<li>用*..</li>
+<li>..代替arg</li>
+<li>do*代替业务函数</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<h4 id="集成mybatis"><a href="#集成mybatis" class="headerlink" title="集成mybatis"></a>集成mybatis</h4><ol>
+<li><p>mybatis步骤</p>
+<ol>
+<li><p>创建对象dao</p>
+</li>
+<li><p>mapper.xml</p>
+</li>
+<li><p>创建代理</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//创建工厂</span></span><br><span class="line"><span class="comment">//xml实现</span></span><br><span class="line">String resource = <span class="string">&quot;org/mybatis/example/mybatis-config.xml&quot;</span>;</span><br><span class="line">InputStream inputStream = Resources.getResourceAsStream(resource);</span><br><span class="line">SqlSessionFactory sqlSessionFactory = <span class="keyword">new</span> SqlSessionFactoryBuilder().build(inputStream);</span><br><span class="line"></span><br><span class="line"><span class="comment">//java实现</span></span><br><span class="line">DataSource dataSource = BlogDataSourceFactory.getBlogDataSource();</span><br><span class="line">TransactionFactory transactionFactory = <span class="keyword">new</span> JdbcTransactionFactory();</span><br><span class="line">Environment environment = <span class="keyword">new</span> Environment(<span class="string">&quot;development&quot;</span>, transactionFactory, dataSource);</span><br><span class="line">Configuration configuration = <span class="keyword">new</span> Configuration(environment);</span><br><span class="line">configuration.addMapper(BlogMapper.class);</span><br><span class="line">SqlSessionFactory sqlSessionFactory = <span class="keyword">new</span> SqlSessionFactoryBuilder().build(configuration);</span><br><span class="line"></span><br><span class="line"><span class="comment">//获取sqlsession</span></span><br><span class="line">SqlSession session = sqlSessionFactory.openSession()</span><br><span class="line"><span class="comment">//创建mapper实例</span></span><br><span class="line">UserMapper mapper = session.getMapper(UserMapper.class);</span><br></pre></td></tr></table></figure></li>
+<li><p>mybatis步骤</p>
+<ol>
+<li><p>依赖mysql-connector-java mybatis</p>
+</li>
+<li><p>mybatis.config.xml </p>
+<ol>
+<li>&lt;dataSource&gt;&lt;driver,url,username,password&gt;</li>
+<li>&lt;mappers&gt;&lt;mapper resource=”com.wyg.mapper.*.xml”&gt;</li>
+</ol>
+</li>
+<li><p>mapper.xml—-&gt;&lt;select,insert&gt;</p>
+</li>
+<li><p>javaTest</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="number">1.</span>创建文件流</span><br><span class="line">in=org.apache.ibatis.io.Resources.getResourceAsStream(<span class="string">&quot;.xml&quot;</span>);</span><br><span class="line"><span class="number">2.</span>创建工厂</span><br><span class="line">SqlSessionFactory factory=<span class="keyword">new</span> SqlSessionFactoryBuilder().build(in);</span><br><span class="line"><span class="number">3.</span>创建session</span><br><span class="line">SqlSession sqlsession=factory.openSession();</span><br><span class="line"><span class="number">4.</span>创建mapper</span><br><span class="line">UserMapper userMapper=sqlSession.getMapper(UserMapper.class);</span><br><span class="line"><span class="number">5.</span>调用mapper</span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>spring</category>
+        <category>java</category>
+        <category>javaWeb</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>设计模式</title>
+    <url>/2021/09/24/java/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/</url>
+    <content><![CDATA[<h3 id="单例模式"><a href="#单例模式" class="headerlink" title="单例模式"></a>单例模式</h3><ul>
+<li>单例类只能有一个实例。</li>
+<li>单例类必须自己创建自己的唯一实例。</li>
+<li>单例类必须给所有其他对象提供这一实例。</li>
+</ul>
+<span id="more"></span>
+
+<p>实例：</p>
+<p>​    Windows 是多进程多线程的，在操作一个文件的时候，就不可避免地出现多个进程或线程同时操作一个文件的现象，所以所有文件的处理必须通过唯一的实例来进行。</p>
+<p>特点：</p>
+<ol>
+<li>私有构造器。</li>
+<li>占用内存低（懒汉式）（饿汉式直接创建可能浪费内存）懒汉式线程不安全，但是加锁后可以避免（双重检测锁，voliate）。</li>
+<li>但是强大，霸道的反射依然会造成线程不安全。三重检测。（）</li>
+</ol>
+]]></content>
+      <categories>
+        <category>java</category>
+        <category>设计规范</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>反射</title>
+    <url>/2021/09/22/java/%E5%8F%8D%E5%B0%84%E5%92%8C%E6%B3%A8%E8%A7%A3/</url>
+    <content><![CDATA[<h3 id=""><a href="#" class="headerlink" title=""></a></h3><h3 id="-1"><a href="#-1" class="headerlink" title=""></a></h3><p>test</p>
+]]></content>
+      <categories>
+        <category>java</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>springBoot</title>
+    <url>/2021/09/29/java/springBoot/</url>
+    <content><![CDATA[<h3 id="spring-boot-starter"><a href="#spring-boot-starter" class="headerlink" title="spring-boot-starter"></a>spring-boot-starter</h3><ol>
+<li>可以认为starter是一种服务（和JS的插件类似）——使得使用某个功能的开发者不需要关注各种依赖库的处理，不需要具体的配置信息，由Spring Boot自动通过classpath路径下的类发现需要的Bean，并织入bean</li>
+</ol>
+<span id="more"></span>]]></content>
+      <categories>
+        <category>java</category>
+        <category>spring</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>puppeteer使用</title>
+    <url>/2021/10/01/utils/puppeteer/</url>
+    <content><![CDATA[<h1 id="Puppeteer的使用"><a href="#Puppeteer的使用" class="headerlink" title="Puppeteer的使用"></a>Puppeteer的使用</h1><h3 id="爬虫"><a href="#爬虫" class="headerlink" title="爬虫"></a>爬虫</h3><h5 id="python"><a href="#python" class="headerlink" title="python"></a>python</h5><ol>
+<li><p>urllib+requests——Beautifulsoup+lxml—&gt;数据</p>
+</li>
+<li><p>scrapy  :抓取+解析</p>
+<span id="more"></span></li>
+</ol>
+<h5 id="puppeteer"><a href="#puppeteer" class="headerlink" title="puppeteer"></a>puppeteer</h5><ol>
+<li><p>s</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm init</span><br><span class="line">npm i puppeteer</span><br></pre></td></tr></table></figure></li>
+<li><p>seletor</p>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>utils</category>
+        <category>爬虫</category>
+      </categories>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2021/09/29/project/springboot_%E7%A7%92%E6%9D%80%E7%B3%BB%E7%BB%9F/</url>
+    <content><![CDATA[<h3 id="技术介绍"><a href="#技术介绍" class="headerlink" title="技术介绍"></a>技术介绍</h3><ol>
+<li>秒杀 两个问题：并发读，并发写。防止最坏的情况发生。<ol>
+<li>稳  高可用 最坏情况planb</li>
+<li>准  一致性</li>
+<li>快  高性能， 效率</li>
+</ol>
+</li>
+<li> <img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20210930003833352.png" alt="image-20210930003833352"></li>
+<li><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20210930003801073.png" alt="image-20210930003800497"></li>
+<li><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20210930003852477.png" alt="image-20210930003852477"></li>
+<li></li>
+</ol>
+]]></content>
+  </entry>
+  <entry>
+    <title>hexo使用</title>
+    <url>/2021/09/30/utils/blog/</url>
+    <content><![CDATA[<p>搭建个人博客</p>
+<ol>
+<li><p>下载node.js</p>
+</li>
+<li><p>npm下载cnpm</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm install -g cnpm  --registry=https://registry.npm.taobao.org</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span></li>
+<li><p>下载hexo </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cnpm install -g hexo-cli</span><br></pre></td></tr></table></figure></li>
+<li><p>创建目录</p>
+</li>
+<li><p>hexo初始化blog 和deployer</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cd blog</span><br><span class="line">hexo init</span><br><span class="line">npm install hexo-deployer-git --save</span><br><span class="line">npm i hexo-renderer-swig</span><br></pre></td></tr></table></figure>
+
+<p>或者</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone https://gitee.com/weilining/hexo-starter.git blog</span><br><span class="line">cd blog</span><br><span class="line">git submodule init</span><br><span class="line">git submodule update</span><br><span class="line">npm config set registry http://registry.npm.taobao.org</span><br><span class="line">npm i</span><br><span class="line">npm install hexo-deployer-git --save</span><br></pre></td></tr></table></figure></li>
+<li><p>hexo g 生成静态文件</p>
+</li>
+<li><p>启动(localhost:4000)</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">hexo s -p 400 </span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="操作"><a href="#操作" class="headerlink" title="操作"></a>操作</h3><ol>
+<li><p>创建文章</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&quot;文章&quot;</span><br></pre></td></tr></table></figure></li>
+<li><p>生成静态文件</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">hexo g</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="通过github搭建"><a href="#通过github搭建" class="headerlink" title="通过github搭建"></a>通过github搭建</h3><ol>
+<li><p>创建public仓库 name/name.github.io    </p>
+</li>
+<li><p>下载插件</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cnpm install --save hexo-deployer-git</span><br></pre></td></tr></table></figure></li>
+<li><p>修改config.yml</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">deploy:</span><br><span class="line">  type: git</span><br><span class="line">  repo: https://github.com/Wang-yonggan/Wang-yonggan.github.io.git</span><br><span class="line">  branch: master</span><br></pre></td></tr></table></figure></li>
+<li><p>分类：</p>
+<ol>
+<li>```<br>hexo new page categories<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">   2.  index.md加入type: categories</span><br><span class="line"></span><br><span class="line">5. hexo clean &amp;&amp; hexo g &amp;&amp; hexo s</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">### 主题</span><br><span class="line"></span><br><span class="line">1. git clone ..  themes/name</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+git clone <a href="https://github.com/litten/hexo-theme-yilia.git">https://github.com/litten/hexo-theme-yilia.git</a> themes/yilia</li>
+</ol>
+<p>git clone <a href="https://github.com/theme-next/hexo-theme-next">https://github.com/theme-next/hexo-theme-next</a> themes/next</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">   </span><br><span class="line"></span><br><span class="line">2. vim config.yml</span><br><span class="line"></span><br><span class="line">   theme:name</span><br><span class="line"></span><br><span class="line">3. hexo clean</span><br><span class="line"></span><br><span class="line">### config.yml</span><br><span class="line"></span><br><span class="line">1. webset</span><br><span class="line">   1. title 标题</span><br><span class="line">   2. subtitle 副标题</span><br><span class="line">   3. description 网站描述 seo</span><br><span class="line">   4. author 作者</span><br><span class="line">   5. language 语言</span><br><span class="line">   6. timezone 时区</span><br><span class="line"></span><br><span class="line">2. URL</span><br><span class="line"></span><br><span class="line">   url：网站的网址</span><br><span class="line">   root：网站的根目录</span><br><span class="line">   permalink：文章的永久链接格式，可以在permalink这里配置，如默认中的配置，在hello world文章中就会是这样的url</span><br><span class="line"></span><br><span class="line">3. directory</span><br><span class="line">   1. source_dir：存放hexo文章的文件夹，我们写的md文件都放在这个配置对应的文件夹下，默认值是source</span><br><span class="line">   2. public_dir：存放hexo g生成的文件，执行hexo g后根目录就会出现这个文件夹，默认值是public</span><br><span class="line">   3. tag_dir：按标签存放文章的目录，默认值是tags，如果我们给文章添加标签，使用hexo g时public文件夹下就会多出一个tags文件夹（根据我们的配置文件夹名不同），这里给hello-world.md添加一个tags</span><br><span class="line">   4. archive_dir：归档文件夹，存放归档文件，默认值为archives</span><br><span class="line">   5. category_dir：分类文件夹，按分类存放的文件，和上面的tags一样，只要在文章中的Font-matter添加了categories就会在使用hexo g构造时出现相应的文件夹</span><br><span class="line">   6. code_dir：Include code 文件夹，source_dir 下的子目录，默认值为downloads/code</span><br><span class="line">   7. i18n_dir：国际化（i18n）文件夹，默认值:lang</span><br><span class="line">   8. skip_render：跳过指定文件的渲染，匹配到的文件将会被不做改动复制到public文件夹下，如果路径对应的是我们的文章，那会直接忽略掉该文章，我们这样设置来忽略掉hello-world.md文件</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">### issue</span><br><span class="line"></span><br><span class="line">1. 下载主题没有显示：</span><br><span class="line">   1. 文件夹名问题</span><br><span class="line">   2. config未该</span><br><span class="line">   3. 没有clean+g+d</span><br><span class="line">   4. gitee没有更行部署</span><br><span class="line">   </span><br><span class="line">2. 部署其他文件夹</span><br><span class="line"></span><br><span class="line">   1. 每次hexo d之前copy 文件到posts，但是我发现文件的创建时间被改变了</span><br><span class="line"></span><br><span class="line">   2. 将hexo的source文件路径改为ana-notes，但是这样没办法生成目录</span><br><span class="line"></span><br><span class="line">   3. 最终选择copy+python修改文件创建时间的方式 </span><br><span class="line"></span><br><span class="line">      具体bat代码</span><br><span class="line"></span><br><span class="line">      ````</span><br><span class="line">      echo 清空posts文件夹</span><br><span class="line">      rd /s /q %post_path%</span><br><span class="line">      md %post_path%</span><br><span class="line">      echo 递归copy文件</span><br><span class="line">      xcopy /y /e %src_path% %post_path%</span><br><span class="line">      echo 还原时间</span><br><span class="line">      python E:\data-ana\ana-notes\工具\tools\get_blog_create_time.py</span><br><span class="line">      echo 提交</span><br><span class="line">      hexo clean &amp;&amp; hexo g &amp;&amp; hexo d</span><br><span class="line">      ````</span><br><span class="line"></span><br><span class="line">      </span><br><span class="line"></span><br><span class="line">3. 修改config.yml后报错：yml格式是:后面有空格</span><br><span class="line"></span><br><span class="line">4. 实现gitee page自动提交：</span><br><span class="line"></span><br><span class="line">   nodejs+puppeteer(xpath)</span><br><span class="line">   </span><br><span class="line">5. 注意，特殊字符尽量不用</span><br><span class="line"></span><br><span class="line">   1. 小括号</span><br><span class="line">   2. 大括号</span><br><span class="line">   3. 中括号</span><br><span class="line">   </span><br><span class="line">6. git config --global core.autocrlf false换行转义</span><br><span class="line"></span><br><span class="line">### config</span><br><span class="line"></span><br><span class="line">1. 切换中文language</span><br><span class="line"></span><br><span class="line">   zh-CN</span><br><span class="line"></span><br><span class="line">### next&lt;-landscape</span><br><span class="line"></span><br><span class="line">0. http://theme-next.iissnan.com/</span><br><span class="line"></span><br><span class="line">1. 更换主题</span><br><span class="line"></span><br><span class="line">   config--&gt;schemes</span><br><span class="line"></span><br><span class="line">2. 设置头像avater</span><br><span class="line"></span><br><span class="line">3. 社交图标</span><br><span class="line"></span><br><span class="line">   social_icons</span><br><span class="line"></span><br><span class="line">   https://fontawesome.com/v5.15/icons?d=gallery&amp;p=2</span><br><span class="line"></span><br><span class="line">4. 首页全文</span><br><span class="line"></span><br><span class="line">   auto_excerpt</span><br><span class="line"></span><br><span class="line">   &lt;!--more--&gt;</span><br><span class="line"></span><br><span class="line">5. 网站图标</span><br><span class="line"></span><br><span class="line">   ```python</span><br><span class="line">   favicon:aaaa.avg</span><br><span class="line">   source/image/aaaa.avg</span><br></pre></td></tr></table></figure></li>
+<li><p>背景</p>
+<p>canvas</p>
+</li>
+<li><p>加载进度条 pace</p>
+</li>
+<li><p>读进度条：scrollpercent</p>
+</li>
+<li><p>评论</p>
+<p>changyan</p>
+</li>
+<li><p>搜索</p>
+</li>
+</ol>
+   <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm install hexo-generator-searchdb --save</span><br><span class="line"></span><br><span class="line">hexo-config</span><br><span class="line">search:</span><br><span class="line">  path: search.xml</span><br><span class="line">  field: post</span><br><span class="line">  format: html</span><br><span class="line">  limit: 10000</span><br><span class="line">config</span><br><span class="line">local_search:</span><br></pre></td></tr></table></figure>
+
+<ol start="11">
+<li><p>不算子（访问次数）：busuanzi_count</p>
+</li>
+<li><p>隐藏底盘</p>
+<p>​    footer false</p>
+</li>
+<li><p>修改字体大小</p>
+<p>打开<code>\themes\next\source\css\ _variables\base.styl</code>文件，将<code>$font-size-base</code>改成<code>16px</code>，如下所示：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$font-size-base            =16px</span><br></pre></td></tr></table></figure></li>
+<li><p>夜间模式darkmode</p>
+</li>
+<li><p>网站丝滑motion true</p>
+</li>
+</ol>
+<h3 id="plugin"><a href="#plugin" class="headerlink" title="plugin"></a>plugin</h3><ol>
+<li><p>代码高亮</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm install hexo-prism-plugin --save</span><br></pre></td></tr></table></figure></li>
+<li><p>字数统计</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm i –save hexo-wordcount</span><br></pre></td></tr></table></figure></li>
+<li><p>搜索</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">npm install hexo-generator-searchdb --save</span><br></pre></td></tr></table></figure>
+
+<p>hexo.config</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">search:</span><br><span class="line">  path: search.xml</span><br><span class="line">  field: post</span><br><span class="line">  format: html</span><br><span class="line">  <span class="built_in">limit</span>: 10000</span><br></pre></td></tr></table></figure>
+
+<p>theme.config</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">local_search:</span><br></pre></td></tr></table></figure></li>
+<li></li>
+</ol>
+]]></content>
+      <categories>
+        <category>utils</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>xpat使用</title>
+    <url>/2021/10/03/utils/xpath/</url>
+    <content><![CDATA[<h3 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h3><ol>
+<li><p>层级 /直接子集() // 跳跃层级(递归)</p>
+</li>
+<li><p>属性 @</p>
+<ol>
+<li><p>class</p>
+</li>
+<li><p>id</p>
+</li>
+<li><p>property</p>
+</li>
+<li><p>//article//a/@href</p>
+<span id="more"></span></li>
+</ol>
+</li>
+<li><p>函数</p>
+<ol>
+<li><p>contain</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">\\div[contain(@class, &quot;classnameContain&quot;)]</span><br></pre></td></tr></table></figure></li>
+<li><p>text</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">http://books.toscrape.com/catalogue/category/books_1/index.html</span><br><span class="line">//ul[@class=&quot;nav nav-list&quot;]//ul//a/text()</span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+</ol>
+<h3 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h3><p>1. </p>
+]]></content>
+      <categories>
+        <category>utils</category>
+      </categories>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2021/09/29/springlearn/gs-rest-service/complete/manifest/</url>
+    <content><![CDATA[{"applications":[{"name":"gs-rest-service","memory":"256M","instances":1,"host":"rest-service","domain":"guides.spring.io","path":"build/libs/gs-rest-service-0.1.0.jar"}]}]]></content>
+  </entry>
+</search>
