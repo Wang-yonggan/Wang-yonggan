@@ -2,17 +2,12 @@
 <search>
   <entry>
     <title></title>
-    <url>/2021/09/17/db/mysql_base/</url>
-    <content><![CDATA[]]></content>
-  </entry>
-  <entry>
-    <title></title>
     <url>/2021/09/17/db/mysql_base_sql/</url>
     <content><![CDATA[]]></content>
   </entry>
   <entry>
     <title></title>
-    <url>/2021/09/17/db/mysql_other/</url>
+    <url>/2021/09/17/db/mysql_base/</url>
     <content><![CDATA[]]></content>
   </entry>
   <entry>
@@ -22,17 +17,22 @@
   </entry>
   <entry>
     <title></title>
+    <url>/2021/09/17/db/mysql_other/</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title></title>
     <url>/2021/09/17/db/redis/</url>
     <content><![CDATA[]]></content>
   </entry>
   <entry>
     <title></title>
-    <url>/2021/09/17/distribute/hadoop/</url>
+    <url>/2021/09/17/distribute/spark/</url>
     <content><![CDATA[]]></content>
   </entry>
   <entry>
     <title></title>
-    <url>/2021/09/17/distribute/spark/</url>
+    <url>/2021/09/17/distribute/hadoop/</url>
     <content><![CDATA[]]></content>
   </entry>
   <entry>
@@ -47,7 +47,7 @@
   </entry>
   <entry>
     <title></title>
-    <url>/2021/09/17/java/webBack/spring/</url>
+    <url>/2021/09/17/java/webBack/springBoot/</url>
     <content><![CDATA[]]></content>
   </entry>
   <entry>
@@ -57,7 +57,7 @@
   </entry>
   <entry>
     <title></title>
-    <url>/2021/09/17/java/webBack/springBoot/</url>
+    <url>/2021/09/17/java/webBack/spring/</url>
     <content><![CDATA[]]></content>
   </entry>
   <entry>
@@ -160,6 +160,79 @@
       <categories>
         <category>数据库</category>
         <category>mysql</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>hadoop的启动</title>
+    <url>/2021/09/10/distribute/hadoop%E5%90%AF%E5%8A%A8/</url>
+    <content><![CDATA[<h2 id="一、-基本环境"><a href="#一、-基本环境" class="headerlink" title="一、 基本环境"></a>一、 基本环境</h2><ol>
+<li><p>获取主机名字 master、s1、s2</p>
+</li>
+<li><p>时钟同步</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">/usr/sbin/ntpdate cn.pool.ntp.org</span><br></pre></td></tr></table></figure></li>
+<li><p>关闭防火墙</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">systemctl stop firewalld.service</span><br></pre></td></tr></table></figure></li>
+<li><p>编辑host 以对应ping 如：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">10.42.0.93 master</span><br><span class="line">10.42.0.94 slave01</span><br><span class="line">10.42.0.95 slave02</span><br></pre></td></tr></table></figure></li>
+<li><p>测试ping是否成功</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ping master -c 3</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="二、联机"><a href="#二、联机" class="headerlink" title="二、联机"></a>二、联机</h2><ol>
+<li><p>生成公钥</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ssh-keygen -t rsa</span><br></pre></td></tr></table></figure></li>
+<li><p>公钥备份文件</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cat ~/.ssh/id_rsa.pub &gt;&gt; ~/.ssh/authorized_keys</span><br></pre></td></tr></table></figure></li>
+<li><p>修改文件权限</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">chmod 600 ~/.ssh/authorized_keys</span><br></pre></td></tr></table></figure></li>
+<li><p>将专用密钥添加到 ssh-agent 的高速缓存中</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ssh-add ~/.ssh/id_rsa</span><br></pre></td></tr></table></figure></li>
+<li><p>公钥转移到其他机器</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">scp ~/.ssh/authorized_keys zkpk@slave01:~/.ssh/</span><br></pre></td></tr></table></figure></li>
+<li><p>其他机器也生成密钥</p>
+</li>
+<li><p>测试远程   ssh s1</p>
+</li>
+</ol>
+<h2 id="三、安装java"><a href="#三、安装java" class="headerlink" title="三、安装java"></a>三、安装java</h2><ol>
+<li><p>root下解压</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">tar -xzvf /home/zkpk/tgz/jdk-8u131-linux-x64.tar.gz -C /usr/java</span><br></pre></td></tr></table></figure></li>
+<li><p>修改环境变量</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">gedit /home/zkpk/.bash_profile</span><br><span class="line">	export JAVA_HOME=/usr/java/jdk1.8.0_131/</span><br><span class="line">	export PATH=$JAVA_HOME/bin:$PATH</span><br><span class="line">source /home/zkpk/.bash_profile</span><br></pre></td></tr></table></figure></li>
+<li><p>其他机器同样安装</p>
+</li>
+<li><p>测试java：java -version</p>
+</li>
+</ol>
+<h2 id="四、安装hadoop"><a href="#四、安装hadoop" class="headerlink" title="四、安装hadoop"></a>四、安装hadoop</h2><ol>
+<li><p>解压</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">tar -xzvf /home/zkpk/tgz/hadoop-2.7.3.tar.gz –C /home/zkpk</span><br></pre></td></tr></table></figure></li>
+<li><p>修改java环境变量</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">gedit /home/zkpk/hadoop-2.7.3/etc/hadoop/hadoop-env.sh</span><br><span class="line"> 	export JAVA_HOME=/usr/java/jdk1.8.0_131/</span><br><span class="line">gedit ~/hadoop-2.7.3/etc/hadoop/yarn-env.sh</span><br><span class="line">	export JAVA_HOME=/usr/java/jdk1.8.0_131/</span><br></pre></td></tr></table></figure></li>
+<li><p>其他配置</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">1.配置core-site.xml 文件</span><br><span class="line">gedit  ~/hadoop-2.7.3/etc/hadoop/core-site.xml</span><br><span class="line">	&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br><span class="line">    &lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;configuration.xsl&quot;?&gt;</span><br><span class="line">    &lt;!-- Put site-specific property overrides in this file. --&gt;</span><br><span class="line">    &lt;configuration&gt;</span><br><span class="line">            &lt;property&gt;</span><br><span class="line">                    &lt;name&gt;fs.defaultFS&lt;/name&gt;</span><br><span class="line">                    &lt;value&gt;hdfs://master:9000&lt;/value&gt;</span><br><span class="line">            &lt;/property&gt;</span><br><span class="line">            &lt;property&gt;</span><br><span class="line">                    &lt;name&gt;hadoop.tmp.dir&lt;/name&gt;</span><br><span class="line">                    &lt;value&gt;/home/zkpk/hadoopdata&lt;/value&gt;</span><br><span class="line">            &lt;/property&gt;</span><br><span class="line">    &lt;/configuration&gt;</span><br><span class="line">2.配置hdfs-site.xml文件</span><br><span class="line">gedit  ~/hadoop-2.7.3/etc/hadoop/hdfs-site.xml</span><br><span class="line">    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br><span class="line">    &lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;configuration.xsl&quot;?&gt;</span><br><span class="line">    &lt;!-- Put site-specific property overrides in this file. --&gt;</span><br><span class="line">    &lt;configuration&gt;</span><br><span class="line">        &lt;property&gt;</span><br><span class="line">            &lt;name&gt;dfs.replication&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;2&lt;/value&gt;</span><br><span class="line">        &lt;/property&gt;</span><br><span class="line">    &lt;/configuration&gt;</span><br><span class="line">3.配置yarn-site.xml文件</span><br><span class="line">gedit  ~/hadoop-2.7.3/etc/hadoop/yarn-site.xml</span><br><span class="line">    &lt;?xml version=&quot;1.0&quot;?&gt;</span><br><span class="line">    &lt;configuration&gt;</span><br><span class="line">        &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.nodemanager.aux-services&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;mapreduce_shuffle&lt;/value&gt;</span><br><span class="line">        &lt;/property&gt;</span><br><span class="line">        &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:18040&lt;/value&gt;</span><br><span class="line">        &lt;/property&gt;</span><br><span class="line">        &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.scheduler.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:18030&lt;/value&gt;</span><br><span class="line">        &lt;/property&gt;</span><br><span class="line">        &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.resource-tracker.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:18025&lt;/value&gt;</span><br><span class="line">        &lt;/property&gt;</span><br><span class="line">        &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.admin.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:18141&lt;/value&gt;</span><br><span class="line">        &lt;/property&gt;</span><br><span class="line">        &lt;property&gt;</span><br><span class="line">            &lt;name&gt;yarn.resourcemanager.webapp.address&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;master:18088&lt;/value&gt;</span><br><span class="line">        &lt;/property&gt;</span><br><span class="line">    &lt;/configuration&gt;</span><br><span class="line">4.配置mapred-site.xml文件</span><br><span class="line">cp ~/hadoop-2.7.3/etc/hadoop/mapred-site.xml.template  ~/hadoop-2.7.3/etc/hadoop/mapred-site.xml</span><br><span class="line">gedit ~/hadoop-2.7.3/etc/hadoop/mapred-site.xml</span><br><span class="line">    &lt;?xml version=&quot;1.0&quot;?&gt;</span><br><span class="line">    &lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;configuration.xsl&quot;?&gt;</span><br><span class="line">    &lt;configuration&gt;</span><br><span class="line">        &lt;property&gt;</span><br><span class="line">            &lt;name&gt;mapreduce.framework.name&lt;/name&gt;</span><br><span class="line">            &lt;value&gt;yarn&lt;/value&gt;</span><br><span class="line">        &lt;/property&gt;</span><br><span class="line">    &lt;/configuration&gt;</span><br></pre></td></tr></table></figure></li>
+<li><p>配置slaves文件</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">gedit ~/hadoop-2.7.3/etc/hadoop/slaves</span><br><span class="line">    slave01</span><br><span class="line">    slave02</span><br></pre></td></tr></table></figure></li>
+<li><p>创建Hadoop数据目录</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mkdir hadoopdata</span><br></pre></td></tr></table></figure></li>
+<li><p>将配置好的hadoop文件夹复制到从节点</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">scp -r hadoop-2.7.3 zkpk@slave01:~/</span><br></pre></td></tr></table></figure></li>
+<li><p>配置环境变量</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">gedit ~/.bash_profile</span><br><span class="line">    #HADOOP</span><br><span class="line">    export HADOOP_HOME=/home/zkpk/hadoop-2.7.3</span><br><span class="line">    export PATH=$HADOOP_HOME/bin:$HADOOP_HOME/sbin:$PATH</span><br><span class="line">source ~/.bash_profile</span><br></pre></td></tr></table></figure></li>
+<li><p>其他机器同样配置环境变量</p>
+</li>
+<li><p>在master格式化磁盘</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">hdfs namenode -format</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="五、启动检测"><a href="#五、启动检测" class="headerlink" title="五、启动检测"></a>五、启动检测</h2><ol>
+<li>start-all.sh</li>
+<li>jps查看</li>
+<li><a href="http://master:50070/%E6%9F%A5%E7%9C%8B">http://master:50070/查看</a></li>
+<li><img src="C:\Users\22453\AppData\Roaming\Typora\typora-user-images\image-20210911183155100.png" alt="image-20210911183155100"></li>
+</ol>
+]]></content>
+      <categories>
+        <category>大数据开发</category>
+        <category>hadoop</category>
       </categories>
   </entry>
   <entry>
@@ -867,18 +940,6 @@
       </categories>
   </entry>
   <entry>
-    <title>springBoot</title>
-    <url>/2021/09/29/java/springBoot/</url>
-    <content><![CDATA[<h3 id="spring-boot-starter"><a href="#spring-boot-starter" class="headerlink" title="spring-boot-starter"></a>spring-boot-starter</h3><ol>
-<li>可以认为starter是一种服务（和JS的插件类似）——使得使用某个功能的开发者不需要关注各种依赖库的处理，不需要具体的配置信息，由Spring Boot自动通过classpath路径下的类发现需要的Bean，并织入bean</li>
-</ol>
-<span id="more"></span>]]></content>
-      <categories>
-        <category>java</category>
-        <category>spring</category>
-      </categories>
-  </entry>
-  <entry>
     <title>jvm</title>
     <url>/2021/09/28/java/jvm/</url>
     <content><![CDATA[<h3 id=""><a href="#" class="headerlink" title=""></a></h3><ol>
@@ -1126,12 +1187,15 @@
       </categories>
   </entry>
   <entry>
-    <title>反射</title>
-    <url>/2021/09/22/java/%E5%8F%8D%E5%B0%84%E5%92%8C%E6%B3%A8%E8%A7%A3/</url>
-    <content><![CDATA[<h3 id=""><a href="#" class="headerlink" title=""></a></h3><h3 id="-1"><a href="#-1" class="headerlink" title=""></a></h3><p>test</p>
-]]></content>
+    <title>springBoot</title>
+    <url>/2021/09/29/java/springBoot/</url>
+    <content><![CDATA[<h3 id="spring-boot-starter"><a href="#spring-boot-starter" class="headerlink" title="spring-boot-starter"></a>spring-boot-starter</h3><ol>
+<li>可以认为starter是一种服务（和JS的插件类似）——使得使用某个功能的开发者不需要关注各种依赖库的处理，不需要具体的配置信息，由Spring Boot自动通过classpath路径下的类发现需要的Bean，并织入bean</li>
+</ol>
+<span id="more"></span>]]></content>
       <categories>
         <category>java</category>
+        <category>spring</category>
       </categories>
   </entry>
   <entry>
@@ -1156,6 +1220,15 @@
       <categories>
         <category>java</category>
         <category>设计规范</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>反射</title>
+    <url>/2021/09/22/java/%E5%8F%8D%E5%B0%84%E5%92%8C%E6%B3%A8%E8%A7%A3/</url>
+    <content><![CDATA[<h3 id=""><a href="#" class="headerlink" title=""></a></h3><h3 id="-1"><a href="#-1" class="headerlink" title=""></a></h3><p>test</p>
+]]></content>
+      <categories>
+        <category>java</category>
       </categories>
   </entry>
   <entry>
@@ -1317,16 +1390,7 @@ git clone <a href="https://github.com/litten/hexo-theme-yilia.git">https://githu
 <li><p>seletor</p>
 </li>
 </ol>
-]]></content>
-      <categories>
-        <category>utils</category>
-        <category>爬虫</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>xpat使用</title>
-    <url>/2021/10/03/utils/xpath/</url>
-    <content><![CDATA[<h3 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h3><ol>
+<h3 id="xpath"><a href="#xpath" class="headerlink" title="xpath"></a>xpath</h3><ol>
 <li><p>层级 /直接子集() // 跳跃层级(递归)</p>
 </li>
 <li><p>属性 @</p>
@@ -1338,7 +1402,7 @@ git clone <a href="https://github.com/litten/hexo-theme-yilia.git">https://githu
 <li><p>property</p>
 </li>
 <li><p>//article//a/@href</p>
-<span id="more"></span></li>
+<!--more--></li>
 </ol>
 </li>
 <li><p>函数</p>
@@ -1350,10 +1414,10 @@ git clone <a href="https://github.com/litten/hexo-theme-yilia.git">https://githu
 </ol>
 </li>
 </ol>
-<h3 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h3><p>1. </p>
 ]]></content>
       <categories>
         <category>utils</category>
+        <category>爬虫</category>
       </categories>
   </entry>
 </search>
