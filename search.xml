@@ -12,11 +12,6 @@
   </entry>
   <entry>
     <title></title>
-    <url>/2021/09/17/db/redis/</url>
-    <content><![CDATA[]]></content>
-  </entry>
-  <entry>
-    <title></title>
     <url>/2021/09/17/db/mysql_other/</url>
     <content><![CDATA[]]></content>
   </entry>
@@ -27,17 +22,22 @@
   </entry>
   <entry>
     <title></title>
+    <url>/2021/09/17/db/redis/</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title></title>
     <url>/2021/09/17/distribute/hadoop/</url>
     <content><![CDATA[]]></content>
   </entry>
   <entry>
     <title></title>
-    <url>/2021/09/17/os/linuxCmd/</url>
+    <url>/2021/09/17/distribute/spark/</url>
     <content><![CDATA[]]></content>
   </entry>
   <entry>
     <title></title>
-    <url>/2021/09/17/distribute/spark/</url>
+    <url>/2021/09/17/os/linuxCmd/</url>
     <content><![CDATA[]]></content>
   </entry>
   <entry>
@@ -57,12 +57,12 @@
   </entry>
   <entry>
     <title></title>
-    <url>/2021/09/17/java/webBack/springCloud/</url>
+    <url>/2021/09/17/java/webBack/springBoot/</url>
     <content><![CDATA[]]></content>
   </entry>
   <entry>
     <title></title>
-    <url>/2021/09/17/java/webBack/springBoot/</url>
+    <url>/2021/09/17/java/webBack/springCloud/</url>
     <content><![CDATA[]]></content>
   </entry>
   <entry>
@@ -160,6 +160,388 @@
       <categories>
         <category>数据库</category>
         <category>mysql</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>hadoop的启动</title>
+    <url>/2021/09/10/distribute/hadoop%E5%90%AF%E5%8A%A8/</url>
+    <content><![CDATA[<h2 id="一、-基本环境"><a href="#一、-基本环境" class="headerlink" title="一、 基本环境"></a>一、 基本环境</h2><ol>
+<li><p>获取主机名字 master、s1、s2</p>
+</li>
+<li><p>时钟同步</p>
+<pre class="line-numbers language-none"><code class="language-none">&#x2F;usr&#x2F;sbin&#x2F;ntpdate cn.pool.ntp.org<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+<li><p>关闭防火墙</p>
+<pre class="line-numbers language-none"><code class="language-none">systemctl stop firewalld.service<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+<li><p>编辑host 以对应ping 如：</p>
+<pre class="line-numbers language-none"><code class="language-none">10.42.0.93 master
+10.42.0.94 slave01
+10.42.0.95 slave02<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre></li>
+<li><p>测试ping是否成功</p>
+<pre class="line-numbers language-none"><code class="language-none">ping master -c 3<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+</ol>
+<h2 id="二、联机"><a href="#二、联机" class="headerlink" title="二、联机"></a>二、联机</h2><ol>
+<li><p>生成公钥</p>
+<pre class="line-numbers language-none"><code class="language-none">ssh-keygen -t rsa<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+<li><p>公钥备份文件</p>
+<pre class="line-numbers language-none"><code class="language-none">cat ~&#x2F;.ssh&#x2F;id_rsa.pub &gt;&gt; ~&#x2F;.ssh&#x2F;authorized_keys<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+<li><p>修改文件权限</p>
+<pre class="line-numbers language-none"><code class="language-none">chmod 600 ~&#x2F;.ssh&#x2F;authorized_keys<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+<li><p>将专用密钥添加到 ssh-agent 的高速缓存中</p>
+<pre class="line-numbers language-none"><code class="language-none">ssh-add ~&#x2F;.ssh&#x2F;id_rsa<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+<li><p>公钥转移到其他机器</p>
+<pre class="line-numbers language-none"><code class="language-none">scp ~&#x2F;.ssh&#x2F;authorized_keys zkpk@slave01:~&#x2F;.ssh&#x2F;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+<li><p>其他机器也生成密钥</p>
+</li>
+<li><p>测试远程   ssh s1</p>
+</li>
+</ol>
+<h2 id="三、安装java"><a href="#三、安装java" class="headerlink" title="三、安装java"></a>三、安装java</h2><ol>
+<li><p>root下解压</p>
+<pre class="line-numbers language-none"><code class="language-none">tar -xzvf &#x2F;home&#x2F;zkpk&#x2F;tgz&#x2F;jdk-8u131-linux-x64.tar.gz -C &#x2F;usr&#x2F;java<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+<li><p>修改环境变量</p>
+<pre class="line-numbers language-none"><code class="language-none">gedit &#x2F;home&#x2F;zkpk&#x2F;.bash_profile
+	export JAVA_HOME&#x3D;&#x2F;usr&#x2F;java&#x2F;jdk1.8.0_131&#x2F;
+	export PATH&#x3D;$JAVA_HOME&#x2F;bin:$PATH
+source &#x2F;home&#x2F;zkpk&#x2F;.bash_profile<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre></li>
+<li><p>其他机器同样安装</p>
+</li>
+<li><p>测试java：java -version</p>
+</li>
+</ol>
+<h2 id="四、安装hadoop"><a href="#四、安装hadoop" class="headerlink" title="四、安装hadoop"></a>四、安装hadoop</h2><ol>
+<li><p>解压</p>
+<pre class="line-numbers language-none"><code class="language-none">tar -xzvf &#x2F;home&#x2F;zkpk&#x2F;tgz&#x2F;hadoop-2.7.3.tar.gz –C &#x2F;home&#x2F;zkpk<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+<li><p>修改java环境变量</p>
+<pre class="line-numbers language-none"><code class="language-none">gedit &#x2F;home&#x2F;zkpk&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;hadoop-env.sh
+ 	export JAVA_HOME&#x3D;&#x2F;usr&#x2F;java&#x2F;jdk1.8.0_131&#x2F;
+gedit ~&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;yarn-env.sh
+	export JAVA_HOME&#x3D;&#x2F;usr&#x2F;java&#x2F;jdk1.8.0_131&#x2F;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre></li>
+<li><p>其他配置</p>
+<pre class="line-numbers language-none"><code class="language-none">1.配置core-site.xml 文件
+gedit  ~&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;core-site.xml
+	&lt;?xml version&#x3D;&quot;1.0&quot; encoding&#x3D;&quot;UTF-8&quot;?&gt;
+    &lt;?xml-stylesheet type&#x3D;&quot;text&#x2F;xsl&quot; href&#x3D;&quot;configuration.xsl&quot;?&gt;
+    &lt;!-- Put site-specific property overrides in this file. --&gt;
+    &lt;configuration&gt;
+            &lt;property&gt;
+                    &lt;name&gt;fs.defaultFS&lt;&#x2F;name&gt;
+                    &lt;value&gt;hdfs:&#x2F;&#x2F;master:9000&lt;&#x2F;value&gt;
+            &lt;&#x2F;property&gt;
+            &lt;property&gt;
+                    &lt;name&gt;hadoop.tmp.dir&lt;&#x2F;name&gt;
+                    &lt;value&gt;&#x2F;home&#x2F;zkpk&#x2F;hadoopdata&lt;&#x2F;value&gt;
+            &lt;&#x2F;property&gt;
+    &lt;&#x2F;configuration&gt;
+2.配置hdfs-site.xml文件
+gedit  ~&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;hdfs-site.xml
+    &lt;?xml version&#x3D;&quot;1.0&quot; encoding&#x3D;&quot;UTF-8&quot;?&gt;
+    &lt;?xml-stylesheet type&#x3D;&quot;text&#x2F;xsl&quot; href&#x3D;&quot;configuration.xsl&quot;?&gt;
+    &lt;!-- Put site-specific property overrides in this file. --&gt;
+    &lt;configuration&gt;
+        &lt;property&gt;
+            &lt;name&gt;dfs.replication&lt;&#x2F;name&gt;
+            &lt;value&gt;2&lt;&#x2F;value&gt;
+        &lt;&#x2F;property&gt;
+    &lt;&#x2F;configuration&gt;
+3.配置yarn-site.xml文件
+gedit  ~&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;yarn-site.xml
+    &lt;?xml version&#x3D;&quot;1.0&quot;?&gt;
+    &lt;configuration&gt;
+        &lt;property&gt;
+            &lt;name&gt;yarn.nodemanager.aux-services&lt;&#x2F;name&gt;
+            &lt;value&gt;mapreduce_shuffle&lt;&#x2F;value&gt;
+        &lt;&#x2F;property&gt;
+        &lt;property&gt;
+            &lt;name&gt;yarn.resourcemanager.address&lt;&#x2F;name&gt;
+            &lt;value&gt;master:18040&lt;&#x2F;value&gt;
+        &lt;&#x2F;property&gt;
+        &lt;property&gt;
+            &lt;name&gt;yarn.resourcemanager.scheduler.address&lt;&#x2F;name&gt;
+            &lt;value&gt;master:18030&lt;&#x2F;value&gt;
+        &lt;&#x2F;property&gt;
+        &lt;property&gt;
+            &lt;name&gt;yarn.resourcemanager.resource-tracker.address&lt;&#x2F;name&gt;
+            &lt;value&gt;master:18025&lt;&#x2F;value&gt;
+        &lt;&#x2F;property&gt;
+        &lt;property&gt;
+            &lt;name&gt;yarn.resourcemanager.admin.address&lt;&#x2F;name&gt;
+            &lt;value&gt;master:18141&lt;&#x2F;value&gt;
+        &lt;&#x2F;property&gt;
+        &lt;property&gt;
+            &lt;name&gt;yarn.resourcemanager.webapp.address&lt;&#x2F;name&gt;
+            &lt;value&gt;master:18088&lt;&#x2F;value&gt;
+        &lt;&#x2F;property&gt;
+    &lt;&#x2F;configuration&gt;
+4.配置mapred-site.xml文件
+cp ~&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;mapred-site.xml.template  ~&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;mapred-site.xml
+gedit ~&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;mapred-site.xml
+    &lt;?xml version&#x3D;&quot;1.0&quot;?&gt;
+    &lt;?xml-stylesheet type&#x3D;&quot;text&#x2F;xsl&quot; href&#x3D;&quot;configuration.xsl&quot;?&gt;
+    &lt;configuration&gt;
+        &lt;property&gt;
+            &lt;name&gt;mapreduce.framework.name&lt;&#x2F;name&gt;
+            &lt;value&gt;yarn&lt;&#x2F;value&gt;
+        &lt;&#x2F;property&gt;
+    &lt;&#x2F;configuration&gt;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+<li><p>配置slaves文件</p>
+<pre class="line-numbers language-none"><code class="language-none">gedit ~&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;slaves
+    slave01
+    slave02<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre></li>
+<li><p>创建Hadoop数据目录</p>
+<pre class="line-numbers language-none"><code class="language-none">mkdir hadoopdata<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+<li><p>将配置好的hadoop文件夹复制到从节点</p>
+<pre class="line-numbers language-none"><code class="language-none">scp -r hadoop-2.7.3 zkpk@slave01:~&#x2F;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+<li><p>配置环境变量</p>
+<pre class="line-numbers language-none"><code class="language-none">gedit ~&#x2F;.bash_profile
+    #HADOOP
+    export HADOOP_HOME&#x3D;&#x2F;home&#x2F;zkpk&#x2F;hadoop-2.7.3
+    export PATH&#x3D;$HADOOP_HOME&#x2F;bin:$HADOOP_HOME&#x2F;sbin:$PATH
+source ~&#x2F;.bash_profile<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+<li><p>其他机器同样配置环境变量</p>
+</li>
+<li><p>在master格式化磁盘</p>
+<pre class="line-numbers language-none"><code class="language-none">hdfs namenode -format<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+</ol>
+<h2 id="五、启动检测"><a href="#五、启动检测" class="headerlink" title="五、启动检测"></a>五、启动检测</h2><ol>
+<li>start-all.sh</li>
+<li>jps查看</li>
+<li><a href="http://master:50070/%E6%9F%A5%E7%9C%8B">http://master:50070/查看</a></li>
+<li><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20210911183155100.png" alt="image-20210911183155100"></li>
+</ol>
+]]></content>
+      <categories>
+        <category>大数据开发</category>
+        <category>hadoop</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>java8新特性</title>
+    <url>/2021/09/29/java/java8%E6%96%B0%E7%89%B9%E6%80%A7/</url>
+    <content><![CDATA[<h1 id="java8新特性"><a href="#java8新特性" class="headerlink" title="java8新特性"></a>java8新特性</h1><h3 id="一、lambda-参数式函数-代码更少"><a href="#一、lambda-参数式函数-代码更少" class="headerlink" title="一、lambda(参数式函数) 代码更少"></a>一、lambda(参数式函数) 代码更少</h3><p>fun1(fun2())</p>
+<ol>
+<li><p>参数式函数，参数式lambda。</p>
+</li>
+<li><p>java中 lambda是实现了函数的对象，而不像其他语言一样是一个函数。一般用于接口，这个接口只有一个函数需要重写。这个接口的实例就是lambda。</p>
+</li>
+<li><p>但是用到的lambda还是写的那个重写的函数，也就是说我们需要某个功能的时候，我们可以根据四大函数式接口写出自己的函数，将这个接口传入，就完成了一个功能器。</p>
+<span id="more"></span></li>
+<li><p>为了完成多功能，所以lambda对象应该是以参数的身份传入到指定函数，以为创建Lambda很简单，代码很少，这样在不改变原函数的情况下就能根据传入的lambda不同而拥有不同的功能，目的就是多态。</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"> <span class="token keyword">public</span> <span class="token class-name">List</span> <span class="token function">filter</span><span class="token punctuation">(</span><span class="token keyword">int</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>nums<span class="token punctuation">,</span><span class="token class-name">Predicate</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Integer</span><span class="token punctuation">></span></span>predicate<span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+<span class="token function">filter</span><span class="token punctuation">(</span>nums<span class="token punctuation">,</span>o<span class="token operator">-></span>o<span class="token operator">></span><span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">filter</span><span class="token punctuation">(</span>nums<span class="token punctuation">,</span>o<span class="token operator">-></span><span class="token number">2</span><span class="token operator">*</span>o<span class="token operator">></span><span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">filter</span><span class="token punctuation">(</span>nums<span class="token punctuation">,</span>o<span class="token operator">-></span>o<span class="token operator">*</span>o<span class="token operator">></span><span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">filter</span><span class="token punctuation">(</span>nums<span class="token punctuation">,</span>o<span class="token operator">-></span><span class="token number">1</span><span class="token operator">></span><span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+<li><p>创建比较器</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token comment">//lambda</span>
+        <span class="token class-name">Comparator</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Integer</span><span class="token punctuation">></span></span>comparator2<span class="token operator">=</span><span class="token punctuation">(</span>o1<span class="token punctuation">,</span>o2<span class="token punctuation">)</span><span class="token operator">-></span>o1<span class="token punctuation">.</span><span class="token function">compareTo</span><span class="token punctuation">(</span>o2<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">//方法引用  lambda 传fun</span>
+        <span class="token class-name">Comparator</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Integer</span><span class="token punctuation">></span></span>comparator3<span class="token operator">=</span> <span class="token class-name">Integer</span><span class="token operator">::</span><span class="token function">compareTo</span><span class="token punctuation">;</span>
+<span class="token class-name">Arrays</span><span class="token punctuation">.</span><span class="token function">sort</span><span class="token punctuation">(</span>nums<span class="token punctuation">,</span>comparator3<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+<li><p>创建进程</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token class-name">Runnable</span> runnable2<span class="token operator">=</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-></span> <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"rrrr2"</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+<li><p>lambda优化</p>
+<ol>
+<li><p>去掉形参类型(类型推断)</p>
+<ol>
+<li><p>直接传入o1,而不用在前面加integer</p>
+</li>
+<li><p>int[]nums=new int[]{1,2,3}–&gt;</p>
+<p>int[]nums={1,2,3}</p>
+</li>
+</ol>
+</li>
+<li><p>去掉return和{} 只有一句的情况</p>
+</li>
+<li><p>只有一个参数，可以去掉小括号</p>
+</li>
+</ol>
+</li>
+<li><p>格式</p>
+<ol>
+<li>一个参数没返回:obj=x-&gt;fun(x)</li>
+<li>无参无返回: obj=()-&gt;fun()</li>
+<li>两个参数: obj=(x,y)-&gt;fun(x,y)</li>
+<li>有返回: obj=(x,y)-&gt;{fun(x,y) return}</li>
+</ol>
+</li>
+</ol>
+<h3 id="二、函数式接口"><a href="#二、函数式接口" class="headerlink" title="二、函数式接口"></a>二、函数式接口</h3><ol>
+<li><p>@FuntionalInterface</p>
+</li>
+<li><p>面向函数范式编程(FOP)(SQL)</p>
+</li>
+<li><p>面向接口编程</p>
+</li>
+<li><p><strong>面向过程编程（<code>Procedure Oriented</code>、简称<code>PO</code>）</strong> 和 <strong>面向对象编程（<code>Object Oriented</code>、简称<code>OO</code>）</strong> 我们一定听过，然而实际企业级开发里受用更多的一种编程思想那就是：<strong>面向接口编程（<code>Interface-Oriented</code>）</strong>！</p>
+</li>
+<li><p>四大函数式接口</p>
+<ol>
+<li><p>Consumer<T> </p>
+<p>​    消费型：有参无返回 </p>
+<p>​    void accept(T t)</p>
+</li>
+<li><p>Suppiier<T></p>
+<p>​    供给型：无参有返回</p>
+<p>​    T get()</p>
+</li>
+<li><p>Functional&lt;T,R&gt;</p>
+<p>​    函数型：处理参数</p>
+<p>​    R apply(T t)</p>
+</li>
+<li><p>Prediate<T></p>
+<p>​    断定型：有参判定返回bool</p>
+<p>​    boolean test(T t)</p>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="三、方法引用-构造器引用"><a href="#三、方法引用-构造器引用" class="headerlink" title="三、方法引用 构造器引用"></a>三、方法引用 构造器引用</h3><ol>
+<li><p>当要传递给lambda操作，已经有实现方法，就可以使用方法引用。</p>
+</li>
+<li><p>基于lambda</p>
+</li>
+<li><p>关键：传入的方法的返回类型和参数相同</p>
+</li>
+<li><p>就好像现在不用自己写函数传入Lambda体了，而是有现成的函数，那么直接传入</p>
+<p>类::方法名就ok了。</p>
+</li>
+<li><p>三种情况+一种构造器</p>
+<ol>
+<li>类::非静态方法</li>
+<li>对象::静态方法</li>
+<li>类::非静态方法</li>
+<li>构造器引用<ol>
+<li>类::new</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p>要求：两个函数除了名字不一样，其他都一样</p>
+</li>
+<li><p>细节</p>
+<ol>
+<li>不用写入形参，因为类型与参数推断，且要求两函数是一样的，所以没必要写形参。</li>
+</ol>
+</li>
+</ol>
+<h3 id="四、stream-api-并行计算"><a href="#四、stream-api-并行计算" class="headerlink" title="四、stream api 并行计算"></a>四、stream api 并行计算</h3><ol>
+<li><p>stream:运算 cpu打交道</p>
+<p>Collection:集合  内存打交道</p>
+</li>
+<li><p>类似于SQL语句</p>
+</li>
+<li><p>作用：</p>
+<ol>
+<li>查询数据不能用sql的情况,如nosql需要把查询到的数据在java里面进行处理</li>
+</ol>
+</li>
+<li><p>特点：</p>
+<ol>
+<li>自己不储存(视图)</li>
+<li>不会改变原对象，也就是inplace=False</li>
+<li>操作延迟，直到终止操作才会执行</li>
+</ol>
+</li>
+<li><p>步骤</p>
+<ol>
+<li><p>创建</p>
+<ol>
+<li><p>可迭代对象(即实现迭代接口).stream()</p>
+</li>
+<li><p>并行：parallelstream()</p>
+</li>
+<li><p>Arrays.stream(T[]arr)</p>
+</li>
+<li><p>Stream.of(T..)</p>
+</li>
+<li><p>生成器</p>
+<ol>
+<li><p>```java<br>public static<T> iterate(T t,计算器)<br>//例如 生成偶数流<br>Stream.iterate(0,t-&gt;t+2)</p>
+<pre class="line-numbers language-none"><code class="language-none">
+   
+
+2. &#96;&#96;&#96;
+   &#x2F;&#x2F;生成随机数流
+   Stream.generate(Math::random)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+<li></li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p>中间操作{数据处理：}</p>
+<ol>
+<li><p>筛选与切片</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token comment">//筛选</span>
+stream<span class="token punctuation">.</span><span class="token function">filter</span><span class="token punctuation">(</span>a<span class="token operator">-></span>a<span class="token operator">></span><span class="token number">2</span><span class="token punctuation">)</span>
+<span class="token comment">//跳过 跳过前三个</span>
+stream<span class="token punctuation">.</span><span class="token function">skip</span><span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">)</span>
+<span class="token comment">//截断 前三个</span>
+stream<span class="token punctuation">.</span><span class="token function">limit</span><span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">)</span>
+<span class="token comment">//去重</span>
+stream<span class="token punctuation">.</span><span class="token function">distinct</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+<li><p>映射map  (数据转换)</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token comment">//转换成大写</span>
+stream<span class="token punctuation">.</span><span class="token function">map</span><span class="token punctuation">(</span>s<span class="token operator">></span>s<span class="token punctuation">.</span><span class="token function">toUpperCase</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token comment">//选出名字长度大于三的数据</span>
+stream<span class="token punctuation">.</span><span class="token function">map</span><span class="token punctuation">(</span><span class="token class-name">User</span><span class="token operator">::</span><span class="token function">getname</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">filter</span><span class="token punctuation">(</span>name<span class="token operator">-></span>name<span class="token punctuation">.</span>leangth<span class="token operator">></span><span class="token number">3</span><span class="token punctuation">)</span>
+<span class="token comment">//摊平</span>
+stream<span class="token punctuation">.</span><span class="token function">flatMap</span><span class="token punctuation">(</span>mapToStream<span class="token punctuation">)</span>
+<span class="token comment">//其中mapToStream能够把stream里面的单个对象转换成stream的函数</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+<li><p>排序</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java">stream<span class="token punctuation">.</span><span class="token function">sorted</span><span class="token punctuation">(</span><span class="token punctuation">(</span>o1<span class="token punctuation">,</span>o2<span class="token punctuation">)</span><span class="token operator">-></span>o1<span class="token punctuation">.</span>value<span class="token operator">-</span>o2<span class="token punctuation">.</span>value<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+</ol>
+</li>
+<li><p>终止操作</p>
+<ol>
+<li><p>匹配查找</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token comment">//所有匹配->bool</span>
+stream<span class="token punctuation">.</span><span class="token function">addMatch</span><span class="token punctuation">(</span>o<span class="token operator">-></span>o<span class="token punctuation">.</span>age<span class="token operator">></span><span class="token number">18</span><span class="token punctuation">)</span>    
+<span class="token comment">//任意匹配->bool</span>
+stream<span class="token punctuation">.</span><span class="token function">anyMatch</span><span class="token punctuation">(</span>o<span class="token operator">-></span>o<span class="token punctuation">.</span>age<span class="token operator">></span><span class="token number">18</span><span class="token punctuation">)</span>
+<span class="token comment">//第一个元素->Optional&lt;T></span>
+stream<span class="token punctuation">.</span><span class="token function">fidFirst</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+<li><p>其他</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token comment">//数量->long</span>
+stream<span class="token punctuation">.</span><span class="token function">count</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token comment">//最大值->Optional&lt;T></span>
+stream<span class="token punctuation">.</span><span class="token function">max</span><span class="token punctuation">(</span><span class="token punctuation">(</span>o1<span class="token punctuation">,</span>o2<span class="token punctuation">)</span><span class="token operator">-></span>o1<span class="token punctuation">.</span>value<span class="token operator">-</span>o2<span class="token punctuation">.</span>value<span class="token punctuation">)</span>
+<span class="token comment">//内部迭代</span>
+stream<span class="token punctuation">.</span><span class="token function">foreach</span><span class="token punctuation">(</span><span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token operator">:</span>println<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+<li><p>规约 reduce</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token comment">//</span>
+stream<span class="token punctuation">.</span><span class="token function">reduce</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token punctuation">(</span>o1<span class="token punctuation">,</span>o2<span class="token punctuation">)</span><span class="token operator">-></span>o1<span class="token operator">+</span>o2<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre></li>
+<li><p>收集collect(Collector c)</p>
+<pre class="line-numbers language-none"><code class="language-none">&#x2F;&#x2F;list
+stream.collect(Collectors.toList())
+&#x2F;&#x2F;set
+stream.collect(Collectors.toSet())
+&#x2F;&#x2F;不确定性collection
+stream.collect(Collectors.toCollection())<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="optional类-最大减少空指针异常"><a href="#optional类-最大减少空指针异常" class="headerlink" title="optional类 最大减少空指针异常"></a>optional类 最大减少空指针异常</h3><ol>
+<li><p>of</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token comment">//of 不能空    Optional&lt;Student>optionalStudent=Optional.of(student);//of必须非空</span>
+<span class="token comment">//ofNullable 可空，为empty    Optional&lt;Student>optionalStudent2=Optional.ofNullable(student);</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre></li>
+<li><p>orElse</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java">value <span class="token operator">!=</span> <span class="token keyword">null</span> <span class="token operator">?</span> value <span class="token operator">:</span> other<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+<li></li>
+</ol>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><ol>
+<li><p>接口默认方法</p>
+</li>
+<li><p>DateTime api</p>
+</li>
+<li><p>nashorn javascript引擎</p>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>java</category>
+        <category>java高阶</category>
       </categories>
   </entry>
   <entry>
@@ -315,7 +697,7 @@
 <h3 id="Servlet"><a href="#Servlet" class="headerlink" title="Servlet"></a>Servlet</h3><ol>
 <li><p>server applet——&gt;运行在服务器的小程序</p>
 </li>
-<li><p>动态资源：java类若要运行在tomcat，那么它就得实现servlet规范(接口)，这样才能被tomcat识别。</p>
+<li><p>动态资源：java类若要一直运行在tomcat，那么它就得实现servlet规范(接口)，这样才能被tomcat识别。</p>
 </li>
 <li><p>servlet接口方法</p>
 <ol>
@@ -603,8 +985,12 @@
 <li><p>请求转发</p>
 <p>服务器资源跳转方式</p>
 <ol>
-<li>获取转发对象getRequestDispatcher(string path)</li>
-<li>调用对象方法forword(req,resp)</li>
+<li>获取转发对象RequestDispatcher getRequestDispatcher(string path)</li>
+<li>调用对象方法<ol>
+<li>forword(req,resp): 请求抓发,第一个servlet只Writer了resp的头</li>
+<li>include( req , resp): 请求包含—两个请求都Writer了resp体</li>
+</ol>
+</li>
 <li>特点<ol>
 <li>浏览器只有一次请求，其他请求在服务器进行</li>
 <li>浏览器地址不变</li>
@@ -656,6 +1042,16 @@
 org.apache.catalina.connector.RequestFacade@121102ad
 response:
 org.apache.catalina.connector.ResponseFacade@21fac426<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre></li>
+</ol>
+<h3 id="一些理解"><a href="#一些理解" class="headerlink" title="一些理解"></a>一些理解</h3><ol>
+<li>tomcat，</li>
+<li>servlet 一种规范，实现这个规范的Class能够随时接受Requeset,Response，就好象一直运行在tomcat上一样。</li>
+<li>request 一种规范，将浏览器的请求数据进行封装，其中httoRequest将http协议的请求进行封装，这个封装体可以把这些数据到处共享。</li>
+<li>response</li>
+<li>其他<ol>
+<li>@WebServlet(“”)请求模式路径</li>
+</ol>
+</li>
 </ol>
 <h3 id="issue"><a href="#issue" class="headerlink" title="issue"></a>issue</h3><ol>
 <li><p>Request请求参数乱码</p>
@@ -710,237 +1106,7 @@ org.apache.catalina.connector.ResponseFacade@21fac426<span aria-hidden="true" cl
       </categories>
   </entry>
   <entry>
-    <title>java8新特性</title>
-    <url>/2021/09/29/java/java8%E6%96%B0%E7%89%B9%E6%80%A7/</url>
-    <content><![CDATA[<h1 id="java8新特性"><a href="#java8新特性" class="headerlink" title="java8新特性"></a>java8新特性</h1><h3 id="一、lambda-参数式函数-代码更少"><a href="#一、lambda-参数式函数-代码更少" class="headerlink" title="一、lambda(参数式函数) 代码更少"></a>一、lambda(参数式函数) 代码更少</h3><p>fun1(fun2())</p>
-<ol>
-<li><p>参数式函数，参数式lambda。</p>
-</li>
-<li><p>java中 lambda是实现了函数的对象，而不像其他语言一样是一个函数。一般用于接口，这个接口只有一个函数需要重写。这个接口的实例就是lambda。</p>
-</li>
-<li><p>但是用到的lambda还是写的那个重写的函数，也就是说我们需要某个功能的时候，我们可以根据四大函数式接口写出自己的函数，将这个接口传入，就完成了一个功能器。</p>
-<span id="more"></span></li>
-<li><p>为了完成多功能，所以lambda对象应该是以参数的身份传入到指定函数，以为创建Lambda很简单，代码很少，这样在不改变原函数的情况下就能根据传入的lambda不同而拥有不同的功能，目的就是多态。</p>
-<pre class="line-numbers language-java" data-language="java"><code class="language-java"> <span class="token keyword">public</span> <span class="token class-name">List</span> <span class="token function">filter</span><span class="token punctuation">(</span><span class="token keyword">int</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>nums<span class="token punctuation">,</span><span class="token class-name">Predicate</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Integer</span><span class="token punctuation">></span></span>predicate<span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
-<span class="token function">filter</span><span class="token punctuation">(</span>nums<span class="token punctuation">,</span>o<span class="token operator">-></span>o<span class="token operator">></span><span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token function">filter</span><span class="token punctuation">(</span>nums<span class="token punctuation">,</span>o<span class="token operator">-></span><span class="token number">2</span><span class="token operator">*</span>o<span class="token operator">></span><span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token function">filter</span><span class="token punctuation">(</span>nums<span class="token punctuation">,</span>o<span class="token operator">-></span>o<span class="token operator">*</span>o<span class="token operator">></span><span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token function">filter</span><span class="token punctuation">(</span>nums<span class="token punctuation">,</span>o<span class="token operator">-></span><span class="token number">1</span><span class="token operator">></span><span class="token number">6</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
-<li><p>创建比较器</p>
-<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token comment">//lambda</span>
-        <span class="token class-name">Comparator</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Integer</span><span class="token punctuation">></span></span>comparator2<span class="token operator">=</span><span class="token punctuation">(</span>o1<span class="token punctuation">,</span>o2<span class="token punctuation">)</span><span class="token operator">-></span>o1<span class="token punctuation">.</span><span class="token function">compareTo</span><span class="token punctuation">(</span>o2<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token comment">//方法引用  lambda 传fun</span>
-        <span class="token class-name">Comparator</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Integer</span><span class="token punctuation">></span></span>comparator3<span class="token operator">=</span> <span class="token class-name">Integer</span><span class="token operator">::</span><span class="token function">compareTo</span><span class="token punctuation">;</span>
-<span class="token class-name">Arrays</span><span class="token punctuation">.</span><span class="token function">sort</span><span class="token punctuation">(</span>nums<span class="token punctuation">,</span>comparator3<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
-<li><p>创建进程</p>
-<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token class-name">Runnable</span> runnable2<span class="token operator">=</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">-></span> <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"rrrr2"</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-<li><p>lambda优化</p>
-<ol>
-<li><p>去掉形参类型(类型推断)</p>
-<ol>
-<li><p>直接传入o1,而不用在前面加integer</p>
-</li>
-<li><p>int[]nums=new int[]{1,2,3}–&gt;</p>
-<p>int[]nums={1,2,3}</p>
-</li>
-</ol>
-</li>
-<li><p>去掉return和{} 只有一句的情况</p>
-</li>
-<li><p>只有一个参数，可以去掉小括号</p>
-</li>
-</ol>
-</li>
-<li><p>格式</p>
-<ol>
-<li>一个参数没返回:obj=x-&gt;fun(x)</li>
-<li>无参无返回: obj=()-&gt;fun()</li>
-<li>两个参数: obj=(x,y)-&gt;fun(x,y)</li>
-<li>有返回: obj=(x,y)-&gt;{fun(x,y) return}</li>
-</ol>
-</li>
-</ol>
-<h3 id="二、函数式接口"><a href="#二、函数式接口" class="headerlink" title="二、函数式接口"></a>二、函数式接口</h3><ol>
-<li><p>@FuntionalInterface</p>
-</li>
-<li><p>面向函数范式编程(FOP)(SQL)</p>
-</li>
-<li><p>面向接口编程</p>
-</li>
-<li><p><strong>面向过程编程（<code>Procedure Oriented</code>、简称<code>PO</code>）</strong> 和 <strong>面向对象编程（<code>Object Oriented</code>、简称<code>OO</code>）</strong> 我们一定听过，然而实际企业级开发里受用更多的一种编程思想那就是：<strong>面向接口编程（<code>Interface-Oriented</code>）</strong>！</p>
-</li>
-<li><p>四大函数式接口</p>
-<ol>
-<li><p>Consumer<T> </p>
-<p>​    消费型：有参无返回 </p>
-<p>​    void accept(T t)</p>
-</li>
-<li><p>Suppiier<T></p>
-<p>​    供给型：无参有返回</p>
-<p>​    T get()</p>
-</li>
-<li><p>Functional&lt;T,R&gt;</p>
-<p>​    函数型：处理参数</p>
-<p>​    R apply(T t)</p>
-</li>
-<li><p>Prediate<T></p>
-<p>​    断定型：有参判定返回bool</p>
-<p>​    boolean test(T t)</p>
-</li>
-</ol>
-</li>
-</ol>
-<h3 id="三、方法引用-构造器引用"><a href="#三、方法引用-构造器引用" class="headerlink" title="三、方法引用 构造器引用"></a>三、方法引用 构造器引用</h3><ol>
-<li><p>当要传递给lambda操作，已经有实现方法，就可以使用方法引用。</p>
-</li>
-<li><p>基于lambda</p>
-</li>
-<li><p>关键：传入的方法的返回类型和参数相同</p>
-</li>
-<li><p>就好像现在不用自己写函数传入Lambda体了，而是有现成的函数，那么直接传入</p>
-<p>类::方法名就ok了。</p>
-</li>
-<li><p>三种情况+一种构造器</p>
-<ol>
-<li>类::非静态方法</li>
-<li>对象::静态方法</li>
-<li>类::非静态方法</li>
-<li>构造器引用<ol>
-<li>类::new</li>
-</ol>
-</li>
-</ol>
-</li>
-<li><p>要求：两个函数除了名字不一样，其他都一样</p>
-</li>
-<li><p>细节</p>
-<ol>
-<li>不用写入形参，因为类型与参数推断，且要求两函数是一样的，所以没必要写形参。</li>
-</ol>
-</li>
-</ol>
-<h3 id="四、stream-api-并行计算"><a href="#四、stream-api-并行计算" class="headerlink" title="四、stream api 并行计算"></a>四、stream api 并行计算</h3><ol>
-<li><p>stream:运算 cpu打交道</p>
-<p>Collection:集合  内存打交道</p>
-</li>
-<li><p>类似于SQL语句</p>
-</li>
-<li><p>作用：</p>
-<ol>
-<li>查询数据不能用sql的情况,如nosql需要把查询到的数据在java里面进行处理</li>
-</ol>
-</li>
-<li><p>特点：</p>
-<ol>
-<li>自己不储存(视图)</li>
-<li>不会改变原对象，也就是inplace=False</li>
-<li>操作延迟，直到终止操作才会执行</li>
-</ol>
-</li>
-<li><p>步骤</p>
-<ol>
-<li><p>创建</p>
-<ol>
-<li><p>可迭代对象(即实现迭代接口).stream()</p>
-</li>
-<li><p>并行：parallelstream()</p>
-</li>
-<li><p>Arrays.stream(T[]arr)</p>
-</li>
-<li><p>Stream.of(T..)</p>
-</li>
-<li><p>生成器</p>
-<ol>
-<li><p>```java<br>public static<T> iterate(T t,计算器)<br>//例如 生成偶数流<br>Stream.iterate(0,t-&gt;t+2)</p>
-<pre class="line-numbers language-none"><code class="language-none">
-   
-
-2. &#96;&#96;&#96;
-   &#x2F;&#x2F;生成随机数流
-   Stream.generate(Math::random)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
-<li></li>
-</ol>
-</li>
-</ol>
-</li>
-<li><p>中间操作{数据处理：}</p>
-<ol>
-<li><p>筛选与切片</p>
-<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token comment">//筛选</span>
-stream<span class="token punctuation">.</span><span class="token function">filter</span><span class="token punctuation">(</span>a<span class="token operator">-></span>a<span class="token operator">></span><span class="token number">2</span><span class="token punctuation">)</span>
-<span class="token comment">//跳过 跳过前三个</span>
-stream<span class="token punctuation">.</span><span class="token function">skip</span><span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">)</span>
-<span class="token comment">//截断 前三个</span>
-stream<span class="token punctuation">.</span><span class="token function">limit</span><span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">)</span>
-<span class="token comment">//去重</span>
-stream<span class="token punctuation">.</span><span class="token function">distinct</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
-<li><p>映射map  (数据转换)</p>
-<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token comment">//转换成大写</span>
-stream<span class="token punctuation">.</span><span class="token function">map</span><span class="token punctuation">(</span>s<span class="token operator">></span>s<span class="token punctuation">.</span><span class="token function">toUpperCase</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-<span class="token comment">//选出名字长度大于三的数据</span>
-stream<span class="token punctuation">.</span><span class="token function">map</span><span class="token punctuation">(</span><span class="token class-name">User</span><span class="token operator">::</span><span class="token function">getname</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">filter</span><span class="token punctuation">(</span>name<span class="token operator">-></span>name<span class="token punctuation">.</span>leangth<span class="token operator">></span><span class="token number">3</span><span class="token punctuation">)</span>
-<span class="token comment">//摊平</span>
-stream<span class="token punctuation">.</span><span class="token function">flatMap</span><span class="token punctuation">(</span>mapToStream<span class="token punctuation">)</span>
-<span class="token comment">//其中mapToStream能够把stream里面的单个对象转换成stream的函数</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
-<li><p>排序</p>
-<pre class="line-numbers language-java" data-language="java"><code class="language-java">stream<span class="token punctuation">.</span><span class="token function">sorted</span><span class="token punctuation">(</span><span class="token punctuation">(</span>o1<span class="token punctuation">,</span>o2<span class="token punctuation">)</span><span class="token operator">-></span>o1<span class="token punctuation">.</span>value<span class="token operator">-</span>o2<span class="token punctuation">.</span>value<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-</ol>
-</li>
-<li><p>终止操作</p>
-<ol>
-<li><p>匹配查找</p>
-<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token comment">//所有匹配->bool</span>
-stream<span class="token punctuation">.</span><span class="token function">addMatch</span><span class="token punctuation">(</span>o<span class="token operator">-></span>o<span class="token punctuation">.</span>age<span class="token operator">></span><span class="token number">18</span><span class="token punctuation">)</span>    
-<span class="token comment">//任意匹配->bool</span>
-stream<span class="token punctuation">.</span><span class="token function">anyMatch</span><span class="token punctuation">(</span>o<span class="token operator">-></span>o<span class="token punctuation">.</span>age<span class="token operator">></span><span class="token number">18</span><span class="token punctuation">)</span>
-<span class="token comment">//第一个元素->Optional&lt;T></span>
-stream<span class="token punctuation">.</span><span class="token function">fidFirst</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
-<li><p>其他</p>
-<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token comment">//数量->long</span>
-stream<span class="token punctuation">.</span><span class="token function">count</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span class="token comment">//最大值->Optional&lt;T></span>
-stream<span class="token punctuation">.</span><span class="token function">max</span><span class="token punctuation">(</span><span class="token punctuation">(</span>o1<span class="token punctuation">,</span>o2<span class="token punctuation">)</span><span class="token operator">-></span>o1<span class="token punctuation">.</span>value<span class="token operator">-</span>o2<span class="token punctuation">.</span>value<span class="token punctuation">)</span>
-<span class="token comment">//内部迭代</span>
-stream<span class="token punctuation">.</span><span class="token function">foreach</span><span class="token punctuation">(</span><span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token operator">:</span>println<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
-<li><p>规约 reduce</p>
-<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token comment">//</span>
-stream<span class="token punctuation">.</span><span class="token function">reduce</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token punctuation">(</span>o1<span class="token punctuation">,</span>o2<span class="token punctuation">)</span><span class="token operator">-></span>o1<span class="token operator">+</span>o2<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre></li>
-<li><p>收集collect(Collector c)</p>
-<pre class="line-numbers language-none"><code class="language-none">&#x2F;&#x2F;list
-stream.collect(Collectors.toList())
-&#x2F;&#x2F;set
-stream.collect(Collectors.toSet())
-&#x2F;&#x2F;不确定性collection
-stream.collect(Collectors.toCollection())<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
-</ol>
-</li>
-</ol>
-</li>
-</ol>
-<h3 id="optional类-最大减少空指针异常"><a href="#optional类-最大减少空指针异常" class="headerlink" title="optional类 最大减少空指针异常"></a>optional类 最大减少空指针异常</h3><ol>
-<li><p>of</p>
-<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token comment">//of 不能空    Optional&lt;Student>optionalStudent=Optional.of(student);//of必须非空</span>
-<span class="token comment">//ofNullable 可空，为empty    Optional&lt;Student>optionalStudent2=Optional.ofNullable(student);</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre></li>
-<li><p>orElse</p>
-<pre class="line-numbers language-java" data-language="java"><code class="language-java">value <span class="token operator">!=</span> <span class="token keyword">null</span> <span class="token operator">?</span> value <span class="token operator">:</span> other<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-<li></li>
-</ol>
-<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><ol>
-<li><p>接口默认方法</p>
-</li>
-<li><p>DateTime api</p>
-</li>
-<li><p>nashorn javascript引擎</p>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>java</category>
-        <category>java高阶</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>java常用类源码</title>
+    <title>java常用工具类源码</title>
     <url>/2021/10/04/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</url>
     <content><![CDATA[<h3 id="比较器Comparator"><a href="#比较器Comparator" class="headerlink" title="比较器Comparator"></a>比较器Comparator</h3><ol>
 <li><p>Arrays.sort(users,new Comparator)</p>
@@ -949,75 +1115,258 @@ stream.collect(Collectors.toCollection())<span aria-hidden="true" class="line-nu
 <p>​    –&gt;i++找到合适开始index</p>
 <p>​    –&gt;2进制插入排序binarySort(a,index,length,c)</p>
 <p>​    –&gt;这是对少量元素进行排序的最佳方法，它需</p>
-<!--more--->
+</li>
+</ol>
+<span id="more"></span>
 
-<p>要O（n logn）比较，但需要O（n^2）数据移动（最坏情况</p>
+<ol start="2">
+<li><p>要O（n logn）比较，但需要O（n^2）数据移动（最坏情况</p>
 <p>-&gt;else -&gt;Timsort</p>
 </li>
 <li><p>Arrays.sort(int[])–&gt;优化的快排</p>
 </li>
 </ol>
-<h3 id=""><a href="#" class="headerlink" title=""></a></h3>]]></content>
+<h3 id="org-apache-logging-log4j-util-Strings-final"><a href="#org-apache-logging-log4j-util-Strings-final" class="headerlink" title="org.apache.logging.log4j.util.Strings(final)"></a>org.apache.logging.log4j.util.Strings(final)</h3><ol>
+<li><p>isEmpty</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">return</span> cs <span class="token operator">==</span> <span class="token keyword">null</span> <span class="token operator">||</span> cs<span class="token punctuation">.</span><span class="token function">length</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+<li><p>isBlank 是否是空白</p>
+</li>
+</ol>
+<h3 id="java-lang"><a href="#java-lang" class="headerlink" title="java.lang"></a>java.lang</h3><ol>
+<li><p>final class</p>
+<ol>
+<li><p>String</p>
+<ol>
+<li><p>charAt,indexOf,compareTo,concat(str),contain,equals,endsWith,ifEmpty</p>
+<p>replace,split</p>
+</li>
+<li><p>copyValueOf(),valueOf(char[],begin,length),valueOf(基本类型)</p>
+</li>
+<li><p>subString(begin,end),toLowerCase,trim</p>
+</li>
+</ol>
+</li>
+<li><p>Character</p>
+<ol>
+<li>equals,isLetter是否是一个字母,isLowLetter是否小写字母，toLowCase,compareTo</li>
+<li>digit</li>
+</ol>
+</li>
+<li><p>Object</p>
+<ol>
+<li><p>final native getClass 获得运行时Class而非String/类 com.wyg.entity.user,也可能是他的子类。</p>
+</li>
+<li><p>native clone</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java">x<span class="token punctuation">.</span><span class="token function">clone</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">!=</span>x
+x<span class="token punctuation">.</span><span class="token function">clone</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">==</span>x
+x<span class="token punctuation">.</span><span class="token function">clone</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">equal</span><span class="token punctuation">(</span><span class="token string">''</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre></li>
+<li><p>native hashcode</p>
+</li>
+<li><p>可重写：toString,equals</p>
+</li>
+</ol>
+</li>
+<li><p>System</p>
+<ol>
+<li><p>获取系统信息，修改系统信息，标准输入输出流，加载文件、库。</p>
+</li>
+<li><p>native void arraycopy(src[],begin1,dest[],begin2,length)</p>
+</li>
+<li><p>exit退出</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">exit</span><span class="token punctuation">(</span><span class="token keyword">int</span> status<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token class-name">Runtime</span><span class="token punctuation">.</span><span class="token function">getRuntime</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">exit</span><span class="token punctuation">(</span>status<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre></li>
+<li><p>getProperties获取当前系统信息</p>
+<pre class="line-numbers language-properties" data-language="properties"><code class="language-properties"><span class="token attr-name">os.version</span><span class="token punctuation">=</span><span class="token attr-value">10.0, </span>
+<span class="token attr-name">os.arch</span><span class="token punctuation">=</span><span class="token attr-value">amd64,</span>
+<span class="token attr-name">os.name</span><span class="token punctuation">=</span><span class="token attr-value">Windows 10, sun.jnu.encoding=GBK, </span>
+<span class="token attr-name">file.encoding</span><span class="token punctuation">=</span><span class="token attr-value">UTF-8, </span>
+<span class="token attr-name">user.language</span><span class="token punctuation">=</span><span class="token attr-value">zh,</span>
+<span class="token attr-name">user.dir</span><span class="token punctuation">=</span><span class="token attr-value">D:\java\新特性, </span>
+<span class="token attr-name">user.country</span><span class="token punctuation">=</span><span class="token attr-value">CN,</span>
+<span class="token attr-name">user.name</span><span class="token punctuation">=</span><span class="token attr-value">22453, </span>
+<span class="token attr-name">user.home</span><span class="token punctuation">=</span><span class="token attr-value">C:\Users\22453, </span>
+<span class="token attr-name">user.timezone</span><span class="token punctuation">=</span><span class="token attr-value">Asia/Shanghai, </span>
+<span class="token attr-name">java.runtime.name</span><span class="token punctuation">=</span><span class="token attr-value">OpenJDK Runtime Environment, </span>
+<span class="token attr-name">java.vm.name</span><span class="token punctuation">=</span><span class="token attr-value">OpenJDK 64-Bit Server VM, </span>
+<span class="token attr-name">java.vm.specification.name</span><span class="token punctuation">=</span><span class="token attr-value">Java Virtual Machine Specification,</span>
+<span class="token attr-name">java.runtime.version</span><span class="token punctuation">=</span><span class="token attr-value">1.8.0_302-b08, java.awt.graphicsenv=sun.awt.Win32GraphicsEnvironment, java.endorsed.dirs=D:\java\jdk8u302-b08\jre\lib\endorsed,</span>
+<span class="token attr-name">java.io.tmpdir</span><span class="token punctuation">=</span><span class="token attr-value">C:\Users\22453\AppData\Local\Temp\,</span>
+<span class="token attr-name">java.library.path</span><span class="token punctuation">=</span><span class="token attr-value">cmd.path</span>
+<span class="token attr-name">java.specification.name</span><span class="token punctuation">=</span><span class="token attr-value">Java Platform API Specification, </span>
+<span class="token attr-name">java.class.version</span><span class="token punctuation">=</span><span class="token attr-value">52.0,</span>
+<span class="token attr-name">java.vm.specification.version</span><span class="token punctuation">=</span><span class="token attr-value">1.8, </span>
+<span class="token attr-name">java.home</span><span class="token punctuation">=</span><span class="token attr-value">D:\java\jdk8u302-b08\jre,</span>
+<span class="token attr-name">java.version</span><span class="token punctuation">=</span><span class="token attr-value">1.8.0_302, </span>
+<span class="token attr-name">java.vendor</span><span class="token punctuation">=</span><span class="token attr-value">Temurin,</span>
+<span class="token attr-name">sun.cpu.endian</span><span class="token punctuation">=</span><span class="token attr-value">little, </span>
+<span class="token attr-name">sun.java.launcher</span><span class="token punctuation">=</span><span class="token attr-value">SUN_STANDARD, </span>
+<span class="token attr-name">sun.desktop</span><span class="token punctuation">=</span><span class="token attr-value">windows,</span>
+<span class="token attr-name">sun.boot.library.path</span><span class="token punctuation">=</span><span class="token attr-value">D:\java\jdk8u302-b08\jre\bin, </span>
+<span class="token attr-name">sun.cpu.isalist</span><span class="token punctuation">=</span><span class="token attr-value">amd64&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+</ol>
+</li>
+<li><p>Math</p>
+</li>
+<li></li>
+</ol>
+</li>
+<li><p>class</p>
+<ol>
+<li>interface Runable</li>
+<li>Thread implements Runnable<ol>
+<li>static sleep 当前线程休息</li>
+<li>start,调用run</li>
+<li>getId,getName</li>
+<li>static currentThread,返回当前线程</li>
+<li></li>
+</ol>
+</li>
+<li>class Package implements java.lang.reflect.AnnotatedElemen–单例</li>
+</ol>
+</li>
+<li><p>特殊类：</p>
+<ol>
+<li><p>异常类class Throwable implements Serializable</p>
+<ol>
+<li>getMassage</li>
+<li>printStackTrace</li>
+</ol>
+</li>
+<li><p>final Void</p>
+<ol>
+<li><p>结合native方法构成关键字</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">static</span> <span class="token keyword">native</span> <span class="token class-name">Class</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span><span class="token punctuation">></span></span> <span class="token function">getPrimitiveClass</span><span class="token punctuation">(</span><span class="token class-name">String</span> name<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+</ol>
+</li>
+<li><p>final Class&lt;T&gt;</p>
+<ol>
+<li><p>结合native方法构成关键字</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">static</span> <span class="token keyword">native</span> <span class="token class-name">Class</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token operator">?</span><span class="token punctuation">></span></span> <span class="token function">getPrimitiveClass</span><span class="token punctuation">(</span><span class="token class-name">String</span> name<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+<li><p>T newInstance 创造实例</p>
+</li>
+<li></li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="sun-reflect"><a href="#sun-reflect" class="headerlink" title="sun.reflect"></a>sun.reflect</h3>]]></content>
       <categories>
         <category>java</category>
       </categories>
   </entry>
   <entry>
-    <title>jvm</title>
-    <url>/2021/09/28/java/jvm/</url>
-    <content><![CDATA[<h3 id=""><a href="#" class="headerlink" title=""></a></h3><ol>
-<li>OOM，栈溢出</li>
-<li>jvm常用调优</li>
-<li>内存快照</li>
-<li>怎么分析dump文件</li>
-<li>类加载器</li>
-<li>jar包</li>
+    <title>java知识</title>
+    <url>/2021/10/05/java/java%E7%9F%A5%E8%AF%86/</url>
+    <content><![CDATA[<h2 id="类"><a href="#类" class="headerlink" title="类"></a>类</h2><h4 id="私有构造"><a href="#私有构造" class="headerlink" title="私有构造"></a>私有构造</h4><ol>
+<li><p>特点：不能实例化，不能被继承，常用于被实例化一次的类(单例模式)</p>
+</li>
+<li><p>两种方式拿到单例</p>
+<ol>
+<li><p>puvlic static成员变量</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Elvis</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token class-name">Elvis</span> INSTANCE <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Elvis</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">private</span> <span class="token class-name">Elvis</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre></li>
+<li><p>private static成员变量，使用static方法返回</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Elvis</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">final</span> <span class="token class-name">Elvis</span> INSTANCE <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Elvis</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">private</span> <span class="token class-name">Elvis</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token class-name">Elvis</span> <span class="token function">getInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span> <span class="token keyword">return</span> INSTANCE<span class="token punctuation">;</span><span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+<li><p>作用：防止实例化和子类化，常用在util类,常量类，我们一般用这些类static方法而非他的实例，</p>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="继承"><a href="#继承" class="headerlink" title="继承"></a>继承</h3><ol>
+<li><p>强制转换本着宁多勿少的原则，java.lang.ClassCastException运行时异常</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token class-name">Users</span> obj<span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">Users</span><span class="token punctuation">)</span> <span class="token keyword">new</span> <span class="token class-name">Object</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+</ol>
+<h3 id="java四大域对象"><a href="#java四大域对象" class="headerlink" title="java四大域对象"></a><a href="https://blog.csdn.net/u014253011/article/details/85718649">java四大域对象</a></h3><ol>
+<li><p>request HttpServletContext </p>
+<ol>
+<li><p>生命周期：</p>
+<p>在Service方法调用前由服务器创建，传入service方法。整个请求结束，request生命结束。<br>用户发送一个请求，开始，服务器返回响应，请求结束，生命周期结束；</p>
+</li>
+<li><p>作用范围：整个请求链（请求转发也存在）/一次请求转发的范围</p>
+</li>
+<li><p>作用：获取请求数据，共享数据，请求转发。</p>
+</li>
+</ol>
+</li>
+<li><p>session HttpSession</p>
+<ol>
+<li><p>生命周期</p>
+<p>在第一次调用request.getSession()方法时，服务器会检查是否已经有对应的session，如果没有就在内存中创建一个session并返回。<br>（1）当一段时间内session没有被使用（默认为30分钟），则服务器会销毁该session。<br>（2）如果服务器非正常关闭，没有到期的session也会跟着销毁。<br>（3）如果调用session提供的invalidate()，可以立即销毁session。</p>
+</li>
 <li></li>
 </ol>
-<span id="more"></span>
-
-<h3 id="-1"><a href="#-1" class="headerlink" title=""></a></h3><ol>
-<li>对jvm理解<ol>
-<li>javac a.java –&gt;java.class–&gt;类加载器—-&gt;运行区–<ol>
-<li>方法区 垃圾回收</li>
-<li>java栈</li>
-<li>本地方法栈&lt;—本地方法接口&lt;–本地方法库</li>
-<li>native method</li>
-<li>堆heap 垃圾回收</li>
-<li>程序技术器pc</li>
-<li></li>
+</li>
+<li><p>application ServletContext</p>
+<ol>
+<li>生命周期：整个web服务</li>
+<li>作用范围：整个web应用</li>
+<li>作用：<ol>
+<li>读取配置文件</li>
+<li>在不同Servlet 之间转发</li>
 </ol>
 </li>
-<li>jvm位置<ol>
-<li>硬件体系(intel)–&gt;操作系统(win)–&gt;jre（jvm）–&gt;java</li>
 </ol>
 </li>
-<li>jvm结构</li>
+<li><p>page(jsp)   pageContext</p>
+<ol>
+<li>可以作为入口对象获取其他三大域对象的引用，获取其所有域中的数据</li>
+<li>作用于整个JSP页面，是四大作用域中最小的一个</li>
 </ol>
 </li>
-<li>类加载器<ol>
-<li>class是模板，抽象的，object是实体，具象的</li>
-<li>作用:加载class文件</li>
-<li>a.class–&gt;jvm–&gt;new-&gt;实例</li>
+<li><p>特点</p>
+<ol>
+<li>之所以他们是域对象，原因是他们都内置了map集合，都有setAttribute和getAttribute方法。</li>
+<li>都有生命周期，servlet{init,service,destory}也有生命周期。</li>
 </ol>
 </li>
-<li>双亲委派模式</li>
-<li>沙箱安全模式</li>
-<li>native</li>
-<li>方法去</li>
-<li>pc寄存器</li>
-<li>栈</li>
-<li>方法区</li>
-<li>三种jvm</li>
-<li>堆</li>
-<li>新生区，老年区，用就去</li>
-<li>GC算法</li>
-<li></li>
+<li><p>如果一个数据只在当前jsp页面使用，可以使用pageContext域</p>
+<p>如果一个数据，除了在当前Servlet中使用，还要在请求转发中使用，使用request域</p>
+<p>如果一个数据，除了现在我自己要用，过一会我自己还要用，存在session域</p>
+<p>如果一个数据，除了我自己用其他人也要用，存在ServleContext域中</p>
+</li>
+<li><p>域对象：能够在自己的作用范围共享数据。</p>
+</li>
+</ol>
+<h3 id="java9大隐式对象"><a href="#java9大隐式对象" class="headerlink" title="java9大隐式对象"></a>java9大隐式对象</h3><ol>
+<li><p>Session: 主要用于来分别保存每个用户信息，与请求关联的对话;</p>
+</li>
+<li><p>Request: 代表请求对象，主要用于接受客户端通过HTTP协议连接传输到服务器端的数据;</p>
+</li>
+<li><p>Response: 代表响应对象，主要用于向客户端发送数据;</p>
+</li>
+<li><p>out: 主要用于向客户端输出数据；</p>
+</li>
+<li><p>application: 主要用于保存用户信息，代码片段的运行环境;</p>
+</li>
+<li><p>pageContext: 管理网页属性;</p>
+<ol>
+<li>可以作为入口对象获取其他八大隐式对象的引用</li>
+</ol>
+</li>
+<li><p>config: 代码片段配置对象，表示Servlet的配置;</p>
+</li>
+<li><p>page:处理jsp网页;</p>
+</li>
+<li><p>Exception:处理jsp文件执行时发生的错误和异常</p>
+</li>
+</ol>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><h4 id="native关键字"><a href="#native关键字" class="headerlink" title="native关键字"></a>native关键字</h4><ol>
+<li><a href="https://www.cnblogs.com/szlbm/p/5504603.html**">手写一个native</a></li>
+<li>native方法主要用于加载文件和动态链接库，由于Java语言无法访问操作系统底层信息（比如：底层硬件设备等），这时候就需要借助C语言来完成了。被native修饰的方法可以被C语言重写。</li>
+<li>被native关键字修饰的方法叫做本地方法，本地方法和其它方法不一样，本地方法意味着和平台有关</li>
+<li>Java程序中声明native修饰的方法，类似于abstract修饰的方法，只有方法签名，没有方法实现。编译该java文件，会产生一个.class文件。</li>
 </ol>
 ]]></content>
       <categories>
         <category>java</category>
-        <category>java高阶</category>
       </categories>
   </entry>
   <entry>
@@ -1363,6 +1712,64 @@ in<span class="token operator">=</span><span class="token class-name"><span clas
       </categories>
   </entry>
   <entry>
+    <title>jvm</title>
+    <url>/2021/09/28/java/jvm/</url>
+    <content><![CDATA[<h3 id=""><a href="#" class="headerlink" title=""></a></h3><ol>
+<li>OOM，栈溢出</li>
+<li>jvm常用调优</li>
+<li>内存快照</li>
+<li>怎么分析dump文件</li>
+<li>类加载器</li>
+<li>jar包</li>
+<li></li>
+</ol>
+<span id="more"></span>
+
+<h3 id="-1"><a href="#-1" class="headerlink" title=""></a></h3><ol>
+<li>对jvm理解<ol>
+<li>javac a.java –&gt;java.class–&gt;类加载器—-&gt;运行区–<ol>
+<li>方法区 垃圾回收</li>
+<li>java栈</li>
+<li>本地方法栈&lt;—本地方法接口&lt;–本地方法库</li>
+<li>native method</li>
+<li>堆heap 垃圾回收</li>
+<li>程序技术器pc</li>
+<li></li>
+</ol>
+</li>
+<li>jvm位置<ol>
+<li>硬件体系(intel)–&gt;操作系统(win)–&gt;jre（jvm）–&gt;java</li>
+</ol>
+</li>
+<li>jvm结构</li>
+</ol>
+</li>
+<li>类加载器<ol>
+<li>class是模板，抽象的，object是实体，具象的</li>
+<li>作用:加载class文件</li>
+<li>a.class–&gt;jvm–&gt;new-&gt;实例</li>
+</ol>
+</li>
+<li>双亲委派模式</li>
+<li>沙箱安全模式</li>
+<li>native</li>
+<li>方法去</li>
+<li>pc寄存器</li>
+<li>栈</li>
+<li>方法区</li>
+<li>三种jvm</li>
+<li>堆</li>
+<li>新生区，老年区，用就去</li>
+<li>GC算法</li>
+<li></li>
+</ol>
+]]></content>
+      <categories>
+        <category>java</category>
+        <category>java高阶</category>
+      </categories>
+  </entry>
+  <entry>
     <title>springBoot</title>
     <url>/2021/09/29/java/springBoot/</url>
     <content><![CDATA[<h3 id="spring-boot-starter"><a href="#spring-boot-starter" class="headerlink" title="spring-boot-starter"></a>spring-boot-starter</h3><ol>
@@ -1405,158 +1812,6 @@ in<span class="token operator">=</span><span class="token class-name"><span clas
       <categories>
         <category>java</category>
         <category>java高阶</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>hadoop的启动</title>
-    <url>/2021/09/10/distribute/hadoop%E5%90%AF%E5%8A%A8/</url>
-    <content><![CDATA[<h2 id="一、-基本环境"><a href="#一、-基本环境" class="headerlink" title="一、 基本环境"></a>一、 基本环境</h2><ol>
-<li><p>获取主机名字 master、s1、s2</p>
-</li>
-<li><p>时钟同步</p>
-<pre class="line-numbers language-none"><code class="language-none">&#x2F;usr&#x2F;sbin&#x2F;ntpdate cn.pool.ntp.org<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-<li><p>关闭防火墙</p>
-<pre class="line-numbers language-none"><code class="language-none">systemctl stop firewalld.service<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-<li><p>编辑host 以对应ping 如：</p>
-<pre class="line-numbers language-none"><code class="language-none">10.42.0.93 master
-10.42.0.94 slave01
-10.42.0.95 slave02<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre></li>
-<li><p>测试ping是否成功</p>
-<pre class="line-numbers language-none"><code class="language-none">ping master -c 3<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-</ol>
-<h2 id="二、联机"><a href="#二、联机" class="headerlink" title="二、联机"></a>二、联机</h2><ol>
-<li><p>生成公钥</p>
-<pre class="line-numbers language-none"><code class="language-none">ssh-keygen -t rsa<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-<li><p>公钥备份文件</p>
-<pre class="line-numbers language-none"><code class="language-none">cat ~&#x2F;.ssh&#x2F;id_rsa.pub &gt;&gt; ~&#x2F;.ssh&#x2F;authorized_keys<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-<li><p>修改文件权限</p>
-<pre class="line-numbers language-none"><code class="language-none">chmod 600 ~&#x2F;.ssh&#x2F;authorized_keys<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-<li><p>将专用密钥添加到 ssh-agent 的高速缓存中</p>
-<pre class="line-numbers language-none"><code class="language-none">ssh-add ~&#x2F;.ssh&#x2F;id_rsa<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-<li><p>公钥转移到其他机器</p>
-<pre class="line-numbers language-none"><code class="language-none">scp ~&#x2F;.ssh&#x2F;authorized_keys zkpk@slave01:~&#x2F;.ssh&#x2F;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-<li><p>其他机器也生成密钥</p>
-</li>
-<li><p>测试远程   ssh s1</p>
-</li>
-</ol>
-<h2 id="三、安装java"><a href="#三、安装java" class="headerlink" title="三、安装java"></a>三、安装java</h2><ol>
-<li><p>root下解压</p>
-<pre class="line-numbers language-none"><code class="language-none">tar -xzvf &#x2F;home&#x2F;zkpk&#x2F;tgz&#x2F;jdk-8u131-linux-x64.tar.gz -C &#x2F;usr&#x2F;java<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-<li><p>修改环境变量</p>
-<pre class="line-numbers language-none"><code class="language-none">gedit &#x2F;home&#x2F;zkpk&#x2F;.bash_profile
-	export JAVA_HOME&#x3D;&#x2F;usr&#x2F;java&#x2F;jdk1.8.0_131&#x2F;
-	export PATH&#x3D;$JAVA_HOME&#x2F;bin:$PATH
-source &#x2F;home&#x2F;zkpk&#x2F;.bash_profile<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre></li>
-<li><p>其他机器同样安装</p>
-</li>
-<li><p>测试java：java -version</p>
-</li>
-</ol>
-<h2 id="四、安装hadoop"><a href="#四、安装hadoop" class="headerlink" title="四、安装hadoop"></a>四、安装hadoop</h2><ol>
-<li><p>解压</p>
-<pre class="line-numbers language-none"><code class="language-none">tar -xzvf &#x2F;home&#x2F;zkpk&#x2F;tgz&#x2F;hadoop-2.7.3.tar.gz –C &#x2F;home&#x2F;zkpk<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-<li><p>修改java环境变量</p>
-<pre class="line-numbers language-none"><code class="language-none">gedit &#x2F;home&#x2F;zkpk&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;hadoop-env.sh
- 	export JAVA_HOME&#x3D;&#x2F;usr&#x2F;java&#x2F;jdk1.8.0_131&#x2F;
-gedit ~&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;yarn-env.sh
-	export JAVA_HOME&#x3D;&#x2F;usr&#x2F;java&#x2F;jdk1.8.0_131&#x2F;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre></li>
-<li><p>其他配置</p>
-<pre class="line-numbers language-none"><code class="language-none">1.配置core-site.xml 文件
-gedit  ~&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;core-site.xml
-	&lt;?xml version&#x3D;&quot;1.0&quot; encoding&#x3D;&quot;UTF-8&quot;?&gt;
-    &lt;?xml-stylesheet type&#x3D;&quot;text&#x2F;xsl&quot; href&#x3D;&quot;configuration.xsl&quot;?&gt;
-    &lt;!-- Put site-specific property overrides in this file. --&gt;
-    &lt;configuration&gt;
-            &lt;property&gt;
-                    &lt;name&gt;fs.defaultFS&lt;&#x2F;name&gt;
-                    &lt;value&gt;hdfs:&#x2F;&#x2F;master:9000&lt;&#x2F;value&gt;
-            &lt;&#x2F;property&gt;
-            &lt;property&gt;
-                    &lt;name&gt;hadoop.tmp.dir&lt;&#x2F;name&gt;
-                    &lt;value&gt;&#x2F;home&#x2F;zkpk&#x2F;hadoopdata&lt;&#x2F;value&gt;
-            &lt;&#x2F;property&gt;
-    &lt;&#x2F;configuration&gt;
-2.配置hdfs-site.xml文件
-gedit  ~&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;hdfs-site.xml
-    &lt;?xml version&#x3D;&quot;1.0&quot; encoding&#x3D;&quot;UTF-8&quot;?&gt;
-    &lt;?xml-stylesheet type&#x3D;&quot;text&#x2F;xsl&quot; href&#x3D;&quot;configuration.xsl&quot;?&gt;
-    &lt;!-- Put site-specific property overrides in this file. --&gt;
-    &lt;configuration&gt;
-        &lt;property&gt;
-            &lt;name&gt;dfs.replication&lt;&#x2F;name&gt;
-            &lt;value&gt;2&lt;&#x2F;value&gt;
-        &lt;&#x2F;property&gt;
-    &lt;&#x2F;configuration&gt;
-3.配置yarn-site.xml文件
-gedit  ~&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;yarn-site.xml
-    &lt;?xml version&#x3D;&quot;1.0&quot;?&gt;
-    &lt;configuration&gt;
-        &lt;property&gt;
-            &lt;name&gt;yarn.nodemanager.aux-services&lt;&#x2F;name&gt;
-            &lt;value&gt;mapreduce_shuffle&lt;&#x2F;value&gt;
-        &lt;&#x2F;property&gt;
-        &lt;property&gt;
-            &lt;name&gt;yarn.resourcemanager.address&lt;&#x2F;name&gt;
-            &lt;value&gt;master:18040&lt;&#x2F;value&gt;
-        &lt;&#x2F;property&gt;
-        &lt;property&gt;
-            &lt;name&gt;yarn.resourcemanager.scheduler.address&lt;&#x2F;name&gt;
-            &lt;value&gt;master:18030&lt;&#x2F;value&gt;
-        &lt;&#x2F;property&gt;
-        &lt;property&gt;
-            &lt;name&gt;yarn.resourcemanager.resource-tracker.address&lt;&#x2F;name&gt;
-            &lt;value&gt;master:18025&lt;&#x2F;value&gt;
-        &lt;&#x2F;property&gt;
-        &lt;property&gt;
-            &lt;name&gt;yarn.resourcemanager.admin.address&lt;&#x2F;name&gt;
-            &lt;value&gt;master:18141&lt;&#x2F;value&gt;
-        &lt;&#x2F;property&gt;
-        &lt;property&gt;
-            &lt;name&gt;yarn.resourcemanager.webapp.address&lt;&#x2F;name&gt;
-            &lt;value&gt;master:18088&lt;&#x2F;value&gt;
-        &lt;&#x2F;property&gt;
-    &lt;&#x2F;configuration&gt;
-4.配置mapred-site.xml文件
-cp ~&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;mapred-site.xml.template  ~&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;mapred-site.xml
-gedit ~&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;mapred-site.xml
-    &lt;?xml version&#x3D;&quot;1.0&quot;?&gt;
-    &lt;?xml-stylesheet type&#x3D;&quot;text&#x2F;xsl&quot; href&#x3D;&quot;configuration.xsl&quot;?&gt;
-    &lt;configuration&gt;
-        &lt;property&gt;
-            &lt;name&gt;mapreduce.framework.name&lt;&#x2F;name&gt;
-            &lt;value&gt;yarn&lt;&#x2F;value&gt;
-        &lt;&#x2F;property&gt;
-    &lt;&#x2F;configuration&gt;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
-<li><p>配置slaves文件</p>
-<pre class="line-numbers language-none"><code class="language-none">gedit ~&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;slaves
-    slave01
-    slave02<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre></li>
-<li><p>创建Hadoop数据目录</p>
-<pre class="line-numbers language-none"><code class="language-none">mkdir hadoopdata<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-<li><p>将配置好的hadoop文件夹复制到从节点</p>
-<pre class="line-numbers language-none"><code class="language-none">scp -r hadoop-2.7.3 zkpk@slave01:~&#x2F;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-<li><p>配置环境变量</p>
-<pre class="line-numbers language-none"><code class="language-none">gedit ~&#x2F;.bash_profile
-    #HADOOP
-    export HADOOP_HOME&#x3D;&#x2F;home&#x2F;zkpk&#x2F;hadoop-2.7.3
-    export PATH&#x3D;$HADOOP_HOME&#x2F;bin:$HADOOP_HOME&#x2F;sbin:$PATH
-source ~&#x2F;.bash_profile<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
-<li><p>其他机器同样配置环境变量</p>
-</li>
-<li><p>在master格式化磁盘</p>
-<pre class="line-numbers language-none"><code class="language-none">hdfs namenode -format<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-</ol>
-<h2 id="五、启动检测"><a href="#五、启动检测" class="headerlink" title="五、启动检测"></a>五、启动检测</h2><ol>
-<li>start-all.sh</li>
-<li>jps查看</li>
-<li><a href="http://master:50070/%E6%9F%A5%E7%9C%8B">http://master:50070/查看</a></li>
-<li><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20210911183155100.png" alt="image-20210911183155100"></li>
-</ol>
-]]></content>
-      <categories>
-        <category>大数据开发</category>
-        <category>hadoop</category>
       </categories>
   </entry>
   <entry>
@@ -1649,15 +1904,15 @@ commons-lang3<span aria-hidden="true" class="line-numbers-rows"><span></span><sp
 <pre class="line-numbers language-none"><code class="language-none">
 3. html加入命名空间
 
-   &lt;!--more--&gt;
-
    &#96;&#96;&#96;html
-   &lt;html lang&#x3D;&quot;en&quot;   xmlns:th&#x3D;&quot;http:&#x2F;&#x2F;www.thymeleaf.org&quot;&gt;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+   &lt;html lang&#x3D;&quot;en&quot;   xmlns:th&#x3D;&quot;http:&#x2F;&#x2F;www.thymeleaf.org&quot;&gt;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
 <li><p>html调用</p>
 <pre class="line-numbers language-html" data-language="html"><code class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>p</span> <span class="token attr-name"><span class="token namespace">th:</span>text</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span><span class="token punctuation">'</span>hello<span class="token punctuation">'</span> +$&#123;name&#125;<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>p</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
 </ol>
 </li>
 </ol>
+<span id="more"></span>
+
 <h3 id="mybaitsplus"><a href="#mybaitsplus" class="headerlink" title="mybaitsplus"></a>mybaitsplus</h3><ol>
 <li><p>步骤</p>
 <ol>
@@ -1761,10 +2016,10 @@ commons-lang3<span aria-hidden="true" class="line-numbers-rows"><span></span><sp
 
       2. FilterChainProxy.doFilter-&gt;doFilterInternal把所有的过滤器加载到List
 
-3. 两个接口
+3. 两个接口：用于自定义数据库认证
 
-   1. UserDetailsService 
-   2. PasswordEncoder 加密密码
+   1. @UserDetailsService 用户，基于UsernamaPassword过滤器
+   2. @PasswordEncoder 加密密码
 
 4. 认证
 
@@ -1784,7 +2039,7 @@ commons-lang3<span aria-hidden="true" class="line-numbers-rows"><span></span><sp
     <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">configure</span><span class="token punctuation">(</span><span class="token class-name">AuthenticationManagerBuilder</span> auth<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">Exception</span> <span class="token punctuation">&#123;</span>
         <span class="token class-name">BCryptPasswordEncoder</span> passwordEncoder<span class="token operator">=</span><span class="token keyword">new</span> <span class="token class-name">BCryptPasswordEncoder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
         <span class="token class-name">String</span> password <span class="token operator">=</span> passwordEncoder<span class="token punctuation">.</span><span class="token function">encode</span><span class="token punctuation">(</span><span class="token string">"123456"</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment">//设置密码</span>
-        auth<span class="token punctuation">.</span><span class="token function">inMemoryAuthentication</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">withUser</span><span class="token punctuation">(</span><span class="token string">"wang"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">password</span><span class="token punctuation">(</span>password<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">roles</span><span class="token punctuation">(</span><span class="token string">"admin"</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment">//配置</span>
+      auth<span class="token punctuation">.</span><span class="token function">inMemoryAuthentication</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">withUser</span><span class="token punctuation">(</span><span class="token string">"wang"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">password</span><span class="token punctuation">(</span>password<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">roles</span><span class="token punctuation">(</span><span class="token string">"admin"</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment">//配置</span>
     <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>报错</p>
@@ -1802,44 +2057,56 @@ commons-lang3<span aria-hidden="true" class="line-numbers-rows"><span></span><sp
 </li>
 <li><p>步骤</p>
 <ol>
-<li><p>创建WebSecurityConfigerAdapter的继承</p>
+<li><p>创建UserDetailService手工辅助Bean,并返回一个完整的用于认证和权限鉴定的User{username,password,authorities}</p>
 <pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token annotation punctuation">@Autowired</span>
-    <span class="token keyword">private</span> <span class="token class-name">UserDetailsService</span> userDetailsService<span class="token punctuation">;</span>
-    <span class="token annotation punctuation">@Override</span>
-    <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">configure</span><span class="token punctuation">(</span><span class="token class-name">AuthenticationManagerBuilder</span> auth<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">Exception</span> <span class="token punctuation">&#123;</span>
-        auth<span class="token punctuation">.</span><span class="token function">userDetailsService</span><span class="token punctuation">(</span>userDetailsService<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">passwordEncoder</span><span class="token punctuation">(</span><span class="token function">passwordEncoderxxx</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span>
-    <span class="token annotation punctuation">@Bean</span>
-    <span class="token class-name">PasswordEncoder</span> <span class="token function">passwordEncoderxxx</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-        <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">BCryptPasswordEncoder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span>
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
-<li><p>创建UserDetailService实现类</p>
-<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token annotation punctuation">@Service</span><span class="token punctuation">(</span><span class="token string">"userDetailsService"</span><span class="token punctuation">)</span>
+<span class="token class-name">UserMapper</span> userMapper<span class="token punctuation">;</span>
+<span class="token annotation punctuation">@Service</span><span class="token punctuation">(</span><span class="token string">"userDetailsService"</span><span class="token punctuation">)</span>
 <span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">UserService</span> <span class="token keyword">implements</span> <span class="token class-name">UserDetailsService</span> <span class="token punctuation">&#123;</span>
     <span class="token annotation punctuation">@Override</span>
     <span class="token keyword">public</span> <span class="token class-name">UserDetails</span> <span class="token function">loadUserByUsername</span><span class="token punctuation">(</span><span class="token class-name">String</span> s<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">UsernameNotFoundException</span> <span class="token punctuation">&#123;</span>
-        <span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">GrantedAuthority</span><span class="token punctuation">></span></span> authorities <span class="token operator">=</span> <span class="token class-name">AuthorityUtils</span><span class="token punctuation">.</span><span class="token function">commaSeparatedStringToAuthorityList</span><span class="token punctuation">(</span><span class="token string">"role"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">GrantedAuthority</span><span class="token punctuation">></span></span> authorities <span class="token operator">=</span> <span class="token class-name">AuthorityUtils</span><span class="token punctuation">.</span><span class="token function">commaSeparatedStringToAuthorityList</span><span class="token punctuation">(</span><span class="token string">"role"</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment">//加入权限</span>
         <span class="token comment">//通过数据库获取用户名和密码，这里会自动比较密码是否真确，因为之前已经拦截过user.name和user.password了</span>
         <span class="token class-name">String</span> name <span class="token operator">=</span> <span class="token string">"wang"</span><span class="token punctuation">;</span>
         <span class="token class-name">String</span> password <span class="token operator">=</span> <span class="token string">"123"</span><span class="token punctuation">;</span>
         <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">User</span><span class="token punctuation">(</span>name<span class="token punctuation">,</span>
                 <span class="token keyword">new</span> <span class="token class-name">BCryptPasswordEncoder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">encode</span><span class="token punctuation">(</span>password<span class="token punctuation">)</span><span class="token punctuation">,</span> authorities<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
-</ol>
-</li>
-<li><p>重写@configration的configure(http)方法</p>
+    <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+<li><p>创建WebSecurityConfigerAdapter的子类进行</p>
+<ol>
+<li><p>认证:configure(AuthenticationManagerBuilder auth)</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">MySecurityConfig</span> <span class="token keyword">extends</span> <span class="token class-name">WebSecurityConfigurerAdapter</span> <span class="token punctuation">&#123;</span>
+    <span class="token annotation punctuation">@Autowired</span>
+    <span class="token keyword">private</span> <span class="token class-name">UserDetailsService</span> userDetailsService<span class="token punctuation">;</span>
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">configure</span><span class="token punctuation">(</span><span class="token class-name">AuthenticationManagerBuilder</span> auth<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">Exception</span> <span class="token punctuation">&#123;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"认证"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        auth<span class="token punctuation">.</span><span class="token function">userDetailsService</span><span class="token punctuation">(</span>userDetailsService<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">passwordEncoder</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">BCryptPasswordEncoder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+<li><p>权限鉴定:  void configure(HttpSecurity http)  </p>
 <pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token annotation punctuation">@Override</span>
     <span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">configure</span><span class="token punctuation">(</span><span class="token class-name">HttpSecurity</span> http<span class="token punctuation">)</span> <span class="token keyword">throws</span> <span class="token class-name">Exception</span> <span class="token punctuation">&#123;</span>
         http<span class="token punctuation">.</span><span class="token function">formLogin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token comment">//自定义登录</span>
-                <span class="token punctuation">.</span><span class="token function">loginPage</span><span class="token punctuation">(</span><span class="token string">"/login.html"</span><span class="token punctuation">)</span><span class="token comment">//登录页面</span>
+                <span class="token punctuation">.</span><span class="token function">loginPage</span><span class="token punctuation">(</span><span class="token string">"/login.html"</span><span class="token punctuation">)</span><span class="token comment">//登录页面--->去另一个configure认证--->认证完--->原路径</span>
                 <span class="token punctuation">.</span><span class="token function">loginProcessingUrl</span><span class="token punctuation">(</span><span class="token string">"/user/login"</span><span class="token punctuation">)</span><span class="token comment">//登录访问路径-->postController</span>
                 <span class="token punctuation">.</span><span class="token function">defaultSuccessUrl</span><span class="token punctuation">(</span><span class="token string">"/test/index"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">permitAll</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token comment">//登录成功页面</span>
                 <span class="token punctuation">.</span><span class="token function">and</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">authorizeRequests</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">antMatchers</span><span class="token punctuation">(</span><span class="token string">"/"</span><span class="token punctuation">,</span><span class="token string">"/test/hi"</span><span class="token punctuation">,</span><span class="token string">"/user/login"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">permitAll</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token comment">//不需要认证的界面</span>
                 <span class="token punctuation">.</span><span class="token function">anyRequest</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">authenticated</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
                 <span class="token punctuation">.</span><span class="token function">and</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">csrf</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">disable</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment">//关闭csrf防护。</span>
     <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
-<li><p>bug—-&gt;我的测试页面一直不需要认证，原因是浏览器没关闭，cookie自带的信息帮我认证了。</p>
+<li><p>权限鉴定步骤:</p>
+<ol>
+<li>用户登录访问任意需要认证的路径，比如/test/hello,”/test/hi”不行。</li>
+<li>会跳转到/login.html，用户输入用户名和密码，访问login.html的post表单地址,这个地址对应loginProcessingUrl(“/user/login”)。</li>
+<li>认证成功后跳转回/test/hello</li>
+<li>失败</li>
+<li>暂时没发现defaultSuccessUrl作用</li>
+<li>注意login.html必须是username,password</li>
+<li>bug—-&gt;我的测试页面一直不需要认证，原因是浏览器没关闭，cookie自带的信息帮我认证了。</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
 </li>
 </ol>
 </li>
@@ -1848,15 +2115,32 @@ commons-lang3<span aria-hidden="true" class="line-numbers-rows"><span></span><sp
 <li><p>角色权限</p>
 <ol>
 <li><p>基于角色/权限访问</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token comment">//只有admin才能访问index---->userService从数据库拿到设置权限</span>
+<span class="token comment">//                .antMatchers("/test/index").hasAnyAuthority("admin")//全部权限</span>
+                <span class="token punctuation">.</span><span class="token function">antMatchers</span><span class="token punctuation">(</span><span class="token string">"test/index"</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">hasAnyAuthority</span><span class="token punctuation">(</span><span class="token string">"admin,user"</span><span class="token punctuation">)</span><span class="token comment">//任意权限</span>
+<span class="token comment">//                .antMatchers("/test/index").hasRole("")</span>
+                <span class="token punctuation">.</span><span class="token function">anyRequest</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">authenticated</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">and</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">csrf</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">disable</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment">//关闭csrf防护。</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
 <ol>
-<li><p>hasAuthority 全部权限</p>
-<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token comment">//只有admin才能访问index---->userService从数据库拿到设置权限             .antMatchers("/test/index").hasAnyAuthority("admin")//全部权限</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-<li><p>hasAnyAutority 任意权限</p>
+<li>hasAuthority 全部权限</li>
+<li>hasAnyAutority 任意权限</li>
+<li>hasRole 全部角色</li>
+<li>hasAnyRole 任意角色</li>
+</ol>
 </li>
-<li><p>hasRole</p>
+<li><p>设置权限、角色</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">GrantedAuthority</span><span class="token punctuation">></span></span> authorities <span class="token operator">=</span> <span class="token class-name">AuthorityUtils</span><span class="token punctuation">.</span><span class="token function">commaSeparatedStringToAuthorityList</span><span class="token punctuation">(</span><span class="token string">"ROLE_admin,admin"</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+<li><p>加入无权限页面</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java">http<span class="token punctuation">.</span><span class="token function">exceptionHandling</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">accessDeniedPage</span><span class="token punctuation">(</span><span class="token string">"/unauth.html"</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+</ol>
 </li>
-<li><p>hasAnyRole</p>
-</li>
+<li><p>基于注解而非配置链.antMatchers(“test/index”).hasAnyAuthority(“admin,user”)的方式</p>
+<ol>
+<li>@EnableGlobalMethodSecurity(securedEnabled = true) AppRun开启鉴权注解模式</li>
+<li>@Secured 用户是否拥有运行这个Controller方法的角色</li>
+<li>@PreAuthorize 进入方法前</li>
+<li>@PostAuthorize 方法执行后进行鉴权</li>
 </ol>
 </li>
 </ol>
@@ -1864,7 +2148,9 @@ commons-lang3<span aria-hidden="true" class="line-numbers-rows"><span></span><sp
 </ol>
 </li>
 </ol>
-</li>
+<h5 id="一些理解"><a href="#一些理解" class="headerlink" title="一些理解"></a>一些理解</h5><ol>
+<li>感觉SpringSecurity就是一个拿着cookie和客户端请求乱跑的组件。哪里请求鉴权哪里。</li>
+<li></li>
 </ol>
 <h3 id="MybatisPlus"><a href="#MybatisPlus" class="headerlink" title="MybatisPlus"></a>MybatisPlus</h3><ol>
 <li><p>使用步骤</p>
