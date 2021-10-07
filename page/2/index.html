@@ -187,7 +187,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/10/06/utils/blog/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/10/07/utils/linux%E9%85%8D%E7%BD%AE/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t.png">
@@ -201,7 +201,313 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/10/06/utils/blog/" class="post-title-link" itemprop="url">hexo使用</a>
+            <a href="/2021/10/07/utils/linux%E9%85%8D%E7%BD%AE/" class="post-title-link" itemprop="url">linux配置</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-10-07 11:54:08 / 修改时间：10:04:06" itemprop="dateCreated datePublished" datetime="2021-10-07T11:54:08+08:00">2021-10-07</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/utils/" itemprop="url" rel="index"><span itemprop="name">utils</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2021/10/07/utils/linux%E9%85%8D%E7%BD%AE/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2021/10/07/utils/linux%E9%85%8D%E7%BD%AE/" class="cy_cmt_count" data-xid="2021/10/07/utils/linux配置/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="常用配置"><a href="#常用配置" class="headerlink" title="常用配置"></a>常用配置</h3><ol>
+<li><p>ssh免密登录</p>
+<ol>
+<li><p>编写主机名 gedit /etc/hostname</p>
+<p>master</p>
+</li>
+<li><p>临时设置hostname hostname master</p>
+</li>
+<li><p>上一步生效 bash</p>
+</li>
+<li><p>验证主机名 hostname</p>
+</li>
+<li><p>关闭防火墙systemctl stop/disable firewalld.service </p>
+</li>
+<li><p>ifconfig获取Ip</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211007023706983.png" alt="image-20211007023706983"></p>
+</li>
+<li><p>修改主机—ip 列表  vi /etc/hosts</p>
+<p>10.42.0.93 master</p>
+</li>
+<li><p>时钟同步</p>
+</li>
+<li><p>Ping主机名测试  ping master -c 3</p>
+</li>
+<li><p>生成ssh-key   ssh-keygen -t rsa</p>
+</li>
+<li><p>密钥<font color="red">cat ~/.ssh/id_rsa.pub &gt;&gt; ~/.ssh/authorized_keys</font>&gt;</p>
+</li>
+<li><p>chmod 600 ~/.ssh/authorized_keys</p>
+</li>
+<li><p>复制scp <del>/.ssh/authorized_keys zkpk@slave01:</del>/.ssh</p>
+</li>
+<li><p>换节点生成密钥ssh-keygen -t rsa</p>
+</li>
+<li><p>复制scp <del>/.ssh/authorized_keys zkpk@slave02:</del>/.ssh/temp</p>
+</li>
+<li><p>覆盖 cat t authorized &gt; authorized</p>
+<p>或者追加cat t &gt;&gt; authorized </p>
+</li>
+<li><p>这个key在那个用户就能对那个用户免密</p>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="其他配置"><a href="#其他配置" class="headerlink" title="其他配置"></a>其他配置</h3><ol>
+<li><p>中文输入法</p>
+<ol>
+<li>下载中文输入法yum install ibus-libpinyin</li>
+<li>在设置添加输入数据源汉语(pinyin)</li>
+<li>按win+空格切换</li>
+</ol>
+</li>
+<li><p>配置时钟同步</p>
+<ol>
+<li>定时任务 crontab -e</li>
+<li>0 1 * * * /usr/sbin/ntpdate cn.pool.ntp.org</li>
+<li>手动：/usr/sbin/ntpdate cn.pool.ntp.or</li>
+</ol>
+</li>
+<li><p>防火墙</p>
+<ol>
+<li>查看状态 systemctl status firewalld.service</li>
+<li>关闭systemctl stop/disable firewalld.service </li>
+</ol>
+</li>
+<li><p>localtime换成UTC time</p>
+<ol>
+<li>rm /etc/localtime</li>
+<li>ln -s /usr/share/zoneinfo/Universal /etc/localtime</li>
+</ol>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/morninglight/p/6420414.html">参考-linux 刷新环境变量</a></p>
+<p>方法一：source /etc/profile<br>在/etc/profile文件中添加变量【对所有用户生效（永久的）】<br>方法二：source .bash_profile<br>在用户目录下的.bash_profile文件中增加变量【对单一用户生效（永久的）】</p>
+<p>方法三：直接运行export命令定义变量【只对当前shell（BASH）有效（临时的）】<br>export PATH=/usr/local/webserver/php/bin:$PATH</p>
+</li>
+<li><p>开启网络服务</p>
+<ol>
+<li>systemctl restart network</li>
+<li>参考xshell.1.4</li>
+</ol>
+</li>
+<li><p>下载c++ yum install gcc-c++ -y</p>
+<ol>
+<li>make MALLOC=libc </li>
+</ol>
+</li>
+</ol>
+<h3 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h3><ol>
+<li><p>redis</p>
+<ol>
+<li><p>tar -zxvf</p>
+</li>
+<li><p>下载gcc语言环境,tcl</p>
+<p>root-&gt;yum install gcc</p>
+<p>root-&gt;yum install tcl </p>
+</li>
+<li><p>cd redis—&gt;make</p>
+</li>
+<li><p>make install</p>
+</li>
+</ol>
+</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/10/07/utils/linux%E6%93%8D%E4%BD%9C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="十二峒">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/10/07/utils/linux%E6%93%8D%E4%BD%9C/" class="post-title-link" itemprop="url">linux操作</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-10-07 11:54:08 / 修改时间：10:14:57" itemprop="dateCreated datePublished" datetime="2021-10-07T11:54:08+08:00">2021-10-07</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/utils/" itemprop="url" rel="index"><span itemprop="name">utils</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2021/10/07/utils/linux%E6%93%8D%E4%BD%9C/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2021/10/07/utils/linux%E6%93%8D%E4%BD%9C/" class="cy_cmt_count" data-xid="2021/10/07/utils/linux操作/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>64</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="简单操作"><a href="#简单操作" class="headerlink" title="简单操作"></a>简单操作</h3><ol>
+<li>ls -a 连同.文件一起查看</li>
+<li>解压  tar xzf ..gz</li>
+<li>查看redis进程 ps -ef | grep redis</li>
+<li></li>
+</ol>
+<h3 id="vim"><a href="#vim" class="headerlink" title="vim"></a>vim</h3><ol>
+<li>搜索：c    /str</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/10/07/utils/git/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="十二峒">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/10/07/utils/git/" class="post-title-link" itemprop="url">Git的使用</a>
         </h2>
 
         <div class="post-meta">
@@ -211,7 +517,133 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2021-10-06 18:05:21" itemprop="dateCreated datePublished" datetime="2021-10-06T18:05:21+08:00">2021-10-06</time>
+              <time title="创建时间：2021-10-07 11:54:08" itemprop="dateCreated datePublished" datetime="2021-10-07T11:54:08+08:00">2021-10-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-10-06 12:51:20" itemprop="dateModified" datetime="2021-10-06T12:51:20+08:00">2021-10-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/utils/" itemprop="url" rel="index"><span itemprop="name">utils</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2021/10/07/utils/git/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2021/10/07/utils/git/" class="cy_cmt_count" data-xid="2021/10/07/utils/git/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="Git概念"><a href="#Git概念" class="headerlink" title="Git概念"></a>Git概念</h3><ol>
+<li><p>手工式版本控制</p>
+<ol>
+<li>特点<ol>
+<li>每改一次备份一次</li>
+<li>协同更改需要同时U盘copy</li>
+</ol>
+</li>
+<li>问题<ol>
+<li>备份</li>
+<li>代码还原</li>
+<li>协同开发</li>
+<li>代码追溯(追责)</li>
+</ol>
+</li>
+</ol>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/10/07/utils/git/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/10/07/utils/blog/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="十二峒">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/10/07/utils/blog/" class="post-title-link" itemprop="url">hexo使用</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-10-07 11:54:07" itemprop="dateCreated datePublished" datetime="2021-10-07T11:54:07+08:00">2021-10-07</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
@@ -240,8 +672,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2021/10/06/utils/blog/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2021/10/06/utils/blog/" class="cy_cmt_count" data-xid="2021/10/06/utils/blog/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2021/10/07/utils/blog/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2021/10/07/utils/blog/" class="cy_cmt_count" data-xid="2021/10/07/utils/blog/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -279,7 +711,7 @@
 <pre class="line-numbers language-none"><code class="language-none">npm install -g cnpm  --registry&#x3D;https:&#x2F;&#x2F;registry.npm.taobao.org<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2021/10/06/utils/blog/#more" rel="contents">
+              <a class="btn" href="/2021/10/07/utils/blog/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -303,7 +735,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/10/06/project/springboot_%E7%A7%92%E6%9D%80%E7%B3%BB%E7%BB%9F/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/10/07/project/springboot_%E7%A7%92%E6%9D%80%E7%B3%BB%E7%BB%9F/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t.png">
@@ -317,7 +749,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/10/06/project/springboot_%E7%A7%92%E6%9D%80%E7%B3%BB%E7%BB%9F/" class="post-title-link" itemprop="url">springBoot秒杀系统</a>
+            <a href="/2021/10/07/project/springboot_%E7%A7%92%E6%9D%80%E7%B3%BB%E7%BB%9F/" class="post-title-link" itemprop="url">springBoot秒杀系统</a>
         </h2>
 
         <div class="post-meta">
@@ -326,10 +758,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2021-10-06 18:05:21 / 修改时间：13:57:19" itemprop="dateCreated datePublished" datetime="2021-10-06T18:05:21+08:00">2021-10-06</time>
+              <time title="创建时间：2021-10-07 11:54:07" itemprop="dateCreated datePublished" datetime="2021-10-07T11:54:07+08:00">2021-10-07</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-10-06 13:57:19" itemprop="dateModified" datetime="2021-10-06T13:57:19+08:00">2021-10-06</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -350,8 +788,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2021/10/06/project/springboot_%E7%A7%92%E6%9D%80%E7%B3%BB%E7%BB%9F/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2021/10/06/project/springboot_%E7%A7%92%E6%9D%80%E7%B3%BB%E7%BB%9F/" class="cy_cmt_count" data-xid="2021/10/06/project/springboot_秒杀系统/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2021/10/07/project/springboot_%E7%A7%92%E6%9D%80%E7%B3%BB%E7%BB%9F/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2021/10/07/project/springboot_%E7%A7%92%E6%9D%80%E7%B3%BB%E7%BB%9F/" class="cy_cmt_count" data-xid="2021/10/07/project/springboot_秒杀系统/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -465,313 +903,6 @@ commons-lang3<span aria-hidden="true" class="line-numbers-rows"><span></span><sp
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/10/06/os/linuxCmdPlus/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="十二峒">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/10/06/os/linuxCmdPlus/" class="post-title-link" itemprop="url">未命名</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-10-06 18:05:21" itemprop="dateCreated datePublished" datetime="2021-10-06T18:05:21+08:00">2021-10-06</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-09-17 02:18:36" itemprop="dateModified" datetime="2021-09-17T02:18:36+08:00">2021-09-17</time>
-              </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2021/10/06/os/linuxCmdPlus/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2021/10/06/os/linuxCmdPlus/" class="cy_cmt_count" data-xid="2021/10/06/os/linuxCmdPlus/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>0</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/10/06/os/linuxCmd/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="十二峒">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/10/06/os/linuxCmd/" class="post-title-link" itemprop="url">未命名</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-10-06 18:05:21" itemprop="dateCreated datePublished" datetime="2021-10-06T18:05:21+08:00">2021-10-06</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-09-17 02:18:23" itemprop="dateModified" datetime="2021-09-17T02:18:23+08:00">2021-09-17</time>
-              </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2021/10/06/os/linuxCmd/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2021/10/06/os/linuxCmd/" class="cy_cmt_count" data-xid="2021/10/06/os/linuxCmd/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>0</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/10/06/java/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="十二峒">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/10/06/java/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" class="post-title-link" itemprop="url">设计模式</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-10-06 18:05:21" itemprop="dateCreated datePublished" datetime="2021-10-06T18:05:21+08:00">2021-10-06</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-10-04 10:59:54" itemprop="dateModified" datetime="2021-10-04T10:59:54+08:00">2021-10-04</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/java%E9%AB%98%E9%98%B6/" itemprop="url" rel="index"><span itemprop="name">java高阶</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2021/10/06/java/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2021/10/06/java/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" class="cy_cmt_count" data-xid="2021/10/06/java/设计模式/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>227</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="单例模式"><a href="#单例模式" class="headerlink" title="单例模式"></a>单例模式</h3><ul>
-<li>单例类只能有一个实例。</li>
-<li>单例类必须自己创建自己的唯一实例。</li>
-<li>单例类必须给所有其他对象提供这一实例。</li>
-</ul>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/10/06/java/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -843,7 +974,7 @@ commons-lang3<span aria-hidden="true" class="line-numbers-rows"><span></span><sp
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">31</span>
+          <span class="site-state-item-count">34</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -894,12 +1025,12 @@ commons-lang3<span aria-hidden="true" class="line-numbers-rows"><span></span><sp
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">45k</span>
+    <span title="站点总字数">49k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">41 分钟</span>
+    <span title="站点阅读时长">44 分钟</span>
 </div>
 
         
