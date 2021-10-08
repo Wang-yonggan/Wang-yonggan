@@ -7,22 +7,22 @@
   </entry>
   <entry>
     <title></title>
-    <url>/2021/09/17/db/mysql_base/</url>
-    <content><![CDATA[]]></content>
-  </entry>
-  <entry>
-    <title></title>
     <url>/2021/09/17/db/mysql_base_sql/</url>
     <content><![CDATA[]]></content>
   </entry>
   <entry>
     <title></title>
-    <url>/2021/09/17/db/mysql_other/</url>
+    <url>/2021/09/17/db/mysql_base/</url>
     <content><![CDATA[]]></content>
   </entry>
   <entry>
     <title></title>
     <url>/2021/09/17/db/mysql_principle/</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2021/09/17/db/mysql_other/</url>
     <content><![CDATA[]]></content>
   </entry>
   <entry>
@@ -221,6 +221,22 @@
       </categories>
   </entry>
   <entry>
+    <title>数据库规范</title>
+    <url>/2021/09/24/db/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%A7%84%E8%8C%83/</url>
+    <content><![CDATA[<h3 id="外键"><a href="#外键" class="headerlink" title="外键"></a>外键</h3><ol>
+<li>每次delete update都需要考虑外键。</li>
+<li>阿里巴巴开发规范禁用外键。</li>
+<li>每次考虑外键都要检查主外键表，造成了效率低下。</li>
+<li>级联删除造成数据不可控（不可追溯）</li>
+<li></li>
+</ol>
+]]></content>
+      <categories>
+        <category>数据库</category>
+        <category>mysql</category>
+      </categories>
+  </entry>
+  <entry>
     <title>数据库事务</title>
     <url>/2021/09/24/db/%E4%BA%8B%E5%8A%A1/</url>
     <content><![CDATA[<p>ACID</p>
@@ -297,22 +313,6 @@
       </categories>
   </entry>
   <entry>
-    <title>数据库规范</title>
-    <url>/2021/09/24/db/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%A7%84%E8%8C%83/</url>
-    <content><![CDATA[<h3 id="外键"><a href="#外键" class="headerlink" title="外键"></a>外键</h3><ol>
-<li>每次delete update都需要考虑外键。</li>
-<li>阿里巴巴开发规范禁用外键。</li>
-<li>每次考虑外键都要检查主外键表，造成了效率低下。</li>
-<li>级联删除造成数据不可控（不可追溯）</li>
-<li></li>
-</ol>
-]]></content>
-      <categories>
-        <category>数据库</category>
-        <category>mysql</category>
-      </categories>
-  </entry>
-  <entry>
     <title>java2</title>
     <url>/2021/09/24/java/java2/</url>
     <content><![CDATA[<h3 id="接口"><a href="#接口" class="headerlink" title="接口"></a>接口</h3><ol>
@@ -350,6 +350,158 @@
 ]]></content>
       <categories>
         <category>java</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>hadoop的启动</title>
+    <url>/2021/09/10/distribute/hadoop%E5%90%AF%E5%8A%A8/</url>
+    <content><![CDATA[<h2 id="一、-基本环境"><a href="#一、-基本环境" class="headerlink" title="一、 基本环境"></a>一、 基本环境</h2><ol>
+<li><p>获取主机名字 master、s1、s2</p>
+</li>
+<li><p>时钟同步</p>
+<pre class="line-numbers language-none"><code class="language-none">&#x2F;usr&#x2F;sbin&#x2F;ntpdate cn.pool.ntp.org<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+<li><p>关闭防火墙</p>
+<pre class="line-numbers language-none"><code class="language-none">systemctl stop firewalld.service<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+<li><p>编辑host 以对应ping 如：</p>
+<pre class="line-numbers language-none"><code class="language-none">10.42.0.93 master
+10.42.0.94 slave01
+10.42.0.95 slave02<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre></li>
+<li><p>测试ping是否成功</p>
+<pre class="line-numbers language-none"><code class="language-none">ping master -c 3<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+</ol>
+<h2 id="二、联机"><a href="#二、联机" class="headerlink" title="二、联机"></a>二、联机</h2><ol>
+<li><p>生成公钥</p>
+<pre class="line-numbers language-none"><code class="language-none">ssh-keygen -t rsa<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+<li><p>公钥备份文件</p>
+<pre class="line-numbers language-none"><code class="language-none">cat ~&#x2F;.ssh&#x2F;id_rsa.pub &gt;&gt; ~&#x2F;.ssh&#x2F;authorized_keys<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+<li><p>修改文件权限</p>
+<pre class="line-numbers language-none"><code class="language-none">chmod 600 ~&#x2F;.ssh&#x2F;authorized_keys<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+<li><p>将专用密钥添加到 ssh-agent 的高速缓存中</p>
+<pre class="line-numbers language-none"><code class="language-none">ssh-add ~&#x2F;.ssh&#x2F;id_rsa<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+<li><p>公钥转移到其他机器</p>
+<pre class="line-numbers language-none"><code class="language-none">scp ~&#x2F;.ssh&#x2F;authorized_keys zkpk@slave01:~&#x2F;.ssh&#x2F;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+<li><p>其他机器也生成密钥</p>
+</li>
+<li><p>测试远程   ssh s1</p>
+</li>
+</ol>
+<h2 id="三、安装java"><a href="#三、安装java" class="headerlink" title="三、安装java"></a>三、安装java</h2><ol>
+<li><p>root下解压</p>
+<pre class="line-numbers language-none"><code class="language-none">tar -xzvf &#x2F;home&#x2F;zkpk&#x2F;tgz&#x2F;jdk-8u131-linux-x64.tar.gz -C &#x2F;usr&#x2F;java<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+<li><p>修改环境变量</p>
+<pre class="line-numbers language-none"><code class="language-none">gedit &#x2F;home&#x2F;zkpk&#x2F;.bash_profile
+	export JAVA_HOME&#x3D;&#x2F;usr&#x2F;java&#x2F;jdk1.8.0_131&#x2F;
+	export PATH&#x3D;$JAVA_HOME&#x2F;bin:$PATH
+source &#x2F;home&#x2F;zkpk&#x2F;.bash_profile<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre></li>
+<li><p>其他机器同样安装</p>
+</li>
+<li><p>测试java：java -version</p>
+</li>
+</ol>
+<h2 id="四、安装hadoop"><a href="#四、安装hadoop" class="headerlink" title="四、安装hadoop"></a>四、安装hadoop</h2><ol>
+<li><p>解压</p>
+<pre class="line-numbers language-none"><code class="language-none">tar -xzvf &#x2F;home&#x2F;zkpk&#x2F;tgz&#x2F;hadoop-2.7.3.tar.gz –C &#x2F;home&#x2F;zkpk<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+<li><p>修改java环境变量</p>
+<pre class="line-numbers language-none"><code class="language-none">gedit &#x2F;home&#x2F;zkpk&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;hadoop-env.sh
+ 	export JAVA_HOME&#x3D;&#x2F;usr&#x2F;java&#x2F;jdk1.8.0_131&#x2F;
+gedit ~&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;yarn-env.sh
+	export JAVA_HOME&#x3D;&#x2F;usr&#x2F;java&#x2F;jdk1.8.0_131&#x2F;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre></li>
+<li><p>其他配置</p>
+<pre class="line-numbers language-none"><code class="language-none">1.配置core-site.xml 文件
+gedit  ~&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;core-site.xml
+	&lt;?xml version&#x3D;&quot;1.0&quot; encoding&#x3D;&quot;UTF-8&quot;?&gt;
+    &lt;?xml-stylesheet type&#x3D;&quot;text&#x2F;xsl&quot; href&#x3D;&quot;configuration.xsl&quot;?&gt;
+    &lt;!-- Put site-specific property overrides in this file. --&gt;
+    &lt;configuration&gt;
+            &lt;property&gt;
+                    &lt;name&gt;fs.defaultFS&lt;&#x2F;name&gt;
+                    &lt;value&gt;hdfs:&#x2F;&#x2F;master:9000&lt;&#x2F;value&gt;
+            &lt;&#x2F;property&gt;
+            &lt;property&gt;
+                    &lt;name&gt;hadoop.tmp.dir&lt;&#x2F;name&gt;
+                    &lt;value&gt;&#x2F;home&#x2F;zkpk&#x2F;hadoopdata&lt;&#x2F;value&gt;
+            &lt;&#x2F;property&gt;
+    &lt;&#x2F;configuration&gt;
+2.配置hdfs-site.xml文件
+gedit  ~&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;hdfs-site.xml
+    &lt;?xml version&#x3D;&quot;1.0&quot; encoding&#x3D;&quot;UTF-8&quot;?&gt;
+    &lt;?xml-stylesheet type&#x3D;&quot;text&#x2F;xsl&quot; href&#x3D;&quot;configuration.xsl&quot;?&gt;
+    &lt;!-- Put site-specific property overrides in this file. --&gt;
+    &lt;configuration&gt;
+        &lt;property&gt;
+            &lt;name&gt;dfs.replication&lt;&#x2F;name&gt;
+            &lt;value&gt;2&lt;&#x2F;value&gt;
+        &lt;&#x2F;property&gt;
+    &lt;&#x2F;configuration&gt;
+3.配置yarn-site.xml文件
+gedit  ~&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;yarn-site.xml
+    &lt;?xml version&#x3D;&quot;1.0&quot;?&gt;
+    &lt;configuration&gt;
+        &lt;property&gt;
+            &lt;name&gt;yarn.nodemanager.aux-services&lt;&#x2F;name&gt;
+            &lt;value&gt;mapreduce_shuffle&lt;&#x2F;value&gt;
+        &lt;&#x2F;property&gt;
+        &lt;property&gt;
+            &lt;name&gt;yarn.resourcemanager.address&lt;&#x2F;name&gt;
+            &lt;value&gt;master:18040&lt;&#x2F;value&gt;
+        &lt;&#x2F;property&gt;
+        &lt;property&gt;
+            &lt;name&gt;yarn.resourcemanager.scheduler.address&lt;&#x2F;name&gt;
+            &lt;value&gt;master:18030&lt;&#x2F;value&gt;
+        &lt;&#x2F;property&gt;
+        &lt;property&gt;
+            &lt;name&gt;yarn.resourcemanager.resource-tracker.address&lt;&#x2F;name&gt;
+            &lt;value&gt;master:18025&lt;&#x2F;value&gt;
+        &lt;&#x2F;property&gt;
+        &lt;property&gt;
+            &lt;name&gt;yarn.resourcemanager.admin.address&lt;&#x2F;name&gt;
+            &lt;value&gt;master:18141&lt;&#x2F;value&gt;
+        &lt;&#x2F;property&gt;
+        &lt;property&gt;
+            &lt;name&gt;yarn.resourcemanager.webapp.address&lt;&#x2F;name&gt;
+            &lt;value&gt;master:18088&lt;&#x2F;value&gt;
+        &lt;&#x2F;property&gt;
+    &lt;&#x2F;configuration&gt;
+4.配置mapred-site.xml文件
+cp ~&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;mapred-site.xml.template  ~&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;mapred-site.xml
+gedit ~&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;mapred-site.xml
+    &lt;?xml version&#x3D;&quot;1.0&quot;?&gt;
+    &lt;?xml-stylesheet type&#x3D;&quot;text&#x2F;xsl&quot; href&#x3D;&quot;configuration.xsl&quot;?&gt;
+    &lt;configuration&gt;
+        &lt;property&gt;
+            &lt;name&gt;mapreduce.framework.name&lt;&#x2F;name&gt;
+            &lt;value&gt;yarn&lt;&#x2F;value&gt;
+        &lt;&#x2F;property&gt;
+    &lt;&#x2F;configuration&gt;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+<li><p>配置slaves文件</p>
+<pre class="line-numbers language-none"><code class="language-none">gedit ~&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;slaves
+    slave01
+    slave02<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre></li>
+<li><p>创建Hadoop数据目录</p>
+<pre class="line-numbers language-none"><code class="language-none">mkdir hadoopdata<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+<li><p>将配置好的hadoop文件夹复制到从节点</p>
+<pre class="line-numbers language-none"><code class="language-none">scp -r hadoop-2.7.3 zkpk@slave01:~&#x2F;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+<li><p>配置环境变量</p>
+<pre class="line-numbers language-none"><code class="language-none">gedit ~&#x2F;.bash_profile
+    #HADOOP
+    export HADOOP_HOME&#x3D;&#x2F;home&#x2F;zkpk&#x2F;hadoop-2.7.3
+    export PATH&#x3D;$HADOOP_HOME&#x2F;bin:$HADOOP_HOME&#x2F;sbin:$PATH
+source ~&#x2F;.bash_profile<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+<li><p>其他机器同样配置环境变量</p>
+</li>
+<li><p>在master格式化磁盘</p>
+<pre class="line-numbers language-none"><code class="language-none">hdfs namenode -format<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+</ol>
+<h2 id="五、启动检测"><a href="#五、启动检测" class="headerlink" title="五、启动检测"></a>五、启动检测</h2><ol>
+<li>start-all.sh</li>
+<li>jps查看</li>
+<li><a href="http://master:50070/%E6%9F%A5%E7%9C%8B">http://master:50070/查看</a></li>
+<li><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20210911183155100.png" alt="image-20210911183155100"></li>
+</ol>
+]]></content>
+      <categories>
+        <category>大数据开发</category>
+        <category>hadoop</category>
       </categories>
   </entry>
   <entry>
@@ -728,6 +880,77 @@ x<span class="token punctuation">.</span><span class="token function">clone</spa
       </categories>
   </entry>
   <entry>
+    <title>jvm</title>
+    <url>/2021/09/28/java/jvm/</url>
+    <content><![CDATA[<h3 id=""><a href="#" class="headerlink" title=""></a></h3><ol>
+<li>OOM，栈溢出</li>
+<li>jvm常用调优</li>
+<li>内存快照</li>
+<li>怎么分析dump文件</li>
+<li>类加载器</li>
+<li>jar包</li>
+<li></li>
+</ol>
+<span id="more"></span>
+
+<h3 id="-1"><a href="#-1" class="headerlink" title=""></a></h3><ol>
+<li>对jvm理解<ol>
+<li>javac a.java –&gt;java.class–&gt;类加载器—-&gt;运行区–<ol>
+<li>方法区 垃圾回收</li>
+<li>java栈</li>
+<li>本地方法栈&lt;—本地方法接口&lt;–本地方法库</li>
+<li>native method</li>
+<li>堆heap 垃圾回收</li>
+<li>程序技术器pc</li>
+<li></li>
+</ol>
+</li>
+<li>jvm位置<ol>
+<li>硬件体系(intel)–&gt;操作系统(win)–&gt;jre（jvm）–&gt;java</li>
+</ol>
+</li>
+<li>jvm结构</li>
+</ol>
+</li>
+<li>类加载器<ol>
+<li>class是模板，抽象的，object是实体，具象的</li>
+<li>作用:加载class文件</li>
+<li>a.class–&gt;jvm–&gt;new-&gt;实例</li>
+</ol>
+</li>
+<li>双亲委派模式</li>
+<li>沙箱安全模式</li>
+<li>native</li>
+<li>方法去</li>
+<li>pc寄存器</li>
+<li>栈</li>
+<li>方法区</li>
+<li>三种jvm</li>
+<li>堆</li>
+<li>新生区，老年区，用就去</li>
+<li>GC算法</li>
+<li></li>
+</ol>
+]]></content>
+      <categories>
+        <category>java</category>
+        <category>java高阶</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>springBoot</title>
+    <url>/2021/09/29/java/springBoot/</url>
+    <content><![CDATA[<h3 id="spring-boot-starter"><a href="#spring-boot-starter" class="headerlink" title="spring-boot-starter"></a>spring-boot-starter</h3><ol>
+<li>可以认为starter是一种服务（和JS的插件类似）——使得使用某个功能的开发者不需要关注各种依赖库的处理，不需要具体的配置信息，由Spring Boot自动通过classpath路径下的类发现需要的Bean，并织入bean</li>
+</ol>
+<span id="more"></span>]]></content>
+      <categories>
+        <category>java</category>
+        <category>javaWeb</category>
+        <category>spring</category>
+      </categories>
+  </entry>
+  <entry>
     <title>java知识</title>
     <url>/2021/10/05/java/java%E7%9F%A5%E8%AF%86/</url>
     <content><![CDATA[<h2 id="类"><a href="#类" class="headerlink" title="类"></a>类</h2><h4 id="私有构造"><a href="#私有构造" class="headerlink" title="私有构造"></a>私有构造</h4><ol>
@@ -845,62 +1068,128 @@ x<span class="token punctuation">.</span><span class="token function">clone</spa
       </categories>
   </entry>
   <entry>
-    <title>jvm</title>
-    <url>/2021/09/28/java/jvm/</url>
-    <content><![CDATA[<h3 id=""><a href="#" class="headerlink" title=""></a></h3><ol>
-<li>OOM，栈溢出</li>
-<li>jvm常用调优</li>
-<li>内存快照</li>
-<li>怎么分析dump文件</li>
-<li>类加载器</li>
-<li>jar包</li>
-<li></li>
+    <title>SpringCloud</title>
+    <url>/2021/10/06/java/springCloud/</url>
+    <content><![CDATA[<h3 id="1"><a href="#1" class="headerlink" title="1"></a>1</h3><ol>
+<li><p>springCloud是一系列框架的集合</p>
+</li>
+<li><p>自动挡的房车</p>
+</li>
+<li><p>依赖.pom+配置.properties+@注解</p>
+</li>
+<li><p>微服务架构技术落地实现的集合体，是微服务架构下的一站式解决方案</p>
+<p>服务发现——Netflix Eureka /  nacos<br>客服端负载均衡——Netflix Ribbon</p>
+<p>服务调用—— netflix fergn</p>
+<p>断路器——Netflix Hystrix<br>服务网关——Netflix Zuul /Sprin Cloud CateWay<br>分布式配置——Spring Cloud Config /nacos</p>
+<p>消息总线 —— Spring Cloud Bus/ nacos</p>
+</li>
+<li><h1 id="微服务实现"><a href="#微服务实现" class="headerlink" title="微服务实现"></a>微服务实现</h1><ol>
+<li>微服务架构：SpringCloud、Dubbo、SpringCloudAlibaba</li>
+<li>网关–&gt;负载均衡–&gt;微服务集群–&gt;数据库</li>
 </ol>
-<span id="more"></span>
-
-<h3 id="-1"><a href="#-1" class="headerlink" title=""></a></h3><ol>
-<li>对jvm理解<ol>
-<li>javac a.java –&gt;java.class–&gt;类加载器—-&gt;运行区–<ol>
-<li>方法区 垃圾回收</li>
-<li>java栈</li>
-<li>本地方法栈&lt;—本地方法接口&lt;–本地方法库</li>
-<li>native method</li>
-<li>堆heap 垃圾回收</li>
-<li>程序技术器pc</li>
-<li></li>
+<h2 id="ribbon负载均衡"><a href="#ribbon负载均衡" class="headerlink" title="ribbon负载均衡"></a>ribbon负载均衡</h2><h2 id="nacos注册中心"><a href="#nacos注册中心" class="headerlink" title="nacos注册中心"></a>nacos注册中心</h2></li>
+</ol>
+<h2 id="SpringCloud"><a href="#SpringCloud" class="headerlink" title="SpringCloud"></a>SpringCloud</h2><ol>
+<li>版本对应</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>springCloud</th>
+<th>springBoot</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a href="https://github.com/spring-cloud/spring-cloud-release/wiki/Spring-Cloud-2020.0-Release-Notes">2020.0.x</a> aka Ilford</td>
+<td>2.4.x, 2.5.x (Starting with 2020.0.3)</td>
+</tr>
+<tr>
+<td><a href="https://github.com/spring-cloud/spring-cloud-release/wiki/Spring-Cloud-Hoxton-Release-Notes">Hoxton</a><a href="https://github.com/spring-cloud/spring-cloud-release/wiki/Spring-Cloud-Hoxton-Release-Notes">Hoxton</a></td>
+<td>2.2.x, 2.3.x (Starting with SR5)</td>
+</tr>
+<tr>
+<td><a href="https://github.com/spring-projects/spring-cloud/wiki/Spring-Cloud-Greenwich-Release-Notes">Greenwich</a><a href="https://github.com/spring-projects/spring-cloud/wiki/Spring-Cloud-Greenwich-Release-Notes">Greenwich</a></td>
+<td>2.1.x2.1.x</td>
+</tr>
+<tr>
+<td><a href="https://github.com/spring-projects/spring-cloud/wiki/Spring-Cloud-Finchley-Release-Notes">Finchley</a><a href="https://github.com/spring-projects/spring-cloud/wiki/Spring-Cloud-Finchley-Release-Notes">Finchley</a></td>
+<td>2.0.x2.0.x</td>
+</tr>
+<tr>
+<td><a href="https://github.com/spring-projects/spring-cloud/wiki/Spring-Cloud-Edgware-Release-Notes">Edgware</a></td>
+<td>1.5.x</td>
+</tr>
+<tr>
+<td><a href="https://github.com/spring-projects/spring-cloud/wiki/Spring-Cloud-Dalston-Release-Notes">Dalston</a></td>
+<td>1.5.x</td>
+</tr>
+</tbody></table>
+<h2 id="1、服务拆分、"><a href="#1、服务拆分、" class="headerlink" title="1、服务拆分、"></a>1、服务拆分、</h2><ol>
+<li><p>数据独立、每个模块一个数据库</p>
+</li>
+<li><p><strong>提供者</strong>接口暴露</p>
+</li>
+<li><p>业务独立</p>
+</li>
+<li><p><strong>消费者</strong>远程调用<strong>提供者</strong>：8080–java代码发起请求http请求—&gt;8081</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token comment">//application中注入RestTemplate</span>
+<span class="token annotation punctuation">@Bean</span>
+<span class="token keyword">public</span> <span class="token class-name">RestTemplate</span> <span class="token function">restTemplate</span><span class="token punctuation">(</span>id<span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+    <span class="token keyword">return</span> <span class="token class-name">RestTemplate</span><span class="token punctuation">(</span>param<span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span>
+<span class="token comment">//service调用restTemplate</span>
+<span class="token keyword">public</span> <span class="token class-name">String</span> <span class="token function">getName</span><span class="token punctuation">(</span>order<span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+	<span class="token class-name">String</span> url<span class="token operator">=</span><span class="token string">"http://localhost:8081/user/"</span><span class="token operator">+</span>order<span class="token punctuation">.</span>getId'<span class="token punctuation">;</span>
+    <span class="token keyword">return</span> restTemplate<span class="token punctuation">.</span><span class="token function">getForObject</span><span class="token punctuation">(</span>url<span class="token punctuation">,</span><span class="token class-name">User</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+</ol>
+<h2 id="eureka注册中心"><a href="#eureka注册中心" class="headerlink" title="eureka注册中心"></a>eureka注册中心</h2><ol>
+<li><p>8081可能会改变，所以需要用注册中心</p>
+</li>
+<li><p>消费者—注册中心—提供者</p>
+</li>
+<li><p>每一个模块启动，都会向eureka注册的报道登记（每30秒也会）（因为每一个模块都可能成为提供者），比如user模块：我来了，我是user。如果30s内没有报道，就会除去这个接口。</p>
+</li>
+<li><p>然后来了一个消费者：帮我找找user，看有没有，eureka一看有3个User，eureka就会根据负载均衡挑选一个接口。</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token comment">//application中注入RestTemplate</span>
+<span class="token annotation punctuation">@Bean</span>
+<span class="token annotation punctuation">@LoadBalance</span> <span class="token comment">//负载均衡</span>
+<span class="token keyword">public</span> <span class="token class-name">RestTemplate</span> <span class="token function">restTemplate</span><span class="token punctuation">(</span>id<span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+    <span class="token keyword">return</span> <span class="token class-name">RestTemplate</span><span class="token punctuation">(</span>param<span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span>
+<span class="token comment">//service调用restTemplate</span>
+<span class="token keyword">public</span> <span class="token class-name">String</span> <span class="token function">getName</span><span class="token punctuation">(</span>order<span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+	<span class="token class-name">String</span> url<span class="token operator">=</span><span class="token string">"http://userservice/user/"</span><span class="token operator">+</span>order<span class="token punctuation">.</span>getId'<span class="token punctuation">;</span>
+    <span class="token keyword">return</span> restTemplate<span class="token punctuation">.</span><span class="token function">getForObject</span><span class="token punctuation">(</span>url<span class="token punctuation">,</span><span class="token class-name">User</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+</ol>
+<h3 id="Riboon负载均衡"><a href="#Riboon负载均衡" class="headerlink" title="Riboon负载均衡"></a>Riboon负载均衡</h3><ol>
+<li><p>步骤</p>
+<img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20210913002823604.png" alt="image-20210913002823604" style="zoom:80%;" /></li>
+<li><p>负载均衡原理：Riboon负载均衡的原则是IRule接口实现的ZoneAvoiddanceRule&lt;—-RoundRobinRule，是轮循类。</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java">其中zone可以指定地方
+会优先原则离这个地方最近的服务接口
+其他调整方法：
+	<span class="token annotation punctuation">@Bean</span>
+   	<span class="token keyword">public</span> <span class="token class-name">IRule</span> <span class="token function">testRule</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+    	<span class="token keyword">return</span> <span class="token class-name">RandomRule</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 随机
+<span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+</ol>
+<h3 id="Nacos注册中心—-gt-eureka"><a href="#Nacos注册中心—-gt-eureka" class="headerlink" title="Nacos注册中心—&gt;eureka"></a>Nacos注册中心—&gt;eureka</h3><ol>
+<li><p>特点：</p>
+<ol>
+<li>房产中介，桥梁，注册中心</li>
 </ol>
 </li>
-<li>jvm位置<ol>
-<li>硬件体系(intel)–&gt;操作系统(win)–&gt;jre（jvm）–&gt;java</li>
-</ol>
-</li>
-<li>jvm结构</li>
-</ol>
-</li>
-<li>类加载器<ol>
-<li>class是模板，抽象的，object是实体，具象的</li>
-<li>作用:加载class文件</li>
-<li>a.class–&gt;jvm–&gt;new-&gt;实例</li>
-</ol>
-</li>
-<li>双亲委派模式</li>
-<li>沙箱安全模式</li>
-<li>native</li>
-<li>方法去</li>
-<li>pc寄存器</li>
-<li>栈</li>
-<li>方法区</li>
-<li>三种jvm</li>
-<li>堆</li>
-<li>新生区，老年区，用就去</li>
-<li>GC算法</li>
+<li><p>启动</p>
+<pre class="line-numbers language-none"><code class="language-none">startup.cmd -m standalone 
+其中nacos中
+	standlone是单机启动
+	clusters<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre></li>
 <li></li>
 </ol>
 ]]></content>
-      <categories>
-        <category>java</category>
-        <category>java高阶</category>
-      </categories>
   </entry>
   <entry>
     <title>spring解析</title>
@@ -1245,323 +1534,6 @@ in<span class="token operator">=</span><span class="token class-name"><span clas
       </categories>
   </entry>
   <entry>
-    <title>SpringCloud</title>
-    <url>/2021/10/06/java/springCloud/</url>
-    <content><![CDATA[<h3 id="1"><a href="#1" class="headerlink" title="1"></a>1</h3><ol>
-<li><p>springCloud是一系列框架的集合</p>
-</li>
-<li><p>自动挡的房车</p>
-</li>
-<li><p>依赖.pom+配置.properties+@注解</p>
-</li>
-<li><p>微服务架构技术落地实现的集合体，是微服务架构下的一站式解决方案</p>
-<p>服务发现——Netflix Eureka /  nacos<br>客服端负载均衡——Netflix Ribbon</p>
-<p>服务调用—— netflix fergn</p>
-<p>断路器——Netflix Hystrix<br>服务网关——Netflix Zuul /Sprin Cloud CateWay<br>分布式配置——Spring Cloud Config /nacos</p>
-<p>消息总线 —— Spring Cloud Bus/ nacos</p>
-</li>
-<li><h1 id="微服务实现"><a href="#微服务实现" class="headerlink" title="微服务实现"></a>微服务实现</h1><ol>
-<li>微服务架构：SpringCloud、Dubbo、SpringCloudAlibaba</li>
-<li>网关–&gt;负载均衡–&gt;微服务集群–&gt;数据库</li>
-</ol>
-<h2 id="ribbon负载均衡"><a href="#ribbon负载均衡" class="headerlink" title="ribbon负载均衡"></a>ribbon负载均衡</h2><h2 id="nacos注册中心"><a href="#nacos注册中心" class="headerlink" title="nacos注册中心"></a>nacos注册中心</h2></li>
-</ol>
-<h2 id="SpringCloud"><a href="#SpringCloud" class="headerlink" title="SpringCloud"></a>SpringCloud</h2><ol>
-<li>版本对应</li>
-</ol>
-<table>
-<thead>
-<tr>
-<th>springCloud</th>
-<th>springBoot</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><a href="https://github.com/spring-cloud/spring-cloud-release/wiki/Spring-Cloud-2020.0-Release-Notes">2020.0.x</a> aka Ilford</td>
-<td>2.4.x, 2.5.x (Starting with 2020.0.3)</td>
-</tr>
-<tr>
-<td><a href="https://github.com/spring-cloud/spring-cloud-release/wiki/Spring-Cloud-Hoxton-Release-Notes">Hoxton</a><a href="https://github.com/spring-cloud/spring-cloud-release/wiki/Spring-Cloud-Hoxton-Release-Notes">Hoxton</a></td>
-<td>2.2.x, 2.3.x (Starting with SR5)</td>
-</tr>
-<tr>
-<td><a href="https://github.com/spring-projects/spring-cloud/wiki/Spring-Cloud-Greenwich-Release-Notes">Greenwich</a><a href="https://github.com/spring-projects/spring-cloud/wiki/Spring-Cloud-Greenwich-Release-Notes">Greenwich</a></td>
-<td>2.1.x2.1.x</td>
-</tr>
-<tr>
-<td><a href="https://github.com/spring-projects/spring-cloud/wiki/Spring-Cloud-Finchley-Release-Notes">Finchley</a><a href="https://github.com/spring-projects/spring-cloud/wiki/Spring-Cloud-Finchley-Release-Notes">Finchley</a></td>
-<td>2.0.x2.0.x</td>
-</tr>
-<tr>
-<td><a href="https://github.com/spring-projects/spring-cloud/wiki/Spring-Cloud-Edgware-Release-Notes">Edgware</a></td>
-<td>1.5.x</td>
-</tr>
-<tr>
-<td><a href="https://github.com/spring-projects/spring-cloud/wiki/Spring-Cloud-Dalston-Release-Notes">Dalston</a></td>
-<td>1.5.x</td>
-</tr>
-</tbody></table>
-<h2 id="1、服务拆分、"><a href="#1、服务拆分、" class="headerlink" title="1、服务拆分、"></a>1、服务拆分、</h2><ol>
-<li><p>数据独立、每个模块一个数据库</p>
-</li>
-<li><p><strong>提供者</strong>接口暴露</p>
-</li>
-<li><p>业务独立</p>
-</li>
-<li><p><strong>消费者</strong>远程调用<strong>提供者</strong>：8080–java代码发起请求http请求—&gt;8081</p>
-<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token comment">//application中注入RestTemplate</span>
-<span class="token annotation punctuation">@Bean</span>
-<span class="token keyword">public</span> <span class="token class-name">RestTemplate</span> <span class="token function">restTemplate</span><span class="token punctuation">(</span>id<span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
-    <span class="token keyword">return</span> <span class="token class-name">RestTemplate</span><span class="token punctuation">(</span>param<span class="token punctuation">)</span>
-<span class="token punctuation">&#125;</span>
-<span class="token comment">//service调用restTemplate</span>
-<span class="token keyword">public</span> <span class="token class-name">String</span> <span class="token function">getName</span><span class="token punctuation">(</span>order<span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
-	<span class="token class-name">String</span> url<span class="token operator">=</span><span class="token string">"http://localhost:8081/user/"</span><span class="token operator">+</span>order<span class="token punctuation">.</span>getId'<span class="token punctuation">;</span>
-    <span class="token keyword">return</span> restTemplate<span class="token punctuation">.</span><span class="token function">getForObject</span><span class="token punctuation">(</span>url<span class="token punctuation">,</span><span class="token class-name">User</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
-</ol>
-<h2 id="eureka注册中心"><a href="#eureka注册中心" class="headerlink" title="eureka注册中心"></a>eureka注册中心</h2><ol>
-<li><p>8081可能会改变，所以需要用注册中心</p>
-</li>
-<li><p>消费者—注册中心—提供者</p>
-</li>
-<li><p>每一个模块启动，都会向eureka注册的报道登记（每30秒也会）（因为每一个模块都可能成为提供者），比如user模块：我来了，我是user。如果30s内没有报道，就会除去这个接口。</p>
-</li>
-<li><p>然后来了一个消费者：帮我找找user，看有没有，eureka一看有3个User，eureka就会根据负载均衡挑选一个接口。</p>
-<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token comment">//application中注入RestTemplate</span>
-<span class="token annotation punctuation">@Bean</span>
-<span class="token annotation punctuation">@LoadBalance</span> <span class="token comment">//负载均衡</span>
-<span class="token keyword">public</span> <span class="token class-name">RestTemplate</span> <span class="token function">restTemplate</span><span class="token punctuation">(</span>id<span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
-    <span class="token keyword">return</span> <span class="token class-name">RestTemplate</span><span class="token punctuation">(</span>param<span class="token punctuation">)</span>
-<span class="token punctuation">&#125;</span>
-<span class="token comment">//service调用restTemplate</span>
-<span class="token keyword">public</span> <span class="token class-name">String</span> <span class="token function">getName</span><span class="token punctuation">(</span>order<span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
-	<span class="token class-name">String</span> url<span class="token operator">=</span><span class="token string">"http://userservice/user/"</span><span class="token operator">+</span>order<span class="token punctuation">.</span>getId'<span class="token punctuation">;</span>
-    <span class="token keyword">return</span> restTemplate<span class="token punctuation">.</span><span class="token function">getForObject</span><span class="token punctuation">(</span>url<span class="token punctuation">,</span><span class="token class-name">User</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
-</ol>
-<h3 id="Riboon负载均衡"><a href="#Riboon负载均衡" class="headerlink" title="Riboon负载均衡"></a>Riboon负载均衡</h3><ol>
-<li><p>步骤</p>
-<img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20210913002823604.png" alt="image-20210913002823604" style="zoom:80%;" /></li>
-<li><p>负载均衡原理：Riboon负载均衡的原则是IRule接口实现的ZoneAvoiddanceRule&lt;—-RoundRobinRule，是轮循类。</p>
-<pre class="line-numbers language-java" data-language="java"><code class="language-java">其中zone可以指定地方
-会优先原则离这个地方最近的服务接口
-其他调整方法：
-	<span class="token annotation punctuation">@Bean</span>
-   	<span class="token keyword">public</span> <span class="token class-name">IRule</span> <span class="token function">testRule</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
-    	<span class="token keyword">return</span> <span class="token class-name">RandomRule</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 随机
-<span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
-</ol>
-<h3 id="Nacos注册中心—-gt-eureka"><a href="#Nacos注册中心—-gt-eureka" class="headerlink" title="Nacos注册中心—&gt;eureka"></a>Nacos注册中心—&gt;eureka</h3><ol>
-<li><p>特点：</p>
-<ol>
-<li>房产中介，桥梁，注册中心</li>
-</ol>
-</li>
-<li><p>启动</p>
-<pre class="line-numbers language-none"><code class="language-none">startup.cmd -m standalone 
-其中nacos中
-	standlone是单机启动
-	clusters<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre></li>
-<li></li>
-</ol>
-]]></content>
-  </entry>
-  <entry>
-    <title>springBoot</title>
-    <url>/2021/09/29/java/springBoot/</url>
-    <content><![CDATA[<h3 id="spring-boot-starter"><a href="#spring-boot-starter" class="headerlink" title="spring-boot-starter"></a>spring-boot-starter</h3><ol>
-<li>可以认为starter是一种服务（和JS的插件类似）——使得使用某个功能的开发者不需要关注各种依赖库的处理，不需要具体的配置信息，由Spring Boot自动通过classpath路径下的类发现需要的Bean，并织入bean</li>
-</ol>
-<span id="more"></span>]]></content>
-      <categories>
-        <category>java</category>
-        <category>javaWeb</category>
-        <category>spring</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>反射</title>
-    <url>/2021/09/22/java/%E5%8F%8D%E5%B0%84%E5%92%8C%E6%B3%A8%E8%A7%A3/</url>
-    <content><![CDATA[<h3 id=""><a href="#" class="headerlink" title=""></a></h3><h3 id="-1"><a href="#-1" class="headerlink" title=""></a></h3><p>test</p>
-]]></content>
-      <categories>
-        <category>java</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>hadoop的启动</title>
-    <url>/2021/09/10/distribute/hadoop%E5%90%AF%E5%8A%A8/</url>
-    <content><![CDATA[<h2 id="一、-基本环境"><a href="#一、-基本环境" class="headerlink" title="一、 基本环境"></a>一、 基本环境</h2><ol>
-<li><p>获取主机名字 master、s1、s2</p>
-</li>
-<li><p>时钟同步</p>
-<pre class="line-numbers language-none"><code class="language-none">&#x2F;usr&#x2F;sbin&#x2F;ntpdate cn.pool.ntp.org<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-<li><p>关闭防火墙</p>
-<pre class="line-numbers language-none"><code class="language-none">systemctl stop firewalld.service<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-<li><p>编辑host 以对应ping 如：</p>
-<pre class="line-numbers language-none"><code class="language-none">10.42.0.93 master
-10.42.0.94 slave01
-10.42.0.95 slave02<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre></li>
-<li><p>测试ping是否成功</p>
-<pre class="line-numbers language-none"><code class="language-none">ping master -c 3<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-</ol>
-<h2 id="二、联机"><a href="#二、联机" class="headerlink" title="二、联机"></a>二、联机</h2><ol>
-<li><p>生成公钥</p>
-<pre class="line-numbers language-none"><code class="language-none">ssh-keygen -t rsa<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-<li><p>公钥备份文件</p>
-<pre class="line-numbers language-none"><code class="language-none">cat ~&#x2F;.ssh&#x2F;id_rsa.pub &gt;&gt; ~&#x2F;.ssh&#x2F;authorized_keys<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-<li><p>修改文件权限</p>
-<pre class="line-numbers language-none"><code class="language-none">chmod 600 ~&#x2F;.ssh&#x2F;authorized_keys<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-<li><p>将专用密钥添加到 ssh-agent 的高速缓存中</p>
-<pre class="line-numbers language-none"><code class="language-none">ssh-add ~&#x2F;.ssh&#x2F;id_rsa<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-<li><p>公钥转移到其他机器</p>
-<pre class="line-numbers language-none"><code class="language-none">scp ~&#x2F;.ssh&#x2F;authorized_keys zkpk@slave01:~&#x2F;.ssh&#x2F;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-<li><p>其他机器也生成密钥</p>
-</li>
-<li><p>测试远程   ssh s1</p>
-</li>
-</ol>
-<h2 id="三、安装java"><a href="#三、安装java" class="headerlink" title="三、安装java"></a>三、安装java</h2><ol>
-<li><p>root下解压</p>
-<pre class="line-numbers language-none"><code class="language-none">tar -xzvf &#x2F;home&#x2F;zkpk&#x2F;tgz&#x2F;jdk-8u131-linux-x64.tar.gz -C &#x2F;usr&#x2F;java<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-<li><p>修改环境变量</p>
-<pre class="line-numbers language-none"><code class="language-none">gedit &#x2F;home&#x2F;zkpk&#x2F;.bash_profile
-	export JAVA_HOME&#x3D;&#x2F;usr&#x2F;java&#x2F;jdk1.8.0_131&#x2F;
-	export PATH&#x3D;$JAVA_HOME&#x2F;bin:$PATH
-source &#x2F;home&#x2F;zkpk&#x2F;.bash_profile<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre></li>
-<li><p>其他机器同样安装</p>
-</li>
-<li><p>测试java：java -version</p>
-</li>
-</ol>
-<h2 id="四、安装hadoop"><a href="#四、安装hadoop" class="headerlink" title="四、安装hadoop"></a>四、安装hadoop</h2><ol>
-<li><p>解压</p>
-<pre class="line-numbers language-none"><code class="language-none">tar -xzvf &#x2F;home&#x2F;zkpk&#x2F;tgz&#x2F;hadoop-2.7.3.tar.gz –C &#x2F;home&#x2F;zkpk<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-<li><p>修改java环境变量</p>
-<pre class="line-numbers language-none"><code class="language-none">gedit &#x2F;home&#x2F;zkpk&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;hadoop-env.sh
- 	export JAVA_HOME&#x3D;&#x2F;usr&#x2F;java&#x2F;jdk1.8.0_131&#x2F;
-gedit ~&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;yarn-env.sh
-	export JAVA_HOME&#x3D;&#x2F;usr&#x2F;java&#x2F;jdk1.8.0_131&#x2F;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre></li>
-<li><p>其他配置</p>
-<pre class="line-numbers language-none"><code class="language-none">1.配置core-site.xml 文件
-gedit  ~&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;core-site.xml
-	&lt;?xml version&#x3D;&quot;1.0&quot; encoding&#x3D;&quot;UTF-8&quot;?&gt;
-    &lt;?xml-stylesheet type&#x3D;&quot;text&#x2F;xsl&quot; href&#x3D;&quot;configuration.xsl&quot;?&gt;
-    &lt;!-- Put site-specific property overrides in this file. --&gt;
-    &lt;configuration&gt;
-            &lt;property&gt;
-                    &lt;name&gt;fs.defaultFS&lt;&#x2F;name&gt;
-                    &lt;value&gt;hdfs:&#x2F;&#x2F;master:9000&lt;&#x2F;value&gt;
-            &lt;&#x2F;property&gt;
-            &lt;property&gt;
-                    &lt;name&gt;hadoop.tmp.dir&lt;&#x2F;name&gt;
-                    &lt;value&gt;&#x2F;home&#x2F;zkpk&#x2F;hadoopdata&lt;&#x2F;value&gt;
-            &lt;&#x2F;property&gt;
-    &lt;&#x2F;configuration&gt;
-2.配置hdfs-site.xml文件
-gedit  ~&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;hdfs-site.xml
-    &lt;?xml version&#x3D;&quot;1.0&quot; encoding&#x3D;&quot;UTF-8&quot;?&gt;
-    &lt;?xml-stylesheet type&#x3D;&quot;text&#x2F;xsl&quot; href&#x3D;&quot;configuration.xsl&quot;?&gt;
-    &lt;!-- Put site-specific property overrides in this file. --&gt;
-    &lt;configuration&gt;
-        &lt;property&gt;
-            &lt;name&gt;dfs.replication&lt;&#x2F;name&gt;
-            &lt;value&gt;2&lt;&#x2F;value&gt;
-        &lt;&#x2F;property&gt;
-    &lt;&#x2F;configuration&gt;
-3.配置yarn-site.xml文件
-gedit  ~&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;yarn-site.xml
-    &lt;?xml version&#x3D;&quot;1.0&quot;?&gt;
-    &lt;configuration&gt;
-        &lt;property&gt;
-            &lt;name&gt;yarn.nodemanager.aux-services&lt;&#x2F;name&gt;
-            &lt;value&gt;mapreduce_shuffle&lt;&#x2F;value&gt;
-        &lt;&#x2F;property&gt;
-        &lt;property&gt;
-            &lt;name&gt;yarn.resourcemanager.address&lt;&#x2F;name&gt;
-            &lt;value&gt;master:18040&lt;&#x2F;value&gt;
-        &lt;&#x2F;property&gt;
-        &lt;property&gt;
-            &lt;name&gt;yarn.resourcemanager.scheduler.address&lt;&#x2F;name&gt;
-            &lt;value&gt;master:18030&lt;&#x2F;value&gt;
-        &lt;&#x2F;property&gt;
-        &lt;property&gt;
-            &lt;name&gt;yarn.resourcemanager.resource-tracker.address&lt;&#x2F;name&gt;
-            &lt;value&gt;master:18025&lt;&#x2F;value&gt;
-        &lt;&#x2F;property&gt;
-        &lt;property&gt;
-            &lt;name&gt;yarn.resourcemanager.admin.address&lt;&#x2F;name&gt;
-            &lt;value&gt;master:18141&lt;&#x2F;value&gt;
-        &lt;&#x2F;property&gt;
-        &lt;property&gt;
-            &lt;name&gt;yarn.resourcemanager.webapp.address&lt;&#x2F;name&gt;
-            &lt;value&gt;master:18088&lt;&#x2F;value&gt;
-        &lt;&#x2F;property&gt;
-    &lt;&#x2F;configuration&gt;
-4.配置mapred-site.xml文件
-cp ~&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;mapred-site.xml.template  ~&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;mapred-site.xml
-gedit ~&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;mapred-site.xml
-    &lt;?xml version&#x3D;&quot;1.0&quot;?&gt;
-    &lt;?xml-stylesheet type&#x3D;&quot;text&#x2F;xsl&quot; href&#x3D;&quot;configuration.xsl&quot;?&gt;
-    &lt;configuration&gt;
-        &lt;property&gt;
-            &lt;name&gt;mapreduce.framework.name&lt;&#x2F;name&gt;
-            &lt;value&gt;yarn&lt;&#x2F;value&gt;
-        &lt;&#x2F;property&gt;
-    &lt;&#x2F;configuration&gt;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
-<li><p>配置slaves文件</p>
-<pre class="line-numbers language-none"><code class="language-none">gedit ~&#x2F;hadoop-2.7.3&#x2F;etc&#x2F;hadoop&#x2F;slaves
-    slave01
-    slave02<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre></li>
-<li><p>创建Hadoop数据目录</p>
-<pre class="line-numbers language-none"><code class="language-none">mkdir hadoopdata<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-<li><p>将配置好的hadoop文件夹复制到从节点</p>
-<pre class="line-numbers language-none"><code class="language-none">scp -r hadoop-2.7.3 zkpk@slave01:~&#x2F;<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-<li><p>配置环境变量</p>
-<pre class="line-numbers language-none"><code class="language-none">gedit ~&#x2F;.bash_profile
-    #HADOOP
-    export HADOOP_HOME&#x3D;&#x2F;home&#x2F;zkpk&#x2F;hadoop-2.7.3
-    export PATH&#x3D;$HADOOP_HOME&#x2F;bin:$HADOOP_HOME&#x2F;sbin:$PATH
-source ~&#x2F;.bash_profile<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
-<li><p>其他机器同样配置环境变量</p>
-</li>
-<li><p>在master格式化磁盘</p>
-<pre class="line-numbers language-none"><code class="language-none">hdfs namenode -format<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-</ol>
-<h2 id="五、启动检测"><a href="#五、启动检测" class="headerlink" title="五、启动检测"></a>五、启动检测</h2><ol>
-<li>start-all.sh</li>
-<li>jps查看</li>
-<li><a href="http://master:50070/%E6%9F%A5%E7%9C%8B">http://master:50070/查看</a></li>
-<li><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20210911183155100.png" alt="image-20210911183155100"></li>
-</ol>
-]]></content>
-      <categories>
-        <category>大数据开发</category>
-        <category>hadoop</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>linux操作</title>
-    <url>/2021/10/07/os/linux%E6%93%8D%E4%BD%9C/</url>
-    <content><![CDATA[<h3 id="简单操作"><a href="#简单操作" class="headerlink" title="简单操作"></a>简单操作</h3><ol>
-<li>ls -a 连同.文件一起查看</li>
-<li>解压  tar xzf ..gz</li>
-<li>查看redis进程 ps -ef | grep redis</li>
-<li></li>
-</ol>
-<span id="more"></span>
-
-<h3 id="vim"><a href="#vim" class="headerlink" title="vim"></a>vim</h3><ol>
-<li>搜索：c    /str</li>
-</ol>
-]]></content>
-      <categories>
-        <category>utils</category>
-      </categories>
-  </entry>
-  <entry>
     <title>设计模式</title>
     <url>/2021/09/24/java/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/</url>
     <content><![CDATA[<h3 id="单例模式"><a href="#单例模式" class="headerlink" title="单例模式"></a>单例模式</h3><ul>
@@ -1583,6 +1555,34 @@ source ~&#x2F;.bash_profile<span aria-hidden="true" class="line-numbers-rows"><s
       <categories>
         <category>java</category>
         <category>java高阶</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>反射</title>
+    <url>/2021/09/22/java/%E5%8F%8D%E5%B0%84%E5%92%8C%E6%B3%A8%E8%A7%A3/</url>
+    <content><![CDATA[<h3 id=""><a href="#" class="headerlink" title=""></a></h3><h3 id="-1"><a href="#-1" class="headerlink" title=""></a></h3><p>test</p>
+]]></content>
+      <categories>
+        <category>java</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>linux操作</title>
+    <url>/2021/10/07/os/linux%E6%93%8D%E4%BD%9C/</url>
+    <content><![CDATA[<h3 id="简单操作"><a href="#简单操作" class="headerlink" title="简单操作"></a>简单操作</h3><ol>
+<li>ls -a 连同.文件一起查看</li>
+<li>解压  tar xzf ..gz</li>
+<li>查看redis进程 ps -ef | grep redis</li>
+<li></li>
+</ol>
+<span id="more"></span>
+
+<h3 id="vim"><a href="#vim" class="headerlink" title="vim"></a>vim</h3><ol>
+<li>搜索：c    /str</li>
+</ol>
+]]></content>
+      <categories>
+        <category>utils</category>
       </categories>
   </entry>
   <entry>
@@ -1703,83 +1703,6 @@ source ~&#x2F;.bash_profile<span aria-hidden="true" class="line-numbers-rows"><s
 ]]></content>
       <categories>
         <category>utils</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>springBoot秒杀系统</title>
-    <url>/2021/09/29/project/springboot_%E7%A7%92%E6%9D%80%E7%B3%BB%E7%BB%9F/</url>
-    <content><![CDATA[<h3 id="技术介绍"><a href="#技术介绍" class="headerlink" title="技术介绍"></a>技术介绍</h3><ol>
-<li>秒杀 两个问题：并发读，并发写。防止最坏的情况发生。<ol>
-<li>稳  高可用 最坏情况planb</li>
-<li>准  一致性</li>
-<li>快  高性能， 效率</li>
-</ol>
-</li>
-<li> <img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20210930003833352.png" alt="image-20210930003833352"></li>
-<li><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20210930003801073.png" alt="image-20210930003800497"></li>
-<li><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20210930003852477.png" alt="image-20210930003852477"></li>
-</ol>
-<h3 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h3><ol>
-<li><p>创建项目加入依赖</p>
-<p>mybatisplus,mysql,thymeleaf,springwebm,lomok</p>
-</li>
-<li><p>配置resources</p>
-<ol>
-<li><p>application</p>
-<ol>
-<li>datasource<ol>
-<li>driver-url-username-password</li>
-<li>连接池</li>
-</ol>
-</li>
-<li>logging debug</li>
-<li>mybatis-plus</li>
-</ol>
-</li>
-<li><p>mapper</p>
-</li>
-<li><p>templates</p>
-<ol>
-<li><p>html—&gt;thymeleaf命名空间</p>
-<pre class="line-numbers language-html" data-language="html"><code class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>html</span> <span class="token attr-name">lang</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>en<span class="token punctuation">"</span></span>    <span class="token attr-name"><span class="token namespace">xmlns:</span>th</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>http://www.thymeleaf.org<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
-</ol>
-</li>
-<li><p>logging</p>
-<pre class="line-numbers language-yml" data-language="yml"><code class="language-yml">logging:
-  level:  com.examapl.springkill.mapper: debug<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre></li>
-</ol>
-</li>
-<li><p>登录功能</p>
-<ol>
-<li><p>MD5加密(实质是一种消息摘要算法)</p>
-</li>
-<li><p>步骤</p>
-<ol>
-<li><p>依赖</p>
-<pre class="line-numbers language-xml" data-language="xml"><code class="language-xml">commons-codec
-commons-lang3<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre></li>
-<li><p>二次加密步骤</p>
-<ol>
-<li><p>```<br>根据公有盐第一次转化为md5密码—m1</p>
-<pre class="line-numbers language-none"><code class="language-none">
-2. &#96;&#96;&#96;
-   根据m1和数据库的私有盐进行二次加密-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre></li>
-<li><pre><code>封装函数方便直接得到m2
-</code></pre>
-</li>
-</ol>
-</li>
-<li><p>二次加密优点</p>
-</li>
-</ol>
-</li>
-<li></li>
-</ol>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>项目</category>
       </categories>
   </entry>
   <entry>
@@ -2319,7 +2242,7 @@ git push orgin --tags<span aria-hidden="true" class="line-numbers-rows"><span></
 <li><p>github加入自己的本机的ssh</p>
 </li>
 <li><p>将本机的.git的里面的comfig.remote修改为项目的ssh链接</p>
-<p><a href="mailto:&#103;&#105;&#116;&#64;&#103;&#105;&#116;&#104;&#x75;&#98;&#46;&#99;&#111;&#x6d;">&#103;&#105;&#116;&#64;&#103;&#105;&#116;&#104;&#x75;&#98;&#46;&#99;&#111;&#x6d;</a>:Wang-yonggan/Wang-yonggan.github.io.git</p>
+<p><a href="mailto:&#x67;&#x69;&#116;&#64;&#x67;&#105;&#x74;&#x68;&#x75;&#x62;&#x2e;&#99;&#111;&#109;">&#x67;&#x69;&#116;&#64;&#x67;&#105;&#x74;&#x68;&#x75;&#x62;&#x2e;&#99;&#111;&#109;</a>:Wang-yonggan/Wang-yonggan.github.io.git</p>
 <p><a href="https://github.com/Wang-yonggan/Wang-yonggan.github.io.git">https://github.com/Wang-yonggan/Wang-yonggan.github.io.git</a></p>
 </li>
 </ol>
@@ -2328,6 +2251,83 @@ git push orgin --tags<span aria-hidden="true" class="line-numbers-rows"><span></
 ]]></content>
       <categories>
         <category>utils</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>springBoot秒杀系统</title>
+    <url>/2021/09/29/project/springboot_%E7%A7%92%E6%9D%80%E7%B3%BB%E7%BB%9F/</url>
+    <content><![CDATA[<h3 id="技术介绍"><a href="#技术介绍" class="headerlink" title="技术介绍"></a>技术介绍</h3><ol>
+<li>秒杀 两个问题：并发读，并发写。防止最坏的情况发生。<ol>
+<li>稳  高可用 最坏情况planb</li>
+<li>准  一致性</li>
+<li>快  高性能， 效率</li>
+</ol>
+</li>
+<li> <img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20210930003833352.png" alt="image-20210930003833352"></li>
+<li><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20210930003801073.png" alt="image-20210930003800497"></li>
+<li><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20210930003852477.png" alt="image-20210930003852477"></li>
+</ol>
+<h3 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h3><ol>
+<li><p>创建项目加入依赖</p>
+<p>mybatisplus,mysql,thymeleaf,springwebm,lomok</p>
+</li>
+<li><p>配置resources</p>
+<ol>
+<li><p>application</p>
+<ol>
+<li>datasource<ol>
+<li>driver-url-username-password</li>
+<li>连接池</li>
+</ol>
+</li>
+<li>logging debug</li>
+<li>mybatis-plus</li>
+</ol>
+</li>
+<li><p>mapper</p>
+</li>
+<li><p>templates</p>
+<ol>
+<li><p>html—&gt;thymeleaf命名空间</p>
+<pre class="line-numbers language-html" data-language="html"><code class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>html</span> <span class="token attr-name">lang</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>en<span class="token punctuation">"</span></span>    <span class="token attr-name"><span class="token namespace">xmlns:</span>th</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>http://www.thymeleaf.org<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></li>
+</ol>
+</li>
+<li><p>logging</p>
+<pre class="line-numbers language-yml" data-language="yml"><code class="language-yml">logging:
+  level:  com.examapl.springkill.mapper: debug<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre></li>
+</ol>
+</li>
+<li><p>登录功能</p>
+<ol>
+<li><p>MD5加密(实质是一种消息摘要算法)</p>
+</li>
+<li><p>步骤</p>
+<ol>
+<li><p>依赖</p>
+<pre class="line-numbers language-xml" data-language="xml"><code class="language-xml">commons-codec
+commons-lang3<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre></li>
+<li><p>二次加密步骤</p>
+<ol>
+<li><p>```<br>根据公有盐第一次转化为md5密码—m1</p>
+<pre class="line-numbers language-none"><code class="language-none">
+2. &#96;&#96;&#96;
+   根据m1和数据库的私有盐进行二次加密-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre></li>
+<li><pre><code>封装函数方便直接得到m2
+</code></pre>
+</li>
+</ol>
+</li>
+<li><p>二次加密优点</p>
+</li>
+</ol>
+</li>
+<li></li>
+</ol>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>项目</category>
       </categories>
   </entry>
   <entry>
@@ -2486,6 +2486,107 @@ HOSTNAME&#x3D;slave1<span aria-hidden="true" class="line-numbers-rows"><span></s
 ]]></content>
       <categories>
         <category>utils</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>ORM框架</title>
+    <url>/2021/10/08/%E7%BB%84%E4%BB%B6/ORM%E6%A1%86%E6%9E%B6/</url>
+    <content><![CDATA[<h3 id="orm思想"><a href="#orm思想" class="headerlink" title="orm思想"></a>orm思想</h3><ol>
+<li>JDBC–传统的数据库操作<ol>
+<li>Connection</li>
+</ol>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>项目</category>
+        <category>组件</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>组件2</title>
+    <url>/2021/10/06/%E7%BB%84%E4%BB%B6/%E7%BB%84%E4%BB%B62/</url>
+    <content><![CDATA[<h3 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h3><ol>
+<li><p>xx</p>
+</li>
+<li><p>使用步骤</p>
+<ol>
+<li><p>依赖</p>
+<pre class="line-numbers language-xml" data-language="xml"><code class="language-xml"><span class="token comment">&lt;!-- reids by boot --></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">></span></span>org.springframework.boot<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">></span></span>spring-boot-starter-data-redis<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">></span></span>
+<span class="token comment">&lt;!-- spring2.X集成redis所需common-pool2--></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">></span></span>org.apache.commons<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">></span></span>commons-pool2<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>version</span><span class="token punctuation">></span></span>2.6.0<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>version</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+<li><p>创建配置类(@Configuration)</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token annotation punctuation">@EnableCaching</span> <span class="token comment">//开启缓存</span>
+<span class="token annotation punctuation">@Configuration</span>  <span class="token comment">//配置类</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">RedisConfig</span> <span class="token keyword">extends</span> <span class="token class-name">CachingConfigurerSupport</span> <span class="token punctuation">&#123;</span>
+    <span class="token annotation punctuation">@Bean</span>
+    <span class="token keyword">public</span> <span class="token class-name">RedisTemplate</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">Object</span><span class="token punctuation">></span></span> <span class="token function">redisTemplate</span><span class="token punctuation">(</span><span class="token class-name">RedisConnectionFactory</span> factory<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token class-name">RedisTemplate</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">Object</span><span class="token punctuation">></span></span> template <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">RedisTemplate</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token punctuation">></span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">RedisSerializer</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">></span></span> redisSerializer <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">StringRedisSerializer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">Jackson2JsonRedisSerializer</span> jackson2JsonRedisSerializer <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Jackson2JsonRedisSerializer</span><span class="token punctuation">(</span><span class="token class-name">Object</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">ObjectMapper</span> om <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ObjectMapper</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        om<span class="token punctuation">.</span><span class="token function">setVisibility</span><span class="token punctuation">(</span><span class="token class-name">PropertyAccessor</span><span class="token punctuation">.</span>ALL<span class="token punctuation">,</span> <span class="token class-name">JsonAutoDetect<span class="token punctuation">.</span>Visibility</span><span class="token punctuation">.</span>ANY<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        om<span class="token punctuation">.</span><span class="token function">enableDefaultTyping</span><span class="token punctuation">(</span><span class="token class-name">ObjectMapper<span class="token punctuation">.</span>DefaultTyping</span><span class="token punctuation">.</span>NON_FINAL<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        jackson2JsonRedisSerializer<span class="token punctuation">.</span><span class="token function">setObjectMapper</span><span class="token punctuation">(</span>om<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        template<span class="token punctuation">.</span><span class="token function">setConnectionFactory</span><span class="token punctuation">(</span>factory<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">//key序列化方式</span>
+        template<span class="token punctuation">.</span><span class="token function">setKeySerializer</span><span class="token punctuation">(</span>redisSerializer<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">//value序列化</span>
+        template<span class="token punctuation">.</span><span class="token function">setValueSerializer</span><span class="token punctuation">(</span>jackson2JsonRedisSerializer<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">//value hashmap序列化</span>
+        template<span class="token punctuation">.</span><span class="token function">setHashValueSerializer</span><span class="token punctuation">(</span>jackson2JsonRedisSerializer<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> template<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token annotation punctuation">@Bean</span>
+    <span class="token keyword">public</span> <span class="token class-name">CacheManager</span> <span class="token function">cacheManager</span><span class="token punctuation">(</span><span class="token class-name">RedisConnectionFactory</span> factory<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token class-name">RedisSerializer</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">></span></span> redisSerializer <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">StringRedisSerializer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">Jackson2JsonRedisSerializer</span> jackson2JsonRedisSerializer <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Jackson2JsonRedisSerializer</span><span class="token punctuation">(</span><span class="token class-name">Object</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">//解决查询缓存转换异常的问题</span>
+        <span class="token class-name">ObjectMapper</span> om <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ObjectMapper</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        om<span class="token punctuation">.</span><span class="token function">setVisibility</span><span class="token punctuation">(</span><span class="token class-name">PropertyAccessor</span><span class="token punctuation">.</span>ALL<span class="token punctuation">,</span> <span class="token class-name">JsonAutoDetect<span class="token punctuation">.</span>Visibility</span><span class="token punctuation">.</span>ANY<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        om<span class="token punctuation">.</span><span class="token function">enableDefaultTyping</span><span class="token punctuation">(</span><span class="token class-name">ObjectMapper<span class="token punctuation">.</span>DefaultTyping</span><span class="token punctuation">.</span>NON_FINAL<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        jackson2JsonRedisSerializer<span class="token punctuation">.</span><span class="token function">setObjectMapper</span><span class="token punctuation">(</span>om<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">// 配置序列化（解决乱码的问题）,过期时间600秒</span>
+        <span class="token class-name">RedisCacheConfiguration</span> config <span class="token operator">=</span> <span class="token class-name">RedisCacheConfiguration</span><span class="token punctuation">.</span><span class="token function">defaultCacheConfig</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">entryTtl</span><span class="token punctuation">(</span><span class="token class-name">Duration</span><span class="token punctuation">.</span><span class="token function">ofSeconds</span><span class="token punctuation">(</span><span class="token number">600</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">serializeKeysWith</span><span class="token punctuation">(</span><span class="token class-name">RedisSerializationContext<span class="token punctuation">.</span>SerializationPair</span><span class="token punctuation">.</span><span class="token function">fromSerializer</span><span class="token punctuation">(</span>redisSerializer<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">serializeValuesWith</span><span class="token punctuation">(</span><span class="token class-name">RedisSerializationContext<span class="token punctuation">.</span>SerializationPair</span><span class="token punctuation">.</span><span class="token function">fromSerializer</span><span class="token punctuation">(</span>jackson2JsonRedisSerializer<span class="token punctuation">)</span><span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">disableCachingNullValues</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">RedisCacheManager</span> cacheManager <span class="token operator">=</span> <span class="token class-name">RedisCacheManager</span><span class="token punctuation">.</span><span class="token function">builder</span><span class="token punctuation">(</span>factory<span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">cacheDefaults</span><span class="token punctuation">(</span>config<span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> cacheManager<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+<li><p>Controller开启加上缓存注解</p>
+<ol>
+<li><pre><code class="java">@Cacheable(value = &quot;banner&quot;,key = &quot;&#39;selectIndexList&#39;&quot;)
+</code></pre>
+</li>
+<li><p>注意key 双引号里面有单引号</p>
+</li>
+<li></li>
+</ol>
+</li>
+<li><p>启动redis</p>
+</li>
+</ol>
+</li>
+<li><p>效果，先查redis缓存，没有再去数据库查询。</p>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>项目</category>
+        <category>组件</category>
       </categories>
   </entry>
   <entry>
@@ -2854,92 +2955,6 @@ wrapper<span class="token punctuation">.</span><span class="token function">eq</
 </li>
 <li></li>
 </ol>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>项目</category>
-        <category>组件</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>组件2</title>
-    <url>/2021/10/06/%E7%BB%84%E4%BB%B6/%E7%BB%84%E4%BB%B62/</url>
-    <content><![CDATA[<h3 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h3><ol>
-<li><p>xx</p>
-</li>
-<li><p>使用步骤</p>
-<ol>
-<li><p>依赖</p>
-<pre class="line-numbers language-xml" data-language="xml"><code class="language-xml"><span class="token comment">&lt;!-- reids by boot --></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">></span></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">></span></span>org.springframework.boot<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">></span></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">></span></span>spring-boot-starter-data-redis<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">></span></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">></span></span>
-<span class="token comment">&lt;!-- spring2.X集成redis所需common-pool2--></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">></span></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">></span></span>org.apache.commons<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">></span></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">></span></span>commons-pool2<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">></span></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>version</span><span class="token punctuation">></span></span>2.6.0<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>version</span><span class="token punctuation">></span></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
-<li><p>创建配置类(@Configuration)</p>
-<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token annotation punctuation">@EnableCaching</span> <span class="token comment">//开启缓存</span>
-<span class="token annotation punctuation">@Configuration</span>  <span class="token comment">//配置类</span>
-<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">RedisConfig</span> <span class="token keyword">extends</span> <span class="token class-name">CachingConfigurerSupport</span> <span class="token punctuation">&#123;</span>
-    <span class="token annotation punctuation">@Bean</span>
-    <span class="token keyword">public</span> <span class="token class-name">RedisTemplate</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">Object</span><span class="token punctuation">></span></span> <span class="token function">redisTemplate</span><span class="token punctuation">(</span><span class="token class-name">RedisConnectionFactory</span> factory<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-        <span class="token class-name">RedisTemplate</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">Object</span><span class="token punctuation">></span></span> template <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">RedisTemplate</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token punctuation">></span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token class-name">RedisSerializer</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">></span></span> redisSerializer <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">StringRedisSerializer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token class-name">Jackson2JsonRedisSerializer</span> jackson2JsonRedisSerializer <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Jackson2JsonRedisSerializer</span><span class="token punctuation">(</span><span class="token class-name">Object</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token class-name">ObjectMapper</span> om <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ObjectMapper</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        om<span class="token punctuation">.</span><span class="token function">setVisibility</span><span class="token punctuation">(</span><span class="token class-name">PropertyAccessor</span><span class="token punctuation">.</span>ALL<span class="token punctuation">,</span> <span class="token class-name">JsonAutoDetect<span class="token punctuation">.</span>Visibility</span><span class="token punctuation">.</span>ANY<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        om<span class="token punctuation">.</span><span class="token function">enableDefaultTyping</span><span class="token punctuation">(</span><span class="token class-name">ObjectMapper<span class="token punctuation">.</span>DefaultTyping</span><span class="token punctuation">.</span>NON_FINAL<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        jackson2JsonRedisSerializer<span class="token punctuation">.</span><span class="token function">setObjectMapper</span><span class="token punctuation">(</span>om<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        template<span class="token punctuation">.</span><span class="token function">setConnectionFactory</span><span class="token punctuation">(</span>factory<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token comment">//key序列化方式</span>
-        template<span class="token punctuation">.</span><span class="token function">setKeySerializer</span><span class="token punctuation">(</span>redisSerializer<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token comment">//value序列化</span>
-        template<span class="token punctuation">.</span><span class="token function">setValueSerializer</span><span class="token punctuation">(</span>jackson2JsonRedisSerializer<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token comment">//value hashmap序列化</span>
-        template<span class="token punctuation">.</span><span class="token function">setHashValueSerializer</span><span class="token punctuation">(</span>jackson2JsonRedisSerializer<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token keyword">return</span> template<span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span>
-
-    <span class="token annotation punctuation">@Bean</span>
-    <span class="token keyword">public</span> <span class="token class-name">CacheManager</span> <span class="token function">cacheManager</span><span class="token punctuation">(</span><span class="token class-name">RedisConnectionFactory</span> factory<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-        <span class="token class-name">RedisSerializer</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">></span></span> redisSerializer <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">StringRedisSerializer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token class-name">Jackson2JsonRedisSerializer</span> jackson2JsonRedisSerializer <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Jackson2JsonRedisSerializer</span><span class="token punctuation">(</span><span class="token class-name">Object</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token comment">//解决查询缓存转换异常的问题</span>
-        <span class="token class-name">ObjectMapper</span> om <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ObjectMapper</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        om<span class="token punctuation">.</span><span class="token function">setVisibility</span><span class="token punctuation">(</span><span class="token class-name">PropertyAccessor</span><span class="token punctuation">.</span>ALL<span class="token punctuation">,</span> <span class="token class-name">JsonAutoDetect<span class="token punctuation">.</span>Visibility</span><span class="token punctuation">.</span>ANY<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        om<span class="token punctuation">.</span><span class="token function">enableDefaultTyping</span><span class="token punctuation">(</span><span class="token class-name">ObjectMapper<span class="token punctuation">.</span>DefaultTyping</span><span class="token punctuation">.</span>NON_FINAL<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        jackson2JsonRedisSerializer<span class="token punctuation">.</span><span class="token function">setObjectMapper</span><span class="token punctuation">(</span>om<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token comment">// 配置序列化（解决乱码的问题）,过期时间600秒</span>
-        <span class="token class-name">RedisCacheConfiguration</span> config <span class="token operator">=</span> <span class="token class-name">RedisCacheConfiguration</span><span class="token punctuation">.</span><span class="token function">defaultCacheConfig</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-                <span class="token punctuation">.</span><span class="token function">entryTtl</span><span class="token punctuation">(</span><span class="token class-name">Duration</span><span class="token punctuation">.</span><span class="token function">ofSeconds</span><span class="token punctuation">(</span><span class="token number">600</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-                <span class="token punctuation">.</span><span class="token function">serializeKeysWith</span><span class="token punctuation">(</span><span class="token class-name">RedisSerializationContext<span class="token punctuation">.</span>SerializationPair</span><span class="token punctuation">.</span><span class="token function">fromSerializer</span><span class="token punctuation">(</span>redisSerializer<span class="token punctuation">)</span><span class="token punctuation">)</span>
-                <span class="token punctuation">.</span><span class="token function">serializeValuesWith</span><span class="token punctuation">(</span><span class="token class-name">RedisSerializationContext<span class="token punctuation">.</span>SerializationPair</span><span class="token punctuation">.</span><span class="token function">fromSerializer</span><span class="token punctuation">(</span>jackson2JsonRedisSerializer<span class="token punctuation">)</span><span class="token punctuation">)</span>
-                <span class="token punctuation">.</span><span class="token function">disableCachingNullValues</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token class-name">RedisCacheManager</span> cacheManager <span class="token operator">=</span> <span class="token class-name">RedisCacheManager</span><span class="token punctuation">.</span><span class="token function">builder</span><span class="token punctuation">(</span>factory<span class="token punctuation">)</span>
-                <span class="token punctuation">.</span><span class="token function">cacheDefaults</span><span class="token punctuation">(</span>config<span class="token punctuation">)</span>
-                <span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token keyword">return</span> cacheManager<span class="token punctuation">;</span>
-    <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
-<li><p>Controller开启加上缓存注解</p>
-<ol>
-<li><pre><code class="java">@Cacheable(value = &quot;banner&quot;,key = &quot;&#39;selectIndexList&#39;&quot;)
-</code></pre>
-</li>
-<li><p>注意key 双引号里面有单引号</p>
-</li>
-<li></li>
-</ol>
-</li>
-<li><p>启动redis</p>
-</li>
-</ol>
-</li>
-<li><p>效果，先查redis缓存，没有再去数据库查询。</p>
 </li>
 </ol>
 ]]></content>
