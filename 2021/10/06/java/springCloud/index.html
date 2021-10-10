@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#222">
 <meta name="generator" content="Hexo 5.4.0">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/chrome1.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/chrome2.svg">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
   <link rel="mask-icon" href="/images/logo.svg" color="#222">
 
@@ -322,16 +322,7 @@
 <li><p>业务独立</p>
 </li>
 <li><p><strong>消费者</strong>远程调用<strong>提供者</strong>：8080–java代码发起请求http请求—&gt;8081</p>
-<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token comment">//application中注入RestTemplate</span>
-<span class="token annotation punctuation">@Bean</span>
-<span class="token keyword">public</span> <span class="token class-name">RestTemplate</span> <span class="token function">restTemplate</span><span class="token punctuation">(</span>id<span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
-    <span class="token keyword">return</span> <span class="token class-name">RestTemplate</span><span class="token punctuation">(</span>param<span class="token punctuation">)</span>
-<span class="token punctuation">&#125;</span>
-<span class="token comment">//service调用restTemplate</span>
-<span class="token keyword">public</span> <span class="token class-name">String</span> <span class="token function">getName</span><span class="token punctuation">(</span>order<span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
-	<span class="token class-name">String</span> url<span class="token operator">=</span><span class="token string">"http://localhost:8081/user/"</span><span class="token operator">+</span>order<span class="token punctuation">.</span>getId'<span class="token punctuation">;</span>
-    <span class="token keyword">return</span> restTemplate<span class="token punctuation">.</span><span class="token function">getForObject</span><span class="token punctuation">(</span>url<span class="token punctuation">,</span><span class="token class-name">User</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//application中注入RestTemplate</span></span><br><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> RestTemplate <span class="title">restTemplate</span><span class="params">(id)</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> RestTemplate(param)</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//service调用restTemplate</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">(order)</span></span>&#123;</span><br><span class="line">	String url=<span class="string">&quot;http://localhost:8081/user/&quot;</span>+order.getId<span class="string">&#x27;;</span></span><br><span class="line"><span class="string">    return restTemplate.getForObject(url,User.class).getName();</span></span><br><span class="line"><span class="string">&#125;</span></span><br></pre></td></tr></table></figure></li>
 </ol>
 <h2 id="eureka注册中心"><a href="#eureka注册中心" class="headerlink" title="eureka注册中心"></a>eureka注册中心</h2><ol>
 <li><p>8081可能会改变，所以需要用注册中心</p>
@@ -341,30 +332,13 @@
 <li><p>每一个模块启动，都会向eureka注册的报道登记（每30秒也会）（因为每一个模块都可能成为提供者），比如user模块：我来了，我是user。如果30s内没有报道，就会除去这个接口。</p>
 </li>
 <li><p>然后来了一个消费者：帮我找找user，看有没有，eureka一看有3个User，eureka就会根据负载均衡挑选一个接口。</p>
-<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token comment">//application中注入RestTemplate</span>
-<span class="token annotation punctuation">@Bean</span>
-<span class="token annotation punctuation">@LoadBalance</span> <span class="token comment">//负载均衡</span>
-<span class="token keyword">public</span> <span class="token class-name">RestTemplate</span> <span class="token function">restTemplate</span><span class="token punctuation">(</span>id<span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
-    <span class="token keyword">return</span> <span class="token class-name">RestTemplate</span><span class="token punctuation">(</span>param<span class="token punctuation">)</span>
-<span class="token punctuation">&#125;</span>
-<span class="token comment">//service调用restTemplate</span>
-<span class="token keyword">public</span> <span class="token class-name">String</span> <span class="token function">getName</span><span class="token punctuation">(</span>order<span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
-	<span class="token class-name">String</span> url<span class="token operator">=</span><span class="token string">"http://userservice/user/"</span><span class="token operator">+</span>order<span class="token punctuation">.</span>getId'<span class="token punctuation">;</span>
-    <span class="token keyword">return</span> restTemplate<span class="token punctuation">.</span><span class="token function">getForObject</span><span class="token punctuation">(</span>url<span class="token punctuation">,</span><span class="token class-name">User</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//application中注入RestTemplate</span></span><br><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="meta">@LoadBalance</span> <span class="comment">//负载均衡</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> RestTemplate <span class="title">restTemplate</span><span class="params">(id)</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> RestTemplate(param)</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//service调用restTemplate</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">(order)</span></span>&#123;</span><br><span class="line">	String url=<span class="string">&quot;http://userservice/user/&quot;</span>+order.getId<span class="string">&#x27;;</span></span><br><span class="line"><span class="string">    return restTemplate.getForObject(url,User.class).getName();</span></span><br><span class="line"><span class="string">&#125;</span></span><br></pre></td></tr></table></figure></li>
 </ol>
 <h3 id="Riboon负载均衡"><a href="#Riboon负载均衡" class="headerlink" title="Riboon负载均衡"></a>Riboon负载均衡</h3><ol>
 <li><p>步骤</p>
 <img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20210913002823604.png" alt="image-20210913002823604" style="zoom:80%;" /></li>
 <li><p>负载均衡原理：Riboon负载均衡的原则是IRule接口实现的ZoneAvoiddanceRule&lt;—-RoundRobinRule，是轮循类。</p>
-<pre class="line-numbers language-java" data-language="java"><code class="language-java">其中zone可以指定地方
-会优先原则离这个地方最近的服务接口
-其他调整方法：
-	<span class="token annotation punctuation">@Bean</span>
-   	<span class="token keyword">public</span> <span class="token class-name">IRule</span> <span class="token function">testRule</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
-    	<span class="token keyword">return</span> <span class="token class-name">RandomRule</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> 随机
-<span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></li>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">其中zone可以指定地方</span><br><span class="line">会优先原则离这个地方最近的服务接口</span><br><span class="line">其他调整方法：</span><br><span class="line">	<span class="meta">@Bean</span></span><br><span class="line">   	<span class="function"><span class="keyword">public</span> IRule <span class="title">testRule</span><span class="params">()</span></span>&#123;</span><br><span class="line">    	<span class="keyword">return</span> RandomRule(); 随机</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
 </ol>
 <h3 id="Nacos注册中心—-gt-eureka"><a href="#Nacos注册中心—-gt-eureka" class="headerlink" title="Nacos注册中心—&gt;eureka"></a>Nacos注册中心—&gt;eureka</h3><ol>
 <li><p>特点：</p>
@@ -373,10 +347,7 @@
 </ol>
 </li>
 <li><p>启动</p>
-<pre class="line-numbers language-none"><code class="language-none">startup.cmd -m standalone 
-其中nacos中
-	standlone是单机启动
-	clusters<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre></li>
+<figure class="highlight dos"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">startup.<span class="built_in">cmd</span> -m standalone </span><br><span class="line">其中nacos中</span><br><span class="line">	standlone是单机启动</span><br><span class="line">	clusters</span><br></pre></td></tr></table></figure></li>
 <li></li>
 </ol>
 
@@ -480,14 +451,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">37</span>
+          <span class="site-state-item-count">44</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-count">14</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>
@@ -531,12 +502,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">51k</span>
+    <span title="站点总字数">67k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">46 分钟</span>
+    <span title="站点阅读时长">1:01</span>
 </div>
 
         
