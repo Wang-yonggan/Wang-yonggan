@@ -187,130 +187,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/10/12/project/spring-secruity/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="十二峒">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/10/12/project/spring-secruity/" class="post-title-link" itemprop="url">spring-secruity</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-10-12 09:40:50" itemprop="dateCreated datePublished" datetime="2021-10-12T09:40:50+08:00">2021-10-12</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-10-17 12:26:01" itemprop="dateModified" datetime="2021-10-17T12:26:01+08:00">2021-10-17</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2021/10/12/project/spring-secruity/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2021/10/12/project/spring-secruity/" class="cy_cmt_count" data-xid="2021/10/12/project/spring-secruity/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>755</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="project1"><a href="#project1" class="headerlink" title="project1"></a>project1</h3><ol>
-<li><p>database</p>
-<p>user</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">username,series,token,last_used</span><br></pre></td></tr></table></figure></li>
-<li><p>配置类</p>
-<ol>
-<li><p>注入数据库</p>
-</li>
-<li><p>@configuration</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Autowired</span></span><br><span class="line"><span class="keyword">private</span> DataSource dataSource;</span><br><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> PersistentTokenRepository <span class="title">persistentTokenRepository</span><span class="params">()</span></span>&#123;</span><br><span class="line">    JdbcTokenRepositoryImpl jdbcTokenRepository=<span class="keyword">new</span> JdbcTokenRepositoryImpl();</span><br><span class="line">    jdbcTokenRepository.setDataSource(dataSource);</span><br><span class="line">    <span class="comment">//        jdbcTokenRepository.setCreateTableOnStartup();</span></span><br><span class="line">    <span class="keyword">return</span> jdbcTokenRepository;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(HttpSecurity http)</span> </span></span><br><span class="line"><span class="function">.<span class="title">and</span><span class="params">()</span>.<span class="title">rememberMe</span><span class="params">()</span>.<span class="title">tokenRepository</span><span class="params">(persistentTokenRepository()</span>)<span class="comment">//配置数据库--token</span></span></span><br><span class="line"><span class="function">                .<span class="title">tokenValiditySeconds</span><span class="params">(<span class="number">4</span>)</span><span class="comment">//设置有效时长</span></span></span><br><span class="line"><span class="function">                .<span class="title">userDetailsService</span><span class="params">(userDetailsService)</span></span></span><br></pre></td></tr></table></figure></li>
-<li></li>
-</ol>
-</li>
-<li><p>csrf 跨站请求伪造</p>
-<ol>
-<li><p>依赖</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">     &lt;groupId&gt;org.thymeleaf.extras&lt;/groupId&gt;</span><br><span class="line">     &lt;artifactId&gt;thymeleaf-extras-springsecurity5&lt;/artifactId&gt;</span><br><span class="line">&lt;/dependency&gt;	</span><br></pre></td></tr></table></figure></li>
-<li></li>
-</ol>
-</li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/10/10/%E7%BB%84%E4%BB%B6/spring%E7%BB%84%E4%BB%B6/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -342,7 +218,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-10-17 12:25:23" itemprop="dateModified" datetime="2021-10-17T12:25:23+08:00">2021-10-17</time>
+                <time title="修改时间：2021-10-17 14:07:54" itemprop="dateModified" datetime="2021-10-17T14:07:54+08:00">2021-10-17</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -397,15 +273,15 @@
       
           <h3 id="easyExcel"><a href="#easyExcel" class="headerlink" title="easyExcel"></a>easyExcel</h3><ol>
 <li><p>依赖</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>easyexcel<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.1.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">     <span class="comment">&lt;!-- poi office --&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.poi<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>poi<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;poi.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-<li><p>entity</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@ExcelProperty(&quot;字典名称&quot;)</span></span><br><span class="line"><span class="keyword">private</span> String name;</span><br><span class="line"><span class="meta">@ExcelProperty(&quot;字典描述&quot;)</span></span><br><span class="line"><span class="keyword">private</span> String description;</span><br></pre></td></tr></table></figure></li>
-<li><p>FileUtil.下载</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">downloadEasyExcel</span><span class="params">(HttpServletResponse response, List&lt;T&gt; ExcelBases)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">       String fileName = URLEncoder.encode(<span class="string">&quot;DictData&quot;</span>, <span class="string">&quot;UTF-8&quot;</span>);</span><br><span class="line">       response.setContentType(<span class="string">&quot;application/vnd.ms-excel&quot;</span>);</span><br><span class="line">       response.setCharacterEncoding(<span class="string">&quot;utf-8&quot;</span>);</span><br><span class="line">       response.setHeader(<span class="string">&quot;Content-disposition&quot;</span>, <span class="string">&quot;attachment;filename=&quot;</span> + fileName + <span class="string">&quot;.xlsx&quot;</span>);</span><br><span class="line">       <span class="comment">// excel头策略</span></span><br><span class="line">       WriteCellStyle headWriteCellStyle = <span class="keyword">new</span> WriteCellStyle();</span><br><span class="line">       WriteFont headWriteFont = <span class="keyword">new</span> WriteFont();</span><br><span class="line">       headWriteFont.setFontHeightInPoints((<span class="keyword">short</span>) <span class="number">11</span>);</span><br><span class="line">       headWriteFont.setBold(<span class="keyword">false</span>);</span><br><span class="line">       headWriteCellStyle.setWriteFont(headWriteFont);</span><br><span class="line">       <span class="comment">// excel内容策略</span></span><br><span class="line">       WriteCellStyle contentWriteCellStyle = <span class="keyword">new</span> WriteCellStyle();</span><br><span class="line">       WriteFont contentWriteFont = <span class="keyword">new</span> WriteFont();</span><br><span class="line">       contentWriteFont.setFontHeightInPoints((<span class="keyword">short</span>) <span class="number">11</span>);</span><br><span class="line">       contentWriteCellStyle.setWriteFont(contentWriteFont);</span><br><span class="line">       <span class="comment">// 设置handler</span></span><br><span class="line">       HorizontalCellStyleStrategy styleStrategy = <span class="keyword">new</span> HorizontalCellStyleStrategy(headWriteCellStyle, contentWriteCellStyle);</span><br><span class="line">       <span class="comment">/** 导出数据查询方法*/</span></span><br><span class="line">       EasyExcel.write(response.getOutputStream(), ExcelBases.get(<span class="number">0</span>).getClass())</span><br><span class="line">               .sheet(<span class="string">&quot;下载excel服务&quot;</span>)</span><br><span class="line">               .registerWriteHandler(styleStrategy)</span><br><span class="line">               .doWrite(ExcelBases);</span><br><span class="line">   </span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></li>
-<li><p>上传</p>
-</li>
-</ol>
-
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>easyexcel<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.1.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">     <span class="comment">&lt;!-- poi office --&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.poi<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>poi<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;poi.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/10/10/%E7%BB%84%E4%BB%B6/spring%E7%BB%84%E4%BB%B6/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -688,7 +564,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-10-17 12:32:27" itemprop="dateModified" datetime="2021-10-17T12:32:27+08:00">2021-10-17</time>
+                <time title="修改时间：2021-10-17 14:06:30" itemprop="dateModified" datetime="2021-10-17T14:06:30+08:00">2021-10-17</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -743,23 +619,132 @@
       
           <h3 id="注解配置"><a href="#注解配置" class="headerlink" title="注解配置"></a>注解配置</h3><ol>
 <li><p>注入普通字符串</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Debug</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Value(&quot;normal&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String myDebug; <span class="comment">// 注入普通字符串</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p>@value接受类型</p>
-<ol>
-<li><p>string</p>
-</li>
-<li><p>boolean</p>
-</li>
-<li><p>long</p>
-</li>
-<li><p>表达式</p>
-</li>
-<li></li>
-<li><p>强大</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Value(&quot;#&#123;$&#123;EMAIL_CODE_EXPIRATION_TIME&#125;&#125;&quot;)</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">long</span> EMAIL_CODE_EXPIRATION_TIME;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Debug</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Value(&quot;normal&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String myDebug; <span class="comment">// 注入普通字符串</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2021/10/09/spring/spring-%E9%85%8D%E7%BD%AE1/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/10/08/spring/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="十二峒">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/10/08/spring/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/" class="post-title-link" itemprop="url">各种配置文件</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-10-08 23:51:44" itemprop="dateCreated datePublished" datetime="2021-10-08T23:51:44+08:00">2021-10-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-10-17 12:33:08" itemprop="dateModified" datetime="2021-10-17T12:33:08+08:00">2021-10-17</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/config/" itemprop="url" rel="index"><span itemprop="name">config</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2021/10/08/spring/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2021/10/08/spring/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/" class="cy_cmt_count" data-xid="2021/10/08/spring/配置文件/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>3.5k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="知识"><a href="#知识" class="headerlink" title="知识"></a>知识</h3><ol>
+<li><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/jiangyu1013/article/details/52424726">转载-pom节点说明1</a></p>
+<ol>
+<li><p>modelVersion：声明项目描述符遵循哪一个POM模型版本。<br>模型本身的版本很少改变，虽然如此，但它仍然是必不可少的.<br>这是为了当Maven引入了新的特性或者其他模型变更的时候，确保稳定性。</p>
+</li>
+<li><p>parent：引入父级pom文件。</p>
+</li>
+<li><p>groupId：公司名称、组织名称、项目开发者，配置时生成路径也是由此生成（包名，如com.XXX）。</p>
+</li>
+<li><p>artifactId：项目通用名称。</p>
+</li>
+<li><p>version：对应项目版本号。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/10/08/spring/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -850,14 +835,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-count">51</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-count">13</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>
