@@ -2,7 +2,7 @@
 <search>
   <entry>
     <title></title>
-    <url>/2021/09/17/db/mysql_other/</url>
+    <url>/2021/09/17/os/linuxCmd/</url>
     <content><![CDATA[]]></content>
   </entry>
   <entry>
@@ -12,7 +12,7 @@
   </entry>
   <entry>
     <title></title>
-    <url>/2021/09/17/os/linuxCmd/</url>
+    <url>/2021/10/23/%E7%BB%84%E4%BB%B6/%E5%BA%95%E5%B1%82/handler/</url>
     <content><![CDATA[]]></content>
   </entry>
   <entry>
@@ -46,13 +46,17 @@
   </entry>
   <entry>
     <title></title>
-    <url>/2021/09/17/db/mysql_base/</url>
-    <content><![CDATA[<h3 id=""><a href="#" class="headerlink" title=""></a></h3>]]></content>
-  </entry>
-  <entry>
-    <title></title>
     <url>/2021/09/17/db/mysql_base_sql/</url>
-    <content><![CDATA[<h3 id="导出导入"><a href="#导出导入" class="headerlink" title="导出导入"></a>导出导入</h3><ol>
+    <content><![CDATA[<h3 id="group-by"><a href="#group-by" class="headerlink" title="group by"></a>group by</h3><ol>
+<li><p>聚集user，exam选出用户每场考试的最高分和其他详细信息。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">select</span> user_id,exam_id,depart_id,title,<span class="built_in">max</span>(qualify_score) <span class="keyword">from</span> el_paper <span class="keyword">group</span> <span class="keyword">by</span> user_id,exam_id;</span><br></pre></td></tr></table></figure></li>
+<li></li>
+</ol>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><ol>
+<li><p>去重，保留最小的</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">DELETE</span></span><br><span class="line"><span class="keyword">FROM</span> testdelete</span><br><span class="line"><span class="keyword">WHERE</span> <span class="keyword">ONE</span> <span class="keyword">IN</span>(<span class="keyword">SELECT</span></span><br><span class="line">               <span class="keyword">ONE</span></span><br><span class="line">             <span class="keyword">FROM</span> (<span class="keyword">SELECT</span></span><br><span class="line">                     <span class="keyword">ONE</span></span><br><span class="line">                   <span class="keyword">FROM</span> testdelete</span><br><span class="line">                   <span class="keyword">GROUP</span> <span class="keyword">BY</span> <span class="keyword">ONE</span></span><br><span class="line">                   <span class="keyword">HAVING</span> <span class="built_in">COUNT</span>(<span class="keyword">ONE</span>) <span class="operator">&gt;</span> <span class="number">1</span>) a)</span><br><span class="line">    <span class="keyword">AND</span> id <span class="keyword">NOT</span> <span class="keyword">IN</span>(<span class="keyword">SELECT</span></span><br><span class="line">                    <span class="operator">*</span></span><br><span class="line">                  <span class="keyword">FROM</span> (<span class="keyword">SELECT</span></span><br><span class="line">                          <span class="built_in">MIN</span>(id)</span><br><span class="line">                        <span class="keyword">FROM</span> testdelete</span><br><span class="line">                        <span class="keyword">GROUP</span> <span class="keyword">BY</span> <span class="keyword">ONE</span></span><br><span class="line">                        <span class="keyword">HAVING</span> <span class="built_in">COUNT</span>(<span class="keyword">ONE</span>) <span class="operator">&gt;</span> <span class="number">1</span>) b)</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="导出导入"><a href="#导出导入" class="headerlink" title="导出导入"></a>导出导入</h3><ol>
 <li><p>导出整个数据库<br>mysqldump -u dbuser -p dbname &gt; dbname.sql</p>
 </li>
 <li><p>导出一个表<br>mysqldump -u dbuser -p dbname users&gt; dbname_users.sql</p>
@@ -68,8 +72,13 @@
   </entry>
   <entry>
     <title></title>
+    <url>/2021/09/17/db/mysql_base/</url>
+    <content><![CDATA[<h3 id=""><a href="#" class="headerlink" title=""></a></h3>]]></content>
+  </entry>
+  <entry>
+    <title></title>
     <url>/2021/09/17/db/mysql_details/</url>
-    <content><![CDATA[<h3 id=""><a href="#" class="headerlink" title=""></a></h3><ol>
+    <content><![CDATA[<h3 id="大小"><a href="#大小" class="headerlink" title="大小"></a>大小</h3><ol>
 <li>varchar(50) 表示最多50个字符，包括汉字</li>
 <li>varchar变长，char 定长，定长时间效率高，空间效率差</li>
 <li>int(n)中不论n指定为多少，范围都一样-2<del>31</del>2^31-1，都能插入9位数字。n只是用来控制显示而已，如果为int(4)，插入一个1，显示时也会用空格补齐到4个字节  </li>
@@ -77,82 +86,37 @@
 <li>1k能写大概</li>
 </ol>
 <span id="more"></span>
+
+<h3 id="in和exists"><a href="#in和exists" class="headerlink" title="in和exists"></a>in和exists</h3><ol>
+<li><p><a href="https://blog.csdn.net/codesweetpotato/article/details/109700424">in流程</a></p>
+<p>对于 in 查询来说，会先执行子查询，如上边的 t2 表，然后把查询得到的结果和外表 t1 做<a href="https://so.csdn.net/so/search?from=pc_blog_highlight&q=%E7%AC%9B%E5%8D%A1%E5%B0%94%E7%A7%AF">笛卡尔积</a>，再通过条件进行筛选（这里的条件就是指 name 是否相等），把每个符合条件的数据都加入到结果集中。</p>
+</li>
+<li><p>exists执行流程</p>
+<p>对于 exists 来说，是先查询遍历外表 t1 ，然后每次遍历时，再检查在内表是否符合匹配条件，即检查是否存在 name 相等的数据。</p>
+</li>
+</ol>
+<h3 id="join三种"><a href="#join三种" class="headerlink" title="join三种"></a>join三种</h3><ol>
+<li><p>简单join 即inner join</p>
+<p>复杂度也是最高的，O(mn)</p>
+</li>
+<li></li>
+</ol>
 ]]></content>
   </entry>
   <entry>
-    <title>数据库事务</title>
-    <url>/2021/09/24/db/%E4%BA%8B%E5%8A%A1/</url>
-    <content><![CDATA[<p>ACID</p>
-<p><a href="https://www.cnblogs.com/takumicx/p/9998844.html">数据库事务cnblog</a></p>
-<ol>
-<li><p>Atomicity 原子性</p>
-<ol>
-<li>begin</li>
-<li>sql1</li>
-<li>sql2</li>
-<li>commit</li>
-<li>构成逻辑整体的这些数据库操作,要么全部执行成功,要么全部不执行。基于以事务为单位执行</li>
-</ol>
-</li>
-</ol>
-<span id="more"></span>
-
-<ol start="2">
-<li><p>Consistency一致性：正确性，一个一致性转移到另一个一致性，并且拥有完整性约束。</p>
-</li>
-<li><p>Isolation隔离性：可串行化，即并发执行和串行执行结果一样。</p>
-</li>
-<li><p>Durability持久性：事务一旦提交，其对数据库的更新是永久的。</p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20210924130355472.png" alt="image-20210924130355472"></p>
-</li>
-</ol>
-<h3 id="—"><a href="#—" class="headerlink" title="—"></a>—</h3><ol>
-<li>在事务的ACID特性中,C即一致性是事务的根本追求,而对数据一致性的破坏主要来自两个方面<ol>
-<li>事务的并发执行</li>
-<li>事务故障或系统故障</li>
-</ol>
-</li>
-<li>数据库系统是通过并发控制技术和日志恢复技术来避免这种情况发生的。</li>
-</ol>
-<h3 id="各种错误"><a href="#各种错误" class="headerlink" title="各种错误"></a>各种错误</h3><ol>
-<li><p>脏读:事务读取了其他事务还没提交的事务</p>
-</li>
-<li><p>丢失更新:两个事务对相同的值进行更改，造成了一个更改失败。：a=10   q:a=a-10</p>
-<p>p:a=a+10  结果a=10</p>
-</li>
-<li><p>不可重复度读：读了一次A=1，另一个事务对A改变，第二次在读是A=2.</p>
-</li>
-<li><p>幻读:事务前后数量发生变化。a删除了，另一个事务有插入了一个a，这样数量变了，造成了幻觉。</p>
-</li>
-</ol>
-<h3 id="隔离级别"><a href="#隔离级别" class="headerlink" title="隔离级别"></a>隔离级别</h3><ol>
-<li><p>四种隔离级别从高到低依次是：</p>
-<ol>
-<li><p>读未提交</p>
-</li>
-<li><p>读已提交</p>
-</li>
-<li><p>可重复读 mysql 默认rr</p>
-</li>
-<li><p>创行化</p>
-<p><img src="E:\data-ana\ana-notes\experience\db\隔离级别" alt="image-20210924131844559"></p>
-</li>
-</ol>
-</li>
-<li><p>事务隔离实现：并发控制</p>
-<ol>
-<li>基于封锁</li>
-<li>基于时间戳</li>
-<li>基于有效检查</li>
-<li>基于快照</li>
+    <title></title>
+    <url>/2021/09/17/db/mysql_other/</url>
+    <content><![CDATA[<h2 id="mysql-锁机制"><a href="#mysql-锁机制" class="headerlink" title="mysql 锁机制"></a>mysql 锁机制</h2><h4 id="乐观锁-version"><a href="#乐观锁-version" class="headerlink" title="乐观锁  version"></a>乐观锁  version</h4><ol>
+<li><a href="https://blog.csdn.net/hh1sdfsf56456/article/details/79449714">乐观锁</a></li>
 <li></li>
 </ol>
-</li>
-</ol>
 ]]></content>
-      <categories>
-        <category>db</category>
-      </categories>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2021/09/17/db/mysql_principle/</url>
+    <content><![CDATA[<h3 id="MVCC"><a href="#MVCC" class="headerlink" title="MVCC"></a>MVCC</h3><p>1. </p>
+]]></content>
   </entry>
   <entry>
     <title>mysql优化</title>
@@ -308,6 +272,14 @@
 </ol>
 </li>
 </ol>
+<h3 id="查询优化"><a href="#查询优化" class="headerlink" title="查询优化"></a>查询优化</h3><ol>
+<li>in和exist的区别<ol>
+<li>exist适合 子查询中表数据大于外查询表中数据的业务场景</li>
+<li>in:适合外部表数据大于子查询的表数据的业务场景</li>
+<li></li>
+</ol>
+</li>
+</ol>
 <h3 id="缓存优化"><a href="#缓存优化" class="headerlink" title="缓存优化"></a>缓存优化</h3><h3 id="分区分表"><a href="#分区分表" class="headerlink" title="分区分表"></a>分区分表</h3><h3 id="图片"><a href="#图片" class="headerlink" title="图片"></a>图片</h3><ol>
 <li><p>b+tree和btree的区别<img src="C:\Users\22453\AppData\Roaming\Typora\typora-user-images\image-20211015020343225.png" alt="image-20211015020343225"></p>
 </li>
@@ -321,30 +293,6 @@
 ]]></content>
       <categories>
         <category>mysql</category>
-      </categories>
-  </entry>
-  <entry>
-    <title></title>
-    <url>/2021/09/17/db/mysql_principle/</url>
-    <content><![CDATA[<h3 id="MVCC"><a href="#MVCC" class="headerlink" title="MVCC"></a>MVCC</h3><p>1. </p>
-]]></content>
-  </entry>
-  <entry>
-    <title>数据库规范</title>
-    <url>/2021/09/24/db/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%A7%84%E8%8C%83/</url>
-    <content><![CDATA[<h3 id="外键"><a href="#外键" class="headerlink" title="外键"></a>外键</h3><ol>
-<li><p>每次delete update都需要考虑外键。</p>
-</li>
-<li><p>阿里巴巴开发规范禁用外键。</p>
-</li>
-<li><p>每次考虑外键都要检查主外键表，造成了效率低下。</p>
-</li>
-<li><p>级联删除造成数据不可控（不可追溯）</p>
-<span id="more"></span></li>
-</ol>
-]]></content>
-      <categories>
-        <category>db</category>
       </categories>
   </entry>
   <entry>
@@ -506,9 +454,182 @@
 </ol>
 </li>
 </ol>
-<h3 id="Redis6"><a href="#Redis6" class="headerlink" title="Redis6"></a>Redis6</h3><h4 id="新的数据类型"><a href="#新的数据类型" class="headerlink" title="新的数据类型"></a>新的数据类型</h4><h4 id="redis新事务"><a href="#redis新事务" class="headerlink" title="redis新事务"></a>redis新事务</h4><h4 id="主从复制"><a href="#主从复制" class="headerlink" title="主从复制"></a>主从复制</h4><h4 id="雪崩"><a href="#雪崩" class="headerlink" title="雪崩"></a>雪崩</h4>]]></content>
+<h3 id="Redis6"><a href="#Redis6" class="headerlink" title="Redis6"></a>Redis6</h3><h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ol>
+<li><a href="https://blog.csdn.net/xlgen157387/article/details/79470556">https://blog.csdn.net/xlgen157387/article/details/79470556</a></li>
+</ol>
+<h3 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h3><ol>
+<li>不用keys</li>
+</ol>
+<h4 id="新的数据类型"><a href="#新的数据类型" class="headerlink" title="新的数据类型"></a>新的数据类型</h4><h4 id="redis新事务"><a href="#redis新事务" class="headerlink" title="redis新事务"></a>redis新事务</h4><h4 id="主从复制"><a href="#主从复制" class="headerlink" title="主从复制"></a>主从复制</h4><h4 id="雪崩"><a href="#雪崩" class="headerlink" title="雪崩"></a>雪崩</h4>]]></content>
       <categories>
         <category>db</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>数据库规范</title>
+    <url>/2021/09/24/db/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%A7%84%E8%8C%83/</url>
+    <content><![CDATA[<h3 id="外键"><a href="#外键" class="headerlink" title="外键"></a>外键</h3><ol>
+<li><p>每次delete update都需要考虑外键。</p>
+</li>
+<li><p>阿里巴巴开发规范禁用外键。</p>
+</li>
+<li><p>每次考虑外键都要检查主外键表，造成了效率低下。</p>
+</li>
+<li><p>级联删除造成数据不可控（不可追溯）</p>
+<span id="more"></span></li>
+</ol>
+]]></content>
+      <categories>
+        <category>db</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>数据库事务</title>
+    <url>/2021/09/24/db/%E4%BA%8B%E5%8A%A1/</url>
+    <content><![CDATA[<p>ACID</p>
+<p><a href="https://www.cnblogs.com/takumicx/p/9998844.html">数据库事务cnblog</a></p>
+<ol>
+<li><p>Atomicity 原子性</p>
+<ol>
+<li>begin</li>
+<li>sql1</li>
+<li>sql2</li>
+<li>commit</li>
+<li>构成逻辑整体的这些数据库操作,要么全部执行成功,要么全部不执行。基于以事务为单位执行</li>
+</ol>
+</li>
+</ol>
+<span id="more"></span>
+
+<ol start="2">
+<li><p>Consistency一致性：正确性，一个一致性转移到另一个一致性，并且拥有完整性约束。</p>
+</li>
+<li><p>Isolation隔离性：可串行化，即并发执行和串行执行结果一样。</p>
+</li>
+<li><p>Durability持久性：事务一旦提交，其对数据库的更新是永久的。</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20210924130355472.png" alt="image-20210924130355472"></p>
+</li>
+</ol>
+<h3 id="—"><a href="#—" class="headerlink" title="—"></a>—</h3><ol>
+<li>在事务的ACID特性中,C即一致性是事务的根本追求,而对数据一致性的破坏主要来自两个方面<ol>
+<li>事务的并发执行</li>
+<li>事务故障或系统故障</li>
+</ol>
+</li>
+<li>数据库系统是通过并发控制技术和日志恢复技术来避免这种情况发生的。</li>
+</ol>
+<h3 id="各种错误"><a href="#各种错误" class="headerlink" title="各种错误"></a>各种错误</h3><ol>
+<li><p>脏读:事务读取了其他事务还没提交的事务</p>
+</li>
+<li><p>丢失更新:两个事务对相同的值进行更改，造成了一个更改失败。：a=10   q:a=a-10</p>
+<p>p:a=a+10  结果a=10</p>
+</li>
+<li><p>不可重复度读：读了一次A=1，另一个事务对A改变，第二次在读是A=2.</p>
+</li>
+<li><p>幻读:事务前后数量发生变化。a删除了，另一个事务有插入了一个a，这样数量变了，造成了幻觉。</p>
+</li>
+</ol>
+<h3 id="隔离级别"><a href="#隔离级别" class="headerlink" title="隔离级别"></a>隔离级别</h3><ol>
+<li><p>四种隔离级别从高到低依次是：</p>
+<ol>
+<li><p>读未提交</p>
+</li>
+<li><p>读已提交</p>
+</li>
+<li><p>可重复读 mysql 默认rr</p>
+</li>
+<li><p>创行化</p>
+<p><img src="E:\data-ana\ana-notes\experience\db\隔离级别" alt="image-20210924131844559"></p>
+</li>
+</ol>
+</li>
+<li><p>事务隔离实现：并发控制</p>
+<ol>
+<li>基于封锁</li>
+<li>基于时间戳</li>
+<li>基于有效检查</li>
+<li>基于快照</li>
+<li></li>
+</ol>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>db</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>hadoop的启动</title>
+    <url>/2021/09/10/distribute/hadoop%E5%90%AF%E5%8A%A8/</url>
+    <content><![CDATA[<h2 id="一、-基本环境"><a href="#一、-基本环境" class="headerlink" title="一、 基本环境"></a>一、 基本环境</h2><ol>
+<li><p>获取主机名字 master、s1、s2</p>
+</li>
+<li><p>时钟同步</p>
+<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line"><span class="regexp">/usr/</span>sbin/ntpdate cn.pool.ntp.org</span><br></pre></td></tr></table></figure></li>
+<li><p>关闭防火墙</p>
+<figure class="highlight arduino"><table><tr><td class="code"><pre><span class="line">systemctl stop firewalld.service</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span></li>
+<li><p>编辑host 以对应ping 如：</p>
+<figure class="highlight accesslog"><table><tr><td class="code"><pre><span class="line"><span class="number">10.42.0.93</span> master</span><br><span class="line"><span class="number">10.42.0.94</span> slave01</span><br><span class="line"><span class="number">10.42.0.95</span> slave02</span><br></pre></td></tr></table></figure></li>
+<li><p>测试ping是否成功</p>
+<figure class="highlight crmsh"><table><tr><td class="code"><pre><span class="line">ping <span class="keyword">master</span> <span class="title">-c</span> <span class="number">3</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="二、联机"><a href="#二、联机" class="headerlink" title="二、联机"></a>二、联机</h2><ol>
+<li><p>生成公钥</p>
+<figure class="highlight ebnf"><table><tr><td class="code"><pre><span class="line"><span class="attribute">ssh-keygen -t rsa</span></span><br></pre></td></tr></table></figure></li>
+<li><p>公钥备份文件</p>
+<figure class="highlight arcade"><table><tr><td class="code"><pre><span class="line">cat ~<span class="regexp">/.ssh/i</span>d_rsa.pub &gt;&gt; ~<span class="regexp">/.ssh/</span>authorized_keys</span><br></pre></td></tr></table></figure></li>
+<li><p>修改文件权限</p>
+<figure class="highlight arcade"><table><tr><td class="code"><pre><span class="line">chmod <span class="number">600</span> ~<span class="regexp">/.ssh/</span>authorized_keys</span><br></pre></td></tr></table></figure></li>
+<li><p>将专用密钥添加到 ssh-agent 的高速缓存中</p>
+<figure class="highlight arcade"><table><tr><td class="code"><pre><span class="line">ssh-add ~<span class="regexp">/.ssh/i</span>d_rsa</span><br></pre></td></tr></table></figure></li>
+<li><p>公钥转移到其他机器</p>
+<figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line">scp ~<span class="regexp">/.ssh/</span>authorized_keys zkpk<span class="meta">@slave01</span>:~<span class="regexp">/.ssh/</span></span><br></pre></td></tr></table></figure></li>
+<li><p>其他机器也生成密钥</p>
+</li>
+<li><p>测试远程   ssh s1</p>
+</li>
+</ol>
+<h2 id="三、安装java"><a href="#三、安装java" class="headerlink" title="三、安装java"></a>三、安装java</h2><ol>
+<li><p>root下解压</p>
+<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line">tar -xzvf <span class="regexp">/home/</span>zkpk<span class="regexp">/tgz/</span>jdk-<span class="number">8</span>u131-linux-x64.tar.gz -C <span class="regexp">/usr/</span>java</span><br></pre></td></tr></table></figure></li>
+<li><p>修改环境变量</p>
+<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line">gedit <span class="regexp">/home/</span>zkpk/.bash_profile</span><br><span class="line">	export JAVA_HOME=<span class="regexp">/usr/</span>java<span class="regexp">/jdk1.8.0_131/</span></span><br><span class="line">	export PATH=<span class="variable">$JAVA_HOME</span>/bin:<span class="variable">$PATH</span></span><br><span class="line">source <span class="regexp">/home/</span>zkpk/.bash_profile</span><br></pre></td></tr></table></figure></li>
+<li><p>其他机器同样安装</p>
+</li>
+<li><p>测试java：java -version</p>
+</li>
+</ol>
+<h2 id="四、安装hadoop"><a href="#四、安装hadoop" class="headerlink" title="四、安装hadoop"></a>四、安装hadoop</h2><ol>
+<li><p>解压</p>
+<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line">tar -xzvf <span class="regexp">/home/</span>zkpk<span class="regexp">/tgz/</span>hadoop-<span class="number">2.7</span>.<span class="number">3</span>.tar.gz –C <span class="regexp">/home/</span>zkpk</span><br></pre></td></tr></table></figure></li>
+<li><p>修改java环境变量</p>
+<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line">gedit <span class="regexp">/home/</span>zkpk<span class="regexp">/hadoop-2.7.3/</span>etc<span class="regexp">/hadoop/</span>hadoop-env.sh</span><br><span class="line"> 	export JAVA_HOME=<span class="regexp">/usr/</span>java<span class="regexp">/jdk1.8.0_131/</span></span><br><span class="line">gedit ~<span class="regexp">/hadoop-2.7.3/</span>etc<span class="regexp">/hadoop/y</span>arn-env.sh</span><br><span class="line">	export JAVA_HOME=<span class="regexp">/usr/</span>java<span class="regexp">/jdk1.8.0_131/</span></span><br></pre></td></tr></table></figure></li>
+<li><p>其他配置</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line">1.配置core-site.xml 文件</span><br><span class="line">gedit  ~/hadoop-2.7.3/etc/hadoop/core-site.xml</span><br><span class="line">	<span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span></span><br><span class="line">    <span class="meta">&lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;configuration.xsl&quot;?&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- Put site-specific property overrides in this file. --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">name</span>&gt;</span>fs.defaultFS<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">value</span>&gt;</span>hdfs://master:9000<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">name</span>&gt;</span>hadoop.tmp.dir<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">value</span>&gt;</span>/home/zkpk/hadoopdata<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">2.配置hdfs-site.xml文件</span><br><span class="line">gedit  ~/hadoop-2.7.3/etc/hadoop/hdfs-site.xml</span><br><span class="line">    <span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span></span><br><span class="line">    <span class="meta">&lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;configuration.xsl&quot;?&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- Put site-specific property overrides in this file. --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">name</span>&gt;</span>dfs.replication<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">value</span>&gt;</span>2<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">3.配置yarn-site.xml文件</span><br><span class="line">gedit  ~/hadoop-2.7.3/etc/hadoop/yarn-site.xml</span><br><span class="line">    <span class="meta">&lt;?xml version=&quot;1.0&quot;?&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.nodemanager.aux-services<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">value</span>&gt;</span>mapreduce_shuffle<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.resourcemanager.address<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">value</span>&gt;</span>master:18040<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.resourcemanager.scheduler.address<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">value</span>&gt;</span>master:18030<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.resourcemanager.resource-tracker.address<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">value</span>&gt;</span>master:18025<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.resourcemanager.admin.address<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">value</span>&gt;</span>master:18141<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.resourcemanager.webapp.address<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">value</span>&gt;</span>master:18088<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">4.配置mapred-site.xml文件</span><br><span class="line">cp ~/hadoop-2.7.3/etc/hadoop/mapred-site.xml.template  ~/hadoop-2.7.3/etc/hadoop/mapred-site.xml</span><br><span class="line">gedit ~/hadoop-2.7.3/etc/hadoop/mapred-site.xml</span><br><span class="line">    <span class="meta">&lt;?xml version=&quot;1.0&quot;?&gt;</span></span><br><span class="line">    <span class="meta">&lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;configuration.xsl&quot;?&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">name</span>&gt;</span>mapreduce.framework.name<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">value</span>&gt;</span>yarn<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>配置slaves文件</p>
+<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line">gedit ~<span class="regexp">/hadoop-2.7.3/</span>etc<span class="regexp">/hadoop/</span>slaves</span><br><span class="line">    slave01</span><br><span class="line">    slave02</span><br></pre></td></tr></table></figure></li>
+<li><p>创建Hadoop数据目录</p>
+<figure class="highlight arduino"><table><tr><td class="code"><pre><span class="line">mkdir hadoopdata</span><br></pre></td></tr></table></figure></li>
+<li><p>将配置好的hadoop文件夹复制到从节点</p>
+<figure class="highlight apache"><table><tr><td class="code"><pre><span class="line"><span class="attribute">scp</span> -r hadoop-<span class="number">2</span>.<span class="number">7</span>.<span class="number">3</span> zkpk@slave<span class="number">01</span>:~/</span><br></pre></td></tr></table></figure></li>
+<li><p>配置环境变量</p>
+<figure class="highlight routeros"><table><tr><td class="code"><pre><span class="line">gedit ~/.bash_profile</span><br><span class="line">    #HADOOP</span><br><span class="line">    <span class="builtin-name">export</span> <span class="attribute">HADOOP_HOME</span>=/home/zkpk/hadoop-2.7.3</span><br><span class="line">    <span class="builtin-name">export</span> <span class="attribute">PATH</span>=<span class="variable">$HADOOP_HOME</span>/bin:$HADOOP_HOME/sbin:$PATH</span><br><span class="line">source ~/.bash_profile</span><br></pre></td></tr></table></figure></li>
+<li><p>其他机器同样配置环境变量</p>
+</li>
+<li><p>在master格式化磁盘</p>
+<figure class="highlight dos"><table><tr><td class="code"><pre><span class="line">hdfs namenode -<span class="built_in">format</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="五、启动检测"><a href="#五、启动检测" class="headerlink" title="五、启动检测"></a>五、启动检测</h2><ol>
+<li>start-all.sh</li>
+<li>jps查看</li>
+<li><a href="http://master:50070/%E6%9F%A5%E7%9C%8B">http://master:50070/查看</a></li>
+<li><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20210911183155100.png" alt="image-20210911183155100"></li>
+</ol>
+]]></content>
+      <categories>
+        <category>hadoop</category>
       </categories>
   </entry>
   <entry>
@@ -704,8 +825,10 @@
 </li>
 <li><p>生成器</p>
 <ol>
-<li>生成偶数流<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span>&lt;T&gt; <span class="title">iterate</span><span class="params">(T t,计算器)</span></span></span><br><span class="line"><span class="function">Stream.<span class="title">iterate</span><span class="params">(<span class="number">0</span>,t-&gt;t+<span class="number">2</span>)</span></span></span><br></pre></td></tr></table></figure></li>
-<li>生成随机数流<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream.generate(Math::random)</span><br></pre></td></tr></table></figure></li>
+<li><p>生成偶数流</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span>&lt;T&gt; <span class="title">iterate</span><span class="params">(T t,计算器)</span></span></span><br><span class="line"><span class="function">Stream.<span class="title">iterate</span><span class="params">(<span class="number">0</span>,t-&gt;t+<span class="number">2</span>)</span></span></span><br></pre></td></tr></table></figure></li>
+<li><p>生成随机数流</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Stream.generate(Math::random)</span><br></pre></td></tr></table></figure></li>
 </ol>
 </li>
 </ol>
@@ -730,6 +853,14 @@
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line">stream.reduce(<span class="number">0</span>,(o1,o2)-&gt;o1+o2)</span><br></pre></td></tr></table></figure></li>
 <li><p>收集collect(Collector c)</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//list</span></span><br><span class="line">stream.collect(Collectors.toList())</span><br><span class="line"><span class="comment">//set</span></span><br><span class="line">stream.collect(Collectors.toSet())    </span><br><span class="line"><span class="comment">//不确定性collection</span></span><br><span class="line">stream.collect(Collectors.toCollection())</span><br></pre></td></tr></table></figure></li>
+<li><p>分组</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Map&lt;String, Map&lt;String, Paper&gt;&gt; collect = records.parallelStream().collect(</span><br><span class="line">                Collectors.groupingBy(Paper::getExamId,</span><br><span class="line">                        Collectors.toMap(Paper::getUserId, Function.identity(), (o1, o2) -&gt; (o1.getUserScore() &gt; o2.getUserScore() ? o1 : o2))));</span><br></pre></td></tr></table></figure></li>
+<li><p>平均值</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> avg = exams.stream().mapToInt(UserExam::getMaxScore).sum() / exams.size();</span><br></pre></td></tr></table></figure></li>
+<li><p>某一属性</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">dictEntityList.stream().map(DictEntity::getName).collect(Collectors.toList());</span><br></pre></td></tr></table></figure></li>
+<li><p><a href="https://blog.csdn.net/yihuaiyan/article/details/101050144?utm_term=javastream%E6%B1%82%E5%B9%B3%E5%9D%87%E5%80%BC&utm_medium=distribute.pc_aggpage_search_result.none-task-blog-2~all~sobaiduweb~default-0-101050144&spm=3001.4430">参考</a></p>
+</li>
 </ol>
 </li>
 </ol>
@@ -748,6 +879,19 @@
 </li>
 <li><p>nashorn javascript引擎</p>
 </li>
+</ol>
+<h3 id="函数式接口"><a href="#函数式接口" class="headerlink" title="函数式接口"></a><a href="https://www.runoob.com/java/java8-functional-interfaces.html">函数式接口</a></h3><ol>
+<li><p>Function</p>
+</li>
+<li><p>&lt;T&gt; Function&lt;T, T&gt;  Function.identity()   传</p>
+</li>
+<li><p>BinaryOperator</p>
+<figure class="highlight gcode"><table><tr><td class="code"><pre><span class="line">T apply<span class="comment">(T t, T u)</span>;</span><br><span class="line"><span class="comment">(o1,o2)</span>-&gt;<span class="meta">o1</span>.age&gt;<span class="meta">o2</span>.a? <span class="meta">o1</span> : <span class="meta">o2</span></span><br></pre></td></tr></table></figure></li>
+<li><p>BiFunction&lt;T, U, R&gt;</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function">R <span class="title">apply</span><span class="params">(T t, U u)</span></span>;</span><br></pre></td></tr></table></figure></li>
+<li><p>ToIntFunction<T> </p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">applyAsInt</span><span class="params">(T value)</span></span>;</span><br><span class="line">Student::getAge</span><br><span class="line">o-&gt;o.getAge()    </span><br></pre></td></tr></table></figure></li>
+<li></li>
 </ol>
 ]]></content>
       <categories>
@@ -946,12 +1090,18 @@
     <title>java知识</title>
     <url>/2021/10/05/java/java%E7%9F%A5%E8%AF%86/</url>
     <content><![CDATA[<h3 id="java分析"><a href="#java分析" class="headerlink" title="java分析"></a>java分析</h3><ol>
-<li>基本代码分析<ol>
+<li><p>基本代码分析</p>
+<ol>
 <li>调试–栈</li>
 <li>语法糖、注解等：javac编译+javap反编译</li>
 </ol>
 </li>
-<li>web功能分析：<ol>
+<li><p>判断两个obj是否同类  print obj.getClass</p>
+</li>
+<li><p>判断两个obj是否一样  print   obj.hashcode  但是可能hash碰撞</p>
+</li>
+<li><p>web功能分析：</p>
+<ol>
 <li><p>F12</p>
 </li>
 <li><p>Postman Swagger RestfulTools</p>
@@ -1114,6 +1264,22 @@
       </categories>
   </entry>
   <entry>
+    <title>mybatis</title>
+    <url>/2021/10/16/java/mybatis/</url>
+    <content><![CDATA[<h3 id="占位符"><a href="#占位符" class="headerlink" title="占位符"></a>占位符</h3><ol>
+<li><p>#{}自动处理为string,     取对象get()方法</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;queryCountByDateF&quot;</span> <span class="attr">resultType</span>=<span class="string">&quot;com.wyg.epidemicsituation.domain.CountByDate&quot;</span>&gt;</span></span><br><span class="line">    SELECT count(id) as sum,CREATEd_at as date FROM data_result where isReg = 1 and created_at &gt; #&#123;start&#125; and created_at <span class="symbol">&amp;lt;</span> #&#123;end&#125; GROUP BY CREATEd_at ORDER BY CREATEd_at</span><br><span class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>${arg}无法放在注入攻击  传入的是原型</p>
+</li>
+<li><p>mapper没有用@Param  可用#{arg0}  #{param1}代替</p>
+<span id="more"></span></li>
+</ol>
+<h3 id="缓存"><a href="#缓存" class="headerlink" title="缓存"></a>缓存</h3><h3 id="动态sql"><a href="#动态sql" class="headerlink" title="动态sql"></a>动态sql</h3>]]></content>
+      <categories>
+        <category>组件</category>
+      </categories>
+  </entry>
+  <entry>
     <title>jvm</title>
     <url>/2021/09/28/java/jvm/</url>
     <content><![CDATA[<h3 id=""><a href="#" class="headerlink" title=""></a></h3><ol>
@@ -1167,22 +1333,6 @@
 <h3 id="java编过程"><a href="#java编过程" class="headerlink" title="java编过程"></a>java编过程</h3>]]></content>
       <categories>
         <category>java高阶</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>mybatis</title>
-    <url>/2021/10/16/java/mybatis/</url>
-    <content><![CDATA[<h3 id="占位符"><a href="#占位符" class="headerlink" title="占位符"></a>占位符</h3><ol>
-<li><p>#{}自动处理为string,     取对象get()方法</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;queryCountByDateF&quot;</span> <span class="attr">resultType</span>=<span class="string">&quot;com.wyg.epidemicsituation.domain.CountByDate&quot;</span>&gt;</span></span><br><span class="line">    SELECT count(id) as sum,CREATEd_at as date FROM data_result where isReg = 1 and created_at &gt; #&#123;start&#125; and created_at <span class="symbol">&amp;lt;</span> #&#123;end&#125; GROUP BY CREATEd_at ORDER BY CREATEd_at</span><br><span class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-<li><p>${arg}无法放在注入攻击  传入的是原型</p>
-</li>
-<li><p>mapper没有用@Param  可用#{arg0}  #{param1}代替</p>
-<span id="more"></span></li>
-</ol>
-<h3 id="缓存"><a href="#缓存" class="headerlink" title="缓存"></a>缓存</h3><h3 id="动态sql"><a href="#动态sql" class="headerlink" title="动态sql"></a>动态sql</h3>]]></content>
-      <categories>
-        <category>组件</category>
       </categories>
   </entry>
   <entry>
@@ -1437,99 +1587,6 @@
       </categories>
   </entry>
   <entry>
-    <title>hadoop的启动</title>
-    <url>/2021/09/10/distribute/hadoop%E5%90%AF%E5%8A%A8/</url>
-    <content><![CDATA[<h2 id="一、-基本环境"><a href="#一、-基本环境" class="headerlink" title="一、 基本环境"></a>一、 基本环境</h2><ol>
-<li><p>获取主机名字 master、s1、s2</p>
-</li>
-<li><p>时钟同步</p>
-<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line"><span class="regexp">/usr/</span>sbin/ntpdate cn.pool.ntp.org</span><br></pre></td></tr></table></figure></li>
-<li><p>关闭防火墙</p>
-<figure class="highlight arduino"><table><tr><td class="code"><pre><span class="line">systemctl stop firewalld.service</span><br></pre></td></tr></table></figure>
-
-<span id="more"></span></li>
-<li><p>编辑host 以对应ping 如：</p>
-<figure class="highlight accesslog"><table><tr><td class="code"><pre><span class="line"><span class="number">10.42.0.93</span> master</span><br><span class="line"><span class="number">10.42.0.94</span> slave01</span><br><span class="line"><span class="number">10.42.0.95</span> slave02</span><br></pre></td></tr></table></figure></li>
-<li><p>测试ping是否成功</p>
-<figure class="highlight crmsh"><table><tr><td class="code"><pre><span class="line">ping <span class="keyword">master</span> <span class="title">-c</span> <span class="number">3</span></span><br></pre></td></tr></table></figure></li>
-</ol>
-<h2 id="二、联机"><a href="#二、联机" class="headerlink" title="二、联机"></a>二、联机</h2><ol>
-<li><p>生成公钥</p>
-<figure class="highlight ebnf"><table><tr><td class="code"><pre><span class="line"><span class="attribute">ssh-keygen -t rsa</span></span><br></pre></td></tr></table></figure></li>
-<li><p>公钥备份文件</p>
-<figure class="highlight arcade"><table><tr><td class="code"><pre><span class="line">cat ~<span class="regexp">/.ssh/i</span>d_rsa.pub &gt;&gt; ~<span class="regexp">/.ssh/</span>authorized_keys</span><br></pre></td></tr></table></figure></li>
-<li><p>修改文件权限</p>
-<figure class="highlight arcade"><table><tr><td class="code"><pre><span class="line">chmod <span class="number">600</span> ~<span class="regexp">/.ssh/</span>authorized_keys</span><br></pre></td></tr></table></figure></li>
-<li><p>将专用密钥添加到 ssh-agent 的高速缓存中</p>
-<figure class="highlight arcade"><table><tr><td class="code"><pre><span class="line">ssh-add ~<span class="regexp">/.ssh/i</span>d_rsa</span><br></pre></td></tr></table></figure></li>
-<li><p>公钥转移到其他机器</p>
-<figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line">scp ~<span class="regexp">/.ssh/</span>authorized_keys zkpk<span class="meta">@slave01</span>:~<span class="regexp">/.ssh/</span></span><br></pre></td></tr></table></figure></li>
-<li><p>其他机器也生成密钥</p>
-</li>
-<li><p>测试远程   ssh s1</p>
-</li>
-</ol>
-<h2 id="三、安装java"><a href="#三、安装java" class="headerlink" title="三、安装java"></a>三、安装java</h2><ol>
-<li><p>root下解压</p>
-<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line">tar -xzvf <span class="regexp">/home/</span>zkpk<span class="regexp">/tgz/</span>jdk-<span class="number">8</span>u131-linux-x64.tar.gz -C <span class="regexp">/usr/</span>java</span><br></pre></td></tr></table></figure></li>
-<li><p>修改环境变量</p>
-<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line">gedit <span class="regexp">/home/</span>zkpk/.bash_profile</span><br><span class="line">	export JAVA_HOME=<span class="regexp">/usr/</span>java<span class="regexp">/jdk1.8.0_131/</span></span><br><span class="line">	export PATH=<span class="variable">$JAVA_HOME</span>/bin:<span class="variable">$PATH</span></span><br><span class="line">source <span class="regexp">/home/</span>zkpk/.bash_profile</span><br></pre></td></tr></table></figure></li>
-<li><p>其他机器同样安装</p>
-</li>
-<li><p>测试java：java -version</p>
-</li>
-</ol>
-<h2 id="四、安装hadoop"><a href="#四、安装hadoop" class="headerlink" title="四、安装hadoop"></a>四、安装hadoop</h2><ol>
-<li><p>解压</p>
-<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line">tar -xzvf <span class="regexp">/home/</span>zkpk<span class="regexp">/tgz/</span>hadoop-<span class="number">2.7</span>.<span class="number">3</span>.tar.gz –C <span class="regexp">/home/</span>zkpk</span><br></pre></td></tr></table></figure></li>
-<li><p>修改java环境变量</p>
-<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line">gedit <span class="regexp">/home/</span>zkpk<span class="regexp">/hadoop-2.7.3/</span>etc<span class="regexp">/hadoop/</span>hadoop-env.sh</span><br><span class="line"> 	export JAVA_HOME=<span class="regexp">/usr/</span>java<span class="regexp">/jdk1.8.0_131/</span></span><br><span class="line">gedit ~<span class="regexp">/hadoop-2.7.3/</span>etc<span class="regexp">/hadoop/y</span>arn-env.sh</span><br><span class="line">	export JAVA_HOME=<span class="regexp">/usr/</span>java<span class="regexp">/jdk1.8.0_131/</span></span><br></pre></td></tr></table></figure></li>
-<li><p>其他配置</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line">1.配置core-site.xml 文件</span><br><span class="line">gedit  ~/hadoop-2.7.3/etc/hadoop/core-site.xml</span><br><span class="line">	<span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span></span><br><span class="line">    <span class="meta">&lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;configuration.xsl&quot;?&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- Put site-specific property overrides in this file. --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">name</span>&gt;</span>fs.defaultFS<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">value</span>&gt;</span>hdfs://master:9000<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">name</span>&gt;</span>hadoop.tmp.dir<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">value</span>&gt;</span>/home/zkpk/hadoopdata<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">2.配置hdfs-site.xml文件</span><br><span class="line">gedit  ~/hadoop-2.7.3/etc/hadoop/hdfs-site.xml</span><br><span class="line">    <span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span></span><br><span class="line">    <span class="meta">&lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;configuration.xsl&quot;?&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- Put site-specific property overrides in this file. --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">name</span>&gt;</span>dfs.replication<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">value</span>&gt;</span>2<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">3.配置yarn-site.xml文件</span><br><span class="line">gedit  ~/hadoop-2.7.3/etc/hadoop/yarn-site.xml</span><br><span class="line">    <span class="meta">&lt;?xml version=&quot;1.0&quot;?&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.nodemanager.aux-services<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">value</span>&gt;</span>mapreduce_shuffle<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.resourcemanager.address<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">value</span>&gt;</span>master:18040<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.resourcemanager.scheduler.address<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">value</span>&gt;</span>master:18030<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.resourcemanager.resource-tracker.address<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">value</span>&gt;</span>master:18025<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.resourcemanager.admin.address<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">value</span>&gt;</span>master:18141<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.resourcemanager.webapp.address<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">value</span>&gt;</span>master:18088<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">4.配置mapred-site.xml文件</span><br><span class="line">cp ~/hadoop-2.7.3/etc/hadoop/mapred-site.xml.template  ~/hadoop-2.7.3/etc/hadoop/mapred-site.xml</span><br><span class="line">gedit ~/hadoop-2.7.3/etc/hadoop/mapred-site.xml</span><br><span class="line">    <span class="meta">&lt;?xml version=&quot;1.0&quot;?&gt;</span></span><br><span class="line">    <span class="meta">&lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;configuration.xsl&quot;?&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">name</span>&gt;</span>mapreduce.framework.name<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">value</span>&gt;</span>yarn<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-<li><p>配置slaves文件</p>
-<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line">gedit ~<span class="regexp">/hadoop-2.7.3/</span>etc<span class="regexp">/hadoop/</span>slaves</span><br><span class="line">    slave01</span><br><span class="line">    slave02</span><br></pre></td></tr></table></figure></li>
-<li><p>创建Hadoop数据目录</p>
-<figure class="highlight arduino"><table><tr><td class="code"><pre><span class="line">mkdir hadoopdata</span><br></pre></td></tr></table></figure></li>
-<li><p>将配置好的hadoop文件夹复制到从节点</p>
-<figure class="highlight apache"><table><tr><td class="code"><pre><span class="line"><span class="attribute">scp</span> -r hadoop-<span class="number">2</span>.<span class="number">7</span>.<span class="number">3</span> zkpk@slave<span class="number">01</span>:~/</span><br></pre></td></tr></table></figure></li>
-<li><p>配置环境变量</p>
-<figure class="highlight routeros"><table><tr><td class="code"><pre><span class="line">gedit ~/.bash_profile</span><br><span class="line">    #HADOOP</span><br><span class="line">    <span class="builtin-name">export</span> <span class="attribute">HADOOP_HOME</span>=/home/zkpk/hadoop-2.7.3</span><br><span class="line">    <span class="builtin-name">export</span> <span class="attribute">PATH</span>=<span class="variable">$HADOOP_HOME</span>/bin:$HADOOP_HOME/sbin:$PATH</span><br><span class="line">source ~/.bash_profile</span><br></pre></td></tr></table></figure></li>
-<li><p>其他机器同样配置环境变量</p>
-</li>
-<li><p>在master格式化磁盘</p>
-<figure class="highlight dos"><table><tr><td class="code"><pre><span class="line">hdfs namenode -<span class="built_in">format</span></span><br></pre></td></tr></table></figure></li>
-</ol>
-<h2 id="五、启动检测"><a href="#五、启动检测" class="headerlink" title="五、启动检测"></a>五、启动检测</h2><ol>
-<li>start-all.sh</li>
-<li>jps查看</li>
-<li><a href="http://master:50070/%E6%9F%A5%E7%9C%8B">http://master:50070/查看</a></li>
-<li><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20210911183155100.png" alt="image-20210911183155100"></li>
-</ol>
-]]></content>
-      <categories>
-        <category>hadoop</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>linux操作</title>
-    <url>/2021/10/07/os/linux%E6%93%8D%E4%BD%9C/</url>
-    <content><![CDATA[<h3 id="简单操作"><a href="#简单操作" class="headerlink" title="简单操作"></a>简单操作</h3><ol>
-<li>ls -a 连同.文件一起查看</li>
-<li>解压  tar xzf ..gz</li>
-<li>查看redis进程 ps -ef | grep redis</li>
-<li></li>
-</ol>
-<span id="more"></span>
-
-<h3 id="vim"><a href="#vim" class="headerlink" title="vim"></a>vim</h3><ol>
-<li>搜索：c    /str</li>
-</ol>
-]]></content>
-      <categories>
-        <category>os</category>
-      </categories>
-  </entry>
-  <entry>
     <title>linux配置</title>
     <url>/2021/10/07/os/linux%E9%85%8D%E7%BD%AE/</url>
     <content><![CDATA[<h3 id="常用配置"><a href="#常用配置" class="headerlink" title="常用配置"></a>常用配置</h3><ol>
@@ -1655,35 +1712,22 @@
       </categories>
   </entry>
   <entry>
-    <title>spring-secruity</title>
-    <url>/2021/10/12/project/spring-secruity/</url>
-    <content><![CDATA[<h3 id="project1"><a href="#project1" class="headerlink" title="project1"></a>project1</h3><ol>
-<li><p>database</p>
-<p>user</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">username,series,token,last_used</span><br></pre></td></tr></table></figure></li>
-<li><p>配置类</p>
-<ol>
-<li><p>注入数据库</p>
-</li>
-<li><p>@configuration</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Autowired</span></span><br><span class="line"><span class="keyword">private</span> DataSource dataSource;</span><br><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> PersistentTokenRepository <span class="title">persistentTokenRepository</span><span class="params">()</span></span>&#123;</span><br><span class="line">    JdbcTokenRepositoryImpl jdbcTokenRepository=<span class="keyword">new</span> JdbcTokenRepositoryImpl();</span><br><span class="line">    jdbcTokenRepository.setDataSource(dataSource);</span><br><span class="line">    <span class="comment">//        jdbcTokenRepository.setCreateTableOnStartup();</span></span><br><span class="line">    <span class="keyword">return</span> jdbcTokenRepository;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(HttpSecurity http)</span> </span></span><br><span class="line"><span class="function">.<span class="title">and</span><span class="params">()</span>.<span class="title">rememberMe</span><span class="params">()</span>.<span class="title">tokenRepository</span><span class="params">(persistentTokenRepository()</span>)<span class="comment">//配置数据库--token</span></span></span><br><span class="line"><span class="function">                .<span class="title">tokenValiditySeconds</span><span class="params">(<span class="number">4</span>)</span><span class="comment">//设置有效时长</span></span></span><br><span class="line"><span class="function">                .<span class="title">userDetailsService</span><span class="params">(userDetailsService)</span></span></span><br></pre></td></tr></table></figure></li>
-</ol>
-</li>
-</ol>
-   <span id="more"></span>
-
-<ol start="3">
-<li><p>csrf 跨站请求伪造</p>
-<ol>
-<li><p>依赖</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">     &lt;groupId&gt;org.thymeleaf.extras&lt;/groupId&gt;</span><br><span class="line">     &lt;artifactId&gt;thymeleaf-extras-springsecurity5&lt;/artifactId&gt;</span><br><span class="line">&lt;/dependency&gt;	</span><br></pre></td></tr></table></figure></li>
+    <title>linux操作</title>
+    <url>/2021/10/07/os/linux%E6%93%8D%E4%BD%9C/</url>
+    <content><![CDATA[<h3 id="简单操作"><a href="#简单操作" class="headerlink" title="简单操作"></a>简单操作</h3><ol>
+<li>ls -a 连同.文件一起查看</li>
+<li>解压  tar xzf ..gz</li>
+<li>查看redis进程 ps -ef | grep redis</li>
 <li></li>
 </ol>
-</li>
+<span id="more"></span>
+
+<h3 id="vim"><a href="#vim" class="headerlink" title="vim"></a>vim</h3><ol>
+<li>搜索：c    /str</li>
 </ol>
 ]]></content>
       <categories>
-        <category>spring</category>
+        <category>os</category>
       </categories>
   </entry>
   <entry>
@@ -1715,6 +1759,38 @@
 ]]></content>
       <categories>
         <category>project</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>spring-secruity</title>
+    <url>/2021/10/12/project/spring-secruity/</url>
+    <content><![CDATA[<h3 id="project1"><a href="#project1" class="headerlink" title="project1"></a>project1</h3><ol>
+<li><p>database</p>
+<p>user</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">username,series,token,last_used</span><br></pre></td></tr></table></figure></li>
+<li><p>配置类</p>
+<ol>
+<li><p>注入数据库</p>
+</li>
+<li><p>@configuration</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Autowired</span></span><br><span class="line"><span class="keyword">private</span> DataSource dataSource;</span><br><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> PersistentTokenRepository <span class="title">persistentTokenRepository</span><span class="params">()</span></span>&#123;</span><br><span class="line">    JdbcTokenRepositoryImpl jdbcTokenRepository=<span class="keyword">new</span> JdbcTokenRepositoryImpl();</span><br><span class="line">    jdbcTokenRepository.setDataSource(dataSource);</span><br><span class="line">    <span class="comment">//        jdbcTokenRepository.setCreateTableOnStartup();</span></span><br><span class="line">    <span class="keyword">return</span> jdbcTokenRepository;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(HttpSecurity http)</span> </span></span><br><span class="line"><span class="function">.<span class="title">and</span><span class="params">()</span>.<span class="title">rememberMe</span><span class="params">()</span>.<span class="title">tokenRepository</span><span class="params">(persistentTokenRepository()</span>)<span class="comment">//配置数据库--token</span></span></span><br><span class="line"><span class="function">                .<span class="title">tokenValiditySeconds</span><span class="params">(<span class="number">4</span>)</span><span class="comment">//设置有效时长</span></span></span><br><span class="line"><span class="function">                .<span class="title">userDetailsService</span><span class="params">(userDetailsService)</span></span></span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+</ol>
+   <span id="more"></span>
+
+<ol start="3">
+<li><p>csrf 跨站请求伪造</p>
+<ol>
+<li><p>依赖</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">     &lt;groupId&gt;org.thymeleaf.extras&lt;/groupId&gt;</span><br><span class="line">     &lt;artifactId&gt;thymeleaf-extras-springsecurity5&lt;/artifactId&gt;</span><br><span class="line">&lt;/dependency&gt;	</span><br></pre></td></tr></table></figure></li>
+<li></li>
+</ol>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>spring</category>
       </categories>
   </entry>
   <entry>
@@ -1819,6 +1895,13 @@
 </li>
 <li><p>自定义配置文件    ${}取得</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@PropertySource(&quot;classpath:config.properties&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ConfigProperty</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Value(&quot;$&#123;name&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h3><ol>
+<li><p>yml&gt;yaml&gt;properties</p>
+</li>
+<li><p>yml能调用Pro ,当有yml和pro的时候会优先使用pro,如果yml没特定内容，就会使用pro</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211026215034623.png" alt="image-20211026215034623"></p>
+</li>
 </ol>
 <h3 id="yml"><a href="#yml" class="headerlink" title="yml"></a>yml</h3><ol>
 <li><p>yml1</p>
@@ -2093,6 +2176,31 @@
       </categories>
   </entry>
   <entry>
+    <title>spring3</title>
+    <url>/2021/10/28/spring/spring3/</url>
+    <content><![CDATA[<h3 id="1"><a href="#1" class="headerlink" title="1"></a>1</h3><ol>
+<li><p>对于非@Compoent 如需要serviceImpl可以在构造函数中传入这个service</p>
+<p>如easyExcel的listener就需要</p>
+</li>
+<li></li>
+</ol>
+]]></content>
+      <categories>
+        <category>spring</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>springBoot</title>
+    <url>/2021/09/29/spring/springBoot/</url>
+    <content><![CDATA[<h3 id="spring-boot-starter"><a href="#spring-boot-starter" class="headerlink" title="spring-boot-starter"></a>spring-boot-starter</h3><ol>
+<li>可以认为starter是一种服务（和JS的插件类似）——使得使用某个功能的开发者不需要关注各种依赖库的处理，不需要具体的配置信息，由Spring Boot自动通过classpath路径下的类发现需要的Bean，并织入bean</li>
+</ol>
+<span id="more"></span>]]></content>
+      <categories>
+        <category>spring</category>
+      </categories>
+  </entry>
+  <entry>
     <title>SpringCloud</title>
     <url>/2021/10/06/spring/springCloud/</url>
     <content><![CDATA[<h3 id="1"><a href="#1" class="headerlink" title="1"></a>1</h3><ol>
@@ -2186,17 +2294,6 @@
 <li></li>
 </ol>
 ]]></content>
-  </entry>
-  <entry>
-    <title>springBoot</title>
-    <url>/2021/09/29/spring/springBoot/</url>
-    <content><![CDATA[<h3 id="spring-boot-starter"><a href="#spring-boot-starter" class="headerlink" title="spring-boot-starter"></a>spring-boot-starter</h3><ol>
-<li>可以认为starter是一种服务（和JS的插件类似）——使得使用某个功能的开发者不需要关注各种依赖库的处理，不需要具体的配置信息，由Spring Boot自动通过classpath路径下的类发现需要的Bean，并织入bean</li>
-</ol>
-<span id="more"></span>]]></content>
-      <categories>
-        <category>spring</category>
-      </categories>
   </entry>
   <entry>
     <title>springMVC</title>
@@ -2464,138 +2561,6 @@
       </categories>
   </entry>
   <entry>
-    <title>hexo使用</title>
-    <url>/2021/09/30/utils/blog/</url>
-    <content><![CDATA[<p>搭建个人博客</p>
-<ol>
-<li><p>下载node.js</p>
-</li>
-<li><p>npm下载cnpm</p>
-<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line">npm install -g cnpm  --registry=https:<span class="regexp">//</span>registry.npm.taobao.org</span><br></pre></td></tr></table></figure>
-
-<span id="more"></span></li>
-<li><p>下载hexo </p>
-<figure class="highlight avrasm"><table><tr><td class="code"><pre><span class="line">cnpm install -g hexo-<span class="keyword">cli</span></span><br></pre></td></tr></table></figure></li>
-<li><p>创建目录</p>
-</li>
-<li><p>hexo初始化blog 和deployer</p>
-<figure class="highlight coffeescript"><table><tr><td class="code"><pre><span class="line">cd blog</span><br><span class="line">hexo init</span><br><span class="line"><span class="built_in">npm</span> install hexo-deployer-git --save</span><br><span class="line"><span class="built_in">npm</span> i hexo-renderer-swig</span><br></pre></td></tr></table></figure>
-
-<p>或者</p>
-<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line">git clone https:<span class="regexp">//gi</span>tee.com<span class="regexp">/weilining/</span>hexo-starter.git blog</span><br><span class="line">cd blog</span><br><span class="line">git submodule init</span><br><span class="line">git submodule update</span><br><span class="line">npm config set registry http:<span class="regexp">//</span>registry.npm.taobao.org</span><br><span class="line">npm i</span><br><span class="line">npm install hexo-deployer-git --save</span><br></pre></td></tr></table></figure></li>
-<li><p>hexo g 生成静态文件</p>
-</li>
-<li><p>启动(localhost:4000)</p>
-<figure class="highlight apache"><table><tr><td class="code"><pre><span class="line"><span class="attribute">hexo</span> s -p <span class="number">400</span> </span><br></pre></td></tr></table></figure></li>
-</ol>
-<h3 id="操作"><a href="#操作" class="headerlink" title="操作"></a>操作</h3><ol>
-<li><p>创建文章</p>
-<figure class="highlight 1c"><table><tr><td class="code"><pre><span class="line"><span class="string">&quot;文章&quot;</span></span><br></pre></td></tr></table></figure></li>
-<li><p>生成静态文件</p>
-<figure class="highlight ebnf"><table><tr><td class="code"><pre><span class="line"><span class="attribute">hexo g</span></span><br></pre></td></tr></table></figure></li>
-</ol>
-<h3 id="通过github搭建"><a href="#通过github搭建" class="headerlink" title="通过github搭建"></a>通过github搭建</h3><ol>
-<li><p>创建public仓库 name/name.github.io    </p>
-</li>
-<li><p>下载插件</p>
-<figure class="highlight ada"><table><tr><td class="code"><pre><span class="line">cnpm install <span class="comment">--save hexo-deployer-git</span></span><br></pre></td></tr></table></figure></li>
-<li><p>修改config.yml</p>
-<figure class="highlight dts"><table><tr><td class="code"><pre><span class="line"><span class="symbol">deploy:</span></span><br><span class="line"><span class="symbol">  type:</span> git</span><br><span class="line"><span class="symbol">  repo:</span> https:<span class="comment">//github.com/Wang-yonggan/Wang-yonggan.github.io.git</span></span><br><span class="line"><span class="symbol">  branch:</span> master</span><br></pre></td></tr></table></figure></li>
-<li><p>分类：</p>
-<ol>
-<li>```<br>hexo new page categories<figure class="highlight crmsh"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">   <span class="number">2</span>.  index.md加入<span class="keyword">type</span>: categories</span><br><span class="line"></span><br><span class="line"><span class="number">5</span>. hexo clean &amp;&amp; hexo g &amp;&amp; hexo s</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">### 主题</span></span><br><span class="line"></span><br><span class="line"><span class="number">1</span>. git <span class="keyword">clone</span> <span class="title">..  themes</span>/name</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-git clone <a href="https://github.com/litten/hexo-theme-yilia.git">https://github.com/litten/hexo-theme-yilia.git</a> themes/yilia</li>
-</ol>
-<p>git clone <a href="https://github.com/theme-next/hexo-theme-next">https://github.com/theme-next/hexo-theme-next</a> themes/next</p>
-<figure class="highlight markdown"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">   </span><br><span class="line"></span><br><span class="line"><span class="bullet">2.</span> vim config.yml</span><br><span class="line"></span><br><span class="line">   theme:name</span><br><span class="line"></span><br><span class="line"><span class="bullet">3.</span> hexo clean</span><br><span class="line"></span><br><span class="line"><span class="section">### config.yml</span></span><br><span class="line"></span><br><span class="line"><span class="bullet">1.</span> webset</span><br><span class="line"><span class="bullet">   1.</span> title 标题</span><br><span class="line"><span class="bullet">   2.</span> subtitle 副标题</span><br><span class="line"><span class="bullet">   3.</span> description 网站描述 seo</span><br><span class="line"><span class="bullet">   4.</span> author 作者</span><br><span class="line"><span class="bullet">   5.</span> language 语言</span><br><span class="line"><span class="bullet">   6.</span> timezone 时区</span><br><span class="line"></span><br><span class="line"><span class="bullet">2.</span> URL</span><br><span class="line"></span><br><span class="line">   url：网站的网址</span><br><span class="line">   root：网站的根目录</span><br><span class="line">   permalink：文章的永久链接格式，可以在permalink这里配置，如默认中的配置，在hello world文章中就会是这样的url</span><br><span class="line"></span><br><span class="line"><span class="bullet">3.</span> directory</span><br><span class="line"><span class="bullet">   1.</span> source<span class="emphasis">_dir：存放hexo文章的文件夹，我们写的md文件都放在这个配置对应的文件夹下，默认值是source</span></span><br><span class="line"><span class="emphasis">   2. public_</span>dir：存放hexo g生成的文件，执行hexo g后根目录就会出现这个文件夹，默认值是public</span><br><span class="line"><span class="bullet">   3.</span> tag<span class="emphasis">_dir：按标签存放文章的目录，默认值是tags，如果我们给文章添加标签，使用hexo g时public文件夹下就会多出一个tags文件夹（根据我们的配置文件夹名不同），这里给hello-world.md添加一个tags</span></span><br><span class="line"><span class="emphasis">   4. archive_</span>dir：归档文件夹，存放归档文件，默认值为archives</span><br><span class="line"><span class="bullet">   5.</span> category<span class="emphasis">_dir：分类文件夹，按分类存放的文件，和上面的tags一样，只要在文章中的Font-matter添加了categories就会在使用hexo g构造时出现相应的文件夹</span></span><br><span class="line"><span class="emphasis">   6. code_</span>dir：Include code 文件夹，source<span class="emphasis">_dir 下的子目录，默认值为downloads/code</span></span><br><span class="line"><span class="emphasis">   7. i18n_</span>dir：国际化（i18n）文件夹，默认值:lang</span><br><span class="line"><span class="bullet">   8.</span> skip<span class="emphasis">_render：跳过指定文件的渲染，匹配到的文件将会被不做改动复制到public文件夹下，如果路径对应的是我们的文章，那会直接忽略掉该文章，我们这样设置来忽略掉hello-world.md文件</span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis">### issue</span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis">1. 下载主题没有显示：</span></span><br><span class="line"><span class="emphasis">   1. 文件夹名问题</span></span><br><span class="line"><span class="emphasis">   2. config未该</span></span><br><span class="line"><span class="emphasis">   3. 没有clean+g+d</span></span><br><span class="line"><span class="emphasis">   4. gitee没有更行部署</span></span><br><span class="line"><span class="emphasis">   </span></span><br><span class="line"><span class="emphasis">2. 部署其他文件夹</span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis">   1. 每次hexo d之前copy 文件到posts，但是我发现文件的创建时间被改变了</span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis">   2. 将hexo的source文件路径改为ana-notes，但是这样没办法生成目录</span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis">   3. 最终选择copy+python修改文件创建时间的方式 </span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis">      具体bat代码</span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis">      ````</span></span><br><span class="line"><span class="emphasis">      echo 清空posts文件夹</span></span><br><span class="line"><span class="emphasis">      rd /s /q %post_</span>path%</span><br><span class="line"><span class="code">      md %post_path%</span></span><br><span class="line"><span class="code">      echo 递归copy文件</span></span><br><span class="line"><span class="code">      xcopy /y /e %src_path% %post_path%</span></span><br><span class="line"><span class="code">      echo 还原时间</span></span><br><span class="line"><span class="code">      python E:\data-ana\ana-notes\工具\tools\get_blog_create_time.py</span></span><br><span class="line"><span class="code">      echo 提交</span></span><br><span class="line"><span class="code">      hexo clean &amp;&amp; hexo g &amp;&amp; hexo d</span></span><br><span class="line"><span class="code">      ````</span></span><br><span class="line"><span class="code"></span></span><br><span class="line"><span class="code">      </span></span><br><span class="line"><span class="code"></span></span><br><span class="line"><span class="bullet">3.</span> 修改config.yml后报错：yml格式是:后面有空格</span><br><span class="line"></span><br><span class="line"><span class="bullet">4.</span> 实现gitee page自动提交：</span><br><span class="line"></span><br><span class="line">   nodejs+puppeteer(xpath)</span><br><span class="line">   </span><br><span class="line"><span class="bullet">5.</span> 注意，特殊字符尽量不用</span><br><span class="line"></span><br><span class="line"><span class="bullet">   1.</span> 小括号</span><br><span class="line"><span class="bullet">   2.</span> 大括号</span><br><span class="line"><span class="bullet">   3.</span> 中括号</span><br><span class="line">   </span><br><span class="line"><span class="bullet">6.</span> git config --global core.autocrlf false换行转义</span><br><span class="line"></span><br><span class="line"><span class="bullet">7.</span> github</span><br><span class="line"></span><br><span class="line"><span class="bullet">   1.</span> git config --global http.sslVerify &quot;false&quot;</span><br><span class="line"></span><br><span class="line"><span class="section">### config</span></span><br><span class="line"></span><br><span class="line"><span class="bullet">1.</span> 切换中文language</span><br><span class="line"></span><br><span class="line">   zh-CN</span><br><span class="line"></span><br><span class="line"><span class="section">### next&lt;-landscape</span></span><br><span class="line"></span><br><span class="line"><span class="bullet">0.</span> http://theme-next.iissnan.com/</span><br><span class="line"></span><br><span class="line"><span class="bullet">1.</span> 更换主题</span><br><span class="line"></span><br><span class="line">   config--&gt;schemes</span><br><span class="line"></span><br><span class="line"><span class="bullet">2.</span> 设置头像avater</span><br><span class="line"></span><br><span class="line"><span class="bullet">3.</span> 社交图标</span><br><span class="line"></span><br><span class="line">   social<span class="emphasis">_icons</span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis">   https://fontawesome.com/v5.15/icons?d=gallery&amp;p=2</span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis">4. 首页全文</span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis">   auto_</span>excerpt</span><br><span class="line"></span><br><span class="line">   &lt;!--more--&gt;</span><br><span class="line"></span><br><span class="line"><span class="bullet">5.</span> 网站图标</span><br><span class="line"></span><br><span class="line">   <span class="code">```python</span></span><br><span class="line"><span class="code">   favicon:aaaa.avg</span></span><br><span class="line"><span class="code">   source/image/aaaa.avg</span></span><br></pre></td></tr></table></figure></li>
-<li><p>背景</p>
-<p>canvas</p>
-</li>
-<li><p>加载进度条 pace</p>
-</li>
-<li><p>读进度条：scrollpercent</p>
-</li>
-<li><p>评论</p>
-<p>changyan</p>
-</li>
-<li><p>搜索</p>
-</li>
-</ol>
-   <figure class="highlight dts"><table><tr><td class="code"><pre><span class="line">npm install hexo-generator-searchdb --save</span><br><span class="line"></span><br><span class="line">hexo-config</span><br><span class="line"><span class="symbol">search:</span></span><br><span class="line"><span class="symbol">  path:</span> search.xml</span><br><span class="line"><span class="symbol">  field:</span> post</span><br><span class="line"><span class="symbol">  format:</span> html</span><br><span class="line"><span class="symbol">  limit:</span> <span class="number">10000</span></span><br><span class="line">config</span><br><span class="line"><span class="symbol">local_search:</span></span><br></pre></td></tr></table></figure>
-
-<ol start="11">
-<li><p>不算子（访问次数）：busuanzi_count</p>
-</li>
-<li><p>隐藏底盘:footer.powered</p>
-</li>
-<li><p>修改字体大小</p>
-<p>打开<code>\themes\next\source\css\ _variables\base.styl</code>文件，将<code>$font-size-base</code>改成<code>16px</code>，如下所示：</p>
-<figure class="highlight gams"><table><tr><td class="code"><pre><span class="line"><span class="meta"><span class="meta-keyword">$font</span>-size-base            =16px</span></span><br></pre></td></tr></table></figure></li>
-<li><p>夜间模式darkmode</p>
-</li>
-<li><p>网站丝滑motion true</p>
-</li>
-<li><p>three</p>
-</li>
-<li><p>移动端回顶onmobile</p>
-<p>pc端：back2top</p>
-</li>
-<li><p>阅读进度：reading_progress</p>
-</li>
-<li><p>阅读进度保存：bookmark</p>
-</li>
-<li><p>github图标：github_banner</p>
-</li>
-<li><p>font：字体设置</p>
-</li>
-<li><p>代码高亮hexo.config</p>
-<ol>
-<li>highlight</li>
-<li>prismjs二选1</li>
-</ol>
-</li>
-</ol>
-<h3 id="plugin"><a href="#plugin" class="headerlink" title="plugin"></a>plugin</h3><ol>
-<li><p>代码高亮</p>
-<figure class="highlight stata"><table><tr><td class="code"><pre><span class="line">npm install hexo-prism-<span class="keyword">plugin</span> --<span class="keyword">save</span></span><br></pre></td></tr></table></figure></li>
-<li><p>字数统计</p>
-<figure class="highlight coffeescript"><table><tr><td class="code"><pre><span class="line"><span class="built_in">npm</span> i –save hexo-wordcount</span><br></pre></td></tr></table></figure>
-
-<p>theme.config</p>
-<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">post_wordcount:</span></span><br><span class="line">  <span class="attr">item_text:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">wordcount:</span> <span class="literal">true</span> <span class="comment">#单篇文章字数</span></span><br><span class="line">  <span class="attr">min2read:</span> <span class="literal">true</span> <span class="comment">#单篇阅读时长</span></span><br><span class="line">  <span class="attr">totalcount:</span> <span class="literal">true</span> <span class="comment">#站点总字数</span></span><br><span class="line">  <span class="attr">separated_meta:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure></li>
-<li><p>搜索</p>
-<ol>
-<li>下载依赖</li>
-</ol>
-<figure class="highlight ada"><table><tr><td class="code"><pre><span class="line">npm install hexo-generator-searchdb <span class="comment">--save</span></span><br></pre></td></tr></table></figure>
-
-<ol start="2">
-<li>修改hexo.config</li>
-</ol>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">search:</span><br><span class="line">  path: search.xml</span><br><span class="line">  field: post</span><br><span class="line">  format: html</span><br><span class="line">  <span class="built_in">limit</span>: 10000</span><br></pre></td></tr></table></figure>
-
-<ol start="3">
-<li>修改theme.config</li>
-</ol>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">local_search:</span><br></pre></td></tr></table></figure></li>
-<li><p>几何背景</p>
-<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line">cd <span class="keyword">next</span></span><br><span class="line">git clone https:<span class="regexp">//gi</span>thub.com<span class="regexp">/theme-next/</span>theme-<span class="keyword">next</span>-canvas-ribbon source<span class="regexp">/lib/</span>canvas-ribbon</span><br></pre></td></tr></table></figure>
-
-<p>theme.config</p>
-<p>canvas_ribbon</p>
-</li>
-<li><p>字数统计</p>
-<p>npm install hexo-word-counter</p>
-<p>clean g s</p>
-</li>
-<li></li>
-</ol>
-]]></content>
-      <categories>
-        <category>utils</category>
-      </categories>
-  </entry>
-  <entry>
     <title>各种配置文件</title>
     <url>/2021/10/08/spring/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/</url>
     <content><![CDATA[<h3 id="知识"><a href="#知识" class="headerlink" title="知识"></a>知识</h3><ol>
@@ -2723,429 +2688,6 @@ git clone <a href="https://github.com/litten/hexo-theme-yilia.git">https://githu
 ]]></content>
       <categories>
         <category>config</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>Git的使用</title>
-    <url>/2021/10/04/utils/git/</url>
-    <content><![CDATA[<h3 id="Git概念"><a href="#Git概念" class="headerlink" title="Git概念"></a>Git概念</h3><ol>
-<li><p>手工式版本控制</p>
-<ol>
-<li>特点<ol>
-<li>每改一次备份一次</li>
-<li>协同更改需要同时U盘copy</li>
-</ol>
-</li>
-<li>问题<ol>
-<li>备份</li>
-<li>代码还原</li>
-<li>协同开发</li>
-<li>代码追溯(追责)</li>
-</ol>
-</li>
-</ol>
-<span id="more"></span></li>
-<li><p>解决：<font color='red'>版本控制</font>结束了手动管理多个“版本”的史前时代，进入到版本控制的20世纪。</p>
-</li>
-<li><p>集中式版本控制SVN/CVS</p>
-<ol>
-<li>版本库都放在集中式服务器</li>
-<li>使用前先从集中式服务器copy过来</li>
-<li>修改完后在上传到集中服务器</li>
-</ol>
-</li>
-<li><p>分布式版本控制（共享版本库）</p>
-<ol>
-<li>每个人都有所有的版本，gitee/github也算个人</li>
-<li>一个人修改了A那么直接上传就会记录这个修改内容</li>
-<li>本地有所有的版本</li>
-</ol>
-</li>
-</ol>
-<h3 id="Git操作"><a href="#Git操作" class="headerlink" title="Git操作"></a>Git操作</h3><h5 id="基本操作"><a href="#基本操作" class="headerlink" title="基本操作"></a>基本操作</h5><ol>
-<li><p>安装完成先自报家门</p>
-<figure class="highlight verilog"><table><tr><td class="code"><pre><span class="line">git <span class="keyword">config</span> --<span class="keyword">global</span> user<span class="variable">.name</span> <span class="string">&quot;Your Name&quot;</span></span><br><span class="line">git <span class="keyword">config</span> --<span class="keyword">global</span> user<span class="variable">.email</span> <span class="string">&quot;email@example.com&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>git config 命令的 –global 表示整个电脑的git都设置为这个身份</p>
-</li>
-<li><p>创建版本库</p>
-<figure class="highlight dos"><table><tr><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> blog</span><br><span class="line"><span class="built_in">cd</span> blog</span><br><span class="line">git init</span><br></pre></td></tr></table></figure></li>
-<li><p>写文件</p>
-<figure class="highlight pgsql"><table><tr><td class="code"><pre><span class="line">touch readme.txt</span><br><span class="line">git <span class="keyword">add</span> .</span><br><span class="line">git <span class="keyword">commit</span> -m &quot;wrote a file&quot;</span><br></pre></td></tr></table></figure>
-
-<p>. 表示当前目录</p>
-</li>
-</ol>
-<h5 id="版本撤回"><a href="#版本撤回" class="headerlink" title="版本撤回"></a>版本撤回</h5><ol>
-<li><p>查看当前文件状态(工作区同暂存区、HEAD相比，并显示未add和已add未commit的信息)</p>
-<figure class="highlight ebnf"><table><tr><td class="code"><pre><span class="line"><span class="attribute">git status</span></span><br></pre></td></tr></table></figure>
-
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211004192710237.png" alt="image-20211004192710237"></p>
-</li>
-<li><p>查看文件修改内容(工作区同上一次暂存区相比)</p>
-<figure class="highlight maxima"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">diff</span> readme.txt</span><br></pre></td></tr></table></figure></li>
-<li><p>查看每次修改和对应的修改提示</p>
-<figure class="highlight 1c"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">log</span></span><br></pre></td></tr></table></figure></li>
-<li><p>版本撤回</p>
-<ol>
-<li><p>回到上上个版本</p>
-<figure class="highlight pgsql"><table><tr><td class="code"><pre><span class="line">git <span class="keyword">reset</span> <span class="comment">--hard HEAD^^</span></span><br></pre></td></tr></table></figure></li>
-<li><p>–hard表示</p>
-</li>
-<li><p>git reset –head 版本id/head都可以回退</p>
-</li>
-<li><p>如果撤多了那么别叉掉窗口，几下最近几次commit-id的前机会还可以回撤</p>
-<figure class="highlight jboss-cli"><table><tr><td class="code"><pre><span class="line">git reset <span class="params">--hard</span> <span class="keyword">cd</span>0c</span><br></pre></td></tr></table></figure></li>
-<li><p>如果不小心叉掉了，git reflog还可以查看各个commit-id</p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211004183507316.png" alt="image-20211004183507316"></p>
-<p>最下面是第一次commit</p>
-<p>然后根据git reset commit-id 回退版本</p>
-</li>
-<li><p>但是，如果你的工作区没有add就进行了版本撤回，那么就会找不到你这此更改的内容。</p>
-</li>
-<li><p>如果你的工作区已经add到了缓存区，</p>
-</li>
-</ol>
-</li>
-<li><p>撤销修改</p>
-<ol>
-<li><p>丢弃工作区，工作区&lt;—暂存区</p>
-<figure class="highlight ada"><table><tr><td class="code"><pre><span class="line">git checkout <span class="comment">-- readme.txt</span></span><br></pre></td></tr></table></figure></li>
-<li><p>丢掉暂存区，暂存区&lt;—版本库</p>
-<figure class="highlight maxima"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">reset</span> head readme.txt</span><br></pre></td></tr></table></figure></li>
-</ol>
-</li>
-<li><p>删除文件</p>
-<p>rm readme.txt</p>
-<ol>
-<li><p>整体删除</p>
-<figure class="highlight pgsql"><table><tr><td class="code"><pre><span class="line">git rm/<span class="keyword">add</span> readme.txt</span><br><span class="line">git <span class="keyword">commit</span> -m &quot;&quot;</span><br></pre></td></tr></table></figure></li>
-<li><p>撤回删除(从暂存区拿回)</p>
-<figure class="highlight ada"><table><tr><td class="code"><pre><span class="line">git checkout <span class="comment">-- test.txt</span></span><br></pre></td></tr></table></figure></li>
-</ol>
-</li>
-</ol>
-<h5 id="远程仓库"><a href="#远程仓库" class="headerlink" title="远程仓库"></a>远程仓库</h5><ol>
-<li><p>添加远程仓库</p>
-<figure class="highlight llvm"><table><tr><td class="code"><pre><span class="line">git remote <span class="keyword">add</span> origin git<span class="title">@github.com</span>:Wang-yonggan/test.git</span><br></pre></td></tr></table></figure></li>
-<li><p>远程库的名字就是<code>origin</code>，这是Git默认的叫法把本地库的内容推送到远程，用<code>git push</code>命令，实际上是把当前分支<code>master</code>推送到远程。</p>
-</li>
-<li><p>由于远程库是空的，我们第一次推送<code>master</code>分支时，加上了<code>-u</code>参数，Git不但会把本地的<code>master</code>分支内容推送的远程新的<code>master</code>分支，还会把本地的<code>master</code>分支和远程的<code>master</code>分支关联起来，在以后的推送或者拉取时就可以简化命令。</p>
-<p>以后只需要</p>
-<figure class="highlight maxima"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">push</span> <span class="built_in">origin</span> master</span><br></pre></td></tr></table></figure></li>
-<li><p>查看远程仓库状态</p>
-<figure class="highlight ebnf"><table><tr><td class="code"><pre><span class="line"><span class="attribute">git remote -v</span></span><br></pre></td></tr></table></figure></li>
-<li><p>解除远程仓库关系</p>
-<figure class="highlight ebnf"><table><tr><td class="code"><pre><span class="line"><span class="attribute">git remote rm origin</span></span><br></pre></td></tr></table></figure></li>
-<li><p>克隆(支持两种协议)</p>
-<ol>
-<li>https 默认</li>
-<li>git 更快，有的公司不支持</li>
-</ol>
-</li>
-<li><p>远程删除一个文件夹</p>
-<ol>
-<li>git rm -r –cached dir  –&gt;撤回 git reset dir</li>
-<li>git rm –cached file</li>
-<li>git  commit</li>
-<li>git push</li>
-</ol>
-</li>
-</ol>
-<h5 id="分支管理"><a href="#分支管理" class="headerlink" title="分支管理"></a>分支管理</h5><ol>
-<li><p>创建分支</p>
-<figure class="highlight ebnf"><table><tr><td class="code"><pre><span class="line"><span class="attribute">git branch dev</span></span><br></pre></td></tr></table></figure></li>
-<li><p>切换分支</p>
-<p>checkout==switch</p>
-<figure class="highlight ebnf"><table><tr><td class="code"><pre><span class="line"><span class="attribute">git checkout dev</span></span><br></pre></td></tr></table></figure></li>
-<li><p>查看有哪些分支</p>
-<figure class="highlight ebnf"><table><tr><td class="code"><pre><span class="line"><span class="attribute">git branch</span></span><br></pre></td></tr></table></figure></li>
-<li><p>合并分支(只有撤回到master下面这句才有效)</p>
-<figure class="highlight cos"><table><tr><td class="code"><pre><span class="line">git <span class="keyword">merge</span> dev</span><br></pre></td></tr></table></figure></li>
-<li><p>删除分支</p>
-<figure class="highlight ebnf"><table><tr><td class="code"><pre><span class="line"><span class="attribute">git branch -d dev</span></span><br></pre></td></tr></table></figure></li>
-<li><p>远程分支master&lt;—–&gt;本地分支master</p>
-</li>
-<li><p>本地的分支会共享暂存区，但版本库独立，即分支master创建并add到暂存区的a文件如果被分支dev commit了，那么再切换到master就没有这个文件。</p>
-</li>
-<li><p>分支冲突</p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211004221917099.png" alt="image-20211004221917099"></p>
-<p>修改+add+commit手动合并</p>
-</li>
-</ol>
-<h5 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h5><ol>
-<li><p>tag标签</p>
-<p>​    标签与commit-id对应关系</p>
-<ol>
-<li><p>创建tag</p>
-<figure class="highlight crmsh"><table><tr><td class="code"><pre><span class="line">git <span class="keyword">tag</span> <span class="title">v1</span>.<span class="number">0</span></span><br></pre></td></tr></table></figure></li>
-<li><p>根据commit-id创建tag</p>
-<figure class="highlight crmsh"><table><tr><td class="code"><pre><span class="line">git <span class="keyword">tag</span> <span class="title">v0</span>.<span class="number">8</span> abcde</span><br></pre></td></tr></table></figure></li>
-<li><p>上传tags</p>
-<figure class="highlight armasm"><table><tr><td class="code"><pre><span class="line"><span class="symbol">git</span> <span class="keyword">push</span> orgin <span class="built_in">v1</span>.<span class="number">0</span></span><br><span class="line"><span class="symbol">git</span> <span class="keyword">push</span> orgin --tags</span><br></pre></td></tr></table></figure></li>
-<li><p>删除tags</p>
-<figure class="highlight elixir"><table><tr><td class="code"><pre><span class="line">git push origin <span class="symbol">:refs/tags/v0</span>.<span class="number">9</span></span><br></pre></td></tr></table></figure></li>
-</ol>
-</li>
-<li><p>忽略文件</p>
-<ol>
-<li><p>文件内容(!表示非)</p>
-<figure class="highlight jboss-cli"><table><tr><td class="code"><pre><span class="line">*<span class="string">.txt</span>*</span><br><span class="line">!<span class="string">.gitignore</span></span><br></pre></td></tr></table></figure></li>
-<li><p>强制添加</p>
-<figure class="highlight reasonml"><table><tr><td class="code"><pre><span class="line">git add -f <span class="module-access"><span class="module"><span class="identifier">App</span>.</span></span><span class="keyword">class</span></span><br></pre></td></tr></table></figure></li>
-<li><p>例子</p>
-<ol>
-<li>忽略.o和.a文件 : *.[oa]</li>
-<li>忽略目录d: d/</li>
-<li>* ？：代表任意的一个字符<br>  * ＊：代表任意数目的字符<br>  * {!ab}：必须不是此类型<br>  * {ab,bb,cx}：代表ab,bb,cx中任一类型即可<br>  * [abc]：代表a,b,c中任一字符即可<br>  * [ ^abc]：代表必须不是a,b,c中任一字符</li>
-<li></li>
-</ol>
-</li>
-</ol>
-</li>
-<li><p>别名</p>
-<ol>
-<li><p>st=status</p>
-<figure class="highlight verilog"><table><tr><td class="code"><pre><span class="line">git <span class="keyword">config</span> --<span class="keyword">global</span> <span class="keyword">alias</span><span class="variable">.st</span> status</span><br></pre></td></tr></table></figure></li>
-</ol>
-</li>
-</ol>
-<h3 id="Git"><a href="#Git" class="headerlink" title="Git"></a>Git</h3><ol>
-<li>分支</li>
-<li>版本<ol>
-<li>HEAD表示当前版本</li>
-<li>HEAD^^表示上上一个版本</li>
-<li>HEAD~100表示上100个版本</li>
-<li></li>
-</ol>
-</li>
-</ol>
-<h3 id="做过的配置"><a href="#做过的配置" class="headerlink" title="做过的配置"></a>做过的配置</h3><ol>
-<li><p>git config –global http.sslVerify true   </p>
-<p>push 失败 SSL</p>
-</li>
-<li><p>push 到github失败，网速问题</p>
-<p>使用@git协议</p>
-<ol>
-<li><p>github加入自己的本机的ssh</p>
-</li>
-<li><p>将本机的.git的里面的comfig.remote修改为项目的ssh链接</p>
-<p><a href="mailto:&#103;&#x69;&#116;&#x40;&#x67;&#105;&#x74;&#104;&#117;&#98;&#46;&#99;&#111;&#109;">&#103;&#x69;&#116;&#x40;&#x67;&#105;&#x74;&#104;&#117;&#98;&#46;&#99;&#111;&#109;</a>:Wang-yonggan/Wang-yonggan.github.io.git</p>
-<p><a href="https://github.com/Wang-yonggan/Wang-yonggan.github.io.git">https://github.com/Wang-yonggan/Wang-yonggan.github.io.git</a></p>
-</li>
-</ol>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>utils</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>maven的使用</title>
-    <url>/2021/10/07/utils/maven/</url>
-    <content><![CDATA[<h3 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h3><p>1.<a href="https://www.cnblogs.com/PatrickLee/archive/2012/10/31/2747398.html">https://www.cnblogs.com/PatrickLee/archive/2012/10/31/2747398.html</a></p>
-<ol start="2">
-<li><p>编译：mvn compile　　–src/main/java目录java源码编译生成class （target目录下）</p>
-</li>
-<li><p>测试：mvn test　　　　–src/test/java 目录编译</p>
-</li>
-<li><p>清理：mvn clean　　　 –删除target目录，也就是将class文件等删除</p>
-</li>
-<li><p>打包：mvn package　　–生成压缩文件：java项目#jar包；web项目#war包，也是放在target目录下</p>
-</li>
-<li><p>安装：mvn install　　　–将压缩文件(jar或者war)上传到本地仓库</p>
-</li>
-<li><p>部署|发布：mvn deploy　　–将压缩文件上传私服</p>
-<span id="more"></span></li>
-</ol>
-<h3 id="创建项目"><a href="#创建项目" class="headerlink" title="创建项目"></a>创建项目</h3><ol>
-<li>java项目</li>
-</ol>
-<figure class="highlight routeros"><table><tr><td class="code"><pre><span class="line">mvn archetype:generate <span class="attribute">-DgroupId</span>=com.dreams.maven.quickstart <span class="attribute">-DartifactId</span>=simple <span class="attribute">-DarchetypeArtifactId</span>=maven-archetype-quickstart</span><br><span class="line"></span><br><span class="line">mvn archetype:create</span><br><span class="line">   <span class="attribute">-DgroupId</span>=packageName</span><br><span class="line">   <span class="attribute">-DartifactId</span>=projectName </span><br></pre></td></tr></table></figure>
-
-<ol start="2">
-<li><p>wen项目</p>
-<figure class="highlight routeros"><table><tr><td class="code"><pre><span class="line">mvn archetype:generate <span class="attribute">-DgroupId</span>=com.packageName <span class="attribute">-DartifactId</span>=webappName <span class="attribute">-DarchetypeArtifactId</span>=maven-archetype-quickstart</span><br></pre></td></tr></table></figure></li>
-</ol>
-<p>mvn                                 –核心命令</p>
-<p> archetype:generate                              –创建项目 </p>
-<p>-DgroupId=com.dreams.maven.quickstart             –包名的写法，域名的反写 </p>
-<p>-DartifactId=simple                                               –项目名称 </p>
-<p>-DarchetypeArtifactId=maven-archetype-quickstart  –表示创建的是[maven]java项目—固定</p>
-<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3>]]></content>
-      <categories>
-        <category>utils</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>idea操作</title>
-    <url>/2021/10/08/utils/idea%E6%93%8D%E4%BD%9C/</url>
-    <content><![CDATA[<h3 id="操作"><a href="#操作" class="headerlink" title="操作"></a>操作</h3><ol>
-<li>基本<ol>
-<li>创建 setter toString.. alt+insert</li>
-<li></li>
-</ol>
-</li>
-<li>次级</li>
-<li>高阶<ol>
-<li><p>查看父子图 右键+图</p>
-</li>
-<li><p>查看所有方法,alt+7</p>
-<span id="more"></span></li>
-<li><p>alt+左键 多行复制</p>
-</li>
-<li><p>shift双击搜索</p>
-</li>
-<li><p>alt+回车  检错</p>
-</li>
-</ol>
-</li>
-</ol>
-<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><ol>
-<li>插件<ol>
-<li>开发<ol>
-<li>restfulTool</li>
-<li></li>
-</ol>
-</li>
-<li>其他<ol>
-<li>chinese中文</li>
-<li>static</li>
-<li></li>
-</ol>
-</li>
-<li>外观<ol>
-<li>meterial theme</li>
-</ol>
-</li>
-</ol>
-</li>
-<li>自定义快捷键<ol>
-<li>ctrl+右键 重命名</li>
-<li>F1 运行</li>
-<li>ctrl+shift+右键 格式化代码</li>
-</ol>
-</li>
-<li>代码动态模板<ol>
-<li>zz html  &lt;!–$a–&gt;</li>
-<li></li>
-</ol>
-</li>
-<li>代码模板</li>
-</ol>
-]]></content>
-      <categories>
-        <category>utils</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>puppeteer使用</title>
-    <url>/2021/10/01/utils/puppeteer/</url>
-    <content><![CDATA[<h1 id="Puppeteer的使用"><a href="#Puppeteer的使用" class="headerlink" title="Puppeteer的使用"></a>Puppeteer的使用</h1><h3 id="爬虫"><a href="#爬虫" class="headerlink" title="爬虫"></a>爬虫</h3><h5 id="python"><a href="#python" class="headerlink" title="python"></a>python</h5><ol>
-<li><p>urllib+requests——Beautifulsoup+lxml—&gt;数据</p>
-</li>
-<li><p>scrapy  :抓取+解析</p>
-<span id="more"></span></li>
-</ol>
-<h5 id="puppeteer"><a href="#puppeteer" class="headerlink" title="puppeteer"></a>puppeteer</h5><ol>
-<li><p>下载</p>
-<figure class="highlight coffeescript"><table><tr><td class="code"><pre><span class="line"><span class="built_in">npm</span> init</span><br><span class="line"><span class="built_in">npm</span> i puppeteer</span><br></pre></td></tr></table></figure></li>
-<li><p>seletor</p>
-</li>
-</ol>
-<h3 id="xpath"><a href="#xpath" class="headerlink" title="xpath"></a>xpath</h3><ol>
-<li><p>层级 /直接子集() // 跳跃层级(递归)</p>
-</li>
-<li><p>属性 @</p>
-<ol>
-<li><p>class</p>
-</li>
-<li><p>id</p>
-</li>
-<li><p>property</p>
-</li>
-<li><p>//article//a/@href</p>
-<!--more--></li>
-</ol>
-</li>
-<li><p>函数</p>
-<ol>
-<li><p>contain</p>
-<figure class="highlight applescript"><table><tr><td class="code"><pre><span class="line">\\<span class="keyword">div</span>[<span class="keyword">contain</span>(@<span class="built_in">class</span>, <span class="string">&quot;classnameContain&quot;</span>)]</span><br></pre></td></tr></table></figure></li>
-<li><p>text</p>
-<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line">http:<span class="regexp">//</span>books.toscrape.com<span class="regexp">/catalogue/</span>category<span class="regexp">/books_1/i</span>ndex.html</span><br><span class="line"><span class="regexp">//u</span>l[@class=<span class="string">&quot;nav nav-list&quot;</span>]<span class="regexp">//u</span>l<span class="regexp">//</span>a/text()</span><br></pre></td></tr></table></figure></li>
-</ol>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>utils</category>
-        <category>爬虫</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>xshell的使用</title>
-    <url>/2021/10/06/utils/xshell/</url>
-    <content><![CDATA[<h3 id="连接VMware"><a href="#连接VMware" class="headerlink" title="连接VMware"></a>连接VMware</h3><ol>
-<li><p>配置linux的网络连接</p>
-<ol>
-<li><p><a href="https://www.cnblogs.com/shireenlee4testing/p/9469650.html">参考-如何使用Xshell连接VMware上的Linux虚拟机</a></p>
-</li>
-<li><p>在VMware workstation里，点击菜单栏上的【编辑】–&gt;【虚拟网络编辑器】，打开下方的虚拟网络编辑器。</p>
-<ol>
-<li>选择VMnet8（NAT模式）</li>
-<li>管理员模式下取消勾选【使用本地DHCP服务…】</li>
-</ol>
-</li>
-<li><p>net设置查看子网ip和网关ip</p>
-<span id="more"></span></li>
-<li><p>root下 vi /etc/sysconfig/network-scripts/ifcfg-ens* </p>
-<figure class="highlight routeros"><table><tr><td class="code"><pre><span class="line"><span class="attribute">BOOTPROTO</span>=static</span><br><span class="line"><span class="attribute">IPADDR</span>=192.168.44.3    </span><br><span class="line"><span class="attribute">NETMASK</span>=255.255.255.0</span><br><span class="line"><span class="attribute">GATEWAY</span>=192.168.44.2    				</span><br><span class="line"><span class="attribute">ONBOOT</span>=<span class="literal">yes</span></span><br><span class="line"></span><br><span class="line">192.168.44.0    vmware.net.config.z</span><br><span class="line"><span class="attribute">IPADDR</span>=192.168.44.3    host<span class="built_in"> ip</span></span><br><span class="line"><span class="built_in"></span><span class="attribute">GATEWAY</span>=192.168.44.2   getway----vmware.net.config.getway</span><br></pre></td></tr></table></figure></li>
-<li><p>设置DNS</p>
-<p>vi /etc/sysconfig/network</p>
-<figure class="highlight ini"><table><tr><td class="code"><pre><span class="line"><span class="attr">NETWORKING</span>=<span class="literal">yes</span></span><br><span class="line"><span class="attr">HOSTNAME</span>=slave1</span><br></pre></td></tr></table></figure></li>
-<li><p>修改主机名</p>
-<p>vim /etc/hostname</p>
-<p>slave1</p>
-</li>
-<li><p>重启网络服务</p>
-<ol>
-<li>systemctl stop NetworkManager 关闭manager</li>
-<li>systemctl restart network</li>
-<li>service network restart</li>
-</ol>
-</li>
-<li><p>设置windows的网络连接</p>
-<ol>
-<li><p>设置VMnet8在Windows上的IP属性，（打开控制面板–&gt;网络和Internet，在右侧点击【更改适配器设置】，进入“网络连接”页面）</p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211006230732307.png" alt="image-20211006230732307"></p>
-</li>
-</ol>
-</li>
-<li><p>连接 ssh 192.168.44.3</p>
-</li>
-</ol>
-</li>
-<li><p>免密连接</p>
-<ol>
-<li><a href="https://www.cnblogs.com/dadonggg/p/8350423.html">参考—Xshell配置ssh免密码登录-密钥公钥(Public key)</a></li>
-<li>ssh登录原理<ol>
-<li>客户端发出认证请求；</li>
-<li>服务器端使用客户端发送的公钥对一个随机的256位的字符串进行加密，并发送给 客户端；</li>
-<li>客户端使用私钥对字符串进行解密，并生成一个MD5值发送给服务器端；</li>
-<li>服务器端根据原始随机字符串生成MD5值进行匹配, 确认客户端身份；</li>
-<li>至此, 双方互相确认对方身份并建立加密信道, 可以正式进行安全通信。</li>
-<li><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211007002314884.png" alt="image-20211007002314884"></li>
-</ol>
-</li>
-</ol>
-</li>
-</ol>
-<p>cat id_rsa_2048_master.pub &gt;&gt; ~/.ssh/authorized_keys</p>
-]]></content>
-      <categories>
-        <category>utils</category>
       </categories>
   </entry>
   <entry>
@@ -3280,10 +2822,56 @@ git clone <a href="https://github.com/litten/hexo-theme-yilia.git">https://githu
   <entry>
     <title>mybatis-plus使用</title>
     <url>/2021/10/09/%E7%BB%84%E4%BB%B6/mybatis-plus/</url>
-    <content><![CDATA[<h3 id="wrapper"><a href="#wrapper" class="headerlink" title="wrapper"></a>wrapper</h3><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211009144556147.png" alt="image-20211009144556147"></p>
+    <content><![CDATA[<h3 id="基本"><a href="#基本" class="headerlink" title="基本"></a>基本</h3><ol>
+<li>Mapper extends BaseMapper&lt;Student&gt;</li>
+<li>Service extends Iservice&lt;Student&gt;</li>
+<li>ServiceImpl extends ServiceImpl&lt;Mapper,Student&gt; implements Service </li>
+<li>其他<ol>
+<li>所有要用到的方法都需要在接口service上定义或者已经被定义</li>
+<li>甚至对于需要写mapper.xml的方法需要在xml,mapper,servcie,serviceImpl都要有</li>
+</ol>
+</li>
+</ol>
+<h3 id="wrapper"><a href="#wrapper" class="headerlink" title="wrapper"></a>wrapper</h3><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211009144556147.png" alt="image-20211009144556147"></p>
 <span id="more"></span>
 
-<h3 id="CURD"><a href="#CURD" class="headerlink" title="CURD"></a>CURD</h3><ol>
+<p> <a href="https://mp.baomidou.com/guide/wrapper.html">wrapper官方文档</a></p>
+<ol>
+<li><p>全等map：allEq(map,bool)</p>
+</li>
+<li><p>不相等 ne</p>
+</li>
+<li><p>allEq(filter)  筛选key</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">//key有a才算条件</span></span><br><span class="line">allEq((k,v) -&gt; k.indexOf(<span class="string">&quot;a&quot;</span>) &gt;= <span class="number">0</span>, &#123;id:<span class="number">1</span>,name:<span class="string">&quot;老王&quot;</span>,age:<span class="keyword">null</span>&#125;)---&gt;name = <span class="string">&#x27;老王&#x27;</span> and age is <span class="keyword">null</span></span><br></pre></td></tr></table></figure></li>
+<li><p>范围 between</p>
+<p>between(“age”, 18, 30)<code>---&gt;</code>age between 18 and 30</p>
+</li>
+<li><p>模糊查询</p>
+<p>like(“name”, “王”)<code>---&gt;</code>name like ‘%王%’</p>
+<p>likeLeft 左  这个不走索引</p>
+</li>
+<li><p>insql 纯sql的in</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">inSql(<span class="string">&quot;id&quot;</span>, <span class="string">&quot;select id from table where id &lt; 3&quot;</span>)`---&gt;`<span class="function">id <span class="title">in</span> <span class="params">(select id from table where id &lt; <span class="number">3</span>)</span></span></span><br></pre></td></tr></table></figure></li>
+<li><p>groupBy</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">groupBy(<span class="string">&quot;id&quot;</span>, <span class="string">&quot;name&quot;</span>)`---&gt;`group by id,name</span><br></pre></td></tr></table></figure></li>
+<li><p>having   sql</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">having(<span class="string">&quot;sum(age) &gt; &#123;0&#125;&quot;</span>, <span class="number">11</span>)---&gt;<span class="function">having <span class="title">sum</span><span class="params">(age)</span> &gt; 11</span></span><br></pre></td></tr></table></figure></li>
+<li><p>order asc desc</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">orderByAsc(<span class="string">&quot;id&quot;</span>, <span class="string">&quot;name&quot;</span>)---&gt;order by id ASC,name ASC</span><br></pre></td></tr></table></figure></li>
+<li><p>func</p>
+</li>
+<li><p>apply –拼接sql</p>
+<p>该方法可用于数据库<strong>函数</strong> 动态入参的<code>params</code>对应前面<code>applySql</code>内部的<code>&#123;index&#125;</code>部分.这样是不会有sql注入风险的,反之会有!</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">apply(<span class="string">&quot;date_format(dateColumn,&#x27;%Y-%m-%d&#x27;) = &#123;0&#125;&quot;</span>, <span class="string">&quot;2008-08-08&quot;</span>)</span><br><span class="line">    ---&gt; date_format(dateColumn,<span class="string">&#x27;%Y-%m-%d&#x27;</span>) = <span class="string">&#x27;2008-08-08&#x27;</span><span class="string">&quot;)</span></span><br></pre></td></tr></table></figure></li>
+<li><p>last –最后拼接</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">last(<span class="string">&quot;limit 1&quot;</span>)</span><br></pre></td></tr></table></figure></li>
+<li><p>exists 拼接exists语句</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">exists(<span class="string">&quot;select id from table where age = 1&quot;</span>)---&gt;exists (select id from table where age = <span class="number">1</span>)</span><br></pre></td></tr></table></figure></li>
+<li><p>LambdaQuerryWrapper</p>
+<p>1. </p>
+</li>
+</ol>
+<h3 id=""><a href="#" class="headerlink" title=""></a></h3><h3 id="CURD"><a href="#CURD" class="headerlink" title="CURD"></a>CURD</h3><ol>
 <li>BaseMapper<ol>
 <li>select<ol>
 <li>selectById</li>
@@ -3522,26 +3110,6 @@ git clone <a href="https://github.com/litten/hexo-theme-yilia.git">https://githu
       </categories>
   </entry>
   <entry>
-    <title>spring组件</title>
-    <url>/2021/10/10/%E7%BB%84%E4%BB%B6/spring%E7%BB%84%E4%BB%B6/</url>
-    <content><![CDATA[<h3 id="easyExcel"><a href="#easyExcel" class="headerlink" title="easyExcel"></a>easyExcel</h3><ol>
-<li><p>依赖</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>easyexcel<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.1.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">     <span class="comment">&lt;!-- poi office --&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.poi<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>poi<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;poi.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<span id="more"></span></li>
-<li><p>entity</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@ExcelProperty(&quot;字典名称&quot;)</span></span><br><span class="line"><span class="keyword">private</span> String name;</span><br><span class="line"><span class="meta">@ExcelProperty(&quot;字典描述&quot;)</span></span><br><span class="line"><span class="keyword">private</span> String description;</span><br></pre></td></tr></table></figure></li>
-<li><p>FileUtil.下载</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">downloadEasyExcel</span><span class="params">(HttpServletResponse response, List&lt;T&gt; ExcelBases)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">       String fileName = URLEncoder.encode(<span class="string">&quot;DictData&quot;</span>, <span class="string">&quot;UTF-8&quot;</span>);</span><br><span class="line">       response.setContentType(<span class="string">&quot;application/vnd.ms-excel&quot;</span>);</span><br><span class="line">       response.setCharacterEncoding(<span class="string">&quot;utf-8&quot;</span>);</span><br><span class="line">       response.setHeader(<span class="string">&quot;Content-disposition&quot;</span>, <span class="string">&quot;attachment;filename=&quot;</span> + fileName + <span class="string">&quot;.xlsx&quot;</span>);</span><br><span class="line">       <span class="comment">// excel头策略</span></span><br><span class="line">       WriteCellStyle headWriteCellStyle = <span class="keyword">new</span> WriteCellStyle();</span><br><span class="line">       WriteFont headWriteFont = <span class="keyword">new</span> WriteFont();</span><br><span class="line">       headWriteFont.setFontHeightInPoints((<span class="keyword">short</span>) <span class="number">11</span>);</span><br><span class="line">       headWriteFont.setBold(<span class="keyword">false</span>);</span><br><span class="line">       headWriteCellStyle.setWriteFont(headWriteFont);</span><br><span class="line">       <span class="comment">// excel内容策略</span></span><br><span class="line">       WriteCellStyle contentWriteCellStyle = <span class="keyword">new</span> WriteCellStyle();</span><br><span class="line">       WriteFont contentWriteFont = <span class="keyword">new</span> WriteFont();</span><br><span class="line">       contentWriteFont.setFontHeightInPoints((<span class="keyword">short</span>) <span class="number">11</span>);</span><br><span class="line">       contentWriteCellStyle.setWriteFont(contentWriteFont);</span><br><span class="line">       <span class="comment">// 设置handler</span></span><br><span class="line">       HorizontalCellStyleStrategy styleStrategy = <span class="keyword">new</span> HorizontalCellStyleStrategy(headWriteCellStyle, contentWriteCellStyle);</span><br><span class="line">       <span class="comment">/** 导出数据查询方法*/</span></span><br><span class="line">       EasyExcel.write(response.getOutputStream(), ExcelBases.get(<span class="number">0</span>).getClass())</span><br><span class="line">               .sheet(<span class="string">&quot;下载excel服务&quot;</span>)</span><br><span class="line">               .registerWriteHandler(styleStrategy)</span><br><span class="line">               .doWrite(ExcelBases);</span><br><span class="line">   </span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></li>
-<li><p>上传</p>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>spring</category>
-      </categories>
-  </entry>
-  <entry>
     <title>web组件</title>
     <url>/2021/10/04/%E7%BB%84%E4%BB%B6/web%E7%BB%84%E4%BB%B6/</url>
     <content><![CDATA[<h3 id="thymeleaf"><a href="#thymeleaf" class="headerlink" title="thymeleaf"></a>thymeleaf</h3><ol>
@@ -3730,8 +3298,708 @@ git clone <a href="https://github.com/litten/hexo-theme-yilia.git">https://githu
       </categories>
   </entry>
   <entry>
+    <title>spring组件</title>
+    <url>/2021/10/10/%E7%BB%84%E4%BB%B6/spring%E7%BB%84%E4%BB%B6/</url>
+    <content><![CDATA[<h3 id="easyExcel"><a href="#easyExcel" class="headerlink" title="easyExcel"></a>easyExcel</h3><ol>
+<li><p>依赖</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>easyexcel<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.1.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">     <span class="comment">&lt;!-- poi office --&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.poi<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>poi<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;poi.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<span id="more"></span></li>
+<li><p>entity</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@ExcelProperty(&quot;字典名称&quot;)</span></span><br><span class="line"><span class="keyword">private</span> String name;</span><br><span class="line"><span class="meta">@ExcelProperty(&quot;字典描述&quot;)</span></span><br><span class="line"><span class="keyword">private</span> String description;</span><br></pre></td></tr></table></figure></li>
+<li><p>FileUtil.下载</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">downloadEasyExcel</span><span class="params">(HttpServletResponse response, List&lt;T&gt; ExcelBases)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">       String fileName = URLEncoder.encode(<span class="string">&quot;DictData&quot;</span>, <span class="string">&quot;UTF-8&quot;</span>);</span><br><span class="line">       response.setContentType(<span class="string">&quot;application/vnd.ms-excel&quot;</span>);</span><br><span class="line">       response.setCharacterEncoding(<span class="string">&quot;utf-8&quot;</span>);</span><br><span class="line">       response.setHeader(<span class="string">&quot;Content-disposition&quot;</span>, <span class="string">&quot;attachment;filename=&quot;</span> + fileName + <span class="string">&quot;.xlsx&quot;</span>);</span><br><span class="line">       <span class="comment">// excel头策略</span></span><br><span class="line">       WriteCellStyle headWriteCellStyle = <span class="keyword">new</span> WriteCellStyle();</span><br><span class="line">       WriteFont headWriteFont = <span class="keyword">new</span> WriteFont();</span><br><span class="line">       headWriteFont.setFontHeightInPoints((<span class="keyword">short</span>) <span class="number">11</span>);</span><br><span class="line">       headWriteFont.setBold(<span class="keyword">false</span>);</span><br><span class="line">       headWriteCellStyle.setWriteFont(headWriteFont);</span><br><span class="line">       <span class="comment">// excel内容策略</span></span><br><span class="line">       WriteCellStyle contentWriteCellStyle = <span class="keyword">new</span> WriteCellStyle();</span><br><span class="line">       WriteFont contentWriteFont = <span class="keyword">new</span> WriteFont();</span><br><span class="line">       contentWriteFont.setFontHeightInPoints((<span class="keyword">short</span>) <span class="number">11</span>);</span><br><span class="line">       contentWriteCellStyle.setWriteFont(contentWriteFont);</span><br><span class="line">       <span class="comment">// 设置handler</span></span><br><span class="line">       HorizontalCellStyleStrategy styleStrategy = <span class="keyword">new</span> HorizontalCellStyleStrategy(headWriteCellStyle, contentWriteCellStyle);</span><br><span class="line">       <span class="comment">/** 导出数据查询方法*/</span></span><br><span class="line">       EasyExcel.write(response.getOutputStream(), ExcelBases.get(<span class="number">0</span>).getClass())</span><br><span class="line">               .sheet(<span class="string">&quot;下载excel服务&quot;</span>)</span><br><span class="line">               .registerWriteHandler(styleStrategy)</span><br><span class="line">               .doWrite(ExcelBases);</span><br><span class="line">   </span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>上传</p>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>spring</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>web图片上传与获取</title>
+    <url>/2021/10/21/%E7%BB%84%E4%BB%B6/%E5%9B%BE%E7%89%87%E9%97%AE%E9%A2%98/</url>
+    <content><![CDATA[<h3 id="配置资源路径"><a href="#配置资源路径" class="headerlink" title="配置资源路径"></a>配置资源路径</h3><ol>
+<li><p>配置类</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WebResourceConfig</span> <span class="keyword">implements</span> <span class="title">WebMvcConfigurer</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addResourceHandlers</span><span class="params">(ResourceHandlerRegistry registry)</span> </span>&#123;</span><br><span class="line">        registry.addResourceHandler(<span class="string">&quot;/img/**&quot;</span>).addResourceLocations(<span class="string">&quot;file:D:/data/java/img/&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>上传mutifile到指定路径</p>
+</li>
+<li><p>html访问/img/</p>
+</li>
+</ol>
+<h3 id="properties配置文件"><a href="#properties配置文件" class="headerlink" title="properties配置文件"></a>properties配置文件</h3><ol>
+<li></li>
+</ol>
+<h3 id="nginx"><a href="#nginx" class="headerlink" title="nginx"></a>nginx</h3><ol>
+<li></li>
+</ol>
+<h3 id="阿里云OSS"><a href="#阿里云OSS" class="headerlink" title="阿里云OSS"></a>阿里云OSS</h3><ol>
+<li><p>依赖</p>
+</li>
+<li><p>配置</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.aliyun.oss<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>aliyun-sdk-oss<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>代码</p>
+<ol>
+<li><p>配置类</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ConstantPropertiesUtils</span> <span class="keyword">implements</span> <span class="title">InitializingBean</span> </span>&#123; <span class="meta">@Value(&quot;$&#123;aliyun.oss.file.endpoint&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String endpoint; <span class="meta">@Value(&quot;$&#123;aliyun.oss.file.keyid&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String keyId; <span class="meta">@Value(&quot;$&#123;aliyun.oss.file.keysecret&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String keySecret; <span class="meta">@Value(&quot;$&#123;aliyun.oss.file.bucketname&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String bucketName;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String END_POIND;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String ACCESS_KEY_ID;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String ACCESS_KEY_SECRET;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String BUCKET_NAME;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">afterPropertiesSet</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        END_POIND = endpoint;</span><br><span class="line">        ACCESS_KEY_ID = keyId;</span><br><span class="line">        ACCESS_KEY_SECRET = keySecret;</span><br><span class="line">        BUCKET_NAME = bucketName;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>上传</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">uploadFileAvatar</span><span class="params">(MultipartFile file)</span> </span>&#123;</span><br><span class="line">       <span class="comment">// 工具类获取值</span></span><br><span class="line">       String endpoint = OssConfig.END_POIND;</span><br><span class="line">       String bucketName = OssConfig.BUCKET_NAME;</span><br><span class="line">       <span class="keyword">try</span> &#123;</span><br><span class="line">           <span class="comment">// 创建OSS实例。</span></span><br><span class="line">           OSS ossClient = <span class="keyword">new</span> OSSClientBuilder().build(endpoint,</span><br><span class="line">                   OssConfig.ACCESS_KEY_ID, OssConfig.ACCESS_KEY_SECRET);</span><br><span class="line">           <span class="comment">//获取文件名称</span></span><br><span class="line">           String fileName =getFileName(file.getOriginalFilename());</span><br><span class="line">           fileName=<span class="string">&quot;test.jpg&quot;</span>;</span><br><span class="line">           <span class="comment">//第一个参数  Bucket名称 文件路径  文件流</span></span><br><span class="line">           ossClient.putObject(bucketName, fileName, file.getInputStream());</span><br><span class="line">           ossClient.shutdown();  <span class="comment">// 关闭OSSClient。</span></span><br><span class="line">           <span class="comment">//把上传之后文件路径返回</span></span><br><span class="line">           <span class="comment">//需要把上传到阿里云oss路径手动拼接出来</span></span><br><span class="line">           String url = <span class="string">&quot;https://&quot;</span> + bucketName + <span class="string">&quot;.&quot;</span> + endpoint + <span class="string">&quot;/&quot;</span> + fileName;</span><br><span class="line">           System.out.println(url);<span class="comment">//https://job-wyg.oss-cn-beijing.aliyuncs.com/test.jpg</span></span><br><span class="line">           <span class="keyword">return</span> url;</span><br><span class="line">       &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">           e.printStackTrace();</span><br><span class="line">           <span class="keyword">return</span> <span class="keyword">null</span>;&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>组件</category>
+      </categories>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2021/10/26/%E7%BB%84%E4%BB%B6/%E6%97%A5%E5%BF%97/</url>
+    <content><![CDATA[<h3 id="知识"><a href="#知识" class="headerlink" title="知识"></a>知识</h3><ol>
+<li><a href="https://cloud.tencent.com/developer/news/546399">常见日志组件的区别</a></li>
+<li></li>
+</ol>
+<h3 id="logger"><a href="#logger" class="headerlink" title="logger"></a>logger</h3><ol>
+<li><p>Log4j建议只使用四个级别，优先级从高到低分别是 ERROR、WARN、INFO、DEBUG</p>
+<figure class="highlight pgsql"><table><tr><td class="code"><pre><span class="line">比如在这里定义了<span class="keyword">INFO</span>级别，则应用程序中所有<span class="keyword">DEBUG</span>级别的日志信息将不被打印出来，也是说大于等于的级别的日志才输出。</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="AOP统一日志"><a href="#AOP统一日志" class="headerlink" title="AOP统一日志"></a>AOP统一日志</h3><p>1. </p>
+]]></content>
+  </entry>
+  <entry>
+    <title>组件2</title>
+    <url>/2021/10/06/%E7%BB%84%E4%BB%B6/%E7%BB%84%E4%BB%B62/</url>
+    <content><![CDATA[<h3 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h3><ol>
+<li><p>使用步骤</p>
+<ol>
+<li><p>依赖</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="comment">&lt;!-- reids by boot --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-data-redis<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- spring2.X集成redis所需common-pool2--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.commons<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>commons-pool2<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">version</span>&gt;</span>2.6.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<span id="more"></span></li>
+<li><p>创建配置类(@Configuration)</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@EnableCaching</span> <span class="comment">//开启缓存</span></span><br><span class="line"><span class="meta">@Configuration</span>  <span class="comment">//配置类</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RedisConfig</span> <span class="keyword">extends</span> <span class="title">CachingConfigurerSupport</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> RedisTemplate&lt;String, Object&gt; <span class="title">redisTemplate</span><span class="params">(RedisConnectionFactory factory)</span> </span>&#123;</span><br><span class="line">        RedisTemplate&lt;String, Object&gt; template = <span class="keyword">new</span> RedisTemplate&lt;&gt;();</span><br><span class="line">        RedisSerializer&lt;String&gt; redisSerializer = <span class="keyword">new</span> StringRedisSerializer();</span><br><span class="line">        Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = <span class="keyword">new</span> Jackson2JsonRedisSerializer(Object.class);</span><br><span class="line">        ObjectMapper om = <span class="keyword">new</span> ObjectMapper();</span><br><span class="line">        om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);</span><br><span class="line">        om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);</span><br><span class="line">        jackson2JsonRedisSerializer.setObjectMapper(om);</span><br><span class="line">        template.setConnectionFactory(factory);</span><br><span class="line">        <span class="comment">//key序列化方式</span></span><br><span class="line">        template.setKeySerializer(redisSerializer);</span><br><span class="line">        <span class="comment">//value序列化</span></span><br><span class="line">        template.setValueSerializer(jackson2JsonRedisSerializer);</span><br><span class="line">        <span class="comment">//value hashmap序列化</span></span><br><span class="line">        template.setHashValueSerializer(jackson2JsonRedisSerializer);</span><br><span class="line">        <span class="keyword">return</span> template;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> CacheManager <span class="title">cacheManager</span><span class="params">(RedisConnectionFactory factory)</span> </span>&#123;</span><br><span class="line">        RedisSerializer&lt;String&gt; redisSerializer = <span class="keyword">new</span> StringRedisSerializer();</span><br><span class="line">        Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = <span class="keyword">new</span> Jackson2JsonRedisSerializer(Object.class);</span><br><span class="line">        <span class="comment">//解决查询缓存转换异常的问题</span></span><br><span class="line">        ObjectMapper om = <span class="keyword">new</span> ObjectMapper();</span><br><span class="line">        om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);</span><br><span class="line">        om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);</span><br><span class="line">        jackson2JsonRedisSerializer.setObjectMapper(om);</span><br><span class="line">        <span class="comment">// 配置序列化（解决乱码的问题）,过期时间600秒</span></span><br><span class="line">        RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()</span><br><span class="line">                .entryTtl(Duration.ofSeconds(<span class="number">600</span>))</span><br><span class="line">                .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(redisSerializer))</span><br><span class="line">                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(jackson2JsonRedisSerializer))</span><br><span class="line">                .disableCachingNullValues();</span><br><span class="line">        RedisCacheManager cacheManager = RedisCacheManager.builder(factory)</span><br><span class="line">                .cacheDefaults(config)</span><br><span class="line">                .build();</span><br><span class="line">        <span class="keyword">return</span> cacheManager;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>Controller开启加上缓存注解</p>
+<ol>
+<li><pre><code class="java">@Cacheable(value = &quot;banner&quot;,key = &quot;&#39;selectIndexList&#39;&quot;)
+</code></pre>
+</li>
+<li><p>注意key 双引号里面有单引号</p>
+</li>
+<li></li>
+</ol>
+</li>
+<li><p>启动redis</p>
+</li>
+</ol>
+</li>
+<li><p>效果，先查redis缓存，没有再去数据库查询。</p>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>组件</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>统计分析模块</title>
+    <url>/2021/10/23/%E7%BB%84%E4%BB%B6/%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>组件</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>hexo使用</title>
+    <url>/2021/09/30/utils/blog/</url>
+    <content><![CDATA[<p>搭建个人博客</p>
+<ol>
+<li><p>下载node.js</p>
+</li>
+<li><p>npm下载cnpm</p>
+<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line">npm install -g cnpm  --registry=https:<span class="regexp">//</span>registry.npm.taobao.org</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span></li>
+<li><p>下载hexo </p>
+<figure class="highlight avrasm"><table><tr><td class="code"><pre><span class="line">cnpm install -g hexo-<span class="keyword">cli</span></span><br></pre></td></tr></table></figure></li>
+<li><p>创建目录</p>
+</li>
+<li><p>hexo初始化blog 和deployer</p>
+<figure class="highlight coffeescript"><table><tr><td class="code"><pre><span class="line">cd blog</span><br><span class="line">hexo init</span><br><span class="line"><span class="built_in">npm</span> install hexo-deployer-git --save</span><br><span class="line"><span class="built_in">npm</span> i hexo-renderer-swig</span><br></pre></td></tr></table></figure>
+
+<p>或者</p>
+<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line">git clone https:<span class="regexp">//gi</span>tee.com<span class="regexp">/weilining/</span>hexo-starter.git blog</span><br><span class="line">cd blog</span><br><span class="line">git submodule init</span><br><span class="line">git submodule update</span><br><span class="line">npm config set registry http:<span class="regexp">//</span>registry.npm.taobao.org</span><br><span class="line">npm i</span><br><span class="line">npm install hexo-deployer-git --save</span><br></pre></td></tr></table></figure></li>
+<li><p>hexo g 生成静态文件</p>
+</li>
+<li><p>启动(localhost:4000)</p>
+<figure class="highlight apache"><table><tr><td class="code"><pre><span class="line"><span class="attribute">hexo</span> s -p <span class="number">400</span> </span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="操作"><a href="#操作" class="headerlink" title="操作"></a>操作</h3><ol>
+<li><p>创建文章</p>
+<figure class="highlight 1c"><table><tr><td class="code"><pre><span class="line"><span class="string">&quot;文章&quot;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>生成静态文件</p>
+<figure class="highlight ebnf"><table><tr><td class="code"><pre><span class="line"><span class="attribute">hexo g</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="通过github搭建"><a href="#通过github搭建" class="headerlink" title="通过github搭建"></a>通过github搭建</h3><ol>
+<li><p>创建public仓库 name/name.github.io    </p>
+</li>
+<li><p>下载插件</p>
+<figure class="highlight ada"><table><tr><td class="code"><pre><span class="line">cnpm install <span class="comment">--save hexo-deployer-git</span></span><br></pre></td></tr></table></figure></li>
+<li><p>修改config.yml</p>
+<figure class="highlight dts"><table><tr><td class="code"><pre><span class="line"><span class="symbol">deploy:</span></span><br><span class="line"><span class="symbol">  type:</span> git</span><br><span class="line"><span class="symbol">  repo:</span> https:<span class="comment">//github.com/Wang-yonggan/Wang-yonggan.github.io.git</span></span><br><span class="line"><span class="symbol">  branch:</span> master</span><br></pre></td></tr></table></figure></li>
+<li><p>分类：</p>
+<ol>
+<li>```<br>hexo new page categories<figure class="highlight crmsh"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">   <span class="number">2</span>.  index.md加入<span class="keyword">type</span>: categories</span><br><span class="line"></span><br><span class="line"><span class="number">5</span>. hexo clean &amp;&amp; hexo g &amp;&amp; hexo s</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">### 主题</span></span><br><span class="line"></span><br><span class="line"><span class="number">1</span>. git <span class="keyword">clone</span> <span class="title">..  themes</span>/name</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+git clone <a href="https://github.com/litten/hexo-theme-yilia.git">https://github.com/litten/hexo-theme-yilia.git</a> themes/yilia</li>
+</ol>
+<p>git clone <a href="https://github.com/theme-next/hexo-theme-next">https://github.com/theme-next/hexo-theme-next</a> themes/next</p>
+<figure class="highlight markdown"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">   </span><br><span class="line"></span><br><span class="line"><span class="bullet">2.</span> vim config.yml</span><br><span class="line"></span><br><span class="line">   theme:name</span><br><span class="line"></span><br><span class="line"><span class="bullet">3.</span> hexo clean</span><br><span class="line"></span><br><span class="line"><span class="section">### config.yml</span></span><br><span class="line"></span><br><span class="line"><span class="bullet">1.</span> webset</span><br><span class="line"><span class="bullet">   1.</span> title 标题</span><br><span class="line"><span class="bullet">   2.</span> subtitle 副标题</span><br><span class="line"><span class="bullet">   3.</span> description 网站描述 seo</span><br><span class="line"><span class="bullet">   4.</span> author 作者</span><br><span class="line"><span class="bullet">   5.</span> language 语言</span><br><span class="line"><span class="bullet">   6.</span> timezone 时区</span><br><span class="line"></span><br><span class="line"><span class="bullet">2.</span> URL</span><br><span class="line"></span><br><span class="line">   url：网站的网址</span><br><span class="line">   root：网站的根目录</span><br><span class="line">   permalink：文章的永久链接格式，可以在permalink这里配置，如默认中的配置，在hello world文章中就会是这样的url</span><br><span class="line"></span><br><span class="line"><span class="bullet">3.</span> directory</span><br><span class="line"><span class="bullet">   1.</span> source<span class="emphasis">_dir：存放hexo文章的文件夹，我们写的md文件都放在这个配置对应的文件夹下，默认值是source</span></span><br><span class="line"><span class="emphasis">   2. public_</span>dir：存放hexo g生成的文件，执行hexo g后根目录就会出现这个文件夹，默认值是public</span><br><span class="line"><span class="bullet">   3.</span> tag<span class="emphasis">_dir：按标签存放文章的目录，默认值是tags，如果我们给文章添加标签，使用hexo g时public文件夹下就会多出一个tags文件夹（根据我们的配置文件夹名不同），这里给hello-world.md添加一个tags</span></span><br><span class="line"><span class="emphasis">   4. archive_</span>dir：归档文件夹，存放归档文件，默认值为archives</span><br><span class="line"><span class="bullet">   5.</span> category<span class="emphasis">_dir：分类文件夹，按分类存放的文件，和上面的tags一样，只要在文章中的Font-matter添加了categories就会在使用hexo g构造时出现相应的文件夹</span></span><br><span class="line"><span class="emphasis">   6. code_</span>dir：Include code 文件夹，source<span class="emphasis">_dir 下的子目录，默认值为downloads/code</span></span><br><span class="line"><span class="emphasis">   7. i18n_</span>dir：国际化（i18n）文件夹，默认值:lang</span><br><span class="line"><span class="bullet">   8.</span> skip<span class="emphasis">_render：跳过指定文件的渲染，匹配到的文件将会被不做改动复制到public文件夹下，如果路径对应的是我们的文章，那会直接忽略掉该文章，我们这样设置来忽略掉hello-world.md文件</span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis">### issue</span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis">1. 下载主题没有显示：</span></span><br><span class="line"><span class="emphasis">   1. 文件夹名问题</span></span><br><span class="line"><span class="emphasis">   2. config未该</span></span><br><span class="line"><span class="emphasis">   3. 没有clean+g+d</span></span><br><span class="line"><span class="emphasis">   4. gitee没有更行部署</span></span><br><span class="line"><span class="emphasis">   </span></span><br><span class="line"><span class="emphasis">2. 部署其他文件夹</span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis">   1. 每次hexo d之前copy 文件到posts，但是我发现文件的创建时间被改变了</span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis">   2. 将hexo的source文件路径改为ana-notes，但是这样没办法生成目录</span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis">   3. 最终选择copy+python修改文件创建时间的方式 </span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis">      具体bat代码</span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis">      ````</span></span><br><span class="line"><span class="emphasis">      echo 清空posts文件夹</span></span><br><span class="line"><span class="emphasis">      rd /s /q %post_</span>path%</span><br><span class="line"><span class="code">      md %post_path%</span></span><br><span class="line"><span class="code">      echo 递归copy文件</span></span><br><span class="line"><span class="code">      xcopy /y /e %src_path% %post_path%</span></span><br><span class="line"><span class="code">      echo 还原时间</span></span><br><span class="line"><span class="code">      python E:\data-ana\ana-notes\工具\tools\get_blog_create_time.py</span></span><br><span class="line"><span class="code">      echo 提交</span></span><br><span class="line"><span class="code">      hexo clean &amp;&amp; hexo g &amp;&amp; hexo d</span></span><br><span class="line"><span class="code">      ````</span></span><br><span class="line"><span class="code"></span></span><br><span class="line"><span class="code">      </span></span><br><span class="line"><span class="code"></span></span><br><span class="line"><span class="bullet">3.</span> 修改config.yml后报错：yml格式是:后面有空格</span><br><span class="line"></span><br><span class="line"><span class="bullet">4.</span> 实现gitee page自动提交：</span><br><span class="line"></span><br><span class="line">   nodejs+puppeteer(xpath)</span><br><span class="line">   </span><br><span class="line"><span class="bullet">5.</span> 注意，特殊字符尽量不用</span><br><span class="line"></span><br><span class="line"><span class="bullet">   1.</span> 小括号</span><br><span class="line"><span class="bullet">   2.</span> 大括号</span><br><span class="line"><span class="bullet">   3.</span> 中括号</span><br><span class="line">   </span><br><span class="line"><span class="bullet">6.</span> git config --global core.autocrlf false换行转义</span><br><span class="line"></span><br><span class="line"><span class="bullet">7.</span> github</span><br><span class="line"></span><br><span class="line"><span class="bullet">   1.</span> git config --global http.sslVerify &quot;false&quot;</span><br><span class="line"></span><br><span class="line"><span class="section">### config</span></span><br><span class="line"></span><br><span class="line"><span class="bullet">1.</span> 切换中文language</span><br><span class="line"></span><br><span class="line">   zh-CN</span><br><span class="line"></span><br><span class="line"><span class="section">### next&lt;-landscape</span></span><br><span class="line"></span><br><span class="line"><span class="bullet">0.</span> http://theme-next.iissnan.com/</span><br><span class="line"></span><br><span class="line"><span class="bullet">1.</span> 更换主题</span><br><span class="line"></span><br><span class="line">   config--&gt;schemes</span><br><span class="line"></span><br><span class="line"><span class="bullet">2.</span> 设置头像avater</span><br><span class="line"></span><br><span class="line"><span class="bullet">3.</span> 社交图标</span><br><span class="line"></span><br><span class="line">   social<span class="emphasis">_icons</span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis">   https://fontawesome.com/v5.15/icons?d=gallery&amp;p=2</span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis">4. 首页全文</span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis">   auto_</span>excerpt</span><br><span class="line"></span><br><span class="line">   &lt;!--more--&gt;</span><br><span class="line"></span><br><span class="line"><span class="bullet">5.</span> 网站图标</span><br><span class="line"></span><br><span class="line">   <span class="code">```python</span></span><br><span class="line"><span class="code">   favicon:aaaa.avg</span></span><br><span class="line"><span class="code">   source/image/aaaa.avg</span></span><br></pre></td></tr></table></figure></li>
+<li><p>背景</p>
+<p>canvas</p>
+</li>
+<li><p>加载进度条 pace</p>
+</li>
+<li><p>读进度条：scrollpercent</p>
+</li>
+<li><p>评论</p>
+<p>changyan</p>
+</li>
+<li><p>搜索</p>
+</li>
+</ol>
+   <figure class="highlight dts"><table><tr><td class="code"><pre><span class="line">npm install hexo-generator-searchdb --save</span><br><span class="line"></span><br><span class="line">hexo-config</span><br><span class="line"><span class="symbol">search:</span></span><br><span class="line"><span class="symbol">  path:</span> search.xml</span><br><span class="line"><span class="symbol">  field:</span> post</span><br><span class="line"><span class="symbol">  format:</span> html</span><br><span class="line"><span class="symbol">  limit:</span> <span class="number">10000</span></span><br><span class="line">config</span><br><span class="line"><span class="symbol">local_search:</span></span><br></pre></td></tr></table></figure>
+
+<ol start="11">
+<li><p>不算子（访问次数）：busuanzi_count</p>
+</li>
+<li><p>隐藏底盘:footer.powered</p>
+</li>
+<li><p>修改字体大小</p>
+<p>打开<code>\themes\next\source\css\ _variables\base.styl</code>文件，将<code>$font-size-base</code>改成<code>16px</code>，如下所示：</p>
+<figure class="highlight gams"><table><tr><td class="code"><pre><span class="line"><span class="meta"><span class="meta-keyword">$font</span>-size-base            =16px</span></span><br></pre></td></tr></table></figure></li>
+<li><p>夜间模式darkmode</p>
+</li>
+<li><p>网站丝滑motion true</p>
+</li>
+<li><p>three</p>
+</li>
+<li><p>移动端回顶onmobile</p>
+<p>pc端：back2top</p>
+</li>
+<li><p>阅读进度：reading_progress</p>
+</li>
+<li><p>阅读进度保存：bookmark</p>
+</li>
+<li><p>github图标：github_banner</p>
+</li>
+<li><p>font：字体设置</p>
+</li>
+<li><p>代码高亮hexo.config</p>
+<ol>
+<li>highlight</li>
+<li>prismjs二选1</li>
+</ol>
+</li>
+</ol>
+<h3 id="plugin"><a href="#plugin" class="headerlink" title="plugin"></a>plugin</h3><ol>
+<li><p>代码高亮</p>
+<figure class="highlight stata"><table><tr><td class="code"><pre><span class="line">npm install hexo-prism-<span class="keyword">plugin</span> --<span class="keyword">save</span></span><br></pre></td></tr></table></figure></li>
+<li><p>字数统计</p>
+<figure class="highlight coffeescript"><table><tr><td class="code"><pre><span class="line"><span class="built_in">npm</span> i –save hexo-wordcount</span><br></pre></td></tr></table></figure>
+
+<p>theme.config</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">post_wordcount:</span></span><br><span class="line">  <span class="attr">item_text:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">wordcount:</span> <span class="literal">true</span> <span class="comment">#单篇文章字数</span></span><br><span class="line">  <span class="attr">min2read:</span> <span class="literal">true</span> <span class="comment">#单篇阅读时长</span></span><br><span class="line">  <span class="attr">totalcount:</span> <span class="literal">true</span> <span class="comment">#站点总字数</span></span><br><span class="line">  <span class="attr">separated_meta:</span> <span class="literal">true</span></span><br></pre></td></tr></table></figure></li>
+<li><p>搜索</p>
+<ol>
+<li>下载依赖</li>
+</ol>
+<figure class="highlight ada"><table><tr><td class="code"><pre><span class="line">npm install hexo-generator-searchdb <span class="comment">--save</span></span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>修改hexo.config</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">search:</span><br><span class="line">  path: search.xml</span><br><span class="line">  field: post</span><br><span class="line">  format: html</span><br><span class="line">  <span class="built_in">limit</span>: 10000</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>修改theme.config</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">local_search:</span><br></pre></td></tr></table></figure></li>
+<li><p>几何背景</p>
+<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line">cd <span class="keyword">next</span></span><br><span class="line">git clone https:<span class="regexp">//gi</span>thub.com<span class="regexp">/theme-next/</span>theme-<span class="keyword">next</span>-canvas-ribbon source<span class="regexp">/lib/</span>canvas-ribbon</span><br></pre></td></tr></table></figure>
+
+<p>theme.config</p>
+<p>canvas_ribbon</p>
+</li>
+<li><p>字数统计</p>
+<p>npm install hexo-word-counter</p>
+<p>clean g s</p>
+</li>
+<li></li>
+</ol>
+]]></content>
+      <categories>
+        <category>utils</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>idea操作</title>
+    <url>/2021/10/08/utils/idea%E6%93%8D%E4%BD%9C/</url>
+    <content><![CDATA[<h3 id="操作"><a href="#操作" class="headerlink" title="操作"></a>操作</h3><ol>
+<li>基本<ol>
+<li>创建 setter toString.. alt+insert</li>
+<li></li>
+</ol>
+</li>
+<li>次级</li>
+<li>高阶<ol>
+<li><p>查看父子图 右键+图</p>
+</li>
+<li><p>查看所有方法,alt+7</p>
+<span id="more"></span></li>
+<li><p>alt+左键 多行复制</p>
+</li>
+<li><p>shift双击搜索</p>
+</li>
+<li><p>alt+回车  检错</p>
+</li>
+<li><p>ctrl+alt+b查看实现类  </p>
+<figure class="highlight cos"><table><tr><td class="code"><pre><span class="line">直接<span class="keyword">print</span>这个类的<span class="keyword">Class</span>也是个好方法</span><br></pre></td></tr></table></figure></li>
+<li></li>
+</ol>
+</li>
+</ol>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><ol>
+<li>插件<ol>
+<li>开发<ol>
+<li>restfulTool</li>
+<li></li>
+</ol>
+</li>
+<li>其他<ol>
+<li>chinese中文</li>
+<li>static</li>
+<li></li>
+</ol>
+</li>
+<li>外观<ol>
+<li>meterial theme</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>自定义快捷键<ol>
+<li>ctrl+右键 重命名</li>
+<li>F1 运行</li>
+<li>ctrl+shift+右键 格式化代码</li>
+</ol>
+</li>
+<li>代码动态模板<ol>
+<li>zz html  &lt;!–$a–&gt;</li>
+<li></li>
+</ol>
+</li>
+<li>代码模板</li>
+</ol>
+]]></content>
+      <categories>
+        <category>utils</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>Git的使用</title>
+    <url>/2021/10/04/utils/git/</url>
+    <content><![CDATA[<h3 id="Git概念"><a href="#Git概念" class="headerlink" title="Git概念"></a>Git概念</h3><ol>
+<li><p>手工式版本控制</p>
+<ol>
+<li>特点<ol>
+<li>每改一次备份一次</li>
+<li>协同更改需要同时U盘copy</li>
+</ol>
+</li>
+<li>问题<ol>
+<li>备份</li>
+<li>代码还原</li>
+<li>协同开发</li>
+<li>代码追溯(追责)</li>
+</ol>
+</li>
+</ol>
+<span id="more"></span></li>
+<li><p>解决：<font color='red'>版本控制</font>结束了手动管理多个“版本”的史前时代，进入到版本控制的20世纪。</p>
+</li>
+<li><p>集中式版本控制SVN/CVS</p>
+<ol>
+<li>版本库都放在集中式服务器</li>
+<li>使用前先从集中式服务器copy过来</li>
+<li>修改完后在上传到集中服务器</li>
+</ol>
+</li>
+<li><p>分布式版本控制（共享版本库）</p>
+<ol>
+<li>每个人都有所有的版本，gitee/github也算个人</li>
+<li>一个人修改了A那么直接上传就会记录这个修改内容</li>
+<li>本地有所有的版本</li>
+</ol>
+</li>
+</ol>
+<h3 id="Git操作"><a href="#Git操作" class="headerlink" title="Git操作"></a>Git操作</h3><h5 id="基本操作"><a href="#基本操作" class="headerlink" title="基本操作"></a>基本操作</h5><ol>
+<li><p>安装完成先自报家门</p>
+<figure class="highlight verilog"><table><tr><td class="code"><pre><span class="line">git <span class="keyword">config</span> --<span class="keyword">global</span> user<span class="variable">.name</span> <span class="string">&quot;Your Name&quot;</span></span><br><span class="line">git <span class="keyword">config</span> --<span class="keyword">global</span> user<span class="variable">.email</span> <span class="string">&quot;email@example.com&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>git config 命令的 –global 表示整个电脑的git都设置为这个身份</p>
+</li>
+<li><p>创建版本库</p>
+<figure class="highlight dos"><table><tr><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> blog</span><br><span class="line"><span class="built_in">cd</span> blog</span><br><span class="line">git init</span><br></pre></td></tr></table></figure></li>
+<li><p>写文件</p>
+<figure class="highlight pgsql"><table><tr><td class="code"><pre><span class="line">touch readme.txt</span><br><span class="line">git <span class="keyword">add</span> .</span><br><span class="line">git <span class="keyword">commit</span> -m &quot;wrote a file&quot;</span><br></pre></td></tr></table></figure>
+
+<p>. 表示当前目录</p>
+</li>
+</ol>
+<h5 id="版本撤回"><a href="#版本撤回" class="headerlink" title="版本撤回"></a>版本撤回</h5><ol>
+<li><p>查看当前文件状态(工作区同暂存区、HEAD相比，并显示未add和已add未commit的信息)</p>
+<figure class="highlight ebnf"><table><tr><td class="code"><pre><span class="line"><span class="attribute">git status</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211004192710237.png" alt="image-20211004192710237"></p>
+</li>
+<li><p>查看文件修改内容(工作区同上一次暂存区相比)</p>
+<figure class="highlight maxima"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">diff</span> readme.txt</span><br></pre></td></tr></table></figure></li>
+<li><p>查看每次修改和对应的修改提示</p>
+<figure class="highlight 1c"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">log</span></span><br></pre></td></tr></table></figure></li>
+<li><p>版本撤回</p>
+<ol>
+<li><p>回到上上个版本</p>
+<figure class="highlight pgsql"><table><tr><td class="code"><pre><span class="line">git <span class="keyword">reset</span> <span class="comment">--hard HEAD^^</span></span><br></pre></td></tr></table></figure></li>
+<li><p>–hard表示</p>
+</li>
+<li><p>git reset –head 版本id/head都可以回退</p>
+</li>
+<li><p>如果撤多了那么别叉掉窗口，几下最近几次commit-id的前机会还可以回撤</p>
+<figure class="highlight jboss-cli"><table><tr><td class="code"><pre><span class="line">git reset <span class="params">--hard</span> <span class="keyword">cd</span>0c</span><br></pre></td></tr></table></figure></li>
+<li><p>如果不小心叉掉了，git reflog还可以查看各个commit-id</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211004183507316.png" alt="image-20211004183507316"></p>
+<p>最下面是第一次commit</p>
+<p>然后根据git reset commit-id 回退版本</p>
+</li>
+<li><p>但是，如果你的工作区没有add就进行了版本撤回，那么就会找不到你这此更改的内容。</p>
+</li>
+<li><p>如果你的工作区已经add到了缓存区，</p>
+</li>
+</ol>
+</li>
+<li><p>撤销修改</p>
+<ol>
+<li><p>丢弃工作区，工作区&lt;—暂存区</p>
+<figure class="highlight ada"><table><tr><td class="code"><pre><span class="line">git checkout <span class="comment">-- readme.txt</span></span><br></pre></td></tr></table></figure></li>
+<li><p>丢掉暂存区，暂存区&lt;—版本库</p>
+<figure class="highlight maxima"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">reset</span> head readme.txt</span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+<li><p>删除文件</p>
+<p>rm readme.txt</p>
+<ol>
+<li><p>整体删除</p>
+<figure class="highlight pgsql"><table><tr><td class="code"><pre><span class="line">git rm/<span class="keyword">add</span> readme.txt</span><br><span class="line">git <span class="keyword">commit</span> -m &quot;&quot;</span><br></pre></td></tr></table></figure></li>
+<li><p>撤回删除(从暂存区拿回)</p>
+<figure class="highlight ada"><table><tr><td class="code"><pre><span class="line">git checkout <span class="comment">-- test.txt</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+</ol>
+<h5 id="远程仓库"><a href="#远程仓库" class="headerlink" title="远程仓库"></a>远程仓库</h5><ol>
+<li><p>添加远程仓库</p>
+<figure class="highlight llvm"><table><tr><td class="code"><pre><span class="line">git remote <span class="keyword">add</span> origin git<span class="title">@github.com</span>:Wang-yonggan/test.git</span><br></pre></td></tr></table></figure></li>
+<li><p>远程库的名字就是<code>origin</code>，这是Git默认的叫法把本地库的内容推送到远程，用<code>git push</code>命令，实际上是把当前分支<code>master</code>推送到远程。</p>
+</li>
+<li><p>由于远程库是空的，我们第一次推送<code>master</code>分支时，加上了<code>-u</code>参数，Git不但会把本地的<code>master</code>分支内容推送的远程新的<code>master</code>分支，还会把本地的<code>master</code>分支和远程的<code>master</code>分支关联起来，在以后的推送或者拉取时就可以简化命令。</p>
+<p>以后只需要</p>
+<figure class="highlight maxima"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">push</span> <span class="built_in">origin</span> master</span><br></pre></td></tr></table></figure></li>
+<li><p>查看远程仓库状态</p>
+<figure class="highlight ebnf"><table><tr><td class="code"><pre><span class="line"><span class="attribute">git remote -v</span></span><br></pre></td></tr></table></figure></li>
+<li><p>解除远程仓库关系</p>
+<figure class="highlight ebnf"><table><tr><td class="code"><pre><span class="line"><span class="attribute">git remote rm origin</span></span><br></pre></td></tr></table></figure></li>
+<li><p>克隆(支持两种协议)</p>
+<ol>
+<li>https 默认</li>
+<li>git 更快，有的公司不支持</li>
+</ol>
+</li>
+<li><p>远程删除一个文件夹</p>
+<ol>
+<li>git rm -r –cached dir  –&gt;撤回 git reset dir</li>
+<li>git rm –cached file</li>
+<li>git  commit</li>
+<li>git push</li>
+</ol>
+</li>
+</ol>
+<h5 id="分支管理"><a href="#分支管理" class="headerlink" title="分支管理"></a>分支管理</h5><ol>
+<li><p>创建分支</p>
+<figure class="highlight ebnf"><table><tr><td class="code"><pre><span class="line"><span class="attribute">git branch dev</span></span><br></pre></td></tr></table></figure></li>
+<li><p>切换分支</p>
+<p>checkout==switch</p>
+<figure class="highlight ebnf"><table><tr><td class="code"><pre><span class="line"><span class="attribute">git checkout dev</span></span><br></pre></td></tr></table></figure></li>
+<li><p>查看有哪些分支</p>
+<figure class="highlight ebnf"><table><tr><td class="code"><pre><span class="line"><span class="attribute">git branch</span></span><br></pre></td></tr></table></figure></li>
+<li><p>合并分支(只有撤回到master下面这句才有效)</p>
+<figure class="highlight cos"><table><tr><td class="code"><pre><span class="line">git <span class="keyword">merge</span> dev</span><br></pre></td></tr></table></figure></li>
+<li><p>删除分支</p>
+<figure class="highlight ebnf"><table><tr><td class="code"><pre><span class="line"><span class="attribute">git branch -d dev</span></span><br></pre></td></tr></table></figure></li>
+<li><p>远程分支master&lt;—–&gt;本地分支master</p>
+</li>
+<li><p>本地的分支会共享暂存区，但版本库独立，即分支master创建并add到暂存区的a文件如果被分支dev commit了，那么再切换到master就没有这个文件。</p>
+</li>
+<li><p>分支冲突</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211004221917099.png" alt="image-20211004221917099"></p>
+<p>修改+add+commit手动合并</p>
+</li>
+</ol>
+<h5 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h5><ol>
+<li><p>tag标签</p>
+<p>​    标签与commit-id对应关系</p>
+<ol>
+<li><p>创建tag</p>
+<figure class="highlight crmsh"><table><tr><td class="code"><pre><span class="line">git <span class="keyword">tag</span> <span class="title">v1</span>.<span class="number">0</span></span><br></pre></td></tr></table></figure></li>
+<li><p>根据commit-id创建tag</p>
+<figure class="highlight crmsh"><table><tr><td class="code"><pre><span class="line">git <span class="keyword">tag</span> <span class="title">v0</span>.<span class="number">8</span> abcde</span><br></pre></td></tr></table></figure></li>
+<li><p>上传tags</p>
+<figure class="highlight armasm"><table><tr><td class="code"><pre><span class="line"><span class="symbol">git</span> <span class="keyword">push</span> orgin <span class="built_in">v1</span>.<span class="number">0</span></span><br><span class="line"><span class="symbol">git</span> <span class="keyword">push</span> orgin --tags</span><br></pre></td></tr></table></figure></li>
+<li><p>删除tags</p>
+<figure class="highlight elixir"><table><tr><td class="code"><pre><span class="line">git push origin <span class="symbol">:refs/tags/v0</span>.<span class="number">9</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+<li><p>忽略文件</p>
+<ol>
+<li><p>文件内容(!表示非)</p>
+<figure class="highlight jboss-cli"><table><tr><td class="code"><pre><span class="line">*<span class="string">.txt</span>*</span><br><span class="line">!<span class="string">.gitignore</span></span><br></pre></td></tr></table></figure></li>
+<li><p>强制添加</p>
+<figure class="highlight reasonml"><table><tr><td class="code"><pre><span class="line">git add -f <span class="module-access"><span class="module"><span class="identifier">App</span>.</span></span><span class="keyword">class</span></span><br></pre></td></tr></table></figure></li>
+<li><p>例子</p>
+<ol>
+<li>忽略.o和.a文件 : *.[oa]</li>
+<li>忽略目录d: d/</li>
+<li>* ？：代表任意的一个字符<br>  * ＊：代表任意数目的字符<br>  * {!ab}：必须不是此类型<br>  * {ab,bb,cx}：代表ab,bb,cx中任一类型即可<br>  * [abc]：代表a,b,c中任一字符即可<br>  * [ ^abc]：代表必须不是a,b,c中任一字符</li>
+<li></li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p>别名</p>
+<ol>
+<li><p>st=status</p>
+<figure class="highlight verilog"><table><tr><td class="code"><pre><span class="line">git <span class="keyword">config</span> --<span class="keyword">global</span> <span class="keyword">alias</span><span class="variable">.st</span> status</span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+</ol>
+<h3 id="Git"><a href="#Git" class="headerlink" title="Git"></a>Git</h3><ol>
+<li>分支</li>
+<li>版本<ol>
+<li>HEAD表示当前版本</li>
+<li>HEAD^^表示上上一个版本</li>
+<li>HEAD~100表示上100个版本</li>
+<li></li>
+</ol>
+</li>
+</ol>
+<h3 id="做过的配置"><a href="#做过的配置" class="headerlink" title="做过的配置"></a>做过的配置</h3><ol>
+<li><p>git config –global http.sslVerify true   </p>
+<p>push 失败 SSL</p>
+</li>
+<li><p>push 到github失败，网速问题</p>
+<p>使用@git协议</p>
+<ol>
+<li><p>github加入自己的本机的ssh</p>
+</li>
+<li><p>将本机的.git的里面的comfig.remote修改为项目的ssh链接</p>
+<p><a href="mailto:&#x67;&#105;&#116;&#64;&#x67;&#105;&#x74;&#104;&#x75;&#98;&#46;&#99;&#111;&#x6d;">&#x67;&#105;&#116;&#64;&#x67;&#105;&#x74;&#104;&#x75;&#98;&#46;&#99;&#111;&#x6d;</a>:Wang-yonggan/Wang-yonggan.github.io.git</p>
+<p><a href="https://github.com/Wang-yonggan/Wang-yonggan.github.io.git">https://github.com/Wang-yonggan/Wang-yonggan.github.io.git</a></p>
+</li>
+</ol>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>utils</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>maven的使用</title>
+    <url>/2021/10/07/utils/maven/</url>
+    <content><![CDATA[<h3 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h3><p>1.<a href="https://www.cnblogs.com/PatrickLee/archive/2012/10/31/2747398.html">https://www.cnblogs.com/PatrickLee/archive/2012/10/31/2747398.html</a></p>
+<ol start="2">
+<li><p>编译：mvn compile　　–src/main/java目录java源码编译生成class （target目录下）</p>
+</li>
+<li><p>测试：mvn test　　　　–src/test/java 目录编译</p>
+</li>
+<li><p>清理：mvn clean　　　 –删除target目录，也就是将class文件等删除</p>
+</li>
+<li><p>打包：mvn package　　–生成压缩文件：java项目#jar包；web项目#war包，也是放在target目录下</p>
+</li>
+<li><p>安装：mvn install　　　–将压缩文件(jar或者war)上传到本地仓库</p>
+</li>
+<li><p>部署|发布：mvn deploy　　–将压缩文件上传私服</p>
+<span id="more"></span></li>
+</ol>
+<h3 id="创建项目"><a href="#创建项目" class="headerlink" title="创建项目"></a>创建项目</h3><ol>
+<li>java项目</li>
+</ol>
+<figure class="highlight routeros"><table><tr><td class="code"><pre><span class="line">mvn archetype:generate <span class="attribute">-DgroupId</span>=com.dreams.maven.quickstart <span class="attribute">-DartifactId</span>=simple <span class="attribute">-DarchetypeArtifactId</span>=maven-archetype-quickstart</span><br><span class="line"></span><br><span class="line">mvn archetype:create</span><br><span class="line">   <span class="attribute">-DgroupId</span>=packageName</span><br><span class="line">   <span class="attribute">-DartifactId</span>=projectName </span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li><p>wen项目</p>
+<figure class="highlight routeros"><table><tr><td class="code"><pre><span class="line">mvn archetype:generate <span class="attribute">-DgroupId</span>=com.packageName <span class="attribute">-DartifactId</span>=webappName <span class="attribute">-DarchetypeArtifactId</span>=maven-archetype-quickstart</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>mvn                                 –核心命令</p>
+<p> archetype:generate                              –创建项目 </p>
+<p>-DgroupId=com.dreams.maven.quickstart             –包名的写法，域名的反写 </p>
+<p>-DartifactId=simple                                               –项目名称 </p>
+<p>-DarchetypeArtifactId=maven-archetype-quickstart  –表示创建的是[maven]java项目—固定</p>
+<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3>]]></content>
+      <categories>
+        <category>utils</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>puppeteer使用</title>
+    <url>/2021/10/01/utils/puppeteer/</url>
+    <content><![CDATA[<h1 id="Puppeteer的使用"><a href="#Puppeteer的使用" class="headerlink" title="Puppeteer的使用"></a>Puppeteer的使用</h1><h3 id="爬虫"><a href="#爬虫" class="headerlink" title="爬虫"></a>爬虫</h3><h5 id="python"><a href="#python" class="headerlink" title="python"></a>python</h5><ol>
+<li><p>urllib+requests——Beautifulsoup+lxml—&gt;数据</p>
+</li>
+<li><p>scrapy  :抓取+解析</p>
+<span id="more"></span></li>
+</ol>
+<h5 id="puppeteer"><a href="#puppeteer" class="headerlink" title="puppeteer"></a>puppeteer</h5><ol>
+<li><p>下载</p>
+<figure class="highlight coffeescript"><table><tr><td class="code"><pre><span class="line"><span class="built_in">npm</span> init</span><br><span class="line"><span class="built_in">npm</span> i puppeteer</span><br></pre></td></tr></table></figure></li>
+<li><p>seletor</p>
+</li>
+</ol>
+<h3 id="xpath"><a href="#xpath" class="headerlink" title="xpath"></a>xpath</h3><ol>
+<li><p>层级 /直接子集() // 跳跃层级(递归)</p>
+</li>
+<li><p>属性 @</p>
+<ol>
+<li><p>class</p>
+</li>
+<li><p>id</p>
+</li>
+<li><p>property</p>
+</li>
+<li><p>//article//a/@href</p>
+<!--more--></li>
+</ol>
+</li>
+<li><p>函数</p>
+<ol>
+<li><p>contain</p>
+<figure class="highlight applescript"><table><tr><td class="code"><pre><span class="line">\\<span class="keyword">div</span>[<span class="keyword">contain</span>(@<span class="built_in">class</span>, <span class="string">&quot;classnameContain&quot;</span>)]</span><br></pre></td></tr></table></figure></li>
+<li><p>text</p>
+<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line">http:<span class="regexp">//</span>books.toscrape.com<span class="regexp">/catalogue/</span>category<span class="regexp">/books_1/i</span>ndex.html</span><br><span class="line"><span class="regexp">//u</span>l[@class=<span class="string">&quot;nav nav-list&quot;</span>]<span class="regexp">//u</span>l<span class="regexp">//</span>a/text()</span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>utils</category>
+        <category>爬虫</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>xshell的使用</title>
+    <url>/2021/10/06/utils/xshell/</url>
+    <content><![CDATA[<h3 id="连接VMware"><a href="#连接VMware" class="headerlink" title="连接VMware"></a>连接VMware</h3><ol>
+<li><p>配置linux的网络连接</p>
+<ol>
+<li><p><a href="https://www.cnblogs.com/shireenlee4testing/p/9469650.html">参考-如何使用Xshell连接VMware上的Linux虚拟机</a></p>
+</li>
+<li><p>在VMware workstation里，点击菜单栏上的【编辑】–&gt;【虚拟网络编辑器】，打开下方的虚拟网络编辑器。</p>
+<ol>
+<li>选择VMnet8（NAT模式）</li>
+<li>管理员模式下取消勾选【使用本地DHCP服务…】</li>
+</ol>
+</li>
+<li><p>net设置查看子网ip和网关ip</p>
+<span id="more"></span></li>
+<li><p>root下 vi /etc/sysconfig/network-scripts/ifcfg-ens* </p>
+<figure class="highlight routeros"><table><tr><td class="code"><pre><span class="line"><span class="attribute">BOOTPROTO</span>=static</span><br><span class="line"><span class="attribute">IPADDR</span>=192.168.44.3    </span><br><span class="line"><span class="attribute">NETMASK</span>=255.255.255.0</span><br><span class="line"><span class="attribute">GATEWAY</span>=192.168.44.2    				</span><br><span class="line"><span class="attribute">ONBOOT</span>=<span class="literal">yes</span></span><br><span class="line"></span><br><span class="line">192.168.44.0    vmware.net.config.z</span><br><span class="line"><span class="attribute">IPADDR</span>=192.168.44.3    host<span class="built_in"> ip</span></span><br><span class="line"><span class="built_in"></span><span class="attribute">GATEWAY</span>=192.168.44.2   getway----vmware.net.config.getway</span><br></pre></td></tr></table></figure></li>
+<li><p>设置DNS</p>
+<p>vi /etc/sysconfig/network</p>
+<figure class="highlight ini"><table><tr><td class="code"><pre><span class="line"><span class="attr">NETWORKING</span>=<span class="literal">yes</span></span><br><span class="line"><span class="attr">HOSTNAME</span>=slave1</span><br></pre></td></tr></table></figure></li>
+<li><p>修改主机名</p>
+<p>vim /etc/hostname</p>
+<p>slave1</p>
+</li>
+<li><p>重启网络服务</p>
+<ol>
+<li>systemctl stop NetworkManager 关闭manager</li>
+<li>systemctl restart network</li>
+<li>service network restart</li>
+</ol>
+</li>
+<li><p>设置windows的网络连接</p>
+<ol>
+<li><p>设置VMnet8在Windows上的IP属性，（打开控制面板–&gt;网络和Internet，在右侧点击【更改适配器设置】，进入“网络连接”页面）</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211006230732307.png" alt="image-20211006230732307"></p>
+</li>
+</ol>
+</li>
+<li><p>连接 ssh 192.168.44.3</p>
+</li>
+</ol>
+</li>
+<li><p>免密连接</p>
+<ol>
+<li><a href="https://www.cnblogs.com/dadonggg/p/8350423.html">参考—Xshell配置ssh免密码登录-密钥公钥(Public key)</a></li>
+<li>ssh登录原理<ol>
+<li>客户端发出认证请求；</li>
+<li>服务器端使用客户端发送的公钥对一个随机的256位的字符串进行加密，并发送给 客户端；</li>
+<li>客户端使用私钥对字符串进行解密，并生成一个MD5值发送给服务器端；</li>
+<li>服务器端根据原始随机字符串生成MD5值进行匹配, 确认客户端身份；</li>
+<li>至此, 双方互相确认对方身份并建立加密信道, 可以正式进行安全通信。</li>
+<li><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211007002314884.png" alt="image-20211007002314884"></li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<p>cat id_rsa_2048_master.pub &gt;&gt; ~/.ssh/authorized_keys</p>
+]]></content>
+      <categories>
+        <category>utils</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>时间组件</title>
+    <url>/2021/10/21/java/java%E7%BB%84%E4%BB%B6/%E6%97%B6%E9%97%B4%E7%B1%BB/</url>
+    <content><![CDATA[<h3 id="自定义"><a href="#自定义" class="headerlink" title="自定义"></a>自定义</h3><ol>
+<li><p>sql—util转换</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">java.sql.Date sqlDate = <span class="keyword">new</span> java.sql.Date(utilDate.getTime());</span><br><span class="line">Date date = <span class="keyword">new</span> Date(sqlDate.getTime());<span class="comment">//sql.Date转util.Date        </span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="依赖"><a href="#依赖" class="headerlink" title="依赖"></a>依赖</h3><ol>
+<li><p>joda</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>joda-time<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>joda-time<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>主要获取当前时间 好看字符串</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">DateTime dt = <span class="keyword">new</span> DateTime();</span><br><span class="line">DateTime dt1 = DateTime.now();<span class="comment">//2021-10-21T13:59:41.040+08:00</span></span><br><span class="line">DateTime dt2 = <span class="keyword">new</span> DateTime(<span class="keyword">new</span> Date());<span class="comment">//2021-10-21T13:59:41.132+08:00</span></span><br><span class="line"><span class="comment">// 指定年月日点分秒生成(参数依次是：年,月,日,时,分,秒,毫秒)</span></span><br><span class="line">DateTime dt3 = <span class="keyword">new</span> DateTime(<span class="number">2012</span>, <span class="number">5</span>, <span class="number">20</span>, <span class="number">13</span>, <span class="number">14</span>, <span class="number">0</span>, <span class="number">0</span>);        <span class="comment">// 制定ISO8601生成</span></span><br><span class="line">DateTime dt4 = <span class="keyword">new</span> DateTime(<span class="string">&quot;2014-08-01T12:32:3&quot;</span>);</span><br><span class="line">DateTime dt5 = <span class="keyword">new</span> DateTime(<span class="string">&quot;2014-08-01&quot;</span>);</span><br><span class="line">DateTime dt6 = <span class="keyword">new</span> DateTime(Calendar.getInstance())</span><br></pre></td></tr></table></figure></li>
+<li><p>转换  插入数据库</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Date date = <span class="keyword">new</span> Date(<span class="keyword">new</span> DateTime().toDate().getTime());</span><br></pre></td></tr></table></figure></li>
+<li></li>
+</ol>
+]]></content>
+      <categories>
+        <category>javautils</category>
+      </categories>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2021/10/23/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/session/</url>
+    <content><![CDATA[<h3 id=""><a href="#" class="headerlink" title=""></a></h3><ol>
+<li><a href="https://www.cnblogs.com/sharpxiajun/p/3395607.html">https://www.cnblogs.com/sharpxiajun/p/3395607.html</a></li>
+<li></li>
+</ol>
+]]></content>
+  </entry>
+  <entry>
     <title>单点登录</title>
-    <url>/2021/10/06/%E7%BB%84%E4%BB%B6/%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95/</url>
+    <url>/2021/10/06/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95/</url>
     <content><![CDATA[<h2 id="授权登录"><a href="#授权登录" class="headerlink" title="授权登录"></a>授权登录</h2><ol>
 <li>单点登录，自系统登录，SSO， Singal Sign on</li>
 <li>只需要登陆一次就能无需登录访问其他模块</li>
@@ -3827,97 +4095,6 @@ git clone <a href="https://github.com/litten/hexo-theme-yilia.git">https://githu
 ]]></content>
       <categories>
         <category>组件</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>web图片上传与获取</title>
-    <url>/2021/10/21/%E7%BB%84%E4%BB%B6/%E5%9B%BE%E7%89%87%E9%97%AE%E9%A2%98/</url>
-    <content><![CDATA[<h3 id="配置资源路径"><a href="#配置资源路径" class="headerlink" title="配置资源路径"></a>配置资源路径</h3><ol>
-<li><p>配置类</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WebResourceConfig</span> <span class="keyword">implements</span> <span class="title">WebMvcConfigurer</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addResourceHandlers</span><span class="params">(ResourceHandlerRegistry registry)</span> </span>&#123;</span><br><span class="line">        registry.addResourceHandler(<span class="string">&quot;/img/**&quot;</span>).addResourceLocations(<span class="string">&quot;file:D:/data/java/img/&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p>上传mutifile到指定路径</p>
-</li>
-<li><p>html访问/img/</p>
-</li>
-</ol>
-<h3 id="properties配置文件"><a href="#properties配置文件" class="headerlink" title="properties配置文件"></a>properties配置文件</h3><ol>
-<li></li>
-</ol>
-<h3 id="nginx"><a href="#nginx" class="headerlink" title="nginx"></a>nginx</h3><ol>
-<li></li>
-</ol>
-<h3 id="阿里云OSS"><a href="#阿里云OSS" class="headerlink" title="阿里云OSS"></a>阿里云OSS</h3><ol>
-<li><p>依赖</p>
-</li>
-<li><p>配置</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.aliyun.oss<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>aliyun-sdk-oss<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-<li><p>代码</p>
-<ol>
-<li><p>配置类</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ConstantPropertiesUtils</span> <span class="keyword">implements</span> <span class="title">InitializingBean</span> </span>&#123; <span class="meta">@Value(&quot;$&#123;aliyun.oss.file.endpoint&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String endpoint; <span class="meta">@Value(&quot;$&#123;aliyun.oss.file.keyid&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String keyId; <span class="meta">@Value(&quot;$&#123;aliyun.oss.file.keysecret&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String keySecret; <span class="meta">@Value(&quot;$&#123;aliyun.oss.file.bucketname&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String bucketName;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String END_POIND;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String ACCESS_KEY_ID;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String ACCESS_KEY_SECRET;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String BUCKET_NAME;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">afterPropertiesSet</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        END_POIND = endpoint;</span><br><span class="line">        ACCESS_KEY_ID = keyId;</span><br><span class="line">        ACCESS_KEY_SECRET = keySecret;</span><br><span class="line">        BUCKET_NAME = bucketName;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p>上传</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">uploadFileAvatar</span><span class="params">(MultipartFile file)</span> </span>&#123;</span><br><span class="line">       <span class="comment">// 工具类获取值</span></span><br><span class="line">       String endpoint = OssConfig.END_POIND;</span><br><span class="line">       String bucketName = OssConfig.BUCKET_NAME;</span><br><span class="line">       <span class="keyword">try</span> &#123;</span><br><span class="line">           <span class="comment">// 创建OSS实例。</span></span><br><span class="line">           OSS ossClient = <span class="keyword">new</span> OSSClientBuilder().build(endpoint,</span><br><span class="line">                   OssConfig.ACCESS_KEY_ID, OssConfig.ACCESS_KEY_SECRET);</span><br><span class="line">           <span class="comment">//获取文件名称</span></span><br><span class="line">           String fileName =getFileName(file.getOriginalFilename());</span><br><span class="line">           fileName=<span class="string">&quot;test.jpg&quot;</span>;</span><br><span class="line">           <span class="comment">//第一个参数  Bucket名称 文件路径  文件流</span></span><br><span class="line">           ossClient.putObject(bucketName, fileName, file.getInputStream());</span><br><span class="line">           ossClient.shutdown();  <span class="comment">// 关闭OSSClient。</span></span><br><span class="line">           <span class="comment">//把上传之后文件路径返回</span></span><br><span class="line">           <span class="comment">//需要把上传到阿里云oss路径手动拼接出来</span></span><br><span class="line">           String url = <span class="string">&quot;https://&quot;</span> + bucketName + <span class="string">&quot;.&quot;</span> + endpoint + <span class="string">&quot;/&quot;</span> + fileName;</span><br><span class="line">           System.out.println(url);<span class="comment">//https://job-wyg.oss-cn-beijing.aliyuncs.com/test.jpg</span></span><br><span class="line">           <span class="keyword">return</span> url;</span><br><span class="line">       &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">           e.printStackTrace();</span><br><span class="line">           <span class="keyword">return</span> <span class="keyword">null</span>;&#125;</span><br></pre></td></tr></table></figure></li>
-</ol>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>组件</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>组件2</title>
-    <url>/2021/10/06/%E7%BB%84%E4%BB%B6/%E7%BB%84%E4%BB%B62/</url>
-    <content><![CDATA[<h3 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h3><ol>
-<li><p>使用步骤</p>
-<ol>
-<li><p>依赖</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="comment">&lt;!-- reids by boot --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-data-redis<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- spring2.X集成redis所需common-pool2--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.commons<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>commons-pool2<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">version</span>&gt;</span>2.6.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<span id="more"></span></li>
-<li><p>创建配置类(@Configuration)</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@EnableCaching</span> <span class="comment">//开启缓存</span></span><br><span class="line"><span class="meta">@Configuration</span>  <span class="comment">//配置类</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RedisConfig</span> <span class="keyword">extends</span> <span class="title">CachingConfigurerSupport</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> RedisTemplate&lt;String, Object&gt; <span class="title">redisTemplate</span><span class="params">(RedisConnectionFactory factory)</span> </span>&#123;</span><br><span class="line">        RedisTemplate&lt;String, Object&gt; template = <span class="keyword">new</span> RedisTemplate&lt;&gt;();</span><br><span class="line">        RedisSerializer&lt;String&gt; redisSerializer = <span class="keyword">new</span> StringRedisSerializer();</span><br><span class="line">        Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = <span class="keyword">new</span> Jackson2JsonRedisSerializer(Object.class);</span><br><span class="line">        ObjectMapper om = <span class="keyword">new</span> ObjectMapper();</span><br><span class="line">        om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);</span><br><span class="line">        om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);</span><br><span class="line">        jackson2JsonRedisSerializer.setObjectMapper(om);</span><br><span class="line">        template.setConnectionFactory(factory);</span><br><span class="line">        <span class="comment">//key序列化方式</span></span><br><span class="line">        template.setKeySerializer(redisSerializer);</span><br><span class="line">        <span class="comment">//value序列化</span></span><br><span class="line">        template.setValueSerializer(jackson2JsonRedisSerializer);</span><br><span class="line">        <span class="comment">//value hashmap序列化</span></span><br><span class="line">        template.setHashValueSerializer(jackson2JsonRedisSerializer);</span><br><span class="line">        <span class="keyword">return</span> template;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> CacheManager <span class="title">cacheManager</span><span class="params">(RedisConnectionFactory factory)</span> </span>&#123;</span><br><span class="line">        RedisSerializer&lt;String&gt; redisSerializer = <span class="keyword">new</span> StringRedisSerializer();</span><br><span class="line">        Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = <span class="keyword">new</span> Jackson2JsonRedisSerializer(Object.class);</span><br><span class="line">        <span class="comment">//解决查询缓存转换异常的问题</span></span><br><span class="line">        ObjectMapper om = <span class="keyword">new</span> ObjectMapper();</span><br><span class="line">        om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);</span><br><span class="line">        om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);</span><br><span class="line">        jackson2JsonRedisSerializer.setObjectMapper(om);</span><br><span class="line">        <span class="comment">// 配置序列化（解决乱码的问题）,过期时间600秒</span></span><br><span class="line">        RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()</span><br><span class="line">                .entryTtl(Duration.ofSeconds(<span class="number">600</span>))</span><br><span class="line">                .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(redisSerializer))</span><br><span class="line">                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(jackson2JsonRedisSerializer))</span><br><span class="line">                .disableCachingNullValues();</span><br><span class="line">        RedisCacheManager cacheManager = RedisCacheManager.builder(factory)</span><br><span class="line">                .cacheDefaults(config)</span><br><span class="line">                .build();</span><br><span class="line">        <span class="keyword">return</span> cacheManager;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></li>
-<li><p>Controller开启加上缓存注解</p>
-<ol>
-<li><pre><code class="java">@Cacheable(value = &quot;banner&quot;,key = &quot;&#39;selectIndexList&#39;&quot;)
-</code></pre>
-</li>
-<li><p>注意key 双引号里面有单引号</p>
-</li>
-<li></li>
-</ol>
-</li>
-<li><p>启动redis</p>
-</li>
-</ol>
-</li>
-<li><p>效果，先查redis缓存，没有再去数据库查询。</p>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>组件</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>时间组件</title>
-    <url>/2021/10/21/java/java%E7%BB%84%E4%BB%B6/%E6%97%B6%E9%97%B4%E7%B1%BB/</url>
-    <content><![CDATA[<h3 id="自定义"><a href="#自定义" class="headerlink" title="自定义"></a>自定义</h3><ol>
-<li><p>sql—util转换</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">java.sql.Date sqlDate = <span class="keyword">new</span> java.sql.Date(utilDate.getTime());</span><br><span class="line">Date date = <span class="keyword">new</span> Date(sqlDate.getTime());<span class="comment">//sql.Date转util.Date        </span></span><br></pre></td></tr></table></figure></li>
-</ol>
-<h3 id="依赖"><a href="#依赖" class="headerlink" title="依赖"></a>依赖</h3><ol>
-<li><p>joda</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>joda-time<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>joda-time<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-<li><p>主要获取当前时间 好看字符串</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">DateTime dt = <span class="keyword">new</span> DateTime();</span><br><span class="line">DateTime dt1 = DateTime.now();<span class="comment">//2021-10-21T13:59:41.040+08:00</span></span><br><span class="line">DateTime dt2 = <span class="keyword">new</span> DateTime(<span class="keyword">new</span> Date());<span class="comment">//2021-10-21T13:59:41.132+08:00</span></span><br><span class="line"><span class="comment">// 指定年月日点分秒生成(参数依次是：年,月,日,时,分,秒,毫秒)</span></span><br><span class="line">DateTime dt3 = <span class="keyword">new</span> DateTime(<span class="number">2012</span>, <span class="number">5</span>, <span class="number">20</span>, <span class="number">13</span>, <span class="number">14</span>, <span class="number">0</span>, <span class="number">0</span>);        <span class="comment">// 制定ISO8601生成</span></span><br><span class="line">DateTime dt4 = <span class="keyword">new</span> DateTime(<span class="string">&quot;2014-08-01T12:32:3&quot;</span>);</span><br><span class="line">DateTime dt5 = <span class="keyword">new</span> DateTime(<span class="string">&quot;2014-08-01&quot;</span>);</span><br><span class="line">DateTime dt6 = <span class="keyword">new</span> DateTime(Calendar.getInstance())</span><br></pre></td></tr></table></figure></li>
-<li><p>转换  插入数据库</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Date date = <span class="keyword">new</span> Date(<span class="keyword">new</span> DateTime().toDate().getTime());</span><br></pre></td></tr></table></figure></li>
-<li></li>
-</ol>
-]]></content>
-      <categories>
-        <category>javautils</category>
       </categories>
   </entry>
   <entry>
