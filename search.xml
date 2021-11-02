@@ -22,6 +22,80 @@
 ]]></content>
   </entry>
   <entry>
+    <title>hadoop的启动</title>
+    <url>/2021/09/10/distribute/hadoop%E5%90%AF%E5%8A%A8/</url>
+    <content><![CDATA[<h2 id="一、-基本环境"><a href="#一、-基本环境" class="headerlink" title="一、 基本环境"></a>一、 基本环境</h2><ol>
+<li><p>获取主机名字 master、s1、s2</p>
+</li>
+<li><p>时钟同步</p>
+<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line"><span class="regexp">/usr/</span>sbin/ntpdate cn.pool.ntp.org</span><br></pre></td></tr></table></figure></li>
+<li><p>关闭防火墙</p>
+<figure class="highlight arduino"><table><tr><td class="code"><pre><span class="line">systemctl stop firewalld.service</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span></li>
+<li><p>编辑host 以对应ping 如：</p>
+<figure class="highlight accesslog"><table><tr><td class="code"><pre><span class="line"><span class="number">10.42.0.93</span> master</span><br><span class="line"><span class="number">10.42.0.94</span> slave01</span><br><span class="line"><span class="number">10.42.0.95</span> slave02</span><br></pre></td></tr></table></figure></li>
+<li><p>测试ping是否成功</p>
+<figure class="highlight crmsh"><table><tr><td class="code"><pre><span class="line">ping <span class="keyword">master</span> <span class="title">-c</span> <span class="number">3</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="二、联机"><a href="#二、联机" class="headerlink" title="二、联机"></a>二、联机</h2><ol>
+<li><p>生成公钥</p>
+<figure class="highlight ebnf"><table><tr><td class="code"><pre><span class="line"><span class="attribute">ssh-keygen -t rsa</span></span><br></pre></td></tr></table></figure></li>
+<li><p>公钥备份文件</p>
+<figure class="highlight arcade"><table><tr><td class="code"><pre><span class="line">cat ~<span class="regexp">/.ssh/i</span>d_rsa.pub &gt;&gt; ~<span class="regexp">/.ssh/</span>authorized_keys</span><br></pre></td></tr></table></figure></li>
+<li><p>修改文件权限</p>
+<figure class="highlight arcade"><table><tr><td class="code"><pre><span class="line">chmod <span class="number">600</span> ~<span class="regexp">/.ssh/</span>authorized_keys</span><br></pre></td></tr></table></figure></li>
+<li><p>将专用密钥添加到 ssh-agent 的高速缓存中</p>
+<figure class="highlight arcade"><table><tr><td class="code"><pre><span class="line">ssh-add ~<span class="regexp">/.ssh/i</span>d_rsa</span><br></pre></td></tr></table></figure></li>
+<li><p>公钥转移到其他机器</p>
+<figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line">scp ~<span class="regexp">/.ssh/</span>authorized_keys zkpk<span class="meta">@slave01</span>:~<span class="regexp">/.ssh/</span></span><br></pre></td></tr></table></figure></li>
+<li><p>其他机器也生成密钥</p>
+</li>
+<li><p>测试远程   ssh s1</p>
+</li>
+</ol>
+<h2 id="三、安装java"><a href="#三、安装java" class="headerlink" title="三、安装java"></a>三、安装java</h2><ol>
+<li><p>root下解压</p>
+<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line">tar -xzvf <span class="regexp">/home/</span>zkpk<span class="regexp">/tgz/</span>jdk-<span class="number">8</span>u131-linux-x64.tar.gz -C <span class="regexp">/usr/</span>java</span><br></pre></td></tr></table></figure></li>
+<li><p>修改环境变量</p>
+<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line">gedit <span class="regexp">/home/</span>zkpk/.bash_profile</span><br><span class="line">	export JAVA_HOME=<span class="regexp">/usr/</span>java<span class="regexp">/jdk1.8.0_131/</span></span><br><span class="line">	export PATH=<span class="variable">$JAVA_HOME</span>/bin:<span class="variable">$PATH</span></span><br><span class="line">source <span class="regexp">/home/</span>zkpk/.bash_profile</span><br></pre></td></tr></table></figure></li>
+<li><p>其他机器同样安装</p>
+</li>
+<li><p>测试java：java -version</p>
+</li>
+</ol>
+<h2 id="四、安装hadoop"><a href="#四、安装hadoop" class="headerlink" title="四、安装hadoop"></a>四、安装hadoop</h2><ol>
+<li><p>解压</p>
+<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line">tar -xzvf <span class="regexp">/home/</span>zkpk<span class="regexp">/tgz/</span>hadoop-<span class="number">2.7</span>.<span class="number">3</span>.tar.gz –C <span class="regexp">/home/</span>zkpk</span><br></pre></td></tr></table></figure></li>
+<li><p>修改java环境变量</p>
+<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line">gedit <span class="regexp">/home/</span>zkpk<span class="regexp">/hadoop-2.7.3/</span>etc<span class="regexp">/hadoop/</span>hadoop-env.sh</span><br><span class="line"> 	export JAVA_HOME=<span class="regexp">/usr/</span>java<span class="regexp">/jdk1.8.0_131/</span></span><br><span class="line">gedit ~<span class="regexp">/hadoop-2.7.3/</span>etc<span class="regexp">/hadoop/y</span>arn-env.sh</span><br><span class="line">	export JAVA_HOME=<span class="regexp">/usr/</span>java<span class="regexp">/jdk1.8.0_131/</span></span><br></pre></td></tr></table></figure></li>
+<li><p>其他配置</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line">1.配置core-site.xml 文件</span><br><span class="line">gedit  ~/hadoop-2.7.3/etc/hadoop/core-site.xml</span><br><span class="line">	<span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span></span><br><span class="line">    <span class="meta">&lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;configuration.xsl&quot;?&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- Put site-specific property overrides in this file. --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">name</span>&gt;</span>fs.defaultFS<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">value</span>&gt;</span>hdfs://master:9000<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">name</span>&gt;</span>hadoop.tmp.dir<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">value</span>&gt;</span>/home/zkpk/hadoopdata<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">2.配置hdfs-site.xml文件</span><br><span class="line">gedit  ~/hadoop-2.7.3/etc/hadoop/hdfs-site.xml</span><br><span class="line">    <span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span></span><br><span class="line">    <span class="meta">&lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;configuration.xsl&quot;?&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- Put site-specific property overrides in this file. --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">name</span>&gt;</span>dfs.replication<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">value</span>&gt;</span>2<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">3.配置yarn-site.xml文件</span><br><span class="line">gedit  ~/hadoop-2.7.3/etc/hadoop/yarn-site.xml</span><br><span class="line">    <span class="meta">&lt;?xml version=&quot;1.0&quot;?&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.nodemanager.aux-services<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">value</span>&gt;</span>mapreduce_shuffle<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.resourcemanager.address<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">value</span>&gt;</span>master:18040<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.resourcemanager.scheduler.address<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">value</span>&gt;</span>master:18030<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.resourcemanager.resource-tracker.address<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">value</span>&gt;</span>master:18025<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.resourcemanager.admin.address<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">value</span>&gt;</span>master:18141<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.resourcemanager.webapp.address<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">value</span>&gt;</span>master:18088<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">4.配置mapred-site.xml文件</span><br><span class="line">cp ~/hadoop-2.7.3/etc/hadoop/mapred-site.xml.template  ~/hadoop-2.7.3/etc/hadoop/mapred-site.xml</span><br><span class="line">gedit ~/hadoop-2.7.3/etc/hadoop/mapred-site.xml</span><br><span class="line">    <span class="meta">&lt;?xml version=&quot;1.0&quot;?&gt;</span></span><br><span class="line">    <span class="meta">&lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;configuration.xsl&quot;?&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">name</span>&gt;</span>mapreduce.framework.name<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">value</span>&gt;</span>yarn<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>配置slaves文件</p>
+<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line">gedit ~<span class="regexp">/hadoop-2.7.3/</span>etc<span class="regexp">/hadoop/</span>slaves</span><br><span class="line">    slave01</span><br><span class="line">    slave02</span><br></pre></td></tr></table></figure></li>
+<li><p>创建Hadoop数据目录</p>
+<figure class="highlight arduino"><table><tr><td class="code"><pre><span class="line">mkdir hadoopdata</span><br></pre></td></tr></table></figure></li>
+<li><p>将配置好的hadoop文件夹复制到从节点</p>
+<figure class="highlight apache"><table><tr><td class="code"><pre><span class="line"><span class="attribute">scp</span> -r hadoop-<span class="number">2</span>.<span class="number">7</span>.<span class="number">3</span> zkpk@slave<span class="number">01</span>:~/</span><br></pre></td></tr></table></figure></li>
+<li><p>配置环境变量</p>
+<figure class="highlight routeros"><table><tr><td class="code"><pre><span class="line">gedit ~/.bash_profile</span><br><span class="line">    #HADOOP</span><br><span class="line">    <span class="builtin-name">export</span> <span class="attribute">HADOOP_HOME</span>=/home/zkpk/hadoop-2.7.3</span><br><span class="line">    <span class="builtin-name">export</span> <span class="attribute">PATH</span>=<span class="variable">$HADOOP_HOME</span>/bin:$HADOOP_HOME/sbin:$PATH</span><br><span class="line">source ~/.bash_profile</span><br></pre></td></tr></table></figure></li>
+<li><p>其他机器同样配置环境变量</p>
+</li>
+<li><p>在master格式化磁盘</p>
+<figure class="highlight dos"><table><tr><td class="code"><pre><span class="line">hdfs namenode -<span class="built_in">format</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="五、启动检测"><a href="#五、启动检测" class="headerlink" title="五、启动检测"></a>五、启动检测</h2><ol>
+<li>start-all.sh</li>
+<li>jps查看</li>
+<li><a href="http://master:50070/%E6%9F%A5%E7%9C%8B">http://master:50070/查看</a></li>
+<li><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20210911183155100.png" alt="image-20210911183155100"></li>
+</ol>
+]]></content>
+      <categories>
+        <category>hadoop</category>
+      </categories>
+  </entry>
+  <entry>
     <title>mysql其他知识</title>
     <url>/2021/10/14/db/mysql2/</url>
     <content><![CDATA[<h3 id="日志"><a href="#日志" class="headerlink" title="日志"></a>日志</h3><ol>
@@ -111,6 +185,176 @@
 <li></li>
 </ol>
 ]]></content>
+  </entry>
+  <entry>
+    <title>redis使用</title>
+    <url>/2021/10/06/db/redis/</url>
+    <content><![CDATA[<h3 id="技术发展史"><a href="#技术发展史" class="headerlink" title="技术发展史"></a>技术发展史</h3><ol>
+<li><p>redis</p>
+<ol>
+<li>特点<ol>
+<li><a href="https://www.jianshu.com/p/f42d5f5c495b">原子性</a></li>
+<li><a href="https://www.cnblogs.com/myseries/p/11733861.html">单线程</a></li>
+<li><a href="https://blog.csdn.net/xlgen157387/article/details/79470556">为什么说Redis是单线程的以及Redis为什么这么快</a></li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p>技术分类</p>
+<ol>
+<li><p>功能性: java jsp tomcat html jdbc linux</p>
+</li>
+<li><p>性能: nosql java线程 hadoop nginx mq elasticSearch</p>
+</li>
+<li><p>扩展 struts mybtis  spring springBoot </p>
+<span id="more"></span></li>
+</ol>
+</li>
+<li><p>问题</p>
+<ol>
+<li><p>分布式服务器session共享问题</p>
+<ol>
+<li><p>放入到cookie，安全性差</p>
+</li>
+<li><p>session复制，数据冗余</p>
+</li>
+<li><p>jwt+共享远程nosql，直接放在内存，读取快</p>
+</li>
+</ol>
+</li>
+<li><p>数据库大</p>
+<ol>
+<li>分库分表，读写分离，破坏了业务逻辑</li>
+<li>缓存，内存处理，减少IO操作</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p>NoSQL(not only sql) 非关系型数据库   k—v</p>
+<ol>
+<li>特点<ol>
+<li>不支持ACID</li>
+<li>性能高</li>
+<li>原子性</li>
+</ol>
+</li>
+<li>场景</li>
+<li>适: 高并发，海量数据，扩展性数据 </li>
+<li>不适：事务支持，结构支持</li>
+<li>常见NoSQL</li>
+<li>Redis<pre><code>1. 支持持久化
+    2. 多数据结构
+</code></pre>
+</li>
+<li>MongoDB<pre><code>1. 文档型数据库
+    2. json友好型
+    3. 支持二进制
+</code></pre>
+</li>
+<li>行数据库 </li>
+<li>列数据库 avg ，mean,sum,方便</li>
+<li>图数据库</li>
+</ol>
+</li>
+</ol>
+<h3 id="reids–linux"><a href="#reids–linux" class="headerlink" title="reids–linux"></a>reids–linux</h3><ol>
+<li>各个文件<ol>
+<li>benchmark 性能测试</li>
+<li>check-aof  修复aof</li>
+<li>sentinel  集群</li>
+<li>server  启动<br>1. </li>
+<li>cli 客户端</li>
+</ol>
+</li>
+<li>操作<ol>
+<li>库操作<ol>
+<li>切换库 select 1</li>
+<li>dbsize数据库大小</li>
+<li>flushdb 清空库</li>
+</ol>
+</li>
+<li>key操作<ol>
+<li>查看所有 keys *   keys nam*  查看所有 nam开头的*</li>
+<li>set k v  get k</li>
+<li>exists key</li>
+<li>type key</li>
+<li>del key</li>
+<li>expire key  10  十秒失效  </li>
+<li>ttl  key 查看多少米过期  -2 已经过期   -1 永不过期</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>五大类型<ol>
+<li>string（动态String,ArrryList-&gt;扩容，每次1倍，大于1M则每次1M）<ol>
+<li>max 512M</li>
+<li>set k str  get k</li>
+<li>append k 追加</li>
+<li>strlen k</li>
+<li>setnx  不存在则设置   返回0表示已经存在</li>
+<li>incr/decr k  增加/减少1 </li>
+<li>incrby/decrby k n  增加/减少n   原子性操作</li>
+<li> mset mget msetnx(都不存在才成功)</li>
+<li>getrange k begin end    —-&gt;substring</li>
+<li>setrange k begin  str       —-&gt;替换覆盖</li>
+<li>setex k 100 v  同时设置</li>
+<li>getset 取了就换 </li>
+</ol>
+</li>
+<li>list (多值，排序，双向链表，索引差，两头性能高)<ol>
+<li>lpush k v1 v2  左是头-头插法  v2 v1</li>
+<li>rpush k v1 v2 右是头头插法 v1 v2</li>
+<li>lrange k begin end 从左开始取</li>
+<li>lpop/rpop  从左/右吐出一个</li>
+<li>rpoplpush  右边吐一个放在左边 </li>
+<li>index k 0  按下标取</li>
+<li>llen</li>
+<li>linsert k before/after “str3”  “strn” 在str3 前面插入strn</li>
+<li>lrem k before/after “str3”  …</li>
+<li>lset k 0 “wang” 把第一个设置为”wang”</li>
+</ol>
+</li>
+<li>set 底层hash 无序 不重复<ol>
+<li>sadd k v1 v2</li>
+<li>smembers k</li>
+<li>sismember k v v是否存在 1true</li>
+<li>scard k   返回个数</li>
+<li>spop 随机吐出一个</li>
+<li>srandmenber k  n随机取出n个</li>
+<li>smove k v k2   迁移</li>
+<li>交集</li>
+<li>并集</li>
+<li></li>
+</ol>
+</li>
+<li>hash</li>
+<li>zset</li>
+</ol>
+</li>
+<li>原理<ol>
+<li>单线程+多路IO复用</li>
+<li>list<ol>
+<li>quickList<ol>
+<li>数据少的时候是连续内存  ziplist</li>
+<li>数据多将多个ziplist用链表连接起来</li>
+</ol>
+</li>
+</ol>
+</li>
+<li></li>
+</ol>
+</li>
+</ol>
+<h3 id="Redis6"><a href="#Redis6" class="headerlink" title="Redis6"></a>Redis6</h3><h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ol>
+<li><a href="https://blog.csdn.net/xlgen157387/article/details/79470556">https://blog.csdn.net/xlgen157387/article/details/79470556</a></li>
+</ol>
+<h3 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h3><ol>
+<li>不用keys</li>
+</ol>
+<h4 id="新的数据类型"><a href="#新的数据类型" class="headerlink" title="新的数据类型"></a>新的数据类型</h4><h4 id="redis新事务"><a href="#redis新事务" class="headerlink" title="redis新事务"></a>redis新事务</h4><h4 id="主从复制"><a href="#主从复制" class="headerlink" title="主从复制"></a>主从复制</h4><h4 id="雪崩"><a href="#雪崩" class="headerlink" title="雪崩"></a>雪崩</h4>]]></content>
+      <categories>
+        <category>db</category>
+      </categories>
   </entry>
   <entry>
     <title></title>
@@ -296,176 +540,6 @@
       </categories>
   </entry>
   <entry>
-    <title>redis使用</title>
-    <url>/2021/10/06/db/redis/</url>
-    <content><![CDATA[<h3 id="技术发展史"><a href="#技术发展史" class="headerlink" title="技术发展史"></a>技术发展史</h3><ol>
-<li><p>redis</p>
-<ol>
-<li>特点<ol>
-<li><a href="https://www.jianshu.com/p/f42d5f5c495b">原子性</a></li>
-<li><a href="https://www.cnblogs.com/myseries/p/11733861.html">单线程</a></li>
-<li><a href="https://blog.csdn.net/xlgen157387/article/details/79470556">为什么说Redis是单线程的以及Redis为什么这么快</a></li>
-</ol>
-</li>
-</ol>
-</li>
-<li><p>技术分类</p>
-<ol>
-<li><p>功能性: java jsp tomcat html jdbc linux</p>
-</li>
-<li><p>性能: nosql java线程 hadoop nginx mq elasticSearch</p>
-</li>
-<li><p>扩展 struts mybtis  spring springBoot </p>
-<span id="more"></span></li>
-</ol>
-</li>
-<li><p>问题</p>
-<ol>
-<li><p>分布式服务器session共享问题</p>
-<ol>
-<li><p>放入到cookie，安全性差</p>
-</li>
-<li><p>session复制，数据冗余</p>
-</li>
-<li><p>jwt+共享远程nosql，直接放在内存，读取快</p>
-</li>
-</ol>
-</li>
-<li><p>数据库大</p>
-<ol>
-<li>分库分表，读写分离，破坏了业务逻辑</li>
-<li>缓存，内存处理，减少IO操作</li>
-</ol>
-</li>
-</ol>
-</li>
-<li><p>NoSQL(not only sql) 非关系型数据库   k—v</p>
-<ol>
-<li>特点<ol>
-<li>不支持ACID</li>
-<li>性能高</li>
-<li>原子性</li>
-</ol>
-</li>
-<li>场景</li>
-<li>适: 高并发，海量数据，扩展性数据 </li>
-<li>不适：事务支持，结构支持</li>
-<li>常见NoSQL</li>
-<li>Redis<pre><code>1. 支持持久化
-    2. 多数据结构
-</code></pre>
-</li>
-<li>MongoDB<pre><code>1. 文档型数据库
-    2. json友好型
-    3. 支持二进制
-</code></pre>
-</li>
-<li>行数据库 </li>
-<li>列数据库 avg ，mean,sum,方便</li>
-<li>图数据库</li>
-</ol>
-</li>
-</ol>
-<h3 id="reids–linux"><a href="#reids–linux" class="headerlink" title="reids–linux"></a>reids–linux</h3><ol>
-<li>各个文件<ol>
-<li>benchmark 性能测试</li>
-<li>check-aof  修复aof</li>
-<li>sentinel  集群</li>
-<li>server  启动<br>1. </li>
-<li>cli 客户端</li>
-</ol>
-</li>
-<li>操作<ol>
-<li>库操作<ol>
-<li>切换库 select 1</li>
-<li>dbsize数据库大小</li>
-<li>flushdb 清空库</li>
-</ol>
-</li>
-<li>key操作<ol>
-<li>查看所有 keys *   keys nam*  查看所有 nam开头的*</li>
-<li>set k v  get k</li>
-<li>exists key</li>
-<li>type key</li>
-<li>del key</li>
-<li>expire key  10  十秒失效  </li>
-<li>ttl  key 查看多少米过期  -2 已经过期   -1 永不过期</li>
-</ol>
-</li>
-</ol>
-</li>
-<li>五大类型<ol>
-<li>string（动态String,ArrryList-&gt;扩容，每次1倍，大于1M则每次1M）<ol>
-<li>max 512M</li>
-<li>set k str  get k</li>
-<li>append k 追加</li>
-<li>strlen k</li>
-<li>setnx  不存在则设置   返回0表示已经存在</li>
-<li>incr/decr k  增加/减少1 </li>
-<li>incrby/decrby k n  增加/减少n   原子性操作</li>
-<li> mset mget msetnx(都不存在才成功)</li>
-<li>getrange k begin end    —-&gt;substring</li>
-<li>setrange k begin  str       —-&gt;替换覆盖</li>
-<li>setex k 100 v  同时设置</li>
-<li>getset 取了就换 </li>
-</ol>
-</li>
-<li>list (多值，排序，双向链表，索引差，两头性能高)<ol>
-<li>lpush k v1 v2  左是头-头插法  v2 v1</li>
-<li>rpush k v1 v2 右是头头插法 v1 v2</li>
-<li>lrange k begin end 从左开始取</li>
-<li>lpop/rpop  从左/右吐出一个</li>
-<li>rpoplpush  右边吐一个放在左边 </li>
-<li>index k 0  按下标取</li>
-<li>llen</li>
-<li>linsert k before/after “str3”  “strn” 在str3 前面插入strn</li>
-<li>lrem k before/after “str3”  …</li>
-<li>lset k 0 “wang” 把第一个设置为”wang”</li>
-</ol>
-</li>
-<li>set 底层hash 无序 不重复<ol>
-<li>sadd k v1 v2</li>
-<li>smembers k</li>
-<li>sismember k v v是否存在 1true</li>
-<li>scard k   返回个数</li>
-<li>spop 随机吐出一个</li>
-<li>srandmenber k  n随机取出n个</li>
-<li>smove k v k2   迁移</li>
-<li>交集</li>
-<li>并集</li>
-<li></li>
-</ol>
-</li>
-<li>hash</li>
-<li>zset</li>
-</ol>
-</li>
-<li>原理<ol>
-<li>单线程+多路IO复用</li>
-<li>list<ol>
-<li>quickList<ol>
-<li>数据少的时候是连续内存  ziplist</li>
-<li>数据多将多个ziplist用链表连接起来</li>
-</ol>
-</li>
-</ol>
-</li>
-<li></li>
-</ol>
-</li>
-</ol>
-<h3 id="Redis6"><a href="#Redis6" class="headerlink" title="Redis6"></a>Redis6</h3><h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><ol>
-<li><a href="https://blog.csdn.net/xlgen157387/article/details/79470556">https://blog.csdn.net/xlgen157387/article/details/79470556</a></li>
-</ol>
-<h3 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h3><ol>
-<li>不用keys</li>
-</ol>
-<h4 id="新的数据类型"><a href="#新的数据类型" class="headerlink" title="新的数据类型"></a>新的数据类型</h4><h4 id="redis新事务"><a href="#redis新事务" class="headerlink" title="redis新事务"></a>redis新事务</h4><h4 id="主从复制"><a href="#主从复制" class="headerlink" title="主从复制"></a>主从复制</h4><h4 id="雪崩"><a href="#雪崩" class="headerlink" title="雪崩"></a>雪崩</h4>]]></content>
-      <categories>
-        <category>db</category>
-      </categories>
-  </entry>
-  <entry>
     <title>数据库事务</title>
     <url>/2021/09/24/db/%E4%BA%8B%E5%8A%A1/</url>
     <content><![CDATA[<p>ACID</p>
@@ -645,11 +719,77 @@
       </categories>
   </entry>
   <entry>
-    <title>java操作</title>
-    <url>/2021/10/30/java/java%E6%93%8D%E4%BD%9C/</url>
-    <content><![CDATA[<h3 id="路径问题"><a href="#路径问题" class="headerlink" title="路径问题"></a>路径问题</h3><ol>
-<li><p>代码</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">System.out.println(<span class="string">&quot;java_home:&quot;</span>  + System.getProperty( <span class="string">&quot;java.home&quot;</span> ));<span class="comment">//D:\java\jdk8u302-b08\jre</span></span><br><span class="line">    System.out.println(<span class="string">&quot;user_name:&quot;</span>  + System.getProperty( <span class="string">&quot;user.name&quot;</span> ));<span class="comment">//22453</span></span><br><span class="line">    System.out.println(<span class="string">&quot;user_home:&quot;</span>  + System.getProperty( <span class="string">&quot;user.home&quot;</span> ));<span class="comment">//C:\Users\22453</span></span><br><span class="line">    System.out.println(<span class="string">&quot;user_dir:&quot;</span>  + System.getProperty( <span class="string">&quot;user.dir&quot;</span> ));<span class="comment">//D:\project\boot-test1</span></span><br><span class="line">    System.out.println(ClassLoader.getSystemResource(<span class="string">&quot;&quot;</span>));<span class="comment">//file:/D:/project/boot-test1/target/classes/</span></span><br><span class="line">    System.out.println(Constant.class.getClassLoader().getResource(<span class="string">&quot;&quot;</span>));<span class="comment">//同上</span></span><br></pre></td></tr></table></figure></li>
+    <title>函数式接口</title>
+    <url>/2021/11/02/java/java8%E4%B9%8B%E5%87%BD%E6%95%B0%E5%BC%8F%E6%8E%A5%E5%8F%A3/</url>
+    <content><![CDATA[<h3 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h3><ol>
+<li><p>标准函数式接口在这个包下</p>
+<p>java.util.function</p>
+</li>
+<li><p>@FuntionalInterface</p>
+</li>
+<li><p>面向函数范式编程(FOP)(SQL)</p>
+</li>
+<li><p>面向接口编程</p>
+</li>
+<li><p><strong>面向过程编程（<code>Procedure Oriented</code>、简称<code>PO</code>）</strong> 和 <strong>面向对象编程（<code>Object Oriented</code>、简称<code>OO</code>）</strong> 我们一定听过，然而实际企业级开发里受用更多的一种编程思想那就是：<strong>面向接口编程（<code>Interface-Oriented</code>）</strong>！</p>
+</li>
+</ol>
+<h3 id="四大函数式接口"><a href="#四大函数式接口" class="headerlink" title="四大函数式接口"></a>四大函数式接口</h3><ol>
+<li><p>Consumer<T> </p>
+<p>​    消费型：有参无返回 </p>
+<p>​    void accept(T t)</p>
+</li>
+<li><p>Suppiier<T> 它是一个可以获取任意值的接口而已</p>
+<p>​    供给型：无参有返回</p>
+<p>​    T get()</p>
+</li>
+<li><p>Functional&lt;T,R&gt;</p>
+<p>​    函数型：处理参数</p>
+<p>​    R apply(T t)</p>
+</li>
+<li><p>Prediate<T></p>
+<p>​    断定型：有参判定返回bool</p>
+<p>​    boolean test(T t)</p>
+</li>
+</ol>
+<h3 id="我对函数式接口的理解"><a href="#我对函数式接口的理解" class="headerlink" title="我对函数式接口的理解"></a>我对函数式接口的理解</h3><ol>
+<li><p>java的函数式接口就是为了弥补java中<strong>万物皆对象</strong>,但函数却不是对象的缺憾而产生的。</p>
+<p>比如 一个函数对象</p>
+<figure class="highlight coffeescript"><table><tr><td class="code"><pre><span class="line">Supplier&lt; Integer&gt; a = <span class="function"><span class="params">()</span> -&gt;</span> <span class="number">10</span> + <span class="number">1</span>; <span class="regexp">//</span>这个生产者函数就是一个对象。</span><br></pre></td></tr></table></figure></li>
+<li></li>
+</ol>
+]]></content>
+      <categories>
+        <category>java</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>optional类</title>
+    <url>/2021/11/02/java/java8%E4%B9%8Boptional/</url>
+    <content><![CDATA[<h3 id="属性"><a href="#属性" class="headerlink" title="属性"></a>属性</h3><ol>
+<li>```java<br>private final T value;//值<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="number">2</span>. ```java</span><br><span class="line">   <span class="keyword">private</span> <span class="built_in">static</span> <span class="keyword">final</span> Optional<span class="meta">&lt;?</span>&gt; <span class="keyword">EMPTY</span> = <span class="keyword">new</span> Optional&lt;&gt;();<span class="comment">//空值常量</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="API"><a href="#API" class="headerlink" title="API"></a>API</h3><ol>
+<li><p>构建：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Optional.of()<span class="comment">// 不能传null</span></span><br><span class="line">Optional.ofNullable() <span class="comment">//可以传null</span></span><br><span class="line">Optional.empty()<span class="comment">//返回一个空的optional</span></span><br></pre></td></tr></table></figure></li>
+<li><p> 检查</p>
+</li>
+</ol>
+   <figure class="highlight java"><table><tr><td class="code"><pre><span class="line">o.isPresent() <span class="comment">//判断是否存在值</span></span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><p>取值</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">o.get()  <span class="comment">//如果o为null就会报错</span></span><br><span class="line">o.orElse(abc)<span class="comment">// 取值，如果为Null，返回同类对象abc</span></span><br></pre></td></tr></table></figure></li>
+<li><p>lambda</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">o.ifPresent(s-&gt;System.out.println(s))<span class="comment">//消费者函数 consumer void accept (T t)</span></span><br><span class="line">o.orElseGet(Supplier&lt;? extends T&gt; other)   <span class="comment">// 生产者函数 supplier  T get()</span></span><br><span class="line">o.filter(Predicate&lt;? <span class="keyword">super</span> T&gt; predicate) <span class="comment">//检测者函数 Boolean test(T t)，如果为false就会变null</span></span><br><span class="line">o.map(Function&lt;? <span class="keyword">super</span> T, ? extends U&gt; mapper) <span class="comment">//映射函数Function R apply(T t) 转换类型</span></span><br></pre></td></tr></table></figure></li>
+<li><p>重写方法</p>
+<ol>
+<li><p>判等</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">equals(object o)</span><br><span class="line">--&gt;Object.equals(value,o.value)</span><br><span class="line">----&gt;<span class="keyword">return</span> v1==v2||v1.equals(v2)</span><br></pre></td></tr></table></figure></li>
+<li><p>toString</p>
+</li>
+</ol>
+</li>
 </ol>
 ]]></content>
       <categories>
@@ -700,37 +840,7 @@
 </li>
 </ol>
 <h3 id="二、函数式接口"><a href="#二、函数式接口" class="headerlink" title="二、函数式接口"></a>二、函数式接口</h3><ol>
-<li><p>标准函数式接口在这个包下</p>
-<p>java.util.function</p>
-</li>
-<li><p>@FuntionalInterface</p>
-</li>
-<li><p>面向函数范式编程(FOP)(SQL)</p>
-</li>
-<li><p>面向接口编程</p>
-</li>
-<li><p><strong>面向过程编程（<code>Procedure Oriented</code>、简称<code>PO</code>）</strong> 和 <strong>面向对象编程（<code>Object Oriented</code>、简称<code>OO</code>）</strong> 我们一定听过，然而实际企业级开发里受用更多的一种编程思想那就是：<strong>面向接口编程（<code>Interface-Oriented</code>）</strong>！</p>
-</li>
-<li><p>四大函数式接口</p>
-<ol>
-<li><p>Consumer<T> </p>
-<p>​    消费型：有参无返回 </p>
-<p>​    void accept(T t)</p>
-</li>
-<li><p>Suppiier<T></p>
-<p>​    供给型：无参有返回</p>
-<p>​    T get()</p>
-</li>
-<li><p>Functional&lt;T,R&gt;</p>
-<p>​    函数型：处理参数</p>
-<p>​    R apply(T t)</p>
-</li>
-<li><p>Prediate<T></p>
-<p>​    断定型：有参判定返回bool</p>
-<p>​    boolean test(T t)</p>
-</li>
-</ol>
-</li>
+<li></li>
 </ol>
 <h3 id="三、方法引用-构造器引用"><a href="#三、方法引用-构造器引用" class="headerlink" title="三、方法引用 构造器引用"></a>三、方法引用 构造器引用</h3><ol>
 <li><p>当要传递给lambda操作，已经有实现方法，就可以使用方法引用。</p>
@@ -859,7 +969,6 @@
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function">R <span class="title">apply</span><span class="params">(T t, U u)</span></span>;</span><br></pre></td></tr></table></figure></li>
 <li><p>ToIntFunction<T> </p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">applyAsInt</span><span class="params">(T value)</span></span>;</span><br><span class="line">Student::getAge</span><br><span class="line">o-&gt;o.getAge()    </span><br></pre></td></tr></table></figure></li>
-<li></li>
 </ol>
 <h3 id="我对Lambda的运用"><a href="#我对Lambda的运用" class="headerlink" title="我对Lambda的运用"></a>我对Lambda的运用</h3><ol>
 <li><p>类–&gt;映射string–&gt;加到listString</p>
@@ -1010,6 +1119,32 @@
       </categories>
   </entry>
   <entry>
+    <title>java分析3</title>
+    <url>/2021/10/13/java/java%E7%89%B9%E6%AE%8A%E5%B1%9E%E6%80%A7/</url>
+    <content><![CDATA[<h3 id="面向对象"><a href="#面向对象" class="headerlink" title="面向对象"></a>面向对象</h3><ol>
+<li><p>方法重构</p>
+<ol>
+<li><p>不同return 不同参  可行</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">t</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">t</span><span class="params">(<span class="keyword">int</span> a)</span></span>&#123;<span class="keyword">return</span> <span class="number">1</span>;&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>不同类型同参  不行</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">t</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">t</span><span class="params">()</span></span>&#123;<span class="keyword">return</span> <span class="number">1</span>;&#125;</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span></li>
+<li><p>继承重构也是</p>
+</li>
+<li><p>所以带有@Data的两个继承类，属性能覆盖，但是如果int A.a  String B.a 就会报错，因为A是int getA()</p>
+<p>而B是String getA()。</p>
+</li>
+</ol>
+</li>
+<li></li>
+</ol>
+]]></content>
+      <categories>
+        <category>java</category>
+      </categories>
+  </entry>
+  <entry>
     <title>java常用工具类源码</title>
     <url>/2021/10/04/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</url>
     <content><![CDATA[<h3 id="比较器Comparator"><a href="#比较器Comparator" class="headerlink" title="比较器Comparator"></a>比较器Comparator</h3><ol>
@@ -1066,6 +1201,13 @@
 </li>
 <li><p>可重写：toString,equals</p>
 </li>
+</ol>
+</li>
+<li><p>java.util.Objects  //对Object对象处理的方法类</p>
+<ol>
+<li><p>深度判等</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">deepEquals(Object a, Object b)</span><br><span class="line"><span class="keyword">if</span> (a == b)</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line"><span class="keyword">else</span> <span class="keyword">if</span> (a == <span class="keyword">null</span> || b == <span class="keyword">null</span>)</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">	<span class="keyword">return</span> Arrays.deepEquals0(a, b);</span><br></pre></td></tr></table></figure></li>
+<li></li>
 </ol>
 </li>
 <li><p>System</p>
@@ -1131,76 +1273,15 @@
       </categories>
   </entry>
   <entry>
-    <title>java分析3</title>
-    <url>/2021/10/13/java/java%E7%89%B9%E6%AE%8A%E5%B1%9E%E6%80%A7/</url>
-    <content><![CDATA[<h3 id="面向对象"><a href="#面向对象" class="headerlink" title="面向对象"></a>面向对象</h3><ol>
-<li><p>方法重构</p>
-<ol>
-<li><p>不同return 不同参  可行</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">t</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">t</span><span class="params">(<span class="keyword">int</span> a)</span></span>&#123;<span class="keyword">return</span> <span class="number">1</span>;&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p>不同类型同参  不行</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">t</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">t</span><span class="params">()</span></span>&#123;<span class="keyword">return</span> <span class="number">1</span>;&#125;</span><br></pre></td></tr></table></figure>
-
-<span id="more"></span></li>
-<li><p>继承重构也是</p>
-</li>
-<li><p>所以带有@Data的两个继承类，属性能覆盖，但是如果int A.a  String B.a 就会报错，因为A是int getA()</p>
-<p>而B是String getA()。</p>
-</li>
-</ol>
-</li>
-<li></li>
+    <title>java操作</title>
+    <url>/2021/10/30/java/java%E6%93%8D%E4%BD%9C/</url>
+    <content><![CDATA[<h3 id="路径问题"><a href="#路径问题" class="headerlink" title="路径问题"></a>路径问题</h3><ol>
+<li><p>代码</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">System.out.println(<span class="string">&quot;java_home:&quot;</span>  + System.getProperty( <span class="string">&quot;java.home&quot;</span> ));<span class="comment">//D:\java\jdk8u302-b08\jre</span></span><br><span class="line">    System.out.println(<span class="string">&quot;user_name:&quot;</span>  + System.getProperty( <span class="string">&quot;user.name&quot;</span> ));<span class="comment">//22453</span></span><br><span class="line">    System.out.println(<span class="string">&quot;user_home:&quot;</span>  + System.getProperty( <span class="string">&quot;user.home&quot;</span> ));<span class="comment">//C:\Users\22453</span></span><br><span class="line">    System.out.println(<span class="string">&quot;user_dir:&quot;</span>  + System.getProperty( <span class="string">&quot;user.dir&quot;</span> ));<span class="comment">//D:\project\boot-test1</span></span><br><span class="line">    System.out.println(ClassLoader.getSystemResource(<span class="string">&quot;&quot;</span>));<span class="comment">//file:/D:/project/boot-test1/target/classes/</span></span><br><span class="line">    System.out.println(Constant.class.getClassLoader().getResource(<span class="string">&quot;&quot;</span>));<span class="comment">//同上</span></span><br></pre></td></tr></table></figure></li>
 </ol>
 ]]></content>
       <categories>
         <category>java</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>动态代理</title>
-    <url>/2021/10/13/java/java%E9%AB%98%E9%98%B6/</url>
-    <content><![CDATA[<h3 id="动态代理"><a href="#动态代理" class="headerlink" title="动态代理"></a>动态代理</h3><ol>
-<li><p>方式1 jdk.InvocationHandler</p>
-<ol>
-<li><p>步骤</p>
-<ol>
-<li><p>被代理对象A1  实现接口A的两个方法(m1,m2)</p>
-</li>
-<li><p>创建一个handler实现InvocationHandler接口</p>
-</li>
-<li><p>重写handler的invoke方法</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">doDate()</span><br><span class="line">invoke(tar,args)==doSime()</span><br><span class="line">doLog()</span><br></pre></td></tr></table></figure></li>
-<li><p>实现代理jdk.Proxy</p>
-</li>
-</ol>
-<span id="more"></span></li>
-<li><p>要求： 必须接口</p>
-</li>
-</ol>
-</li>
-<li><p>方式2 CGLIB</p>
-<ol>
-<li>要求：继承，不能final</li>
-</ol>
-</li>
-<li><p>作用：</p>
-<ol>
-<li>减少代码重复</li>
-<li>无痛功能增强</li>
-<li>专注业务逻辑</li>
-<li>解耦合</li>
-</ol>
-</li>
-<li><p>AOP 面向切面编程</p>
-<ol>
-<li> 规范化（约定好）的动态代理</li>
-<li></li>
-</ol>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>java高阶</category>
       </categories>
   </entry>
   <entry>
@@ -1246,9 +1327,7 @@
 </ol>
 <!--more-->
 
-
-
-<h3 id="java四大域对象-转载"><a href="#java四大域对象-转载" class="headerlink" title="java四大域对象-转载"></a><a href="https://blog.csdn.net/u014253011/article/details/85718649">java四大域对象-转载</a></h3><ol>
+<h3 id="java私有构造作用"><a href="#java私有构造作用" class="headerlink" title="java私有构造作用"></a>java私有构造作用</h3><h3 id="java四大域对象-转载"><a href="#java四大域对象-转载" class="headerlink" title="java四大域对象-转载"></a><a href="https://blog.csdn.net/u014253011/article/details/85718649">java四大域对象-转载</a></h3><ol>
 <li><p>request HttpServletContext </p>
 <ol>
 <li><p>生命周期：</p>
@@ -1403,6 +1482,53 @@
 <h3 id="缓存"><a href="#缓存" class="headerlink" title="缓存"></a>缓存</h3><h3 id="动态sql"><a href="#动态sql" class="headerlink" title="动态sql"></a>动态sql</h3>]]></content>
       <categories>
         <category>组件</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>动态代理</title>
+    <url>/2021/10/13/java/java%E9%AB%98%E9%98%B6/</url>
+    <content><![CDATA[<h3 id="动态代理"><a href="#动态代理" class="headerlink" title="动态代理"></a>动态代理</h3><ol>
+<li><p>方式1 jdk.InvocationHandler</p>
+<ol>
+<li><p>步骤</p>
+<ol>
+<li><p>被代理对象A1  实现接口A的两个方法(m1,m2)</p>
+</li>
+<li><p>创建一个handler实现InvocationHandler接口</p>
+</li>
+<li><p>重写handler的invoke方法</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">doDate()</span><br><span class="line">invoke(tar,args)==doSime()</span><br><span class="line">doLog()</span><br></pre></td></tr></table></figure></li>
+<li><p>实现代理jdk.Proxy</p>
+</li>
+</ol>
+<span id="more"></span></li>
+<li><p>要求： 必须接口</p>
+</li>
+</ol>
+</li>
+<li><p>方式2 CGLIB</p>
+<ol>
+<li>要求：继承，不能final</li>
+</ol>
+</li>
+<li><p>作用：</p>
+<ol>
+<li>减少代码重复</li>
+<li>无痛功能增强</li>
+<li>专注业务逻辑</li>
+<li>解耦合</li>
+</ol>
+</li>
+<li><p>AOP 面向切面编程</p>
+<ol>
+<li> 规范化（约定好）的动态代理</li>
+<li></li>
+</ol>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>java高阶</category>
       </categories>
   </entry>
   <entry>
@@ -1657,77 +1783,41 @@
       </categories>
   </entry>
   <entry>
-    <title>hadoop的启动</title>
-    <url>/2021/09/10/distribute/hadoop%E5%90%AF%E5%8A%A8/</url>
-    <content><![CDATA[<h2 id="一、-基本环境"><a href="#一、-基本环境" class="headerlink" title="一、 基本环境"></a>一、 基本环境</h2><ol>
-<li><p>获取主机名字 master、s1、s2</p>
+    <title>session</title>
+    <url>/2021/10/31/javaWeb/Session/</url>
+    <content><![CDATA[<h3 id="session-服务端会话技术"><a href="#session-服务端会话技术" class="headerlink" title="session 服务端会话技术"></a>session 服务端会话技术</h3><ol>
+<li>特点<ol>
+<li>存储一次会话所有的数据</li>
+<li>很大，任意类型</li>
+<li>基于cookie</li>
+<li>服务器关闭前tomcat会自动持久化到本地</li>
+</ol>
 </li>
-<li><p>时钟同步</p>
-<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line"><span class="regexp">/usr/</span>sbin/ntpdate cn.pool.ntp.org</span><br></pre></td></tr></table></figure></li>
-<li><p>关闭防火墙</p>
-<figure class="highlight arduino"><table><tr><td class="code"><pre><span class="line">systemctl stop firewalld.service</span><br></pre></td></tr></table></figure>
-
+<li>原理<ol>
+<li><p>第一次访问 创建session,setId,setAttr</p>
+</li>
+<li><p>响应到浏览器set-cookie:JSESSIONID</p>
+</li>
+<li><p>再次访问根据cookie的sessionId获取session</p>
 <span id="more"></span></li>
-<li><p>编辑host 以对应ping 如：</p>
-<figure class="highlight accesslog"><table><tr><td class="code"><pre><span class="line"><span class="number">10.42.0.93</span> master</span><br><span class="line"><span class="number">10.42.0.94</span> slave01</span><br><span class="line"><span class="number">10.42.0.95</span> slave02</span><br></pre></td></tr></table></figure></li>
-<li><p>测试ping是否成功</p>
-<figure class="highlight crmsh"><table><tr><td class="code"><pre><span class="line">ping <span class="keyword">master</span> <span class="title">-c</span> <span class="number">3</span></span><br></pre></td></tr></table></figure></li>
 </ol>
-<h2 id="二、联机"><a href="#二、联机" class="headerlink" title="二、联机"></a>二、联机</h2><ol>
-<li><p>生成公钥</p>
-<figure class="highlight ebnf"><table><tr><td class="code"><pre><span class="line"><span class="attribute">ssh-keygen -t rsa</span></span><br></pre></td></tr></table></figure></li>
-<li><p>公钥备份文件</p>
-<figure class="highlight arcade"><table><tr><td class="code"><pre><span class="line">cat ~<span class="regexp">/.ssh/i</span>d_rsa.pub &gt;&gt; ~<span class="regexp">/.ssh/</span>authorized_keys</span><br></pre></td></tr></table></figure></li>
-<li><p>修改文件权限</p>
-<figure class="highlight arcade"><table><tr><td class="code"><pre><span class="line">chmod <span class="number">600</span> ~<span class="regexp">/.ssh/</span>authorized_keys</span><br></pre></td></tr></table></figure></li>
-<li><p>将专用密钥添加到 ssh-agent 的高速缓存中</p>
-<figure class="highlight arcade"><table><tr><td class="code"><pre><span class="line">ssh-add ~<span class="regexp">/.ssh/i</span>d_rsa</span><br></pre></td></tr></table></figure></li>
-<li><p>公钥转移到其他机器</p>
-<figure class="highlight typescript"><table><tr><td class="code"><pre><span class="line">scp ~<span class="regexp">/.ssh/</span>authorized_keys zkpk<span class="meta">@slave01</span>:~<span class="regexp">/.ssh/</span></span><br></pre></td></tr></table></figure></li>
-<li><p>其他机器也生成密钥</p>
 </li>
-<li><p>测试远程   ssh s1</p>
+<li>存活时间<ol>
+<li>关闭浏览器消失—&gt;可以通过延长cookie存活时期而持久化存储</li>
+<li>session钝化—&gt;服务器关闭时持久化(序列化)   tomcat会自动进行—&gt;tomcat/work…./localhost/…/Session.ser</li>
+<li>session活化—&gt;服务器读取持久化session到内存</li>
+<li>session失效时间<ol>
+<li>服务器关闭</li>
+<li>自杀:session.invalidate();</li>
+<li>默认30分钟web.xml-&gt;&lt;session-config-timeout&gt;</li>
+</ol>
 </li>
 </ol>
-<h2 id="三、安装java"><a href="#三、安装java" class="headerlink" title="三、安装java"></a>三、安装java</h2><ol>
-<li><p>root下解压</p>
-<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line">tar -xzvf <span class="regexp">/home/</span>zkpk<span class="regexp">/tgz/</span>jdk-<span class="number">8</span>u131-linux-x64.tar.gz -C <span class="regexp">/usr/</span>java</span><br></pre></td></tr></table></figure></li>
-<li><p>修改环境变量</p>
-<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line">gedit <span class="regexp">/home/</span>zkpk/.bash_profile</span><br><span class="line">	export JAVA_HOME=<span class="regexp">/usr/</span>java<span class="regexp">/jdk1.8.0_131/</span></span><br><span class="line">	export PATH=<span class="variable">$JAVA_HOME</span>/bin:<span class="variable">$PATH</span></span><br><span class="line">source <span class="regexp">/home/</span>zkpk/.bash_profile</span><br></pre></td></tr></table></figure></li>
-<li><p>其他机器同样安装</p>
 </li>
-<li><p>测试java：java -version</p>
-</li>
-</ol>
-<h2 id="四、安装hadoop"><a href="#四、安装hadoop" class="headerlink" title="四、安装hadoop"></a>四、安装hadoop</h2><ol>
-<li><p>解压</p>
-<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line">tar -xzvf <span class="regexp">/home/</span>zkpk<span class="regexp">/tgz/</span>hadoop-<span class="number">2.7</span>.<span class="number">3</span>.tar.gz –C <span class="regexp">/home/</span>zkpk</span><br></pre></td></tr></table></figure></li>
-<li><p>修改java环境变量</p>
-<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line">gedit <span class="regexp">/home/</span>zkpk<span class="regexp">/hadoop-2.7.3/</span>etc<span class="regexp">/hadoop/</span>hadoop-env.sh</span><br><span class="line"> 	export JAVA_HOME=<span class="regexp">/usr/</span>java<span class="regexp">/jdk1.8.0_131/</span></span><br><span class="line">gedit ~<span class="regexp">/hadoop-2.7.3/</span>etc<span class="regexp">/hadoop/y</span>arn-env.sh</span><br><span class="line">	export JAVA_HOME=<span class="regexp">/usr/</span>java<span class="regexp">/jdk1.8.0_131/</span></span><br></pre></td></tr></table></figure></li>
-<li><p>其他配置</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line">1.配置core-site.xml 文件</span><br><span class="line">gedit  ~/hadoop-2.7.3/etc/hadoop/core-site.xml</span><br><span class="line">	<span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span></span><br><span class="line">    <span class="meta">&lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;configuration.xsl&quot;?&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- Put site-specific property overrides in this file. --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">name</span>&gt;</span>fs.defaultFS<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">value</span>&gt;</span>hdfs://master:9000<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">name</span>&gt;</span>hadoop.tmp.dir<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">value</span>&gt;</span>/home/zkpk/hadoopdata<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">2.配置hdfs-site.xml文件</span><br><span class="line">gedit  ~/hadoop-2.7.3/etc/hadoop/hdfs-site.xml</span><br><span class="line">    <span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span></span><br><span class="line">    <span class="meta">&lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;configuration.xsl&quot;?&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- Put site-specific property overrides in this file. --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">name</span>&gt;</span>dfs.replication<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">value</span>&gt;</span>2<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">3.配置yarn-site.xml文件</span><br><span class="line">gedit  ~/hadoop-2.7.3/etc/hadoop/yarn-site.xml</span><br><span class="line">    <span class="meta">&lt;?xml version=&quot;1.0&quot;?&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.nodemanager.aux-services<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">value</span>&gt;</span>mapreduce_shuffle<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.resourcemanager.address<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">value</span>&gt;</span>master:18040<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.resourcemanager.scheduler.address<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">value</span>&gt;</span>master:18030<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.resourcemanager.resource-tracker.address<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">value</span>&gt;</span>master:18025<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.resourcemanager.admin.address<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">value</span>&gt;</span>master:18141<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">name</span>&gt;</span>yarn.resourcemanager.webapp.address<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">value</span>&gt;</span>master:18088<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">4.配置mapred-site.xml文件</span><br><span class="line">cp ~/hadoop-2.7.3/etc/hadoop/mapred-site.xml.template  ~/hadoop-2.7.3/etc/hadoop/mapred-site.xml</span><br><span class="line">gedit ~/hadoop-2.7.3/etc/hadoop/mapred-site.xml</span><br><span class="line">    <span class="meta">&lt;?xml version=&quot;1.0&quot;?&gt;</span></span><br><span class="line">    <span class="meta">&lt;?xml-stylesheet type=&quot;text/xsl&quot; href=&quot;configuration.xsl&quot;?&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">name</span>&gt;</span>mapreduce.framework.name<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">value</span>&gt;</span>yarn<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-<li><p>配置slaves文件</p>
-<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line">gedit ~<span class="regexp">/hadoop-2.7.3/</span>etc<span class="regexp">/hadoop/</span>slaves</span><br><span class="line">    slave01</span><br><span class="line">    slave02</span><br></pre></td></tr></table></figure></li>
-<li><p>创建Hadoop数据目录</p>
-<figure class="highlight arduino"><table><tr><td class="code"><pre><span class="line">mkdir hadoopdata</span><br></pre></td></tr></table></figure></li>
-<li><p>将配置好的hadoop文件夹复制到从节点</p>
-<figure class="highlight apache"><table><tr><td class="code"><pre><span class="line"><span class="attribute">scp</span> -r hadoop-<span class="number">2</span>.<span class="number">7</span>.<span class="number">3</span> zkpk@slave<span class="number">01</span>:~/</span><br></pre></td></tr></table></figure></li>
-<li><p>配置环境变量</p>
-<figure class="highlight routeros"><table><tr><td class="code"><pre><span class="line">gedit ~/.bash_profile</span><br><span class="line">    #HADOOP</span><br><span class="line">    <span class="builtin-name">export</span> <span class="attribute">HADOOP_HOME</span>=/home/zkpk/hadoop-2.7.3</span><br><span class="line">    <span class="builtin-name">export</span> <span class="attribute">PATH</span>=<span class="variable">$HADOOP_HOME</span>/bin:$HADOOP_HOME/sbin:$PATH</span><br><span class="line">source ~/.bash_profile</span><br></pre></td></tr></table></figure></li>
-<li><p>其他机器同样配置环境变量</p>
-</li>
-<li><p>在master格式化磁盘</p>
-<figure class="highlight dos"><table><tr><td class="code"><pre><span class="line">hdfs namenode -<span class="built_in">format</span></span><br></pre></td></tr></table></figure></li>
-</ol>
-<h2 id="五、启动检测"><a href="#五、启动检测" class="headerlink" title="五、启动检测"></a>五、启动检测</h2><ol>
-<li>start-all.sh</li>
-<li>jps查看</li>
-<li><a href="http://master:50070/%E6%9F%A5%E7%9C%8B">http://master:50070/查看</a></li>
-<li><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20210911183155100.png" alt="image-20210911183155100"></li>
 </ol>
 ]]></content>
       <categories>
-        <category>hadoop</category>
+        <category>javaWeb</category>
       </categories>
   </entry>
   <entry>
@@ -1785,109 +1875,91 @@
       </categories>
   </entry>
   <entry>
-    <title>session</title>
-    <url>/2021/10/31/javaWeb/Session/</url>
-    <content><![CDATA[<h3 id="session-服务端会话技术"><a href="#session-服务端会话技术" class="headerlink" title="session 服务端会话技术"></a>session 服务端会话技术</h3><ol>
-<li>特点<ol>
-<li>存储一次会话所有的数据</li>
-<li>很大，任意类型</li>
-<li>基于cookie</li>
-<li>服务器关闭前tomcat会自动持久化到本地</li>
+    <title>java-web</title>
+    <url>/2021/09/27/javaWeb/java_web/</url>
+    <content><![CDATA[<h3 id="web-网页"><a href="#web-网页" class="headerlink" title="web(网页)"></a>web(网页)</h3><ol>
+<li>静态web <ol>
+<li>html css</li>
+<li>静态文件</li>
+<li>模板引擎</li>
+<li>即所有的数据都不变化</li>
 </ol>
 </li>
-<li>原理<ol>
-<li><p>第一次访问 创建session,setId,setAttr</p>
-</li>
-<li><p>响应到浏览器set-cookie:JSESSIONID</p>
-</li>
-<li><p>再次访问根据cookie的sessionId获取session</p>
+<li>动态web 这个叫javaWeb<ol>
+<li><p>提供给人的数据会根据用户的请求而会变化</p>
 <span id="more"></span></li>
 </ol>
 </li>
-<li>存活时间<ol>
-<li>关闭浏览器消失—&gt;可以通过延长cookie存活时期而持久化存储</li>
-<li>session钝化—&gt;服务器关闭时持久化(序列化)   tomcat会自动进行—&gt;tomcat/work…./localhost/…/Session.ser</li>
-<li>session活化—&gt;服务器读取持久化session到内存</li>
-<li>session失效时间<ol>
-<li>服务器关闭</li>
-<li>自杀:session.invalidate();</li>
-<li>默认30分钟web.xml-&gt;&lt;session-config-timeout&gt;</li>
+<li>web的组成<ol>
+<li>html css js</li>
+<li>jsp servlet</li>
+<li>java</li>
+<li>jar</li>
+<li>配置文件</li>
+<li>服务器</li>
 </ol>
 </li>
 </ol>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>javaWeb</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>cookie</title>
-    <url>/2021/10/31/javaWeb/cookie/</url>
-    <content><![CDATA[<h2 id="会话"><a href="#会话" class="headerlink" title="会话"></a>会话</h2><ol>
-<li>会话功能：在会话范围内共享数据</li>
-<li>一次会话就是从浏览器打开到关闭期间客户端与服务端的请求和响应</li>
-<li>http无状态，无法进行数据交换，无法识别身份，</li>
-</ol>
-<h3 id="cookie-客户端会话技术"><a href="#cookie-客户端会话技术" class="headerlink" title="cookie 客户端会话技术"></a>cookie 客户端会话技术</h3><ol>
-<li><p>cookie特点</p>
+<h3 id="javaWeb项目结构"><a href="#javaWeb项目结构" class="headerlink" title="javaWeb项目结构"></a>javaWeb项目结构</h3><ol>
+<li><p>文件结构</p>
 <ol>
-<li><p>保存在浏览器内存中</p>
-</li>
-<li><p>key-value,Respones.Header，</p>
-</li>
-<li><p>可设置存活时间</p>
-</li>
-<li><p>安全性低</p>
-</li>
-<li><p>大小有限(每个域名一个大小)</p>
-</li>
-<li><p>不可跨域性</p>
-<span id="more"></span></li>
+<li>根目录(parent)<ol>
+<li>WEN-INF目录<ol>
+<li>web.xml:web核心配置</li>
+<li>Classes:字节码文件（java编译后）</li>
+<li>lib:依赖jar包</li>
 </ol>
 </li>
-<li><p>作用</p>
+</ol>
+</li>
+</ol>
+</li>
+<li><p>web+idea</p>
 <ol>
-<li>登陆记录(欢迎回来，你上一次访问的时间是。。。cookie.set(cookie.getOrDefault(“lastTime”,0)))</li>
-<li>页面间数据传递</li>
-<li>保存用户信息</li>
-</ol>
-</li>
-</ol>
-<h4 id="使用步骤"><a href="#使用步骤" class="headerlink" title="使用步骤"></a>使用步骤</h4><ol>
-<li><p>创建cookie</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Cookie c=<span class="keyword">new</span> Cookie(<span class="string">&quot;name&quot;</span>,<span class="string">&quot;hello&quot;</span>);</span><br></pre></td></tr></table></figure></li>
-<li><p>发送cookie–&gt;想听头 set-cookie:””</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">response.addCookie(c);</span><br></pre></td></tr></table></figure></li>
-<li><p>获取cookie</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Cookie[]cookies=request.getCookies();</span><br></pre></td></tr></table></figure></li>
-<li><p>发送多个cookie</p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211006110443252.png![image-20211006110900739](https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211006110900739.png" alt="image-20211006110443252"></p>
-<p>–&gt;下一次request的时候重复的会被统一(默认用最后一个)</p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211006110648442.png" alt="image-20211006110648442"></p>
-</li>
-</ol>
-<h4 id="cookie问题"><a href="#cookie问题" class="headerlink" title="cookie问题"></a>cookie问题</h4><ol>
-<li><p>cookie保存时间</p>
+<li><p>启动idea,配置启 添加本地tomcat</p>
+<p>配置</p>
 <ol>
-<li>默认浏览器关闭</li>
-<li>持久化存储 cookie.setMaxAge(60<em>60</em>24*30) <ol>
-<li>整数：关闭浏览器n秒后才消失，上面是一个月</li>
-<li>负数：默认</li>
-<li>零：删除此cookie</li>
+<li>虚拟目录</li>
+<li>端口</li>
 </ol>
 </li>
-</ol>
-</li>
-<li><p>cookie中文问题(tomcat&gt;8)</p>
-<p>在浏览器中显示有问题，但是再次发送到java还是可以看到中文</p>
-</li>
-<li><p>cookie共享问题</p>
+<li><p>添加facet的Web</p>
 <ol>
-<li>多个tomcat(服务器)默认情况下是不共享的</li>
-<li>可以使用setPath设置范围(“/“)范围最大</li>
+<li>配置文件path:web.xml</li>
+<li>资源目录 path:webapp</li>
 </ol>
+</li>
+<li><p>在启动配置的tomcat的部署下方配置上下文以配置路径</p>
+</li>
+<li><p>热部署–&gt;debug方式启动</p>
+</li>
+<li><p>右键new servlet</p>
+<p>javaProject.iml/pom.xml</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">sourceRoots</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">root</span> <span class="attr">url</span>=<span class="string">&quot;file://$MODULE_DIR$/src&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">root</span> <span class="attr">url</span>=<span class="string">&quot;file://$MODULE_DIR$/src/main/java&quot;</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">sourceRoots</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+</ol>
+<h3 id="一些理解"><a href="#一些理解" class="headerlink" title="一些理解"></a>一些理解</h3><ol>
+<li>tomcat，</li>
+<li>servlet 一种规范，实现这个规范的Class能够随时接受Requeset,Response，就好象一直运行在tomcat上一样。</li>
+<li>request 一种规范，将浏览器的请求数据进行封装，其中httoRequest将http协议的请求进行封装，这个封装体可以把这些数据到处共享。</li>
+<li>response</li>
+<li>其他<ol>
+<li>@WebServlet(“”)请求模式路径</li>
+<li></li>
+</ol>
+</li>
+</ol>
+<h3 id="issue"><a href="#issue" class="headerlink" title="issue"></a>issue</h3><ol>
+<li><p>Request请求参数乱码</p>
+<ol>
+<li><p>tomcat&gt;8 get方式不会乱码(url)</p>
+</li>
+<li><p>post(stream)-&gt;设置流的编码–&gt;</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">req.setCharacterEncoding(<span class="string">&quot;utf-8&quot;</span>);</span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+<li><p>Response设置编码</p>
 </li>
 </ol>
 ]]></content>
@@ -2005,6 +2077,87 @@
       </categories>
   </entry>
   <entry>
+    <title>cookie</title>
+    <url>/2021/10/31/javaWeb/cookie/</url>
+    <content><![CDATA[<h2 id="会话"><a href="#会话" class="headerlink" title="会话"></a>会话</h2><ol>
+<li>会话功能：在会话范围内共享数据</li>
+<li>一次会话就是从浏览器打开到关闭期间客户端与服务端的请求和响应</li>
+<li>http无状态，无法进行数据交换，无法识别身份，</li>
+</ol>
+<h3 id="cookie-客户端会话技术"><a href="#cookie-客户端会话技术" class="headerlink" title="cookie 客户端会话技术"></a>cookie 客户端会话技术</h3><ol>
+<li><p>cookie特点</p>
+<ol>
+<li><p>保存在浏览器内存中</p>
+</li>
+<li><p>key-value,Respones.Header，</p>
+</li>
+<li><p>可设置存活时间</p>
+</li>
+<li><p>安全性低</p>
+</li>
+<li><p>大小有限(每个域名一个大小)</p>
+</li>
+<li><p>不可跨域性</p>
+<span id="more"></span></li>
+</ol>
+</li>
+<li><p>作用</p>
+<ol>
+<li>登陆记录(欢迎回来，你上一次访问的时间是。。。cookie.set(cookie.getOrDefault(“lastTime”,0)))</li>
+<li>页面间数据传递</li>
+<li>保存用户信息</li>
+</ol>
+</li>
+</ol>
+<h4 id="使用步骤"><a href="#使用步骤" class="headerlink" title="使用步骤"></a>使用步骤</h4><ol>
+<li><p>创建cookie</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Cookie c=<span class="keyword">new</span> Cookie(<span class="string">&quot;name&quot;</span>,<span class="string">&quot;hello&quot;</span>);</span><br></pre></td></tr></table></figure></li>
+<li><p>发送cookie–&gt;想听头 set-cookie:””</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">response.addCookie(c);</span><br></pre></td></tr></table></figure></li>
+<li><p>获取cookie</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Cookie[]cookies=request.getCookies();</span><br></pre></td></tr></table></figure></li>
+<li><p>发送多个cookie</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211006110443252.png![image-20211006110900739](https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211006110900739.png" alt="image-20211006110443252"></p>
+<p>–&gt;下一次request的时候重复的会被统一(默认用最后一个)</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211006110648442.png" alt="image-20211006110648442"></p>
+</li>
+</ol>
+<h4 id="cookie问题"><a href="#cookie问题" class="headerlink" title="cookie问题"></a>cookie问题</h4><ol>
+<li><p>cookie保存时间</p>
+<ol>
+<li>默认浏览器关闭</li>
+<li>持久化存储 cookie.setMaxAge(60<em>60</em>24*30) <ol>
+<li>整数：关闭浏览器n秒后才消失，上面是一个月</li>
+<li>负数：默认</li>
+<li>零：删除此cookie</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p>cookie中文问题(tomcat&gt;8)</p>
+<p>在浏览器中显示有问题，但是再次发送到java还是可以看到中文</p>
+</li>
+<li><p>cookie共享问题</p>
+<ol>
+<li>多个tomcat(服务器)默认情况下是不共享的</li>
+<li>可以使用setPath设置范围(“/“)范围最大</li>
+</ol>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>javaWeb</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>java发送http请求</title>
+    <url>/2021/11/01/javaWeb/java%E5%8F%91%E9%80%81Http%E8%AF%B7%E6%B1%82/</url>
+    <content><![CDATA[<h3 id=""><a href="#" class="headerlink" title=""></a></h3>]]></content>
+      <categories>
+        <category>javaWeb</category>
+      </categories>
+  </entry>
+  <entry>
     <title>request</title>
     <url>/2021/10/31/javaWeb/request/</url>
     <content><![CDATA[<h3 id="request请求"><a href="#request请求" class="headerlink" title="request请求"></a>request请求</h3><h5 id="一次请求响应步骤"><a href="#一次请求响应步骤" class="headerlink" title="一次请求响应步骤"></a>一次请求响应步骤</h5><ol>
@@ -2112,99 +2265,6 @@
 </ol>
 </li>
 <li><p>获取ServletContext getServletContext</p>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>javaWeb</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>java-web</title>
-    <url>/2021/09/27/javaWeb/java_web/</url>
-    <content><![CDATA[<h3 id="web-网页"><a href="#web-网页" class="headerlink" title="web(网页)"></a>web(网页)</h3><ol>
-<li>静态web <ol>
-<li>html css</li>
-<li>静态文件</li>
-<li>模板引擎</li>
-<li>即所有的数据都不变化</li>
-</ol>
-</li>
-<li>动态web 这个叫javaWeb<ol>
-<li><p>提供给人的数据会根据用户的请求而会变化</p>
-<span id="more"></span></li>
-</ol>
-</li>
-<li>web的组成<ol>
-<li>html css js</li>
-<li>jsp servlet</li>
-<li>java</li>
-<li>jar</li>
-<li>配置文件</li>
-<li>服务器</li>
-</ol>
-</li>
-</ol>
-<h3 id="javaWeb项目结构"><a href="#javaWeb项目结构" class="headerlink" title="javaWeb项目结构"></a>javaWeb项目结构</h3><ol>
-<li><p>文件结构</p>
-<ol>
-<li>根目录(parent)<ol>
-<li>WEN-INF目录<ol>
-<li>web.xml:web核心配置</li>
-<li>Classes:字节码文件（java编译后）</li>
-<li>lib:依赖jar包</li>
-</ol>
-</li>
-</ol>
-</li>
-</ol>
-</li>
-<li><p>web+idea</p>
-<ol>
-<li><p>启动idea,配置启 添加本地tomcat</p>
-<p>配置</p>
-<ol>
-<li>虚拟目录</li>
-<li>端口</li>
-</ol>
-</li>
-<li><p>添加facet的Web</p>
-<ol>
-<li>配置文件path:web.xml</li>
-<li>资源目录 path:webapp</li>
-</ol>
-</li>
-<li><p>在启动配置的tomcat的部署下方配置上下文以配置路径</p>
-</li>
-<li><p>热部署–&gt;debug方式启动</p>
-</li>
-<li><p>右键new servlet</p>
-<p>javaProject.iml/pom.xml</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">sourceRoots</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">root</span> <span class="attr">url</span>=<span class="string">&quot;file://$MODULE_DIR$/src&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">root</span> <span class="attr">url</span>=<span class="string">&quot;file://$MODULE_DIR$/src/main/java&quot;</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">sourceRoots</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-</ol>
-</li>
-</ol>
-<h3 id="一些理解"><a href="#一些理解" class="headerlink" title="一些理解"></a>一些理解</h3><ol>
-<li>tomcat，</li>
-<li>servlet 一种规范，实现这个规范的Class能够随时接受Requeset,Response，就好象一直运行在tomcat上一样。</li>
-<li>request 一种规范，将浏览器的请求数据进行封装，其中httoRequest将http协议的请求进行封装，这个封装体可以把这些数据到处共享。</li>
-<li>response</li>
-<li>其他<ol>
-<li>@WebServlet(“”)请求模式路径</li>
-<li></li>
-</ol>
-</li>
-</ol>
-<h3 id="issue"><a href="#issue" class="headerlink" title="issue"></a>issue</h3><ol>
-<li><p>Request请求参数乱码</p>
-<ol>
-<li><p>tomcat&gt;8 get方式不会乱码(url)</p>
-</li>
-<li><p>post(stream)-&gt;设置流的编码–&gt;</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">req.setCharacterEncoding(<span class="string">&quot;utf-8&quot;</span>);</span><br></pre></td></tr></table></figure></li>
-</ol>
-</li>
-<li><p>Response设置编码</p>
 </li>
 </ol>
 ]]></content>
@@ -2583,7 +2643,8 @@
 <li>ls -a 连同.文件一起查看</li>
 <li>解压  tar xzf ..gz</li>
 <li>查看redis进程 ps -ef | grep redis</li>
-<li></li>
+<li>杀死进程pid   pkill 1002</li>
+<li>删除非空文件夹 rm -rf aaa</li>
 </ol>
 <span id="more"></span>
 
@@ -2593,6 +2654,69 @@
 ]]></content>
       <categories>
         <category>os</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>restful</title>
+    <url>/2021/10/07/project/Restful/</url>
+    <content><![CDATA[<h3 id=""><a href="#" class="headerlink" title=""></a></h3><ol>
+<li>restful之前<ol>
+<li>CURD只能get/post<ol>
+<li>8080/add?name=1&amp;password=1</li>
+<li>8080/delete?name=1</li>
+<li>8080/update?name=2&amp;password=2</li>
+<li>8080/get?name=1</li>
+</ol>
+</li>
+<li>四个地址太多了，restful统一这四个地址，根据请求方式来判断进行的操作</li>
+</ol>
+</li>
+</ol>
+<h3 id="RestTemplate"><a href="#RestTemplate" class="headerlink" title="RestTemplate"></a>RestTemplate</h3><ol>
+<li>常见Http客户端请求工具<ol>
+<li>OkHttp</li>
+<li>Apache Http</li>
+</ol>
+</li>
+<li>RestTemplate是spring封装的http web请求模板方法</li>
+<li><a href="https://httpstatus.com/">状态码</a></li>
+<li>作用暂且理解为后端发送rest请求</li>
+</ol>
+]]></content>
+      <categories>
+        <category>project</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>spring-secruity</title>
+    <url>/2021/10/12/project/spring-secruity/</url>
+    <content><![CDATA[<h3 id="project1"><a href="#project1" class="headerlink" title="project1"></a>project1</h3><ol>
+<li><p>database</p>
+<p>user</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">username,series,token,last_used</span><br></pre></td></tr></table></figure></li>
+<li><p>配置类</p>
+<ol>
+<li><p>注入数据库</p>
+</li>
+<li><p>@configuration</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Autowired</span></span><br><span class="line"><span class="keyword">private</span> DataSource dataSource;</span><br><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> PersistentTokenRepository <span class="title">persistentTokenRepository</span><span class="params">()</span></span>&#123;</span><br><span class="line">    JdbcTokenRepositoryImpl jdbcTokenRepository=<span class="keyword">new</span> JdbcTokenRepositoryImpl();</span><br><span class="line">    jdbcTokenRepository.setDataSource(dataSource);</span><br><span class="line">    <span class="comment">//        jdbcTokenRepository.setCreateTableOnStartup();</span></span><br><span class="line">    <span class="keyword">return</span> jdbcTokenRepository;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(HttpSecurity http)</span> </span></span><br><span class="line"><span class="function">.<span class="title">and</span><span class="params">()</span>.<span class="title">rememberMe</span><span class="params">()</span>.<span class="title">tokenRepository</span><span class="params">(persistentTokenRepository()</span>)<span class="comment">//配置数据库--token</span></span></span><br><span class="line"><span class="function">                .<span class="title">tokenValiditySeconds</span><span class="params">(<span class="number">4</span>)</span><span class="comment">//设置有效时长</span></span></span><br><span class="line"><span class="function">                .<span class="title">userDetailsService</span><span class="params">(userDetailsService)</span></span></span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+</ol>
+   <span id="more"></span>
+
+<ol start="3">
+<li><p>csrf 跨站请求伪造</p>
+<ol>
+<li><p>依赖</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">     &lt;groupId&gt;org.thymeleaf.extras&lt;/groupId&gt;</span><br><span class="line">     &lt;artifactId&gt;thymeleaf-extras-springsecurity5&lt;/artifactId&gt;</span><br><span class="line">&lt;/dependency&gt;	</span><br></pre></td></tr></table></figure></li>
+<li></li>
+</ol>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>spring</category>
       </categories>
   </entry>
   <entry>
@@ -2668,69 +2792,6 @@
 ]]></content>
       <categories>
         <category>project</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>restful</title>
-    <url>/2021/10/07/project/Restful/</url>
-    <content><![CDATA[<h3 id=""><a href="#" class="headerlink" title=""></a></h3><ol>
-<li>restful之前<ol>
-<li>CURD只能get/post<ol>
-<li>8080/add?name=1&amp;password=1</li>
-<li>8080/delete?name=1</li>
-<li>8080/update?name=2&amp;password=2</li>
-<li>8080/get?name=1</li>
-</ol>
-</li>
-<li>四个地址太多了，restful统一这四个地址，根据请求方式来判断进行的操作</li>
-</ol>
-</li>
-</ol>
-<h3 id="RestTemplate"><a href="#RestTemplate" class="headerlink" title="RestTemplate"></a>RestTemplate</h3><ol>
-<li>常见Http客户端请求工具<ol>
-<li>OkHttp</li>
-<li>Apache Http</li>
-</ol>
-</li>
-<li>RestTemplate是spring封装的http web请求模板方法</li>
-<li><a href="https://httpstatus.com/">状态码</a></li>
-<li>作用暂且理解为后端发送rest请求</li>
-</ol>
-]]></content>
-      <categories>
-        <category>project</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>spring-secruity</title>
-    <url>/2021/10/12/project/spring-secruity/</url>
-    <content><![CDATA[<h3 id="project1"><a href="#project1" class="headerlink" title="project1"></a>project1</h3><ol>
-<li><p>database</p>
-<p>user</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">username,series,token,last_used</span><br></pre></td></tr></table></figure></li>
-<li><p>配置类</p>
-<ol>
-<li><p>注入数据库</p>
-</li>
-<li><p>@configuration</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Autowired</span></span><br><span class="line"><span class="keyword">private</span> DataSource dataSource;</span><br><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> PersistentTokenRepository <span class="title">persistentTokenRepository</span><span class="params">()</span></span>&#123;</span><br><span class="line">    JdbcTokenRepositoryImpl jdbcTokenRepository=<span class="keyword">new</span> JdbcTokenRepositoryImpl();</span><br><span class="line">    jdbcTokenRepository.setDataSource(dataSource);</span><br><span class="line">    <span class="comment">//        jdbcTokenRepository.setCreateTableOnStartup();</span></span><br><span class="line">    <span class="keyword">return</span> jdbcTokenRepository;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(HttpSecurity http)</span> </span></span><br><span class="line"><span class="function">.<span class="title">and</span><span class="params">()</span>.<span class="title">rememberMe</span><span class="params">()</span>.<span class="title">tokenRepository</span><span class="params">(persistentTokenRepository()</span>)<span class="comment">//配置数据库--token</span></span></span><br><span class="line"><span class="function">                .<span class="title">tokenValiditySeconds</span><span class="params">(<span class="number">4</span>)</span><span class="comment">//设置有效时长</span></span></span><br><span class="line"><span class="function">                .<span class="title">userDetailsService</span><span class="params">(userDetailsService)</span></span></span><br></pre></td></tr></table></figure></li>
-</ol>
-</li>
-</ol>
-   <span id="more"></span>
-
-<ol start="3">
-<li><p>csrf 跨站请求伪造</p>
-<ol>
-<li><p>依赖</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">     &lt;groupId&gt;org.thymeleaf.extras&lt;/groupId&gt;</span><br><span class="line">     &lt;artifactId&gt;thymeleaf-extras-springsecurity5&lt;/artifactId&gt;</span><br><span class="line">&lt;/dependency&gt;	</span><br></pre></td></tr></table></figure></li>
-<li></li>
-</ol>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>spring</category>
       </categories>
   </entry>
   <entry>
@@ -3029,20 +3090,6 @@
       </categories>
   </entry>
   <entry>
-    <title>spring3</title>
-    <url>/2021/10/28/spring/spring3/</url>
-    <content><![CDATA[<h3 id="1"><a href="#1" class="headerlink" title="1"></a>1</h3><ol>
-<li><p>对于非@Compoent 如需要serviceImpl可以在构造函数中传入这个service</p>
-<p>如easyExcel的listener就需要</p>
-</li>
-<li></li>
-</ol>
-]]></content>
-      <categories>
-        <category>spring</category>
-      </categories>
-  </entry>
-  <entry>
     <title>spring2</title>
     <url>/2021/10/21/spring/spring2/</url>
     <content><![CDATA[<h3 id="Bean声明周期"><a href="#Bean声明周期" class="headerlink" title="Bean声明周期"></a>Bean声明周期</h3><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211021203128542.png" alt="image-20211021203128542"></p>
@@ -3111,6 +3158,43 @@
 </li>
 </ol>
 ]]></content>
+      <categories>
+        <category>spring</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>spring3</title>
+    <url>/2021/10/28/spring/spring3/</url>
+    <content><![CDATA[<h3 id="1"><a href="#1" class="headerlink" title="1"></a>1</h3><ol>
+<li><p>对于非@Compoent 如需要serviceImpl可以在构造函数中传入这个service</p>
+<p>如easyExcel的listener就需要</p>
+</li>
+<li></li>
+</ol>
+]]></content>
+      <categories>
+        <category>spring</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>springAOP</title>
+    <url>/2021/10/21/spring/springAOP/</url>
+    <content><![CDATA[<h3 id="代理对象"><a href="#代理对象" class="headerlink" title="代理对象"></a>代理对象</h3><ol>
+<li>循环依赖</li>
+<li></li>
+</ol>
+]]></content>
+      <categories>
+        <category>spring</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>springBoot</title>
+    <url>/2021/09/29/spring/springBoot/</url>
+    <content><![CDATA[<h3 id="spring-boot-starter"><a href="#spring-boot-starter" class="headerlink" title="spring-boot-starter"></a>spring-boot-starter</h3><ol>
+<li>可以认为starter是一种服务（和JS的插件类似）——使得使用某个功能的开发者不需要关注各种依赖库的处理，不需要具体的配置信息，由Spring Boot自动通过classpath路径下的类发现需要的Bean，并织入bean</li>
+</ol>
+<span id="more"></span>]]></content>
       <categories>
         <category>spring</category>
       </categories>
@@ -3209,29 +3293,6 @@
 <li></li>
 </ol>
 ]]></content>
-  </entry>
-  <entry>
-    <title>springAOP</title>
-    <url>/2021/10/21/spring/springAOP/</url>
-    <content><![CDATA[<h3 id="代理对象"><a href="#代理对象" class="headerlink" title="代理对象"></a>代理对象</h3><ol>
-<li>循环依赖</li>
-<li></li>
-</ol>
-]]></content>
-      <categories>
-        <category>spring</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>springBoot</title>
-    <url>/2021/09/29/spring/springBoot/</url>
-    <content><![CDATA[<h3 id="spring-boot-starter"><a href="#spring-boot-starter" class="headerlink" title="spring-boot-starter"></a>spring-boot-starter</h3><ol>
-<li>可以认为starter是一种服务（和JS的插件类似）——使得使用某个功能的开发者不需要关注各种依赖库的处理，不需要具体的配置信息，由Spring Boot自动通过classpath路径下的类发现需要的Bean，并织入bean</li>
-</ol>
-<span id="more"></span>]]></content>
-      <categories>
-        <category>spring</category>
-      </categories>
   </entry>
   <entry>
     <title>springMVC</title>
@@ -3769,10 +3830,15 @@ git clone <a href="https://github.com/litten/hexo-theme-yilia.git">https://githu
 </ol>
 </li>
 <li>问题<ol>
-<li>备份</li>
-<li>代码还原</li>
-<li>协同开发</li>
-<li>代码追溯(追责)</li>
+<li><p>备份</p>
+</li>
+<li><p>代码还原</p>
+</li>
+<li><p>协同开发</p>
+</li>
+<li><p>代码追溯(追责)</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211102012109951.png" alt="image-20211102012109951"></p>
+</li>
 </ol>
 </li>
 </ol>
@@ -3962,50 +4028,13 @@ git clone <a href="https://github.com/litten/hexo-theme-yilia.git">https://githu
 <li><p>github加入自己的本机的ssh</p>
 </li>
 <li><p>将本机的.git的里面的comfig.remote修改为项目的ssh链接</p>
-<p><a href="mailto:&#103;&#x69;&#x74;&#x40;&#103;&#105;&#116;&#x68;&#x75;&#98;&#46;&#x63;&#x6f;&#x6d;">&#103;&#x69;&#x74;&#x40;&#103;&#105;&#116;&#x68;&#x75;&#98;&#46;&#x63;&#x6f;&#x6d;</a>:Wang-yonggan/Wang-yonggan.github.io.git</p>
+<p><a href="mailto:&#x67;&#x69;&#116;&#x40;&#x67;&#x69;&#x74;&#104;&#117;&#98;&#46;&#x63;&#x6f;&#x6d;">&#x67;&#x69;&#116;&#x40;&#x67;&#x69;&#x74;&#104;&#117;&#98;&#46;&#x63;&#x6f;&#x6d;</a>:Wang-yonggan/Wang-yonggan.github.io.git</p>
 <p><a href="https://github.com/Wang-yonggan/Wang-yonggan.github.io.git">https://github.com/Wang-yonggan/Wang-yonggan.github.io.git</a></p>
 </li>
 </ol>
 </li>
 </ol>
 ]]></content>
-      <categories>
-        <category>utils</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>maven的使用</title>
-    <url>/2021/10/07/utils/maven/</url>
-    <content><![CDATA[<h3 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h3><p>1.<a href="https://www.cnblogs.com/PatrickLee/archive/2012/10/31/2747398.html">https://www.cnblogs.com/PatrickLee/archive/2012/10/31/2747398.html</a></p>
-<ol start="2">
-<li><p>编译：mvn compile　　–src/main/java目录java源码编译生成class （target目录下）</p>
-</li>
-<li><p>测试：mvn test　　　　–src/test/java 目录编译</p>
-</li>
-<li><p>清理：mvn clean　　　 –删除target目录，也就是将class文件等删除</p>
-</li>
-<li><p>打包：mvn package　　–生成压缩文件：java项目#jar包；web项目#war包，也是放在target目录下</p>
-</li>
-<li><p>安装：mvn install　　　–将压缩文件(jar或者war)上传到本地仓库</p>
-</li>
-<li><p>部署|发布：mvn deploy　　–将压缩文件上传私服</p>
-<span id="more"></span></li>
-</ol>
-<h3 id="创建项目"><a href="#创建项目" class="headerlink" title="创建项目"></a>创建项目</h3><ol>
-<li>java项目</li>
-</ol>
-<figure class="highlight routeros"><table><tr><td class="code"><pre><span class="line">mvn archetype:generate <span class="attribute">-DgroupId</span>=com.dreams.maven.quickstart <span class="attribute">-DartifactId</span>=simple <span class="attribute">-DarchetypeArtifactId</span>=maven-archetype-quickstart</span><br><span class="line"></span><br><span class="line">mvn archetype:create</span><br><span class="line">   <span class="attribute">-DgroupId</span>=packageName</span><br><span class="line">   <span class="attribute">-DartifactId</span>=projectName </span><br></pre></td></tr></table></figure>
-
-<ol start="2">
-<li><p>wen项目</p>
-<figure class="highlight routeros"><table><tr><td class="code"><pre><span class="line">mvn archetype:generate <span class="attribute">-DgroupId</span>=com.packageName <span class="attribute">-DartifactId</span>=webappName <span class="attribute">-DarchetypeArtifactId</span>=maven-archetype-quickstart</span><br></pre></td></tr></table></figure></li>
-</ol>
-<p>mvn                                 –核心命令</p>
-<p> archetype:generate                              –创建项目 </p>
-<p>-DgroupId=com.dreams.maven.quickstart             –包名的写法，域名的反写 </p>
-<p>-DartifactId=simple                                               –项目名称 </p>
-<p>-DarchetypeArtifactId=maven-archetype-quickstart  –表示创建的是[maven]java项目—固定</p>
-<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3>]]></content>
       <categories>
         <category>utils</category>
       </categories>
@@ -4070,6 +4099,43 @@ git clone <a href="https://github.com/litten/hexo-theme-yilia.git">https://githu
 <li>代码模板</li>
 </ol>
 ]]></content>
+      <categories>
+        <category>utils</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>maven的使用</title>
+    <url>/2021/10/07/utils/maven/</url>
+    <content><![CDATA[<h3 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h3><p>1.<a href="https://www.cnblogs.com/PatrickLee/archive/2012/10/31/2747398.html">https://www.cnblogs.com/PatrickLee/archive/2012/10/31/2747398.html</a></p>
+<ol start="2">
+<li><p>编译：mvn compile　　–src/main/java目录java源码编译生成class （target目录下）</p>
+</li>
+<li><p>测试：mvn test　　　　–src/test/java 目录编译</p>
+</li>
+<li><p>清理：mvn clean　　　 –删除target目录，也就是将class文件等删除</p>
+</li>
+<li><p>打包：mvn package　　–生成压缩文件：java项目#jar包；web项目#war包，也是放在target目录下</p>
+</li>
+<li><p>安装：mvn install　　　–将压缩文件(jar或者war)上传到本地仓库</p>
+</li>
+<li><p>部署|发布：mvn deploy　　–将压缩文件上传私服</p>
+<span id="more"></span></li>
+</ol>
+<h3 id="创建项目"><a href="#创建项目" class="headerlink" title="创建项目"></a>创建项目</h3><ol>
+<li>java项目</li>
+</ol>
+<figure class="highlight routeros"><table><tr><td class="code"><pre><span class="line">mvn archetype:generate <span class="attribute">-DgroupId</span>=com.dreams.maven.quickstart <span class="attribute">-DartifactId</span>=simple <span class="attribute">-DarchetypeArtifactId</span>=maven-archetype-quickstart</span><br><span class="line"></span><br><span class="line">mvn archetype:create</span><br><span class="line">   <span class="attribute">-DgroupId</span>=packageName</span><br><span class="line">   <span class="attribute">-DartifactId</span>=projectName </span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li><p>wen项目</p>
+<figure class="highlight routeros"><table><tr><td class="code"><pre><span class="line">mvn archetype:generate <span class="attribute">-DgroupId</span>=com.packageName <span class="attribute">-DartifactId</span>=webappName <span class="attribute">-DarchetypeArtifactId</span>=maven-archetype-quickstart</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>mvn                                 –核心命令</p>
+<p> archetype:generate                              –创建项目 </p>
+<p>-DgroupId=com.dreams.maven.quickstart             –包名的写法，域名的反写 </p>
+<p>-DartifactId=simple                                               –项目名称 </p>
+<p>-DarchetypeArtifactId=maven-archetype-quickstart  –表示创建的是[maven]java项目—固定</p>
+<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3>]]></content>
       <categories>
         <category>utils</category>
       </categories>
@@ -4182,6 +4248,38 @@ git clone <a href="https://github.com/litten/hexo-theme-yilia.git">https://githu
       <categories>
         <category>utils</category>
       </categories>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2021/09/09/utils/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/</url>
+    <content><![CDATA[<h2 id=""><a href="#" class="headerlink" title=""></a></h2><ol>
+<li>19\d\d  判断19..年    </li>
+<li>a.c   abc adc   </li>
+<li>a\&amp;b   a&amp;b</li>
+<li>a\u548c   a和c</li>
+<li>\d   007  数值  00\D   00A 00B 非数字 </li>
+<li>java\w  字母/数字/下划线 java8    java\W   java！   非字母 非数字 非下划线</li>
+<li>a\sb  a b  空白字符        a\Sb  a&amp;b  非空白字符，非tab </li>
+<li>a\b* abc aa</li>
+<li>\d{0,3} 三个数字</li>
+<li>\d{n,}最少n个数字</li>
+<li>^开头 $结束</li>
+<li>^a\d{3}$ a123</li>
+<li>[abcd]1 a1 z1  == [a-f]1</li>
+<li>[a-f0-9]{6} abc123  1a2b3c  aafe32</li>
+<li>[^0-9]{3} abc 取反</li>
+<li> java|python  java   python</li>
+<li>.一个   *1或多个  +0或一个  ？0或1个 非贪婪匹配<h2 id="属性"><a href="#属性" class="headerlink" title="属性"></a>属性</h2></li>
+<li>er\b  never 因为er结尾  而不能verb</li>
+<li><h2 id="匹配分组-pattern-matcher-str"><a href="#匹配分组-pattern-matcher-str" class="headerlink" title="匹配分组  pattern.matcher(str)"></a>匹配分组  pattern.matcher(str)</h2></li>
+<li>(\d{4})-(\d{1,2})-(\d{1,2}) 分开2021-6-22</li>
+<li>^([0-1][0-9]|2[0-3]):([0-5][0-9])$ 分开 23:22</li>
+</ol>
+<h2 id="分割"><a href="#分割" class="headerlink" title="分割"></a>分割</h2><ol>
+<li>“a b     c”.split(“\s+”)==&gt;”a”,”b”,”c”</li>
+<li>“a,b    ;;;; c”.split(“\s+\,\;”)==&gt;”a”,”b”,”c”</li>
+</ol>
+]]></content>
   </entry>
   <entry>
     <title>ORM框架</title>
@@ -4415,6 +4513,82 @@ git clone <a href="https://github.com/litten/hexo-theme-yilia.git">https://githu
       </categories>
   </entry>
   <entry>
+    <title>springAop</title>
+    <url>/2021/10/13/%E7%BB%84%E4%BB%B6/spring-%E9%9D%A2%E5%90%91%E5%88%87%E9%9D%A2/</url>
+    <content><![CDATA[<h3 id="AOP"><a href="#AOP" class="headerlink" title="AOP"></a>AOP</h3><ol>
+<li>底层: 动态代理</li>
+<li>aspect:切面 即增加的功能  Log()</li>
+<li>x<ol>
+<li>oop 面向对象  </li>
+<li>AOP 以切面为核心，找到所有能用切面实现的功能<ol>
+<li><p>日志 </p>
+</li>
+<li><p>事务</p>
+</li>
+<li><p>统计</p>
+</li>
+<li><p>参数校验</p>
+</li>
+<li><p>权限鉴定</p>
+<span id="more"></span></li>
+</ol>
+</li>
+</ol>
+</li>
+<li>术语<ol>
+<li>joinPoint，连接点</li>
+<li>pointCut 切入点：多个连接点集合</li>
+<li>目标对象：需要增强的类</li>
+<li>Advice 切面功能执行时间</li>
+</ol>
+</li>
+<li>AOP实现<ol>
+<li>springAop  笨重</li>
+<li>aspectJ 开源框架</li>
+</ol>
+</li>
+<li>AspectJ<ol>
+<li>注解<ol>
+<li>@Advice<ol>
+<li>@Before </li>
+<li>@After </li>
+<li>@Arount</li>
+</ol>
+</li>
+<li>execution切入点表达式()</li>
+</ol>
+</li>
+<li>步骤<ol>
+<li>依赖<ol>
+<li>spring </li>
+<li>spring-aspectJ</li>
+</ol>
+</li>
+<li>spring配置文件声明对象<ol>
+<li>声明目标对象</li>
+<li>声明切面对象</li>
+<li>声明AspectJ的自动代理生成器的标签</li>
+</ol>
+</li>
+<li>创建接口和实现类</li>
+<li>创建切面类@Aspect</li>
+<li>通过注解配置切面类的<ol>
+<li>切入点</li>
+<li>切入时间</li>
+</ol>
+</li>
+<li>通过springCotext.getBean()就获得了代理类</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>spring</category>
+      </categories>
+  </entry>
+  <entry>
     <title></title>
     <url>/2021/09/09/%E7%BB%84%E4%BB%B6/mybatis/</url>
     <content><![CDATA[<p>ORM框架</p>
@@ -4529,82 +4703,6 @@ git clone <a href="https://github.com/litten/hexo-theme-yilia.git">https://githu
 <li>封装结果集</li>
 </ol>
 ]]></content>
-  </entry>
-  <entry>
-    <title>springAop</title>
-    <url>/2021/10/13/%E7%BB%84%E4%BB%B6/spring-%E9%9D%A2%E5%90%91%E5%88%87%E9%9D%A2/</url>
-    <content><![CDATA[<h3 id="AOP"><a href="#AOP" class="headerlink" title="AOP"></a>AOP</h3><ol>
-<li>底层: 动态代理</li>
-<li>aspect:切面 即增加的功能  Log()</li>
-<li>x<ol>
-<li>oop 面向对象  </li>
-<li>AOP 以切面为核心，找到所有能用切面实现的功能<ol>
-<li><p>日志 </p>
-</li>
-<li><p>事务</p>
-</li>
-<li><p>统计</p>
-</li>
-<li><p>参数校验</p>
-</li>
-<li><p>权限鉴定</p>
-<span id="more"></span></li>
-</ol>
-</li>
-</ol>
-</li>
-<li>术语<ol>
-<li>joinPoint，连接点</li>
-<li>pointCut 切入点：多个连接点集合</li>
-<li>目标对象：需要增强的类</li>
-<li>Advice 切面功能执行时间</li>
-</ol>
-</li>
-<li>AOP实现<ol>
-<li>springAop  笨重</li>
-<li>aspectJ 开源框架</li>
-</ol>
-</li>
-<li>AspectJ<ol>
-<li>注解<ol>
-<li>@Advice<ol>
-<li>@Before </li>
-<li>@After </li>
-<li>@Arount</li>
-</ol>
-</li>
-<li>execution切入点表达式()</li>
-</ol>
-</li>
-<li>步骤<ol>
-<li>依赖<ol>
-<li>spring </li>
-<li>spring-aspectJ</li>
-</ol>
-</li>
-<li>spring配置文件声明对象<ol>
-<li>声明目标对象</li>
-<li>声明切面对象</li>
-<li>声明AspectJ的自动代理生成器的标签</li>
-</ol>
-</li>
-<li>创建接口和实现类</li>
-<li>创建切面类@Aspect</li>
-<li>通过注解配置切面类的<ol>
-<li>切入点</li>
-<li>切入时间</li>
-</ol>
-</li>
-<li>通过springCotext.getBean()就获得了代理类</li>
-</ol>
-</li>
-</ol>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>spring</category>
-      </categories>
   </entry>
   <entry>
     <title>spring组件</title>
@@ -4817,20 +4915,6 @@ git clone <a href="https://github.com/litten/hexo-theme-yilia.git">https://githu
       </categories>
   </entry>
   <entry>
-    <title></title>
-    <url>/2021/10/26/%E7%BB%84%E4%BB%B6/%E6%97%A5%E5%BF%97/</url>
-    <content><![CDATA[<h3 id="知识"><a href="#知识" class="headerlink" title="知识"></a>知识</h3><ol>
-<li><a href="https://cloud.tencent.com/developer/news/546399">常见日志组件的区别</a></li>
-<li></li>
-</ol>
-<h3 id="logger"><a href="#logger" class="headerlink" title="logger"></a>logger</h3><ol>
-<li><p>Log4j建议只使用四个级别，优先级从高到低分别是 ERROR、WARN、INFO、DEBUG</p>
-<figure class="highlight pgsql"><table><tr><td class="code"><pre><span class="line">比如在这里定义了<span class="keyword">INFO</span>级别，则应用程序中所有<span class="keyword">DEBUG</span>级别的日志信息将不被打印出来，也是说大于等于的级别的日志才输出。</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h3 id="AOP统一日志"><a href="#AOP统一日志" class="headerlink" title="AOP统一日志"></a>AOP统一日志</h3><p>1. </p>
-]]></content>
-  </entry>
-  <entry>
     <title>web图片上传与获取</title>
     <url>/2021/10/21/%E7%BB%84%E4%BB%B6/%E5%9B%BE%E7%89%87%E9%97%AE%E9%A2%98/</url>
     <content><![CDATA[<h3 id="配置资源路径"><a href="#配置资源路径" class="headerlink" title="配置资源路径"></a>配置资源路径</h3><ol>
@@ -4867,6 +4951,20 @@ git clone <a href="https://github.com/litten/hexo-theme-yilia.git">https://githu
       </categories>
   </entry>
   <entry>
+    <title></title>
+    <url>/2021/10/26/%E7%BB%84%E4%BB%B6/%E6%97%A5%E5%BF%97/</url>
+    <content><![CDATA[<h3 id="知识"><a href="#知识" class="headerlink" title="知识"></a>知识</h3><ol>
+<li><a href="https://cloud.tencent.com/developer/news/546399">常见日志组件的区别</a></li>
+<li></li>
+</ol>
+<h3 id="logger"><a href="#logger" class="headerlink" title="logger"></a>logger</h3><ol>
+<li><p>Log4j建议只使用四个级别，优先级从高到低分别是 ERROR、WARN、INFO、DEBUG</p>
+<figure class="highlight pgsql"><table><tr><td class="code"><pre><span class="line">比如在这里定义了<span class="keyword">INFO</span>级别，则应用程序中所有<span class="keyword">DEBUG</span>级别的日志信息将不被打印出来，也是说大于等于的级别的日志才输出。</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="AOP统一日志"><a href="#AOP统一日志" class="headerlink" title="AOP统一日志"></a>AOP统一日志</h3><p>1. </p>
+]]></content>
+  </entry>
+  <entry>
     <title>组件2</title>
     <url>/2021/10/06/%E7%BB%84%E4%BB%B6/%E7%BB%84%E4%BB%B62/</url>
     <content><![CDATA[<h3 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h3><ol>
@@ -4901,6 +4999,14 @@ git clone <a href="https://github.com/litten/hexo-theme-yilia.git">https://githu
       </categories>
   </entry>
   <entry>
+    <title>统计分析模块</title>
+    <url>/2021/10/23/%E7%BB%84%E4%BB%B6/%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>组件</category>
+      </categories>
+  </entry>
+  <entry>
     <title>时间组件</title>
     <url>/2021/10/21/java/java%E7%BB%84%E4%BB%B6/%E6%97%B6%E9%97%B4%E7%B1%BB/</url>
     <content><![CDATA[<h3 id="自定义"><a href="#自定义" class="headerlink" title="自定义"></a>自定义</h3><ol>
@@ -4922,11 +5028,42 @@ git clone <a href="https://github.com/litten/hexo-theme-yilia.git">https://githu
       </categories>
   </entry>
   <entry>
-    <title>统计分析模块</title>
-    <url>/2021/10/23/%E7%BB%84%E4%BB%B6/%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/</url>
-    <content><![CDATA[]]></content>
+    <title>java懒加载</title>
+    <url>/2021/11/02/java/java%E8%AE%BE%E8%AE%A1/java%E6%87%92%E5%8A%A0%E8%BD%BD/</url>
+    <content><![CDATA[<ol>
+<li><p>[参考](<a href="https://zhuanlan.zhihu.com/p/428095023?utm_source=qq&utm_medium=social&utm_oi=1044004825763094528">函数式编程的Java编码实践：利用惰性写出高性能且抽象的代码 - 知乎 (zhihu.com)</a>)</p>
+</li>
+<li><p>懒加载的例子</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Supplier&lt; Integer&gt; a = () -&gt; <span class="number">10</span> + <span class="number">1</span>;</span><br><span class="line"><span class="keyword">int</span> b = a.get() + <span class="number">1</span>;<span class="comment">//创建b的时候才会运算a</span></span><br></pre></td></tr></table></figure></li>
+<li><p>一次计算永久保存的懒加载</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 为了方便与标准的 Java 函数式接口交互，Lazy 也实现了 Supplier</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Lazy</span>&lt; <span class="title">T</span>&gt; <span class="keyword">implements</span> <span class="title">Supplier</span>&lt; <span class="title">T</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Supplier&lt; ? extends T&gt; supplier;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 利用 value 属性缓存 supplier 计算后的值</span></span><br><span class="line">    <span class="keyword">private</span> T value;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">Lazy</span><span class="params">(Supplier&lt; ? extends T&gt; supplier)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.supplier = supplier;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> &lt; T&gt; Lazy&lt; T&gt; of(Supplier&lt; ? extends T&gt; supplier) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Lazy&lt; &gt;(supplier);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> T <span class="title">get</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (value == <span class="keyword">null</span>) &#123;</span><br><span class="line">            T newValue = supplier.get();</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (newValue == <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">&quot;Lazy value can not be null!&quot;</span>);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            value = newValue;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> value;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//调用</span></span><br><span class="line">Lazy&lt; Integer&gt; a = Lazy.of(() -&gt; <span class="number">10</span> + <span class="number">1</span>);</span><br><span class="line"><span class="keyword">int</span> b = a.get() + <span class="number">1</span>;</span><br></pre></td></tr></table></figure></li>
+<li><p>双重依赖型的懒加载：函子</p>
+</li>
+<li><p>函子(Functor) 或者叫mapper 或者叫映射</p>
+<ol>
+<li><p>定义</p>
+<p>函子运算可以将一个 T 映射到 S 的 function 应用到 Box&lt; T&gt; 上，让其成为 Box&lt; S&gt;</p>
+</li>
+<li><p>函数</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt; S&gt; Lazy&lt; S&gt; map(Function&lt; ? <span class="keyword">super</span> T, ? extends S&gt; function) &#123;</span><br><span class="line"><span class="keyword">return</span> Lazy.of(() -&gt; function.apply(get()));&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>调用</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Lazy&lt; Lazy&lt; Set&lt; String&gt;&gt;&gt; permissions = departmentLazy.map(department -&gt;</span><br><span class="line">         supervisorLazy.map(supervisor -&gt; getPermissions(department, supervisor))</span><br><span class="line">);</span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+<li><p>解决多层菱形运算符的懒加载：单子</p>
+</li>
+<li><p>单子：flatMap</p>
+<ol>
+<li><p>函数</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt; S&gt; Lazy&lt; S&gt; flatMap(Function&lt; ? <span class="keyword">super</span> T, Lazy&lt; ? extends S&gt;&gt; function) &#123;</span><br><span class="line">        <span class="keyword">return</span> Lazy.of(() -&gt; function.apply(get()).get());</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>调用</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Lazy&lt; Set&lt; String&gt;&gt; permissions = departmentLazy.flatMap(department -&gt;</span><br><span class="line">         supervisorLazy.map(supervisor -&gt; getPermissions(department, supervisor))</span><br><span class="line">);</span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+</ol>
+]]></content>
       <categories>
-        <category>组件</category>
+        <category>java设计</category>
       </categories>
   </entry>
   <entry>
