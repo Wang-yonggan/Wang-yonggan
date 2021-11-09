@@ -32,6 +32,12 @@
 ]]></content>
   </entry>
   <entry>
+    <title></title>
+    <url>/2021/11/09/db/mysql_other/</url>
+    <content><![CDATA[<p>1. </p>
+]]></content>
+  </entry>
+  <entry>
     <title>hadoop的启动</title>
     <url>/2021/09/10/distribute/hadoop%E5%90%AF%E5%8A%A8/</url>
     <content><![CDATA[<h2 id="一、-基本环境"><a href="#一、-基本环境" class="headerlink" title="一、 基本环境"></a>一、 基本环境</h2><ol>
@@ -106,28 +112,47 @@
       </categories>
   </entry>
   <entry>
-    <title></title>
-    <url>/2021/09/17/db/mysql_other/</url>
-    <content><![CDATA[<ol>
-<li><p>修改数据库名称</p>
+    <title>mysql优化二</title>
+    <url>/2021/11/05/db/mysql%E4%BC%98%E5%8C%962/</url>
+    <content><![CDATA[<h1 id="sql语句优化"><a href="#sql语句优化" class="headerlink" title="sql语句优化"></a>sql语句优化</h1><h2 id="selete"><a href="#selete" class="headerlink" title="selete"></a>selete</h2><ol>
+<li>selete尽量使用字段而不是*。</li>
+</ol>
+<h2 id="update、delete"><a href="#update、delete" class="headerlink" title="update、delete"></a>update、delete</h2><ol>
+<li><p><a href="https://blog.csdn.net/qq_21454973/article/details/109162528">在 delete 和 update 后面加 limit 1 绝对是个好习惯</a></p>
+<blockquote>
+<p>比如，在删除执行中，第一条就命中了删除行，如果 SQL 中有 limit 1；这时就 return 了，否则还会执行完全表扫描才结束。</p>
+</blockquote>
+<span id="more"></span></li>
+<li><p>如果是清空表数据建议直接用 truncate，效率上 truncate 远高于 delete。</p>
+<blockquote>
+<p>truncate 不走事务，不会锁表，也不会生产大量日志写入日志文件；truncate table table_name 后立刻释放磁盘空间，并重置 auto_increment 的值。delete 删除不释放磁盘空间，但后续 insert 会覆盖在之前删除的数据上。 </p>
+</blockquote>
+</li>
+<li><p>丁奇问题</p>
+<blockquote>
+<p>如果你要删除一个表里面的前 10000 行数据，有以下三种方法可以做到：<br>第一种，直接执行 delete from T limit 10000;<br>第二种，在一个连接中循环执行 20 次 delete from T limit 500;<br>第三种，在 20 个连接中同时执行 delete from T limit 500。</p>
+</blockquote>
+<ul>
+<li><p>第一个方案，一次占用的锁时间较长，可能会导致其他客户端一直在等待资源。</p>
+</li>
+<li><p>第二个方案，分成多次占用锁，串行执行，不占有锁的间隙其他客户端可以工作，类似于现在多任务操作系统的时间分片调度，大家分片使用资源，不直接影响使用。</p>
+</li>
+<li><p>第三个方案，自己制造了锁竞争，加剧并发。</p>
+</li>
+</ul>
+</li>
+<li><p>锁表问题</p>
 <ol>
-<li><p>导出数据</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">cmd<span class="operator">&gt;</span> mysqldump <span class="operator">-</span>uroot <span class="operator">-</span>p123456  old_db <span class="operator">&gt;</span> old_db.sql</span><br></pre></td></tr></table></figure></li>
-<li><p>导入</p>
-<span id="more"></span>
-
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">cmd<span class="operator">&gt;</span> mysql <span class="operator">-</span>uroot <span class="operator">-</span>p123456 new_db <span class="operator">&lt;</span>  old_db.sql</span><br></pre></td></tr></table></figure></li>
+<li>如果没有索引，update会锁表，如果加了索引，就会锁行</li>
 </ol>
 </li>
-<li><p>数据库去重</p>
-<ol>
-<li>新建一个表进行迁移</li>
-<li>delete  from student where id not in (selete id,max(age) from student group by (name) as a)</li>
-<li>– DELETE from el_paper where id not in (SELECT id from (SELECT id,user_score FROM el_paper GROUP BY(user_id)) as a )</li>
-</ol>
+<li><p>数据删除磁盘问题</p>
 </li>
 </ol>
 ]]></content>
+      <categories>
+        <category>数据库</category>
+      </categories>
   </entry>
   <entry>
     <title>mysql优化</title>
@@ -308,43 +333,31 @@
 </ol>
 ]]></content>
       <categories>
-        <category>mysql</category>
+        <category>数据库</category>
       </categories>
   </entry>
   <entry>
-    <title>mysql优化二</title>
-    <url>/2021/11/05/db/mysql%E4%BC%98%E5%8C%962/</url>
-    <content><![CDATA[<h1 id="sql语句优化"><a href="#sql语句优化" class="headerlink" title="sql语句优化"></a>sql语句优化</h1><h2 id="selete"><a href="#selete" class="headerlink" title="selete"></a>selete</h2><h2 id="update、delete"><a href="#update、delete" class="headerlink" title="update、delete"></a>update、delete</h2><ol>
-<li><p><a href="https://blog.csdn.net/qq_21454973/article/details/109162528">在 delete 和 update 后面加 limit 1 绝对是个好习惯</a></p>
-<blockquote>
-<p>比如，在删除执行中，第一条就命中了删除行，如果 SQL 中有 limit 1；这时就 return 了，否则还会执行完全表扫描才结束。</p>
-</blockquote>
-<span id="more"></span></li>
-<li><p>如果是清空表数据建议直接用 truncate，效率上 truncate 远高于 delete。</p>
-<blockquote>
-<p>truncate 不走事务，不会锁表，也不会生产大量日志写入日志文件；truncate table table_name 后立刻释放磁盘空间，并重置 auto_increment 的值。delete 删除不释放磁盘空间，但后续 insert 会覆盖在之前删除的数据上。 </p>
-</blockquote>
-</li>
-<li><p>丁奇问题</p>
-<blockquote>
-<p>如果你要删除一个表里面的前 10000 行数据，有以下三种方法可以做到：<br>第一种，直接执行 delete from T limit 10000;<br>第二种，在一个连接中循环执行 20 次 delete from T limit 500;<br>第三种，在 20 个连接中同时执行 delete from T limit 500。</p>
-</blockquote>
-<ul>
-<li><p>第一个方案，一次占用的锁时间较长，可能会导致其他客户端一直在等待资源。</p>
-</li>
-<li><p>第二个方案，分成多次占用锁，串行执行，不占有锁的间隙其他客户端可以工作，类似于现在多任务操作系统的时间分片调度，大家分片使用资源，不直接影响使用。</p>
-</li>
-<li><p>第三个方案，自己制造了锁竞争，加剧并发。</p>
-</li>
-</ul>
-</li>
-<li><p>锁表问题</p>
-<ol>
-<li>如果没有索引，update会锁表，如果加了索引，就会锁行</li>
+    <title>mysql其他知识</title>
+    <url>/2021/10/14/db/mysql%E7%9F%A5%E8%AF%862/</url>
+    <content><![CDATA[<h3 id="日志"><a href="#日志" class="headerlink" title="日志"></a>日志</h3><ol>
+<li>参考<ol>
+<li><a href="https://www.cnblogs.com/du-z/p/11164232.html">cnblog1</a></li>
 </ol>
 </li>
-<li><p>数据删除磁盘问题</p>
-</li>
+</ol>
+<h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><ol>
+<li><p>开启记录执行时间</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">set</span> profiling <span class="operator">=</span> <span class="number">1</span>;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<span id="more"></span>
+
+<h3 id="innodb"><a href="#innodb" class="headerlink" title="innodb"></a>innodb</h3><ol>
+<li>[知乎</li>
+<li><a href="https://zhuanlan.zhihu.com/p/352153062"></a></li>
+</ol>
+<h2 id="mysql-锁机制"><a href="#mysql-锁机制" class="headerlink" title="mysql 锁机制"></a>mysql 锁机制</h2><h4 id="乐观锁-version"><a href="#乐观锁-version" class="headerlink" title="乐观锁  version"></a>乐观锁  version</h4><ol>
+<li><a href="https://blog.csdn.net/hh1sdfsf56456/article/details/79449714">乐观锁</a></li>
+<li></li>
 </ol>
 ]]></content>
       <categories>
@@ -383,31 +396,64 @@
       </categories>
   </entry>
   <entry>
-    <title>mysql其他知识</title>
-    <url>/2021/10/14/db/mysql%E7%9F%A5%E8%AF%862/</url>
-    <content><![CDATA[<h3 id="日志"><a href="#日志" class="headerlink" title="日志"></a>日志</h3><ol>
-<li>参考<ol>
-<li><a href="https://www.cnblogs.com/du-z/p/11164232.html">cnblog1</a></li>
+    <title>mysql设计问题</title>
+    <url>/2021/11/07/db/mysql%E8%AE%BE%E8%AE%A1%E9%97%AE%E9%A2%98/</url>
+    <content><![CDATA[<h3 id="mysql设计问题"><a href="#mysql设计问题" class="headerlink" title="mysql设计问题"></a>mysql设计问题</h3><p>[toc]</p>
+<h2 id="一、逻辑删除"><a href="#一、逻辑删除" class="headerlink" title="一、逻辑删除"></a>一、逻辑删除</h2><ol>
+<li><p>常见逻辑删除：is_delete,delete_time</p>
+</li>
+<li><p>逻辑删除的优缺点</p>
+<ol>
+<li><p>优点: 方便恢复被删除的数据</p>
+</li>
+<li><p>缺点:</p>
+<ol>
+<li><p>查询数据时，所有的查询条件都需要增加deleteTime==null。</p>
+</li>
+<li><p>不可以使用业务唯一性Id作为数据库表Id，需要增加1个专门的没有逻辑意义的自增长Id作为唯一性Id。</p>
+<span id="more"></span></li>
+<li><p>业务Id不能建唯一性约束，也不能建唯一索引。</p>
+<blockquote>
+<p>比如说a入职了，离职了删除了，但是id还在，又入职了，这样就会造成id重复</p>
+</blockquote>
+</li>
+<li><p>增加数据时，判断业务Id是否为重复，需要先做查询，不能利用表的唯一约束。</p>
+</li>
+<li><p>增加数据时，判断唯一性字段是否重复，需要先做查询，也不能利用表的唯一约束。</p>
+</li>
 </ol>
 </li>
 </ol>
-<h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><ol>
-<li><p>开启记录执行时间</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">set</span> profiling <span class="operator">=</span> <span class="number">1</span>;</span><br></pre></td></tr></table></figure></li>
+</li>
+<li><p>第二类逻辑删除：新增一个表，把删除的数据储存在这个表内。</p>
+</li>
 </ol>
-<span id="more"></span>
-
-<h3 id="innodb"><a href="#innodb" class="headerlink" title="innodb"></a>innodb</h3><ol>
-<li>[知乎</li>
-<li><a href="https://zhuanlan.zhihu.com/p/352153062"></a></li>
+<h2 id="二、视图"><a href="#二、视图" class="headerlink" title="二、视图"></a>二、视图</h2><h2 id="三、触发器"><a href="#三、触发器" class="headerlink" title="三、触发器"></a>三、触发器</h2>]]></content>
+      <categories>
+        <category>数据库</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>mysql配置</title>
+    <url>/2021/11/04/db/mysql%E9%85%8D%E7%BD%AE/</url>
+    <content><![CDATA[<h3 id="修改密码"><a href="#修改密码" class="headerlink" title="修改密码"></a>修改密码</h3><h3 id="允许远程登录"><a href="#允许远程登录" class="headerlink" title="允许远程登录"></a>允许远程登录</h3><ol>
+<li><p>新建用户</p>
+<p>grant all on <em>.</em> to root@’%’ identified by ‘root’ with grant option;</p>
+</li>
+<li><p>刷新权限</p>
+<p>flush privileges;</p>
+<span id="more"></span></li>
+<li><p>修改远程密码</p>
+<ol>
+<li>delete from mysql.user where user = ‘root’ and host = ‘%’;</li>
+<li>flush privileges;</li>
+<li>重新建立</li>
 </ol>
-<h2 id="mysql-锁机制"><a href="#mysql-锁机制" class="headerlink" title="mysql 锁机制"></a>mysql 锁机制</h2><h4 id="乐观锁-version"><a href="#乐观锁-version" class="headerlink" title="乐观锁  version"></a>乐观锁  version</h4><ol>
-<li><a href="https://blog.csdn.net/hh1sdfsf56456/article/details/79449714">乐观锁</a></li>
-<li></li>
+</li>
 </ol>
 ]]></content>
       <categories>
-        <category>mysql</category>
+        <category>数据库</category>
       </categories>
   </entry>
   <entry>
@@ -581,68 +627,7 @@
       </categories>
   </entry>
   <entry>
-    <title>mysql设计问题</title>
-    <url>/2021/11/07/db/mysql%E8%AE%BE%E8%AE%A1%E9%97%AE%E9%A2%98/</url>
-    <content><![CDATA[<h3 id="mysql设计问题"><a href="#mysql设计问题" class="headerlink" title="mysql设计问题"></a>mysql设计问题</h3><p>[toc]</p>
-<h2 id="一、逻辑删除"><a href="#一、逻辑删除" class="headerlink" title="一、逻辑删除"></a>一、逻辑删除</h2><ol>
-<li><p>常见逻辑删除：is_delete,delete_time</p>
-</li>
-<li><p>逻辑删除的优缺点</p>
-<ol>
-<li><p>优点: 方便恢复被删除的数据</p>
-</li>
-<li><p>缺点:</p>
-<ol>
-<li><p>查询数据时，所有的查询条件都需要增加deleteTime==null。</p>
-</li>
-<li><p>不可以使用业务唯一性Id作为数据库表Id，需要增加1个专门的没有逻辑意义的自增长Id作为唯一性Id。</p>
-<span id="more"></span></li>
-<li><p>业务Id不能建唯一性约束，也不能建唯一索引。</p>
-<blockquote>
-<p>比如说a入职了，离职了删除了，但是id还在，又入职了，这样就会造成id重复</p>
-</blockquote>
-</li>
-<li><p>增加数据时，判断业务Id是否为重复，需要先做查询，不能利用表的唯一约束。</p>
-</li>
-<li><p>增加数据时，判断唯一性字段是否重复，需要先做查询，也不能利用表的唯一约束。</p>
-</li>
-</ol>
-</li>
-</ol>
-</li>
-<li><p>第二类逻辑删除：新增一个表，把删除的数据储存在这个表内。</p>
-</li>
-</ol>
-<h2 id="二、视图"><a href="#二、视图" class="headerlink" title="二、视图"></a>二、视图</h2><h2 id="三、触发器"><a href="#三、触发器" class="headerlink" title="三、触发器"></a>三、触发器</h2>]]></content>
-      <categories>
-        <category>数据库</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>mysql配置</title>
-    <url>/2021/11/04/db/mysql%E9%85%8D%E7%BD%AE/</url>
-    <content><![CDATA[<h3 id="修改密码"><a href="#修改密码" class="headerlink" title="修改密码"></a>修改密码</h3><h3 id="允许远程登录"><a href="#允许远程登录" class="headerlink" title="允许远程登录"></a>允许远程登录</h3><ol>
-<li><p>新建用户</p>
-<p>grant all on <em>.</em> to root@’%’ identified by ‘root’ with grant option;</p>
-</li>
-<li><p>刷新权限</p>
-<p>flush privileges;</p>
-<span id="more"></span></li>
-<li><p>修改远程密码</p>
-<ol>
-<li>delete from mysql.user where user = ‘root’ and host = ‘%’;</li>
-<li>flush privileges;</li>
-<li>重新建立</li>
-</ol>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>数据库</category>
-      </categories>
-  </entry>
-  <entry>
-    <title></title>
+    <title>mysql其他</title>
     <url>/2021/09/17/db/sql2/</url>
     <content><![CDATA[<h3 id="group-by"><a href="#group-by" class="headerlink" title="group by"></a>group by</h3><ol>
 <li><p>聚集user，exam选出用户每场考试的最高分和其他详细信息。</p>
@@ -667,6 +652,9 @@
 </ol>
 <!--more-->
 ]]></content>
+      <categories>
+        <category>数据库</category>
+      </categories>
   </entry>
   <entry>
     <title>数据库事务</title>
@@ -740,7 +728,7 @@
 </ol>
 ]]></content>
       <categories>
-        <category>db</category>
+        <category>数据库</category>
       </categories>
   </entry>
   <entry>
@@ -773,7 +761,7 @@
 </ol>
 <h2 id=""><a href="#" class="headerlink" title=""></a></h2>]]></content>
       <categories>
-        <category>db</category>
+        <category>数据库</category>
       </categories>
   </entry>
   <entry>
@@ -786,130 +774,9 @@
 ]]></content>
   </entry>
   <entry>
-    <title>java2</title>
-    <url>/2021/09/24/java/java2/</url>
-    <content><![CDATA[<h3 id="接口"><a href="#接口" class="headerlink" title="接口"></a>接口</h3><ol>
-<li>接口基础<ol>
-<li><p>接口继承接口，方法重复只需要重写一个就ok</p>
-</li>
-<li><p>接口可以有default方法</p>
-</li>
-<li><p>接口可以有static方法</p>
-<span id="more"></span></li>
-</ol>
-</li>
-</ol>
-<!-- more --
-
-2. 接口继承
-   1. 两个接口Animal<--Cat
-   2. Cat ani= new Animal可以通过
-   3. 但是如果调用Cat的新增方法就会报错。
-
-
-
-### static
-
-1. 类的所有方法都能访问static方法
-
-2. 类的所有方法都能访问static变量
-
-3. static方法不能访问非static方法
-
-4. static方法不能访问非static变量
-
-   <figure class="highlight actionscript"><table><tr><td class="code"><pre><span class="line">这就好像<span class="keyword">static</span>的东西都无私奉献出来了，但他却置身事外，不过问q</span><br></pre></td></tr></table></figure>
-
-
-<h3 id="protected"><a href="#protected" class="headerlink" title="protected"></a>protected</h3><ol>
-<li>protected权限就是对包的限定</li>
-<li>例子：<ol>
-<li>clone方法是protected的，如果不重写，那么永远实例对象都不能用(除了这个类自带的方法，包括main方法能有权利用到，其他都没这个权力)，</li>
-</ol>
-</li>
-<li>在其他包创建实例，没有能力用到这个类的protected。</li>
-<li>不同包的B继承了A那么，B如果不重写protected，那么除非在A的包下创建实例之外，就永远访问不到protected</li>
-<li>关键<ol>
-<li>自己类里面能用所有的方法(除了static不饿能访问非static方法)</li>
-<li>对于protected，包的概念应该相对于类成员来讲的，而不是相对于类来讲的，也就是说如果在这个protected成员所在的包创建的实例能够调用protected方法。</li>
-<li>不同包下创建的实例就不能调用这个protected成员。</li>
-</ol>
-</li>
-</ol>
-<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><h3 id="泛型"><a href="#泛型" class="headerlink" title="泛型"></a>泛型</h3><ol>
-<li><p> 菱形运算符&lt;&gt;</p>
-</li>
-<li><p>定义(我需要)</p>
-<ol>
-<li><p>接口</p>
-<figure class="highlight angelscript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="symbol">ReadListener</span>&lt;<span class="symbol">T</span>&gt;</span><br></pre></td></tr></table></figure></li>
-<li><p>类</p>
-<figure class="highlight angelscript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="symbol">AnalysisEventListener</span>&lt;<span class="symbol">T</span>&gt;</span><br></pre></td></tr></table></figure></li>
-<li><p>方法</p>
-<figure class="highlight delphi"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span>&lt;T&gt; T copyByClass(<span class="keyword">Object</span> src,<span class="keyword">Class</span> x,<span class="keyword">Class</span> target) </span><br></pre></td></tr></table></figure>
-
-<ol>
-<li><p>如果这两个class参数都不指定T 那么就会返回一个Object</p>
-</li>
-<li><p>如果是</p>
-<figure class="highlight delphi"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span>&lt;T&gt; T copyByClass(<span class="keyword">Object</span> src,<span class="keyword">Class</span> x,<span class="keyword">Class</span>&lt;T&gt; target) </span><br></pre></td></tr></table></figure></li>
-<li><p>那么返回对象就是target类</p>
-</li>
-</ol>
-</li>
-</ol>
-</li>
-<li><p>传入</p>
-<figure class="highlight reasonml"><table><tr><td class="code"><pre><span class="line"><span class="module-access"><span class="module"><span class="identifier">BeanMapper</span>.</span></span>copy<span class="constructor">ByClass(<span class="params">studentVO</span>, Integer.TYPE,Student.<span class="params">class</span>)</span>;</span><br></pre></td></tr></table></figure></li>
-<li><p>如果没有T，那么就只能返返回Object</p>
-</li>
-<li><p>也就是说&lt;&gt;菱形运算符就是为了规范返回与传入，全部Object一堆乱+强制类型转换</p>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>java</category>
-      </categories>
-  </entry>
-  <entry>
     <title></title>
     <url>/2021/11/04/java/hashcode%E7%9A%84%E5%88%86%E6%9E%90/</url>
     <content><![CDATA[<h3 id="hashcode的由来"><a href="#hashcode的由来" class="headerlink" title="hashcode的由来"></a>hashcode的由来</h3><h3 id="hashcode是否会相等"><a href="#hashcode是否会相等" class="headerlink" title="hashcode是否会相等"></a>hashcode是否会相等</h3>]]></content>
-  </entry>
-  <entry>
-    <title>optional类</title>
-    <url>/2021/11/02/java/java8%E4%B9%8Boptional/</url>
-    <content><![CDATA[<h3 id="属性"><a href="#属性" class="headerlink" title="属性"></a>属性</h3><ol>
-<li>```java<br>private final T value;//值<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="number">2</span>. ```java</span><br><span class="line">   <span class="keyword">private</span> <span class="built_in">static</span> <span class="keyword">final</span> Optional<span class="meta">&lt;?</span>&gt; <span class="keyword">EMPTY</span> = <span class="keyword">new</span> Optional&lt;&gt;();<span class="comment">//空值常量</span></span><br></pre></td></tr></table></figure></li>
-</ol>
-<h3 id="API"><a href="#API" class="headerlink" title="API"></a>API</h3><ol>
-<li><p>构建：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Optional.of()<span class="comment">// 不能传null</span></span><br><span class="line">Optional.ofNullable() <span class="comment">//可以传null</span></span><br><span class="line">Optional.empty()<span class="comment">//返回一个空的optional</span></span><br></pre></td></tr></table></figure></li>
-<li><p> 检查</p>
-</li>
-</ol>
-   <figure class="highlight java"><table><tr><td class="code"><pre><span class="line">o.isPresent() <span class="comment">//判断是否存在值</span></span><br></pre></td></tr></table></figure>
-
-<ol start="3">
-<li><p>取值</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">o.get()  <span class="comment">//如果o为null就会报错</span></span><br><span class="line">o.orElse(abc)<span class="comment">// 取值，如果为Null，返回同类对象abc</span></span><br></pre></td></tr></table></figure>
-
-<span id="more"></span></li>
-<li><p>lambda</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">o.ifPresent(s-&gt;System.out.println(s))<span class="comment">//消费者函数 consumer void accept (T t)</span></span><br><span class="line">o.orElseGet(Supplier&lt;? extends T&gt; other)   <span class="comment">// 生产者函数 supplier  T get()</span></span><br><span class="line">o.filter(Predicate&lt;? <span class="keyword">super</span> T&gt; predicate) <span class="comment">//检测者函数 Boolean test(T t)，如果为false就会变null</span></span><br><span class="line">o.map(Function&lt;? <span class="keyword">super</span> T, ? extends U&gt; mapper) <span class="comment">//映射函数Function R apply(T t) 转换类型</span></span><br></pre></td></tr></table></figure></li>
-<li><p>重写方法</p>
-<ol>
-<li><p>判等</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">equals(object o)</span><br><span class="line">--&gt;Object.equals(value,o.value)</span><br><span class="line">----&gt;<span class="keyword">return</span> v1==v2||v1.equals(v2)</span><br></pre></td></tr></table></figure></li>
-<li><p>toString</p>
-</li>
-</ol>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>java</category>
-      </categories>
   </entry>
   <entry>
     <title>函数式接口</title>
@@ -1150,6 +1017,127 @@
       </categories>
   </entry>
   <entry>
+    <title>optional类</title>
+    <url>/2021/11/02/java/java8%E4%B9%8Boptional/</url>
+    <content><![CDATA[<h3 id="属性"><a href="#属性" class="headerlink" title="属性"></a>属性</h3><ol>
+<li>```java<br>private final T value;//值<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="number">2</span>. ```java</span><br><span class="line">   <span class="keyword">private</span> <span class="built_in">static</span> <span class="keyword">final</span> Optional<span class="meta">&lt;?</span>&gt; <span class="keyword">EMPTY</span> = <span class="keyword">new</span> Optional&lt;&gt;();<span class="comment">//空值常量</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="API"><a href="#API" class="headerlink" title="API"></a>API</h3><ol>
+<li><p>构建：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Optional.of()<span class="comment">// 不能传null</span></span><br><span class="line">Optional.ofNullable() <span class="comment">//可以传null</span></span><br><span class="line">Optional.empty()<span class="comment">//返回一个空的optional</span></span><br></pre></td></tr></table></figure></li>
+<li><p> 检查</p>
+</li>
+</ol>
+   <figure class="highlight java"><table><tr><td class="code"><pre><span class="line">o.isPresent() <span class="comment">//判断是否存在值</span></span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><p>取值</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">o.get()  <span class="comment">//如果o为null就会报错</span></span><br><span class="line">o.orElse(abc)<span class="comment">// 取值，如果为Null，返回同类对象abc</span></span><br></pre></td></tr></table></figure>
+
+<span id="more"></span></li>
+<li><p>lambda</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">o.ifPresent(s-&gt;System.out.println(s))<span class="comment">//消费者函数 consumer void accept (T t)</span></span><br><span class="line">o.orElseGet(Supplier&lt;? extends T&gt; other)   <span class="comment">// 生产者函数 supplier  T get()</span></span><br><span class="line">o.filter(Predicate&lt;? <span class="keyword">super</span> T&gt; predicate) <span class="comment">//检测者函数 Boolean test(T t)，如果为false就会变null</span></span><br><span class="line">o.map(Function&lt;? <span class="keyword">super</span> T, ? extends U&gt; mapper) <span class="comment">//映射函数Function R apply(T t) 转换类型</span></span><br></pre></td></tr></table></figure></li>
+<li><p>重写方法</p>
+<ol>
+<li><p>判等</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">equals(object o)</span><br><span class="line">--&gt;Object.equals(value,o.value)</span><br><span class="line">----&gt;<span class="keyword">return</span> v1==v2||v1.equals(v2)</span><br></pre></td></tr></table></figure></li>
+<li><p>toString</p>
+</li>
+</ol>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>java</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>java2</title>
+    <url>/2021/09/24/java/java2/</url>
+    <content><![CDATA[<h3 id="接口"><a href="#接口" class="headerlink" title="接口"></a>接口</h3><ol>
+<li>接口基础<ol>
+<li><p>接口继承接口，方法重复只需要重写一个就ok</p>
+</li>
+<li><p>接口可以有default方法</p>
+</li>
+<li><p>接口可以有static方法</p>
+<span id="more"></span></li>
+</ol>
+</li>
+</ol>
+<!-- more --
+
+2. 接口继承
+   1. 两个接口Animal<--Cat
+   2. Cat ani= new Animal可以通过
+   3. 但是如果调用Cat的新增方法就会报错。
+
+
+
+### static
+
+1. 类的所有方法都能访问static方法
+
+2. 类的所有方法都能访问static变量
+
+3. static方法不能访问非static方法
+
+4. static方法不能访问非static变量
+
+   <figure class="highlight actionscript"><table><tr><td class="code"><pre><span class="line">这就好像<span class="keyword">static</span>的东西都无私奉献出来了，但他却置身事外，不过问q</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="protected"><a href="#protected" class="headerlink" title="protected"></a>protected</h3><ol>
+<li>protected权限就是对包的限定</li>
+<li>例子：<ol>
+<li>clone方法是protected的，如果不重写，那么永远实例对象都不能用(除了这个类自带的方法，包括main方法能有权利用到，其他都没这个权力)，</li>
+</ol>
+</li>
+<li>在其他包创建实例，没有能力用到这个类的protected。</li>
+<li>不同包的B继承了A那么，B如果不重写protected，那么除非在A的包下创建实例之外，就永远访问不到protected</li>
+<li>关键<ol>
+<li>自己类里面能用所有的方法(除了static不饿能访问非static方法)</li>
+<li>对于protected，包的概念应该相对于类成员来讲的，而不是相对于类来讲的，也就是说如果在这个protected成员所在的包创建的实例能够调用protected方法。</li>
+<li>不同包下创建的实例就不能调用这个protected成员。</li>
+</ol>
+</li>
+</ol>
+<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><h3 id="泛型"><a href="#泛型" class="headerlink" title="泛型"></a>泛型</h3><ol>
+<li><p> 菱形运算符&lt;&gt;</p>
+</li>
+<li><p>定义(我需要)</p>
+<ol>
+<li><p>接口</p>
+<figure class="highlight angelscript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="symbol">ReadListener</span>&lt;<span class="symbol">T</span>&gt;</span><br></pre></td></tr></table></figure></li>
+<li><p>类</p>
+<figure class="highlight angelscript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="symbol">AnalysisEventListener</span>&lt;<span class="symbol">T</span>&gt;</span><br></pre></td></tr></table></figure></li>
+<li><p>方法</p>
+<figure class="highlight delphi"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span>&lt;T&gt; T copyByClass(<span class="keyword">Object</span> src,<span class="keyword">Class</span> x,<span class="keyword">Class</span> target) </span><br></pre></td></tr></table></figure>
+
+<ol>
+<li><p>如果这两个class参数都不指定T 那么就会返回一个Object</p>
+</li>
+<li><p>如果是</p>
+<figure class="highlight delphi"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span>&lt;T&gt; T copyByClass(<span class="keyword">Object</span> src,<span class="keyword">Class</span> x,<span class="keyword">Class</span>&lt;T&gt; target) </span><br></pre></td></tr></table></figure></li>
+<li><p>那么返回对象就是target类</p>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p>传入</p>
+<figure class="highlight reasonml"><table><tr><td class="code"><pre><span class="line"><span class="module-access"><span class="module"><span class="identifier">BeanMapper</span>.</span></span>copy<span class="constructor">ByClass(<span class="params">studentVO</span>, Integer.TYPE,Student.<span class="params">class</span>)</span>;</span><br></pre></td></tr></table></figure></li>
+<li><p>如果没有T，那么就只能返返回Object</p>
+</li>
+<li><p>也就是说&lt;&gt;菱形运算符就是为了规范返回与传入，全部Object一堆乱+强制类型转换</p>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>java</category>
+      </categories>
+  </entry>
+  <entry>
     <title>java-web</title>
     <url>/2021/10/31/java/java_web/</url>
     <content><![CDATA[<h3 id="web-网页"><a href="#web-网页" class="headerlink" title="web(网页)"></a>web(网页)</h3><ol>
@@ -1288,6 +1276,18 @@
       </categories>
   </entry>
   <entry>
+    <title>java操作</title>
+    <url>/2021/10/30/java/java%E6%93%8D%E4%BD%9C/</url>
+    <content><![CDATA[<h3 id="路径问题"><a href="#路径问题" class="headerlink" title="路径问题"></a>路径问题</h3><ol>
+<li><p>代码</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">System.out.println(<span class="string">&quot;java_home:&quot;</span>  + System.getProperty( <span class="string">&quot;java.home&quot;</span> ));<span class="comment">//D:\java\jdk8u302-b08\jre</span></span><br><span class="line">    System.out.println(<span class="string">&quot;user_name:&quot;</span>  + System.getProperty( <span class="string">&quot;user.name&quot;</span> ));<span class="comment">//22453</span></span><br><span class="line">    System.out.println(<span class="string">&quot;user_home:&quot;</span>  + System.getProperty( <span class="string">&quot;user.home&quot;</span> ));<span class="comment">//C:\Users\22453</span></span><br><span class="line">    System.out.println(<span class="string">&quot;user_dir:&quot;</span>  + System.getProperty( <span class="string">&quot;user.dir&quot;</span> ));<span class="comment">//D:\project\boot-test1</span></span><br><span class="line">    System.out.println(ClassLoader.getSystemResource(<span class="string">&quot;&quot;</span>));<span class="comment">//file:/D:/project/boot-test1/target/classes/</span></span><br><span class="line">    System.out.println(Constant.class.getClassLoader().getResource(<span class="string">&quot;&quot;</span>));<span class="comment">//同上</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+]]></content>
+      <categories>
+        <category>java</category>
+      </categories>
+  </entry>
+  <entry>
     <title>java常用工具类源码</title>
     <url>/2021/10/04/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/</url>
     <content><![CDATA[<h3 id="比较器Comparator"><a href="#比较器Comparator" class="headerlink" title="比较器Comparator"></a>比较器Comparator</h3><ol>
@@ -1416,11 +1416,25 @@
       </categories>
   </entry>
   <entry>
-    <title>java操作</title>
-    <url>/2021/10/30/java/java%E6%93%8D%E4%BD%9C/</url>
-    <content><![CDATA[<h3 id="路径问题"><a href="#路径问题" class="headerlink" title="路径问题"></a>路径问题</h3><ol>
-<li><p>代码</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">System.out.println(<span class="string">&quot;java_home:&quot;</span>  + System.getProperty( <span class="string">&quot;java.home&quot;</span> ));<span class="comment">//D:\java\jdk8u302-b08\jre</span></span><br><span class="line">    System.out.println(<span class="string">&quot;user_name:&quot;</span>  + System.getProperty( <span class="string">&quot;user.name&quot;</span> ));<span class="comment">//22453</span></span><br><span class="line">    System.out.println(<span class="string">&quot;user_home:&quot;</span>  + System.getProperty( <span class="string">&quot;user.home&quot;</span> ));<span class="comment">//C:\Users\22453</span></span><br><span class="line">    System.out.println(<span class="string">&quot;user_dir:&quot;</span>  + System.getProperty( <span class="string">&quot;user.dir&quot;</span> ));<span class="comment">//D:\project\boot-test1</span></span><br><span class="line">    System.out.println(ClassLoader.getSystemResource(<span class="string">&quot;&quot;</span>));<span class="comment">//file:/D:/project/boot-test1/target/classes/</span></span><br><span class="line">    System.out.println(Constant.class.getClassLoader().getResource(<span class="string">&quot;&quot;</span>));<span class="comment">//同上</span></span><br></pre></td></tr></table></figure></li>
+    <title>java分析3</title>
+    <url>/2021/10/13/java/java%E7%89%B9%E6%AE%8A%E5%B1%9E%E6%80%A7/</url>
+    <content><![CDATA[<h3 id="面向对象"><a href="#面向对象" class="headerlink" title="面向对象"></a>面向对象</h3><ol>
+<li><p>方法重构</p>
+<ol>
+<li><p>不同return 不同参  可行</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">t</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">t</span><span class="params">(<span class="keyword">int</span> a)</span></span>&#123;<span class="keyword">return</span> <span class="number">1</span>;&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>不同类型同参  不行</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">t</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">t</span><span class="params">()</span></span>&#123;<span class="keyword">return</span> <span class="number">1</span>;&#125;</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span></li>
+<li><p>继承重构也是</p>
+</li>
+<li><p>所以带有@Data的两个继承类，属性能覆盖，但是如果int A.a  String B.a 就会报错，因为A是int getA()</p>
+<p>而B是String getA()。</p>
+</li>
+</ol>
+</li>
+<li></li>
 </ol>
 ]]></content>
       <categories>
@@ -1556,32 +1570,6 @@
       </categories>
   </entry>
   <entry>
-    <title>java分析3</title>
-    <url>/2021/10/13/java/java%E7%89%B9%E6%AE%8A%E5%B1%9E%E6%80%A7/</url>
-    <content><![CDATA[<h3 id="面向对象"><a href="#面向对象" class="headerlink" title="面向对象"></a>面向对象</h3><ol>
-<li><p>方法重构</p>
-<ol>
-<li><p>不同return 不同参  可行</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">t</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">t</span><span class="params">(<span class="keyword">int</span> a)</span></span>&#123;<span class="keyword">return</span> <span class="number">1</span>;&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p>不同类型同参  不行</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">t</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">t</span><span class="params">()</span></span>&#123;<span class="keyword">return</span> <span class="number">1</span>;&#125;</span><br></pre></td></tr></table></figure>
-
-<span id="more"></span></li>
-<li><p>继承重构也是</p>
-</li>
-<li><p>所以带有@Data的两个继承类，属性能覆盖，但是如果int A.a  String B.a 就会报错，因为A是int getA()</p>
-<p>而B是String getA()。</p>
-</li>
-</ol>
-</li>
-<li></li>
-</ol>
-]]></content>
-      <categories>
-        <category>java</category>
-      </categories>
-  </entry>
-  <entry>
     <title>动态代理</title>
     <url>/2021/10/13/java/java%E9%AB%98%E9%98%B6/</url>
     <content><![CDATA[<h3 id="动态代理"><a href="#动态代理" class="headerlink" title="动态代理"></a>动态代理</h3><ol>
@@ -1626,6 +1614,22 @@
 ]]></content>
       <categories>
         <category>java高阶</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>mybatis</title>
+    <url>/2021/10/16/java/mybatis/</url>
+    <content><![CDATA[<h3 id="占位符"><a href="#占位符" class="headerlink" title="占位符"></a>占位符</h3><ol>
+<li><p>#{}自动处理为string,     取对象get()方法</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;queryCountByDateF&quot;</span> <span class="attr">resultType</span>=<span class="string">&quot;com.wyg.epidemicsituation.domain.CountByDate&quot;</span>&gt;</span></span><br><span class="line">    SELECT count(id) as sum,CREATEd_at as date FROM data_result where isReg = 1 and created_at &gt; #&#123;start&#125; and created_at <span class="symbol">&amp;lt;</span> #&#123;end&#125; GROUP BY CREATEd_at ORDER BY CREATEd_at</span><br><span class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>${arg}无法放在注入攻击  传入的是原型</p>
+</li>
+<li><p>mapper没有用@Param  可用#{arg0}  #{param1}代替</p>
+<span id="more"></span></li>
+</ol>
+<h3 id="缓存"><a href="#缓存" class="headerlink" title="缓存"></a>缓存</h3><h3 id="动态sql"><a href="#动态sql" class="headerlink" title="动态sql"></a>动态sql</h3>]]></content>
+      <categories>
+        <category>组件</category>
       </categories>
   </entry>
   <entry>
@@ -1682,22 +1686,6 @@
 <h3 id="java编过程"><a href="#java编过程" class="headerlink" title="java编过程"></a>java编过程</h3>]]></content>
       <categories>
         <category>java高阶</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>mybatis</title>
-    <url>/2021/10/16/java/mybatis/</url>
-    <content><![CDATA[<h3 id="占位符"><a href="#占位符" class="headerlink" title="占位符"></a>占位符</h3><ol>
-<li><p>#{}自动处理为string,     取对象get()方法</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;queryCountByDateF&quot;</span> <span class="attr">resultType</span>=<span class="string">&quot;com.wyg.epidemicsituation.domain.CountByDate&quot;</span>&gt;</span></span><br><span class="line">    SELECT count(id) as sum,CREATEd_at as date FROM data_result where isReg = 1 and created_at &gt; #&#123;start&#125; and created_at <span class="symbol">&amp;lt;</span> #&#123;end&#125; GROUP BY CREATEd_at ORDER BY CREATEd_at</span><br><span class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-<li><p>${arg}无法放在注入攻击  传入的是原型</p>
-</li>
-<li><p>mapper没有用@Param  可用#{arg0}  #{param1}代替</p>
-<span id="more"></span></li>
-</ol>
-<h3 id="缓存"><a href="#缓存" class="headerlink" title="缓存"></a>缓存</h3><h3 id="动态sql"><a href="#动态sql" class="headerlink" title="动态sql"></a>动态sql</h3>]]></content>
-      <categories>
-        <category>组件</category>
       </categories>
   </entry>
   <entry>
@@ -2063,71 +2051,91 @@
       </categories>
   </entry>
   <entry>
-    <title>cookie</title>
-    <url>/2021/10/31/javaWeb/cookie/</url>
-    <content><![CDATA[<h2 id="会话"><a href="#会话" class="headerlink" title="会话"></a>会话</h2><ol>
-<li>会话功能：在会话范围内共享数据</li>
-<li>一次会话就是从浏览器打开到关闭期间客户端与服务端的请求和响应</li>
-<li>http无状态，无法进行数据交换，无法识别身份，</li>
+    <title>java-web</title>
+    <url>/2021/09/27/javaWeb/java_web/</url>
+    <content><![CDATA[<h3 id="web-网页"><a href="#web-网页" class="headerlink" title="web(网页)"></a>web(网页)</h3><ol>
+<li>静态web <ol>
+<li>html css</li>
+<li>静态文件</li>
+<li>模板引擎</li>
+<li>即所有的数据都不变化</li>
 </ol>
-<h3 id="cookie-客户端会话技术"><a href="#cookie-客户端会话技术" class="headerlink" title="cookie 客户端会话技术"></a>cookie 客户端会话技术</h3><ol>
-<li><p>cookie特点</p>
-<ol>
-<li><p>保存在浏览器内存中</p>
 </li>
-<li><p>key-value,Respones.Header，</p>
-</li>
-<li><p>可设置存活时间</p>
-</li>
-<li><p>安全性低</p>
-</li>
-<li><p>大小有限(每个域名一个大小)</p>
-</li>
-<li><p>不可跨域性</p>
+<li>动态web 这个叫javaWeb<ol>
+<li><p>提供给人的数据会根据用户的请求而会变化</p>
 <span id="more"></span></li>
 </ol>
 </li>
-<li><p>作用</p>
+<li>web的组成<ol>
+<li>html css js</li>
+<li>jsp servlet</li>
+<li>java</li>
+<li>jar</li>
+<li>配置文件</li>
+<li>服务器</li>
+</ol>
+</li>
+</ol>
+<h3 id="javaWeb项目结构"><a href="#javaWeb项目结构" class="headerlink" title="javaWeb项目结构"></a>javaWeb项目结构</h3><ol>
+<li><p>文件结构</p>
 <ol>
-<li>登陆记录(欢迎回来，你上一次访问的时间是。。。cookie.set(cookie.getOrDefault(“lastTime”,0)))</li>
-<li>页面间数据传递</li>
-<li>保存用户信息</li>
+<li>根目录(parent)<ol>
+<li>WEN-INF目录<ol>
+<li>web.xml:web核心配置</li>
+<li>Classes:字节码文件（java编译后）</li>
+<li>lib:依赖jar包</li>
 </ol>
 </li>
 </ol>
-<h4 id="使用步骤"><a href="#使用步骤" class="headerlink" title="使用步骤"></a>使用步骤</h4><ol>
-<li><p>创建cookie</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Cookie c=<span class="keyword">new</span> Cookie(<span class="string">&quot;name&quot;</span>,<span class="string">&quot;hello&quot;</span>);</span><br></pre></td></tr></table></figure></li>
-<li><p>发送cookie–&gt;想听头 set-cookie:””</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">response.addCookie(c);</span><br></pre></td></tr></table></figure></li>
-<li><p>获取cookie</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Cookie[]cookies=request.getCookies();</span><br></pre></td></tr></table></figure></li>
-<li><p>发送多个cookie</p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211006110443252.png![image-20211006110900739](https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211006110900739.png" alt="image-20211006110443252"></p>
-<p>–&gt;下一次request的时候重复的会被统一(默认用最后一个)</p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211006110648442.png" alt="image-20211006110648442"></p>
 </li>
 </ol>
-<h4 id="cookie问题"><a href="#cookie问题" class="headerlink" title="cookie问题"></a>cookie问题</h4><ol>
-<li><p>cookie保存时间</p>
+</li>
+<li><p>web+idea</p>
 <ol>
-<li>默认浏览器关闭</li>
-<li>持久化存储 cookie.setMaxAge(60<em>60</em>24*30) <ol>
-<li>整数：关闭浏览器n秒后才消失，上面是一个月</li>
-<li>负数：默认</li>
-<li>零：删除此cookie</li>
-</ol>
-</li>
-</ol>
-</li>
-<li><p>cookie中文问题(tomcat&gt;8)</p>
-<p>在浏览器中显示有问题，但是再次发送到java还是可以看到中文</p>
-</li>
-<li><p>cookie共享问题</p>
+<li><p>启动idea,配置启 添加本地tomcat</p>
+<p>配置</p>
 <ol>
-<li>多个tomcat(服务器)默认情况下是不共享的</li>
-<li>可以使用setPath设置范围(“/“)范围最大</li>
+<li>虚拟目录</li>
+<li>端口</li>
 </ol>
+</li>
+<li><p>添加facet的Web</p>
+<ol>
+<li>配置文件path:web.xml</li>
+<li>资源目录 path:webapp</li>
+</ol>
+</li>
+<li><p>在启动配置的tomcat的部署下方配置上下文以配置路径</p>
+</li>
+<li><p>热部署–&gt;debug方式启动</p>
+</li>
+<li><p>右键new servlet</p>
+<p>javaProject.iml/pom.xml</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">sourceRoots</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">root</span> <span class="attr">url</span>=<span class="string">&quot;file://$MODULE_DIR$/src&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">root</span> <span class="attr">url</span>=<span class="string">&quot;file://$MODULE_DIR$/src/main/java&quot;</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">sourceRoots</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+</ol>
+<h3 id="一些理解"><a href="#一些理解" class="headerlink" title="一些理解"></a>一些理解</h3><ol>
+<li>tomcat，</li>
+<li>servlet 一种规范，实现这个规范的Class能够随时接受Requeset,Response，就好象一直运行在tomcat上一样。</li>
+<li>request 一种规范，将浏览器的请求数据进行封装，其中httoRequest将http协议的请求进行封装，这个封装体可以把这些数据到处共享。</li>
+<li>response</li>
+<li>其他<ol>
+<li>@WebServlet(“”)请求模式路径</li>
+<li></li>
+</ol>
+</li>
+</ol>
+<h3 id="issue"><a href="#issue" class="headerlink" title="issue"></a>issue</h3><ol>
+<li><p>Request请求参数乱码</p>
+<ol>
+<li><p>tomcat&gt;8 get方式不会乱码(url)</p>
+</li>
+<li><p>post(stream)-&gt;设置流的编码–&gt;</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">req.setCharacterEncoding(<span class="string">&quot;utf-8&quot;</span>);</span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+<li><p>Response设置编码</p>
 </li>
 </ol>
 ]]></content>
@@ -2245,91 +2253,71 @@
       </categories>
   </entry>
   <entry>
-    <title>java-web</title>
-    <url>/2021/09/27/javaWeb/java_web/</url>
-    <content><![CDATA[<h3 id="web-网页"><a href="#web-网页" class="headerlink" title="web(网页)"></a>web(网页)</h3><ol>
-<li>静态web <ol>
-<li>html css</li>
-<li>静态文件</li>
-<li>模板引擎</li>
-<li>即所有的数据都不变化</li>
+    <title>cookie</title>
+    <url>/2021/10/31/javaWeb/cookie/</url>
+    <content><![CDATA[<h2 id="会话"><a href="#会话" class="headerlink" title="会话"></a>会话</h2><ol>
+<li>会话功能：在会话范围内共享数据</li>
+<li>一次会话就是从浏览器打开到关闭期间客户端与服务端的请求和响应</li>
+<li>http无状态，无法进行数据交换，无法识别身份，</li>
 </ol>
+<h3 id="cookie-客户端会话技术"><a href="#cookie-客户端会话技术" class="headerlink" title="cookie 客户端会话技术"></a>cookie 客户端会话技术</h3><ol>
+<li><p>cookie特点</p>
+<ol>
+<li><p>保存在浏览器内存中</p>
 </li>
-<li>动态web 这个叫javaWeb<ol>
-<li><p>提供给人的数据会根据用户的请求而会变化</p>
+<li><p>key-value,Respones.Header，</p>
+</li>
+<li><p>可设置存活时间</p>
+</li>
+<li><p>安全性低</p>
+</li>
+<li><p>大小有限(每个域名一个大小)</p>
+</li>
+<li><p>不可跨域性</p>
 <span id="more"></span></li>
 </ol>
 </li>
-<li>web的组成<ol>
-<li>html css js</li>
-<li>jsp servlet</li>
-<li>java</li>
-<li>jar</li>
-<li>配置文件</li>
-<li>服务器</li>
-</ol>
-</li>
-</ol>
-<h3 id="javaWeb项目结构"><a href="#javaWeb项目结构" class="headerlink" title="javaWeb项目结构"></a>javaWeb项目结构</h3><ol>
-<li><p>文件结构</p>
+<li><p>作用</p>
 <ol>
-<li>根目录(parent)<ol>
-<li>WEN-INF目录<ol>
-<li>web.xml:web核心配置</li>
-<li>Classes:字节码文件（java编译后）</li>
-<li>lib:依赖jar包</li>
+<li>登陆记录(欢迎回来，你上一次访问的时间是。。。cookie.set(cookie.getOrDefault(“lastTime”,0)))</li>
+<li>页面间数据传递</li>
+<li>保存用户信息</li>
 </ol>
 </li>
 </ol>
+<h4 id="使用步骤"><a href="#使用步骤" class="headerlink" title="使用步骤"></a>使用步骤</h4><ol>
+<li><p>创建cookie</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Cookie c=<span class="keyword">new</span> Cookie(<span class="string">&quot;name&quot;</span>,<span class="string">&quot;hello&quot;</span>);</span><br></pre></td></tr></table></figure></li>
+<li><p>发送cookie–&gt;想听头 set-cookie:””</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">response.addCookie(c);</span><br></pre></td></tr></table></figure></li>
+<li><p>获取cookie</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Cookie[]cookies=request.getCookies();</span><br></pre></td></tr></table></figure></li>
+<li><p>发送多个cookie</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211006110443252.png![image-20211006110900739](https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211006110900739.png" alt="image-20211006110443252"></p>
+<p>–&gt;下一次request的时候重复的会被统一(默认用最后一个)</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211006110648442.png" alt="image-20211006110648442"></p>
 </li>
 </ol>
-</li>
-<li><p>web+idea</p>
+<h4 id="cookie问题"><a href="#cookie问题" class="headerlink" title="cookie问题"></a>cookie问题</h4><ol>
+<li><p>cookie保存时间</p>
 <ol>
-<li><p>启动idea,配置启 添加本地tomcat</p>
-<p>配置</p>
+<li>默认浏览器关闭</li>
+<li>持久化存储 cookie.setMaxAge(60<em>60</em>24*30) <ol>
+<li>整数：关闭浏览器n秒后才消失，上面是一个月</li>
+<li>负数：默认</li>
+<li>零：删除此cookie</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p>cookie中文问题(tomcat&gt;8)</p>
+<p>在浏览器中显示有问题，但是再次发送到java还是可以看到中文</p>
+</li>
+<li><p>cookie共享问题</p>
 <ol>
-<li>虚拟目录</li>
-<li>端口</li>
+<li>多个tomcat(服务器)默认情况下是不共享的</li>
+<li>可以使用setPath设置范围(“/“)范围最大</li>
 </ol>
-</li>
-<li><p>添加facet的Web</p>
-<ol>
-<li>配置文件path:web.xml</li>
-<li>资源目录 path:webapp</li>
-</ol>
-</li>
-<li><p>在启动配置的tomcat的部署下方配置上下文以配置路径</p>
-</li>
-<li><p>热部署–&gt;debug方式启动</p>
-</li>
-<li><p>右键new servlet</p>
-<p>javaProject.iml/pom.xml</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">sourceRoots</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">root</span> <span class="attr">url</span>=<span class="string">&quot;file://$MODULE_DIR$/src&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">root</span> <span class="attr">url</span>=<span class="string">&quot;file://$MODULE_DIR$/src/main/java&quot;</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">sourceRoots</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-</ol>
-</li>
-</ol>
-<h3 id="一些理解"><a href="#一些理解" class="headerlink" title="一些理解"></a>一些理解</h3><ol>
-<li>tomcat，</li>
-<li>servlet 一种规范，实现这个规范的Class能够随时接受Requeset,Response，就好象一直运行在tomcat上一样。</li>
-<li>request 一种规范，将浏览器的请求数据进行封装，其中httoRequest将http协议的请求进行封装，这个封装体可以把这些数据到处共享。</li>
-<li>response</li>
-<li>其他<ol>
-<li>@WebServlet(“”)请求模式路径</li>
-<li></li>
-</ol>
-</li>
-</ol>
-<h3 id="issue"><a href="#issue" class="headerlink" title="issue"></a>issue</h3><ol>
-<li><p>Request请求参数乱码</p>
-<ol>
-<li><p>tomcat&gt;8 get方式不会乱码(url)</p>
-</li>
-<li><p>post(stream)-&gt;设置流的编码–&gt;</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">req.setCharacterEncoding(<span class="string">&quot;utf-8&quot;</span>);</span><br></pre></td></tr></table></figure></li>
-</ol>
-</li>
-<li><p>Response设置编码</p>
 </li>
 </ol>
 ]]></content>
@@ -2781,38 +2769,6 @@
       </categories>
   </entry>
   <entry>
-    <title>spring-secruity</title>
-    <url>/2021/10/12/project/spring-secruity/</url>
-    <content><![CDATA[<h3 id="project1"><a href="#project1" class="headerlink" title="project1"></a>project1</h3><ol>
-<li><p>database</p>
-<p>user</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">username,series,token,last_used</span><br></pre></td></tr></table></figure></li>
-<li><p>配置类</p>
-<ol>
-<li><p>注入数据库</p>
-</li>
-<li><p>@configuration</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Autowired</span></span><br><span class="line"><span class="keyword">private</span> DataSource dataSource;</span><br><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> PersistentTokenRepository <span class="title">persistentTokenRepository</span><span class="params">()</span></span>&#123;</span><br><span class="line">    JdbcTokenRepositoryImpl jdbcTokenRepository=<span class="keyword">new</span> JdbcTokenRepositoryImpl();</span><br><span class="line">    jdbcTokenRepository.setDataSource(dataSource);</span><br><span class="line">    <span class="comment">//        jdbcTokenRepository.setCreateTableOnStartup();</span></span><br><span class="line">    <span class="keyword">return</span> jdbcTokenRepository;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(HttpSecurity http)</span> </span></span><br><span class="line"><span class="function">.<span class="title">and</span><span class="params">()</span>.<span class="title">rememberMe</span><span class="params">()</span>.<span class="title">tokenRepository</span><span class="params">(persistentTokenRepository()</span>)<span class="comment">//配置数据库--token</span></span></span><br><span class="line"><span class="function">                .<span class="title">tokenValiditySeconds</span><span class="params">(<span class="number">4</span>)</span><span class="comment">//设置有效时长</span></span></span><br><span class="line"><span class="function">                .<span class="title">userDetailsService</span><span class="params">(userDetailsService)</span></span></span><br></pre></td></tr></table></figure></li>
-</ol>
-</li>
-</ol>
-   <span id="more"></span>
-
-<ol start="3">
-<li><p>csrf 跨站请求伪造</p>
-<ol>
-<li><p>依赖</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">     &lt;groupId&gt;org.thymeleaf.extras&lt;/groupId&gt;</span><br><span class="line">     &lt;artifactId&gt;thymeleaf-extras-springsecurity5&lt;/artifactId&gt;</span><br><span class="line">&lt;/dependency&gt;	</span><br></pre></td></tr></table></figure></li>
-<li></li>
-</ol>
-</li>
-</ol>
-]]></content>
-      <categories>
-        <category>spring</category>
-      </categories>
-  </entry>
-  <entry>
     <title>springBoot秒杀系统</title>
     <url>/2021/09/29/project/springboot_%E7%A7%92%E6%9D%80%E7%B3%BB%E7%BB%9F/</url>
     <content><![CDATA[<h3 id="技术介绍"><a href="#技术介绍" class="headerlink" title="技术介绍"></a>技术介绍</h3><ol>
@@ -2886,6 +2842,131 @@
       <categories>
         <category>project</category>
       </categories>
+  </entry>
+  <entry>
+    <title>spring-secruity</title>
+    <url>/2021/10/12/project/spring-secruity/</url>
+    <content><![CDATA[<h3 id="project1"><a href="#project1" class="headerlink" title="project1"></a>project1</h3><ol>
+<li><p>database</p>
+<p>user</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">username,series,token,last_used</span><br></pre></td></tr></table></figure></li>
+<li><p>配置类</p>
+<ol>
+<li><p>注入数据库</p>
+</li>
+<li><p>@configuration</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Autowired</span></span><br><span class="line"><span class="keyword">private</span> DataSource dataSource;</span><br><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> PersistentTokenRepository <span class="title">persistentTokenRepository</span><span class="params">()</span></span>&#123;</span><br><span class="line">    JdbcTokenRepositoryImpl jdbcTokenRepository=<span class="keyword">new</span> JdbcTokenRepositoryImpl();</span><br><span class="line">    jdbcTokenRepository.setDataSource(dataSource);</span><br><span class="line">    <span class="comment">//        jdbcTokenRepository.setCreateTableOnStartup();</span></span><br><span class="line">    <span class="keyword">return</span> jdbcTokenRepository;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(HttpSecurity http)</span> </span></span><br><span class="line"><span class="function">.<span class="title">and</span><span class="params">()</span>.<span class="title">rememberMe</span><span class="params">()</span>.<span class="title">tokenRepository</span><span class="params">(persistentTokenRepository()</span>)<span class="comment">//配置数据库--token</span></span></span><br><span class="line"><span class="function">                .<span class="title">tokenValiditySeconds</span><span class="params">(<span class="number">4</span>)</span><span class="comment">//设置有效时长</span></span></span><br><span class="line"><span class="function">                .<span class="title">userDetailsService</span><span class="params">(userDetailsService)</span></span></span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+</ol>
+   <span id="more"></span>
+
+<ol start="3">
+<li><p>csrf 跨站请求伪造</p>
+<ol>
+<li><p>依赖</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">     &lt;groupId&gt;org.thymeleaf.extras&lt;/groupId&gt;</span><br><span class="line">     &lt;artifactId&gt;thymeleaf-extras-springsecurity5&lt;/artifactId&gt;</span><br><span class="line">&lt;/dependency&gt;	</span><br></pre></td></tr></table></figure></li>
+<li></li>
+</ol>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>spring</category>
+      </categories>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2021/10/14/other/%E5%B0%B1%E4%B8%9A%E7%96%91%E9%97%AE/</url>
+    <content><![CDATA[<h3 id="学习"><a href="#学习" class="headerlink" title="学习"></a>学习</h3><ol>
+<li>上班还需要学习吗  <ol>
+<li>新技术</li>
+<li>底层技术</li>
+</ol>
+</li>
+<li>上班</li>
+</ol>
+]]></content>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2021/10/08/other/%E5%BC%80%E5%8F%91%E6%97%A5%E8%AE%B0/</url>
+    <content><![CDATA[<h3 id="需求问题"><a href="#需求问题" class="headerlink" title="需求问题"></a>需求问题</h3><ol>
+<li>这个功能是否已经完成，</li>
+<li></li>
+</ol>
+<h3 id="技术问题"><a href="#技术问题" class="headerlink" title="技术问题"></a>技术问题</h3><ol>
+<li>postman登录测试怎么完成 </li>
+<li>数据库的连接问题</li>
+<li>Repository是mybatispluS?</li>
+</ol>
+<h3 id="处理"><a href="#处理" class="headerlink" title="处理"></a>处理</h3><ol>
+<li>所有api<ol>
+<li>api/dict 增删改查</li>
+<li>dictDetail增删改查</li>
+</ol>
+</li>
+</ol>
+<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line">map 检验</span><br><span class="line"></span><br><span class="line"><span class="regexp">//</span>        Map&lt;String, Map&lt;String, Paper&gt;&gt; map = records.parallelStream().collect(</span><br><span class="line"><span class="regexp">//</span>                Collectors.groupingBy(Paper::getExamId,</span><br><span class="line"><span class="regexp">//</span>                        Collectors.toMap(Paper::getUserId, Function.identity(), (o1, o2) -&gt; (o1.getUserScore() &gt; o2.getUserScore() ? o1 : o2))));</span><br><span class="line"><span class="regexp">//</span>        Debug.debug(<span class="string">&quot;map1&quot;</span>);</span><br><span class="line"><span class="regexp">//</span>        map.forEach((k, v) -&gt; &#123;</span><br><span class="line"><span class="regexp">//</span>            System.out.println(<span class="string">&quot;exam-&gt;&quot;</span>+k + <span class="string">&quot;:&quot;</span>);</span><br><span class="line"><span class="regexp">//</span>            v.forEach((a, b) -&gt; System.out.println(<span class="string">&quot;\tuser:&quot;</span> + a + <span class="string">&quot;:  &quot;</span> + b.getUserScore()));</span><br><span class="line"><span class="regexp">//</span>        &#125;);</span><br></pre></td></tr></table></figure>]]></content>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2021/10/12/other/%E9%9C%80%E6%B1%821/</url>
+    <content><![CDATA[<h3 id="处理"><a href="#处理" class="headerlink" title="处理"></a>处理</h3><ol>
+<li>题目-试卷<ol>
+<li>el_exam  : 试卷   </li>
+<li>el_repo 考试-题库   对应于3</li>
+<li>el_paper 学生–试卷 考试ing试卷状态</li>
+<li>el_qu_answer 题目id–答案id</li>
+<li>el_qu 题目id-内容</li>
+<li>el_paper_qu_answer 试卷id-题目id-回答id-是否选中-答案id</li>
+</ol>
+</li>
+<li>题目-题库<ol>
+<li>el_repo 题库(id，各个数量) 需要增加一个类别</li>
+<li>el_qu_repo 题库id-试题id表</li>
+</ol>
+</li>
+</ol>
+<h3 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h3><ol>
+<li><p>题库类别  –&gt;数据库 加一个id</p>
+</li>
+<li><p>考试时间  前端问题—-后端时间已经精确到时分秒</p>
+</li>
+<li><p>试题默认数量  RepoController的/exam/api/repo/detail   自带通过id查询数量的方法</p>
+</li>
+<li><p>移动试题  </p>
+</li>
+<li><p>成绩显示姓名 本地回显没问题</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211013130356858.png" alt="image-20211013130356858"></p>
+</li>
+<li><p>考试次数大于2  增加方法 localhost:8101/exam/api/exam/exam/isValid</p>
+</li>
+</ol>
+<h3 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h3><ol>
+<li><p>题库类别  –添加字段</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211012162844210.png" alt="image-20211012162844210"></p>
+</li>
+<li><p>考试时间</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211012162641407.png" alt="image-20211012162641407"></p>
+</li>
+<li><p>试题默认<img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211012162559390.png" alt="image-20211012162559390">总数量</p>
+</li>
+<li><p>移动试题</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211012162903396.png" alt="image-20211012162903396"></p>
+</li>
+<li><p>成绩处显示姓名</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211012162814949.png" alt="image-20211012162814949"></p>
+</li>
+<li><p>考试次数大于2</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211012163049400.png" alt="image-20211012163049400"></p>
+</li>
+</ol>
+<h3 id="疑问"><a href="#疑问" class="headerlink" title="疑问"></a>疑问</h3><h3 id="处理-1"><a href="#处理-1" class="headerlink" title="处理"></a>处理</h3><ol>
+<li></li>
+</ol>
+<h3 id="解决-1"><a href="#解决-1" class="headerlink" title="解决"></a>解决</h3><p>1. </p>
+]]></content>
   </entry>
   <entry>
     <title>linux操作</title>
@@ -3195,99 +3276,6 @@
       </categories>
   </entry>
   <entry>
-    <title></title>
-    <url>/2021/10/08/other/%E5%BC%80%E5%8F%91%E6%97%A5%E8%AE%B0/</url>
-    <content><![CDATA[<h3 id="需求问题"><a href="#需求问题" class="headerlink" title="需求问题"></a>需求问题</h3><ol>
-<li>这个功能是否已经完成，</li>
-<li></li>
-</ol>
-<h3 id="技术问题"><a href="#技术问题" class="headerlink" title="技术问题"></a>技术问题</h3><ol>
-<li>postman登录测试怎么完成 </li>
-<li>数据库的连接问题</li>
-<li>Repository是mybatispluS?</li>
-</ol>
-<h3 id="处理"><a href="#处理" class="headerlink" title="处理"></a>处理</h3><ol>
-<li>所有api<ol>
-<li>api/dict 增删改查</li>
-<li>dictDetail增删改查</li>
-</ol>
-</li>
-</ol>
-<figure class="highlight awk"><table><tr><td class="code"><pre><span class="line">map 检验</span><br><span class="line"></span><br><span class="line"><span class="regexp">//</span>        Map&lt;String, Map&lt;String, Paper&gt;&gt; map = records.parallelStream().collect(</span><br><span class="line"><span class="regexp">//</span>                Collectors.groupingBy(Paper::getExamId,</span><br><span class="line"><span class="regexp">//</span>                        Collectors.toMap(Paper::getUserId, Function.identity(), (o1, o2) -&gt; (o1.getUserScore() &gt; o2.getUserScore() ? o1 : o2))));</span><br><span class="line"><span class="regexp">//</span>        Debug.debug(<span class="string">&quot;map1&quot;</span>);</span><br><span class="line"><span class="regexp">//</span>        map.forEach((k, v) -&gt; &#123;</span><br><span class="line"><span class="regexp">//</span>            System.out.println(<span class="string">&quot;exam-&gt;&quot;</span>+k + <span class="string">&quot;:&quot;</span>);</span><br><span class="line"><span class="regexp">//</span>            v.forEach((a, b) -&gt; System.out.println(<span class="string">&quot;\tuser:&quot;</span> + a + <span class="string">&quot;:  &quot;</span> + b.getUserScore()));</span><br><span class="line"><span class="regexp">//</span>        &#125;);</span><br></pre></td></tr></table></figure>]]></content>
-  </entry>
-  <entry>
-    <title></title>
-    <url>/2021/10/14/other/%E5%B0%B1%E4%B8%9A%E7%96%91%E9%97%AE/</url>
-    <content><![CDATA[<h3 id="学习"><a href="#学习" class="headerlink" title="学习"></a>学习</h3><ol>
-<li>上班还需要学习吗  <ol>
-<li>新技术</li>
-<li>底层技术</li>
-</ol>
-</li>
-<li>上班</li>
-</ol>
-]]></content>
-  </entry>
-  <entry>
-    <title></title>
-    <url>/2021/10/12/other/%E9%9C%80%E6%B1%821/</url>
-    <content><![CDATA[<h3 id="处理"><a href="#处理" class="headerlink" title="处理"></a>处理</h3><ol>
-<li>题目-试卷<ol>
-<li>el_exam  : 试卷   </li>
-<li>el_repo 考试-题库   对应于3</li>
-<li>el_paper 学生–试卷 考试ing试卷状态</li>
-<li>el_qu_answer 题目id–答案id</li>
-<li>el_qu 题目id-内容</li>
-<li>el_paper_qu_answer 试卷id-题目id-回答id-是否选中-答案id</li>
-</ol>
-</li>
-<li>题目-题库<ol>
-<li>el_repo 题库(id，各个数量) 需要增加一个类别</li>
-<li>el_qu_repo 题库id-试题id表</li>
-</ol>
-</li>
-</ol>
-<h3 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h3><ol>
-<li><p>题库类别  –&gt;数据库 加一个id</p>
-</li>
-<li><p>考试时间  前端问题—-后端时间已经精确到时分秒</p>
-</li>
-<li><p>试题默认数量  RepoController的/exam/api/repo/detail   自带通过id查询数量的方法</p>
-</li>
-<li><p>移动试题  </p>
-</li>
-<li><p>成绩显示姓名 本地回显没问题</p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211013130356858.png" alt="image-20211013130356858"></p>
-</li>
-<li><p>考试次数大于2  增加方法 localhost:8101/exam/api/exam/exam/isValid</p>
-</li>
-</ol>
-<h3 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h3><ol>
-<li><p>题库类别  –添加字段</p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211012162844210.png" alt="image-20211012162844210"></p>
-</li>
-<li><p>考试时间</p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211012162641407.png" alt="image-20211012162641407"></p>
-</li>
-<li><p>试题默认<img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211012162559390.png" alt="image-20211012162559390">总数量</p>
-</li>
-<li><p>移动试题</p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211012162903396.png" alt="image-20211012162903396"></p>
-</li>
-<li><p>成绩处显示姓名</p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211012162814949.png" alt="image-20211012162814949"></p>
-</li>
-<li><p>考试次数大于2</p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211012163049400.png" alt="image-20211012163049400"></p>
-</li>
-</ol>
-<h3 id="疑问"><a href="#疑问" class="headerlink" title="疑问"></a>疑问</h3><h3 id="处理-1"><a href="#处理-1" class="headerlink" title="处理"></a>处理</h3><ol>
-<li></li>
-</ol>
-<h3 id="解决-1"><a href="#解决-1" class="headerlink" title="解决"></a>解决</h3><p>1. </p>
-]]></content>
-  </entry>
-  <entry>
     <title>bean生命周期</title>
     <url>/2021/10/21/spring/Bean%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/</url>
     <content><![CDATA[<h3 id="Bean声明周期"><a href="#Bean声明周期" class="headerlink" title="Bean声明周期"></a>Bean声明周期</h3><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211021203128542.png" alt="image-20211021203128542"></p>
@@ -3443,111 +3431,6 @@
 <li>可以认为starter是一种服务（和JS的插件类似）——使得使用某个功能的开发者不需要关注各种依赖库的处理，不需要具体的配置信息，由Spring Boot自动通过classpath路径下的类发现需要的Bean，并织入bean</li>
 </ol>
 <span id="more"></span>]]></content>
-      <categories>
-        <category>spring</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>springIOC</title>
-    <url>/2021/11/08/spring/springIOC/</url>
-    <content><![CDATA[<p>[toc]</p>
-<h2 id="IOC概念"><a href="#IOC概念" class="headerlink" title="## IOC概念"></a>## IOC概念</h2><h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><ol>
-<li><p>解决的问题</p>
-<ol>
-<li>原来一个对象使用另一个对象，只能new <ul>
-<li>只能new,加入我改变了new 的参数,<font color='red'>那我要在很多代码里面改</font>那我要在很多代码里面改，耦合度太高 ，所以创建一个工厂统一管理对象的创建，用到的地方不需要知道怎么new，只需要过去就行了</li>
-<li>每次都New 很浪费资源，所以<font color='red'>改为</font>通过xml解析获得</li>
-<li>Class.forName获取,进一步获取bean，进一步降低耦合度</li>
-</ul>
-</li>
-<li></li>
-</ol>
-</li>
-<li><p>技术</p>
-<ul>
-<li>xml解析</li>
-<li>工厂模式</li>
-<li>反射技术</li>
-<li>DI技术</li>
-</ul>
-</li>
-</ol>
-<h2 id="bean注册"><a href="#bean注册" class="headerlink" title="bean注册"></a>bean注册</h2><h3 id="1-sping-xml注册"><a href="#1-sping-xml注册" class="headerlink" title="1. sping.xml注册"></a>1. sping.xml注册</h3><ol>
-<li><p>注意</p>
-<ul>
-<li>默认无参构造,也可以有参</li>
-<li>注入属性是基于DI</li>
-</ul>
-</li>
-<li><p>属性注入方法</p>
-<ol>
-<li><p>set方法&lt;properity&gt;</p>
-</li>
-<li><p>构造函数</p>
-</li>
-<li><p>p命名空间 基于set</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line">xmlns:p=&quot;http://www.springframework.org/schema/p&quot;</span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">&quot;s2&quot;</span> <span class="attr">class</span>=<span class="string">&quot;com.wyg.epidemicsituation.entity.vo.Student&quot;</span> <span class="attr">p:age</span>=<span class="string">&quot;20&quot;</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-</ol>
-</li>
-<li><p>属性注入特殊情况</p>
-<ol>
-<li><p>null  &lt;null&gt;&lt;/null&gt;</p>
-</li>
-<li><p>大于小于号;lt</p>
-</li>
-<li><p>外部bean</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;name&quot;</span> <span class="attr">ref</span>=<span class="string">&quot;testID&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-<li><p>内部bean,作用和外部bean一样，就是形式不一样</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;name&quot;</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">&quot;aa&quot;</span>&gt;</span> <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;&quot;</span>&lt;/<span class="attr">bean</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-</ol>
-</li>
-<li><p>注册bean</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">&quot;http://www.springframework.org/schema/beans&quot;</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xmlns:xsi</span>=<span class="string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xsi:schemaLocation</span>=<span class="string">&quot;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">&quot;s2&quot;</span> <span class="attr">class</span>=<span class="string">&quot;com.wyg.epidemicsituation.entity.vo.Student&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;age&quot;</span> <span class="attr">value</span>=<span class="string">&quot;20&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">name</span>=<span class="string">&quot;name&quot;</span> <span class="attr">value</span>=<span class="string">&quot;wang&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">constructor-arg</span>&gt;</span>//有参</span><br><span class="line">    <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-<li><p>getBean</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">ApplicationContext ioc=<span class="keyword">new</span> ClassPathXmlApplicationContext(<span class="string">&quot;/config/beans.xml&quot;</span>);</span><br><span class="line">Student student= (Student) ioc.getBean(<span class="string">&quot;s2&quot;</span>) ;</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h3 id="2-注解配置"><a href="#2-注解配置" class="headerlink" title="2.  注解配置"></a>2.  注解配置</h3><h2 id="二-获取bean"><a href="#二-获取bean" class="headerlink" title="二 获取bean"></a>二 获取bean</h2><ol>
-<li><p>ioc两种获取(接口)</p>
-<ul>
-<li><p>BeanFactory 内置</p>
-<ul>
-<li>懒加载，加载配置文件不会创建对象，只有getBean才会创建bean，</li>
-</ul>
-</li>
-<li><p>ApplicationContext </p>
-<ul>
-<li>饿汉式，加载配置文件的时候就会创建对象</li>
-<li>实现类</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">ApplicationContext ioc=<span class="keyword">new</span> ClassPathXmlApplicationContext(<span class="string">&quot;/config/beans.xml&quot;</span>);</span><br><span class="line">Student mybean = (Student) ioc.getBean(<span class="string">&quot;mybean&quot;</span>);</span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-</ol>
-<h3 id="注解"><a href="#注解" class="headerlink" title="注解"></a>注解</h3><ol>
-<li><p>qualifier要小写,且要和@autowire一起使用</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">@Qualifier(&quot;companyIntroServiceImpl&quot;)</span></span><br></pre></td></tr></table></figure></li>
-</ol>
-<h3 id="spring中两种Bean"><a href="#spring中两种Bean" class="headerlink" title="spring中两种Bean"></a>spring中两种Bean</h3><ul>
-<li>普通bean<ul>
-<li>定义Student 返回就是Student</li>
-</ul>
-</li>
-<li>工厂bean<ul>
-<li>定义为Student，返回可能是其他类型</li>
-<li>接口FactoryBean</li>
-</ul>
-</li>
-</ul>
-<h3 id="Bean的作用域"><a href="#Bean的作用域" class="headerlink" title="Bean的作用域"></a>Bean的作用域</h3><p>spring里面bean默认为单例，可以设置为单例和多例</p>
-<ol>
-<li><p>设置为多例 </p>
-<figure class="highlight routeros"><table><tr><td class="code"><pre><span class="line">&lt;bean  <span class="attribute">scope</span>=<span class="string">&quot;prototype&quot;</span>&gt; 多例</span><br><span class="line"> <span class="attribute">scope</span>=<span class="string">&quot;session&quot;</span>   保存在session中</span><br></pre></td></tr></table></figure></li>
-<li><p>多例规则：懒加载</p>
-</li>
-<li><p>单例规则：饿汉式</p>
-</li>
-</ol>
-<h3 id="Bean的声明周期"><a href="#Bean的声明周期" class="headerlink" title="Bean的声明周期"></a>Bean的声明周期</h3><h3 id="循环依赖"><a href="#循环依赖" class="headerlink" title="循环依赖"></a>循环依赖</h3>]]></content>
       <categories>
         <category>spring</category>
       </categories>
@@ -3836,15 +3719,109 @@
       </categories>
   </entry>
   <entry>
-    <title></title>
-    <url>/2021/11/05/spring/spring%E6%8E%A5%E5%8F%A3/</url>
-    <content><![CDATA[<ol>
-<li>InitializingBean<ol>
-<li>afterProperies(){//加载配置文件后}</li>
+    <title>springIOC</title>
+    <url>/2021/11/08/spring/springIOC/</url>
+    <content><![CDATA[<p>[toc]</p>
+<h2 id="IOC概念"><a href="#IOC概念" class="headerlink" title="## IOC概念"></a>## IOC概念</h2><h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><ol>
+<li><p>解决的问题</p>
+<ol>
+<li>原来一个对象使用另一个对象，只能new <ul>
+<li>只能new,加入我改变了new 的参数,<font color='red'>那我要在很多代码里面改</font>那我要在很多代码里面改，耦合度太高 ，所以创建一个工厂统一管理对象的创建，用到的地方不需要知道怎么new，只需要过去就行了</li>
+<li>每次都New 很浪费资源，所以<font color='red'>改为</font>通过xml解析获得</li>
+<li>Class.forName获取,进一步获取bean，进一步降低耦合度</li>
+</ul>
+</li>
+<li></li>
 </ol>
 </li>
+<li><p>技术</p>
+<ul>
+<li>xml解析</li>
+<li>工厂模式</li>
+<li>反射技术</li>
+<li>DI技术</li>
+</ul>
+</li>
 </ol>
-]]></content>
+<h2 id="bean注册"><a href="#bean注册" class="headerlink" title="bean注册"></a>bean注册</h2><h3 id="1-sping-xml注册"><a href="#1-sping-xml注册" class="headerlink" title="1. sping.xml注册"></a>1. sping.xml注册</h3><ol>
+<li><p>注意</p>
+<ul>
+<li>默认无参构造,也可以有参</li>
+<li>注入属性是基于DI</li>
+</ul>
+</li>
+<li><p>属性注入方法</p>
+<ol>
+<li><p>set方法&lt;properity&gt;</p>
+</li>
+<li><p>构造函数</p>
+</li>
+<li><p>p命名空间 基于set</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line">xmlns:p=&quot;http://www.springframework.org/schema/p&quot;</span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">&quot;s2&quot;</span> <span class="attr">class</span>=<span class="string">&quot;com.wyg.epidemicsituation.entity.vo.Student&quot;</span> <span class="attr">p:age</span>=<span class="string">&quot;20&quot;</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+<li><p>属性注入特殊情况</p>
+<ol>
+<li><p>null  &lt;null&gt;&lt;/null&gt;</p>
+</li>
+<li><p>大于小于号;lt</p>
+</li>
+<li><p>外部bean</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;name&quot;</span> <span class="attr">ref</span>=<span class="string">&quot;testID&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>内部bean,作用和外部bean一样，就是形式不一样</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;name&quot;</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">&quot;aa&quot;</span>&gt;</span> <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;&quot;</span>&lt;/<span class="attr">bean</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+<li><p>注册bean</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">&quot;http://www.springframework.org/schema/beans&quot;</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xmlns:xsi</span>=<span class="string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xsi:schemaLocation</span>=<span class="string">&quot;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">&quot;s2&quot;</span> <span class="attr">class</span>=<span class="string">&quot;com.wyg.epidemicsituation.entity.vo.Student&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;age&quot;</span> <span class="attr">value</span>=<span class="string">&quot;20&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">name</span>=<span class="string">&quot;name&quot;</span> <span class="attr">value</span>=<span class="string">&quot;wang&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">constructor-arg</span>&gt;</span>//有参</span><br><span class="line">    <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>getBean</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">ApplicationContext ioc=<span class="keyword">new</span> ClassPathXmlApplicationContext(<span class="string">&quot;/config/beans.xml&quot;</span>);</span><br><span class="line">Student student= (Student) ioc.getBean(<span class="string">&quot;s2&quot;</span>) ;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="2-注解配置"><a href="#2-注解配置" class="headerlink" title="2.  注解配置"></a>2.  注解配置</h3><h2 id="二-获取bean"><a href="#二-获取bean" class="headerlink" title="二 获取bean"></a>二 获取bean</h2><ol>
+<li><p>ioc两种获取(接口)</p>
+<ul>
+<li><p>BeanFactory 内置</p>
+<ul>
+<li>懒加载，加载配置文件不会创建对象，只有getBean才会创建bean，</li>
+</ul>
+</li>
+<li><p>ApplicationContext </p>
+<ul>
+<li>饿汉式，加载配置文件的时候就会创建对象</li>
+<li>实现类</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">ApplicationContext ioc=<span class="keyword">new</span> ClassPathXmlApplicationContext(<span class="string">&quot;/config/beans.xml&quot;</span>);</span><br><span class="line">Student mybean = (Student) ioc.getBean(<span class="string">&quot;mybean&quot;</span>);</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ol>
+<h3 id="注解"><a href="#注解" class="headerlink" title="注解"></a>注解</h3><ol>
+<li><p>qualifier要小写,且要和@autowire一起使用</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">@Qualifier(&quot;companyIntroServiceImpl&quot;)</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="spring中两种Bean"><a href="#spring中两种Bean" class="headerlink" title="spring中两种Bean"></a>spring中两种Bean</h3><ul>
+<li>普通bean<ul>
+<li>定义Student 返回就是Student</li>
+</ul>
+</li>
+<li>工厂bean<ul>
+<li>定义为Student，返回可能是其他类型</li>
+<li>接口FactoryBean</li>
+</ul>
+</li>
+</ul>
+<h3 id="Bean的作用域"><a href="#Bean的作用域" class="headerlink" title="Bean的作用域"></a>Bean的作用域</h3><p>spring里面bean默认为单例，可以设置为单例和多例</p>
+<ol>
+<li><p>设置为多例 </p>
+<figure class="highlight routeros"><table><tr><td class="code"><pre><span class="line">&lt;bean  <span class="attribute">scope</span>=<span class="string">&quot;prototype&quot;</span>&gt; 多例</span><br><span class="line"> <span class="attribute">scope</span>=<span class="string">&quot;session&quot;</span>   保存在session中</span><br></pre></td></tr></table></figure></li>
+<li><p>多例规则：懒加载</p>
+</li>
+<li><p>单例规则：饿汉式</p>
+</li>
+</ol>
+<h3 id="Bean的声明周期"><a href="#Bean的声明周期" class="headerlink" title="Bean的声明周期"></a>Bean的声明周期</h3><h3 id="循环依赖"><a href="#循环依赖" class="headerlink" title="循环依赖"></a>循环依赖</h3>]]></content>
+      <categories>
+        <category>spring</category>
+      </categories>
   </entry>
   <entry>
     <title>spring新特性</title>
@@ -3854,6 +3831,17 @@
       <categories>
         <category>spring</category>
       </categories>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2021/11/05/spring/spring%E6%8E%A5%E5%8F%A3/</url>
+    <content><![CDATA[<ol>
+<li>InitializingBean<ol>
+<li>afterProperies(){//加载配置文件后}</li>
+</ol>
+</li>
+</ol>
+]]></content>
   </entry>
   <entry>
     <title>spring概念解析</title>
@@ -4488,26 +4476,6 @@ git clone <a href="https://github.com/litten/hexo-theme-yilia.git">https://githu
       </categories>
   </entry>
   <entry>
-    <title>文件工具</title>
-    <url>/2021/11/08/utils/fileUtil/</url>
-    <content><![CDATA[<h3 id="pdf-word-ppt"><a href="#pdf-word-ppt" class="headerlink" title="pdf-word-ppt"></a>pdf-word-ppt</h3><ol>
-<li><p>下载pdf的需求</p>
-<blockquote>
-<p>曲线救国: 先保存html,然后转换成pdf</p>
-</blockquote>
-<ol>
-<li>保存html</li>
-<li>html转换pdf<ul>
-<li>程序:wkhtmltopdf</li>
-<li>借用shell或者bat</li>
-</ul>
-</li>
-</ol>
-</li>
-</ol>
-]]></content>
-  </entry>
-  <entry>
     <title>Git的使用</title>
     <url>/2021/10/04/utils/git/</url>
     <content><![CDATA[<h3 id="Git概念"><a href="#Git概念" class="headerlink" title="Git概念"></a>Git概念</h3><ol>
@@ -4717,7 +4685,7 @@ git clone <a href="https://github.com/litten/hexo-theme-yilia.git">https://githu
 <li><p>github加入自己的本机的ssh</p>
 </li>
 <li><p>将本机的.git的里面的comfig.remote修改为项目的ssh链接</p>
-<p><a href="mailto:&#x67;&#x69;&#x74;&#x40;&#103;&#x69;&#x74;&#104;&#x75;&#98;&#x2e;&#99;&#111;&#109;">&#x67;&#x69;&#x74;&#x40;&#103;&#x69;&#x74;&#104;&#x75;&#98;&#x2e;&#99;&#111;&#109;</a>:Wang-yonggan/Wang-yonggan.github.io.git</p>
+<p><a href="mailto:&#x67;&#x69;&#116;&#64;&#103;&#x69;&#116;&#x68;&#x75;&#x62;&#x2e;&#x63;&#111;&#x6d;">&#x67;&#x69;&#116;&#64;&#103;&#x69;&#116;&#x68;&#x75;&#x62;&#x2e;&#x63;&#111;&#x6d;</a>:Wang-yonggan/Wang-yonggan.github.io.git</p>
 <p><a href="https://github.com/Wang-yonggan/Wang-yonggan.github.io.git">https://github.com/Wang-yonggan/Wang-yonggan.github.io.git</a></p>
 </li>
 </ol>
@@ -4727,6 +4695,26 @@ git clone <a href="https://github.com/litten/hexo-theme-yilia.git">https://githu
       <categories>
         <category>utils</category>
       </categories>
+  </entry>
+  <entry>
+    <title>文件工具</title>
+    <url>/2021/11/08/utils/fileUtil/</url>
+    <content><![CDATA[<h3 id="pdf-word-ppt"><a href="#pdf-word-ppt" class="headerlink" title="pdf-word-ppt"></a>pdf-word-ppt</h3><ol>
+<li><p>下载pdf的需求</p>
+<blockquote>
+<p>曲线救国: 先保存html,然后转换成pdf</p>
+</blockquote>
+<ol>
+<li>保存html</li>
+<li>html转换pdf<ul>
+<li>程序:wkhtmltopdf</li>
+<li>借用shell或者bat</li>
+</ul>
+</li>
+</ol>
+</li>
+</ol>
+]]></content>
   </entry>
   <entry>
     <title>idea操作</title>
@@ -6067,16 +6055,12 @@ git clone <a href="https://github.com/litten/hexo-theme-yilia.git">https://githu
     <url>/2021/11/05/db/sql/%E5%85%B6%E4%BB%96sql/</url>
     <content><![CDATA[<h3 id="导入导出"><a href="#导入导出" class="headerlink" title="导入导出"></a>导入导出</h3><ol>
 <li><p>导出数据库结构、数据、结构和数据、导出表</p>
-<p>mysqldump -uroot -p123456 -d db1&gt; dbname.sql</p>
-<p>mysqldump -uroot -p123456 -t db1 &gt; dbname.sql</p>
-<p>mysqldump -uroot -p123456 db1 &gt; dbname.sql</p>
-<p>mysqldump -uroot -p123456 -d db1 test &gt; test.sql</p>
-</li>
-<li><p>导入source d:/test.sql</p>
-</li>
-<li><p>导出、入到txt</p>
-<p>SELECT * INTO OUTFILE ‘temp.txt’</p>
-<p>LOAD DATA INFILE ‘/home/temp.txt’ INTO TABLE table_name</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">mysql<span class="operator">&gt;</span> mysqldump <span class="operator">-</span>uroot <span class="operator">-</span>p123456 <span class="operator">-</span>d db1<span class="operator">&gt;</span> dbname.sql</span><br><span class="line">mysql<span class="operator">&gt;</span> mysqldump <span class="operator">-</span>uroot <span class="operator">-</span>p123456 <span class="operator">-</span>t db1 <span class="operator">&gt;</span> dbname.sql</span><br><span class="line">mysql<span class="operator">&gt;</span> mysqldump <span class="operator">-</span>uroot <span class="operator">-</span>p123456 db1 <span class="operator">&gt;</span> dbname.sql</span><br><span class="line">mysql<span class="operator">&gt;</span> mysqldump <span class="operator">-</span>uroot <span class="operator">-</span>p123456 <span class="operator">-</span>d db1 test <span class="operator">&gt;</span> test.sql</span><br></pre></td></tr></table></figure></li>
+<li><p>导入</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">mysql<span class="operator">&gt;</span> source d:<span class="operator">/</span>test.sql</span><br></pre></td></tr></table></figure></li>
+<li><p>导出、入  txt</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">INTO</span> OUTFILE <span class="string">&#x27;temp.txt&#x27;</span></span><br><span class="line">LOAD DATA INFILE <span class="string">&#x27;/home/temp.txt&#x27;</span> <span class="keyword">INTO</span> <span class="keyword">TABLE</span> table_name</span><br></pre></td></tr></table></figure>
+
 <span id="more"></span></li>
 </ol>
 <h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><ol>
@@ -6089,6 +6073,12 @@ git clone <a href="https://github.com/litten/hexo-theme-yilia.git">https://githu
 </li>
 <li><p>复制表结构 create table t3 as select * from choose where 1=2;</p>
 </li>
+</ol>
+<h3 id="数据库去重"><a href="#数据库去重" class="headerlink" title="数据库去重"></a>数据库去重</h3><ol>
+<li><p>新建一个表进行迁移</p>
+</li>
+<li><p>代码解决</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="number">1.</span> <span class="keyword">delete</span>  <span class="keyword">from</span> student <span class="keyword">where</span> id <span class="keyword">not</span> <span class="keyword">in</span> (selete id,<span class="built_in">max</span>(age) <span class="keyword">from</span> student <span class="keyword">group</span> <span class="keyword">by</span> (name) <span class="keyword">as</span> a)</span><br><span class="line"></span><br><span class="line"><span class="number">2.</span> <span class="keyword">DELETE</span> <span class="keyword">from</span> el_paper <span class="keyword">where</span> id <span class="keyword">not</span> <span class="keyword">in</span> (<span class="keyword">SELECT</span> id <span class="keyword">from</span> (<span class="keyword">SELECT</span> id,user_score <span class="keyword">FROM</span> el_paper <span class="keyword">GROUP</span> <span class="keyword">BY</span>(user_id)) <span class="keyword">as</span> a )</span><br></pre></td></tr></table></figure></li>
 </ol>
 ]]></content>
   </entry>
@@ -6107,16 +6097,6 @@ git clone <a href="https://github.com/litten/hexo-theme-yilia.git">https://githu
         <category>数据库</category>
         <category>sql语句</category>
       </categories>
-  </entry>
-  <entry>
-    <title></title>
-    <url>/2021/11/09/java/java%E7%BB%84%E4%BB%B6/file-content-type/</url>
-    <content><![CDATA[<p>[toc]</p>
-<h3 id="一、比较全面的contentType的类型值"><a href="#一、比较全面的contentType的类型值" class="headerlink" title="一、比较全面的contentType的类型值"></a>一、比较全面的contentType的类型值</h3><p><a href="https://blog.csdn.net/qq_37651267/article/details/91380351">参考</a></p>
-<p>文件扩展名    Content-Type(Mime-Type)    文件扩展名    Content-Type(Mime-Type)<br>.<em>（ 二进制流，不知道下载文件类型）    application/octet-stream    .tif    image/tiff<br>.asp    text/asp    .asx    video/x-ms-asf<br>.au    audio/basic    .avi    video/avi<br>.awf    application/vnd.adobe.workflow    .biz    text/xml<br>.bmp    application/x-bmp    .bot    application/x-bot<br>.cit    application/x-cit    .class    java/</em><br>.csi    application/x-csi    .css    text/css<br>.dcd    text/xml    .dcx    application/x-dcx<br>.dib    application/x-dib    .dll    application/x-msdownload<br>.doc    application/msword    .dot    application/msword<br>.drw    application/x-drw    .dtd    text/xml<br>.dwf    Model/vnd.dwf    .dwf    application/x-dwf<br>.etd    application/x-ebx    .exe    application/x-msdownload<br>.gif    image/gif    .gl2    application/x-gl2<br>.hrf    application/x-hrf    .hta    application/hta<br>.htc    text/x-component    .htm    text/html<br>.html    text/html    .htt    text/webviewhtml<br>.htx    text/html    .icb    application/x-icb<br>.ico    image/x-icon    .ico    application/x-ico<br>.iff    application/x-iff    .ig4    application/x-g4<br>.igs    application/x-igs    .iii    application/x-iphone<br>.img    application/x-img    .ins    application/x-internet-signup<br>.java    java/*    .jfif    image/jpeg<br>.jpe    image/jpeg    .jpe    application/x-jpe<br>.jpeg    image/jpeg    .jpg    image/jpeg<br>.jpg    application/x-jpg    .js    application/x-javascript<br>.jsp    text/html    .la1    audio/x-liquid-file<br>.mdb    application/msaccess    .mdb    application/x-mdb<br>.mfp    application/x-shockwave-flash    .mht    message/rfc822<br>.mhtml    message/rfc822    .mi    application/x-mi<br>.mid    audio/mid    .midi    audio/mid<br>.mil    application/x-mil    .mml    text/xml<br>.mnd    audio/x-musicnet-download    .mns    audio/x-musicnet-stream<br>.mocha    application/x-javascript    .movie    video/x-sgi-movie<br>.mp1    audio/mp1    .mp2    audio/mp2<br>.mp2v    video/mpeg    .mp3    audio/mp3<br>.mp4    video/mpeg4    .mpa    video/x-mpg<br>.mpd    application/vnd.ms-project    .mpe    video/x-mpeg<br>.mpeg    video/mpg    .mpg    video/mpg<br>.mpga    audio/rn-mpeg    .mpp    application/vnd.ms-project<br>.mps    video/x-mpeg    .mpt    application/vnd.ms-project<br>.mpv    video/mpg    .mpv2    video/mpeg<br>.mpw    application/vnd.ms-project    .mpx    application/vnd.ms-project<br>.mtx    text/xml    .mxp    application/x-mmxp<br>.net    image/pnetvue    .nrf    application/x-nrf<br>.nws    message/rfc822    .odc    text/x-ms-odc<br>.out    application/x-out    .p10    application/pkcs10<br>.p12    application/x-pkcs12    .p7b    application/x-pkcs7-certificates<br>.p7c    application/pkcs7-mime    .p7m    application/pkcs7-mime<br>.p7r    application/x-pkcs7-certreqresp    .p7s    application/pkcs7-signature<br>.pc5    application/x-pc5    .pci    application/x-pci<br>.pcl    application/x-pcl    .pcx    application/x-pcx<br>.pdf    application/pdf    .pdf    application/pdf<br>.pdx    application/vnd.adobe.pdx    .pfx    application/x-pkcs12<br>.pgl    application/x-pgl    .pic    application/x-pic<br>.pko    application/vnd.ms-pki.pko    .pl    application/x-perl<br>.plg    text/html    .pls    audio/scpls<br>.plt    application/x-plt    .png    image/png<br>.png    application/x-png    .pot    application/vnd.ms-powerpoint<br>.ppa    application/vnd.ms-powerpoint    .ppm    application/x-ppm<br>.pps    application/vnd.ms-powerpoint    .ppt    application/vnd.ms-powerpoint<br>.ppt    application/x-ppt    .pr    application/x-pr<br>.prf    application/pics-rules    .prn    application/x-prn<br>.prt    application/x-prt    .ps    application/x-ps<br>.ps    application/postscript    .ptn    application/x-ptn<br>.pwz    application/vnd.ms-powerpoint    .r3t    text/vnd.rn-realtext3d<br>.ra    audio/vnd.rn-realaudio    .ram    audio/x-pn-realaudio<br>.ras    application/x-ras    .rat    application/rat-file<br>.rdf    text/xml    .rec    application/vnd.rn-recording<br>.red    application/x-red    .rgb    application/x-rgb<br>.rjs    application/vnd.rn-realsystem-rjs    .rjt    application/vnd.rn-realsystem-rjt<br>.rlc    application/x-rlc    .rle    application/x-rle<br>.rm    application/vnd.rn-realmedia    .rmf    application/vnd.adobe.rmf<br>.rmi    audio/mid    .rmj    application/vnd.rn-realsystem-rmj<br>.rmm    audio/x-pn-realaudio    .rmp    application/vnd.rn-rn_music_package<br>.rms    application/vnd.rn-realmedia-secure    .rmvb    application/vnd.rn-realmedia-vbr<br>.rmx    application/vnd.rn-realsystem-rmx    .rnx    application/vnd.rn-realplayer<br>.rp    image/vnd.rn-realpix    .rpm    audio/x-pn-realaudio-plugin<br>.rsml    application/vnd.rn-rsml    .rt    text/vnd.rn-realtext<br>.rtf    application/msword    .rtf    application/x-rtf<br>.rv    video/vnd.rn-realvideo    .sam    application/x-sam<br>.sat    application/x-sat    .sdp    application/sdp<br>.sdw    application/x-sdw    .sit    application/x-stuffit<br>.slb    application/x-slb    .sld    application/x-sld<br>.slk    drawing/x-slk    .smi    application/smil<br>.smil    application/smil    .smk    application/x-smk<br>.snd    audio/basic    .sol    text/plain<br>.sor    text/plain    .spc    application/x-pkcs7-certificates<br>.spl    application/futuresplash    .spp    text/xml<br>.ssm    application/streamingmedia    .sst    application/vnd.ms-pki.certstore<br>.stl    application/vnd.ms-pki.stl    .stm    text/html<br>.sty    application/x-sty    .svg    text/xml<br>.swf    application/x-shockwave-flash    .tdf    application/x-tdf<br>.tg4    application/x-tg4    .tga    application/x-tga<br>.tif    image/tiff    .tif    application/x-tif<br>.tiff    image/tiff    .tld    text/xml<br>.top    drawing/x-top    .torrent    application/x-bittorrent<br>.tsd    text/xml    .txt    text/plain<br>.uin    application/x-icq    .uls    text/iuls<br>.vcf    text/x-vcard    .vda    application/x-vda<br>.vdx    application/vnd.visio    .vml    text/xml<br>.vpg    application/x-vpeg005    .vsd    application/vnd.visio<br>.vsd    application/x-vsd    .vss    application/vnd.visio<br>.vst    application/vnd.visio    .vst    application/x-vst<br>.vsw    application/vnd.visio    .vsx    application/vnd.visio<br>.vtx    application/vnd.visio    .vxml    text/xml<br>.wav    audio/wav    .wax    audio/x-ms-wax<br>.wb1    application/x-wb1    .wb2    application/x-wb2<br>.wb3    application/x-wb3    .wbmp    image/vnd.wap.wbmp<br>.wiz    application/msword    .wk3    application/x-wk3<br>.wk4    application/x-wk4    .wkq    application/x-wkq<br>.wks    application/x-wks    .wm    video/x-ms-wm<br>.wma    audio/x-ms-wma    .wmd    application/x-ms-wmd<br>.wmf    application/x-wmf    .wml    text/vnd.wap.wml<br>.wmv    video/x-ms-wmv    .wmx    video/x-ms-wmx<br>.wmz    application/x-ms-wmz    .wp6    application/x-wp6<br>.wpd    application/x-wpd    .wpg    application/x-wpg<br>.wpl    application/vnd.ms-wpl    .wq1    application/x-wq1<br>.wr1    application/x-wr1    .wri    application/x-wri<br>.wrk    application/x-wrk    .ws    application/x-ws<br>.ws2    application/x-ws    .wsc    text/scriptlet<br>.wsdl    text/xml    .wvx    video/x-ms-wvx<br>.xdp    application/vnd.adobe.xdp    .xdr    text/xml<br>.xfd    application/vnd.adobe.xfd    .xfdf    application/vnd.adobe.xfdf<br>.xhtml    text/html    .xls    application/vnd.ms-excel<br>.xls    application/x-xls    .xlw    application/x-xlw<br>.xml    text/xml    .xpl    audio/scpls<br>.xq    text/xml    .xql    text/xml<br>.xquery    text/xml    .xsd    text/xml<br>.xsl    text/xml    .xslt    text/xml<br>.xwd    application/x-xwd    .x_b    application/x-x_b<br>.sis    application/vnd.symbian.install    .sisx    application/vnd.symbian.install<br>.x_t    application/x-x_t    .ipa    application/vnd.iphone<br>.apk    application/vnd.android.package-archive    .xap    application/x-silverlight-app</p>
-<h3 id="二、Requests"><a href="#二、Requests" class="headerlink" title="二、Requests"></a>二、Requests</h3><p>Heade r    解释    示例<br>Accept    指定客户端能够接收的内容类型    Accept: text/plain, text/html<br>Accept-Charset    浏览器可以接受的字符编码集。    Accept-Charset: iso-8859-5<br>Accept-Encoding    指定浏览器可以支持的web服务器返回内容压缩编码类型。    Accept-Encoding: compress, gzip<br>Accept-Language    浏览器可接受的语言    Accept-Language: en,zh<br>Accept-Ranges    可以请求网页实体的一个或者多个子范围字段    Accept-Ranges: bytes<br>Authorization    HTTP授权的授权证书    Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==<br>Cache-Control    指定请求和响应遵循的缓存机制    Cache-Control: no-cache<br>Connection    表示是否需要持久连接。    （HTTP 1.1默认进行持久连接）<br>Cookie    HTTP请求发送时，会把保存在该请求域名下的所有cookie值一起发送给web服务器。    Cookie: $Version=1; Skin=new;<br>Content-Length    请求的内容长度    Content-Length: 348<br>Content-Type    请求的与实体对应的MIME信息    Content-Type: application/x-www-form-urlencoded<br>Date    请求发送的日期和时间    Date: Tue, 15 Nov 2010 08:12:31 GMT<br>Expect    请求的特定的服务器行为    Expect: 100-continue<br>From    发出请求的用户的Email    From: <a href="mailto:&#117;&#x73;&#x65;&#114;&#64;&#101;&#x6d;&#97;&#105;&#x6c;&#46;&#x63;&#x6f;&#109;">&#117;&#x73;&#x65;&#114;&#64;&#101;&#x6d;&#97;&#105;&#x6c;&#46;&#x63;&#x6f;&#109;</a><br>Host    指定请求的服务器的域名和端口号    Host: <a href="http://www.zcmhi.com/">www.zcmhi.com</a><br>If-Match    只有请求内容与实体相匹配才有效    If-Match: “737060cd8c284d8af7ad3082f209582d”<br>If-Modified-Since    如果请求的部分在指定时间之后被修改则请求成功，未被修改则返回304代码    If-Modified-Since: Sat, 29 Oct 2010 19:43:31 GMT<br>If-None-Match    如果内容未改变返回304代码，参数为服务器先前发送的Etag，与服务器回应的Etag比较判断是否改变    If-None-Match: “737060cd8c284d8af7ad3082f209582d”<br>If-Range    如果实体未改变，服务器发送客户端丢失的部分，否则发送整个实体。参数也为Etag    If-Range: “737060cd8c284d8af7ad3082f209582d”<br>If-Unmodified-Since    只在实体在指定时间之后未被修改才请求成功    If-Unmodified-Since: Sat, 29 Oct 2010 19:43:31 GMT<br>Max-Forwards    限制信息通过代理和网关传送的时间    Max-Forwards: 10<br>Pragma    用来包含实现特定的指令    Pragma: no-cache<br>Proxy-Authorization    连接到代理的授权证书    Proxy-Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==<br>Range    只请求实体的一部分，指定范围    Range: bytes=500-999<br>Referer    先前网页的地址，当前请求网页紧随其后,即来路    Referer: <a href="http://www.zcmhi.com/archives/71.html">http://www.zcmhi.com/archives/71.html</a><br>TE    客户端愿意接受的传输编码，并通知服务器接受接受尾加头信息    TE: trailers,deflate;q=0.5<br>Upgrade    向服务器指定某种传输协议以便服务器进行转换（如果支持）    Upgrade: HTTP/2.0, SHTTP/1.3, IRC/6.9, RTA/x11<br>User-Agent    User-Agent的内容包含发出请求的用户信息    User-Agent: Mozilla/5.0 (Linux; X11)<br>Via    通知中间网关或代理服务器地址，通信协议    Via: 1.0 fred, 1.1 nowhere.com (Apache/1.1)<br>Warning    关于消息实体的警告信息    Warn: 199 Miscellaneous warning</p>
-<h3 id="三、Responses"><a href="#三、Responses" class="headerlink" title="三、Responses"></a>三、Responses</h3><p>Heade r    解释    示例<br>Accept-Ranges    表明服务器是否支持指定范围请求及哪种类型的分段请求    Accept-Ranges: bytes<br>Age    从原始服务器到代理缓存形成的估算时间（以秒计，非负）    Age: 12<br>Allow    对某网络资源的有效的请求行为，不允许则返回405    Allow: GET, HEAD<br>Cache-Control    告诉所有的缓存机制是否可以缓存及哪种类型    Cache-Control: no-cache<br>Content-Encoding    web服务器支持的返回内容压缩编码类型。    Content-Encoding: gzip<br>Content-Language    响应体的语言    Content-Language: en,zh<br>Content-Length    响应体的长度    Content-Length: 348<br>Content-Location    请求资源可替代的备用的另一地址    Content-Location: /index.htm<br>Content-MD5    返回资源的MD5校验值    Content-MD5: Q2hlY2sgSW50ZWdyaXR5IQ==<br>Content-Range    在整个返回体中本部分的字节位置    Content-Range: bytes 21010-47021/47022<br>Content-Type    返回内容的MIME类型    Content-Type: text/html; charset=utf-8<br>Date    原始服务器消息发出的时间    Date: Tue, 15 Nov 2010 08:12:31 GMT<br>ETag    请求变量的实体标签的当前值    ETag: “737060cd8c284d8af7ad3082f209582d”<br>Expires    响应过期的日期和时间    Expires: Thu, 01 Dec 2010 16:00:00 GMT<br>Last-Modified    请求资源的最后修改时间    Last-Modified: Tue, 15 Nov 2010 12:45:26 GMT<br>Location    用来重定向接收方到非请求URL的位置来完成请求或标识新的资源    Location: <a href="http://www.zcmhi.com/archives/94.html">http://www.zcmhi.com/archives/94.html</a><br>Pragma    包括实现特定的指令，它可应用到响应链上的任何接收方    Pragma: no-cache<br>Proxy-Authenticate    它指出认证方案和可应用到代理的该URL上的参数    Proxy-Authenticate: Basic<br>refresh    应用于重定向或一个新的资源被创造，在5秒之后重定向（由网景提出，被大部分浏览器支持）    Refresh: 5; url=<a href="http://www.zcmhi.com/archives/94.html">http://www.zcmhi.com/archives/94.html</a><br>Retry-After    如果实体暂时不可取，通知客户端在指定时间之后再次尝试    Retry-After: 120<br>Server    web服务器软件名称    Server: Apache/1.3.27 (Unix) (Red-Hat/Linux)<br>Set-Cookie    设置Http Cookie    Set-Cookie: UserID=JohnDoe; Max-Age=3600; Version=1<br>Trailer    指出头域在分块传输编码的尾部存在    Trailer: Max-Forwards<br>Transfer-Encoding    文件传输编码    Transfer-Encoding:chunked<br>Vary    告诉下游代理是使用缓存响应还是从原始服务器请求    Vary: *<br>Via    告知代理客户端响应是通过哪里发送的    Via: 1.0 fred, 1.1 nowhere.com (Apache/1.1)<br>Warning    警告实体可能存在的问题    Warning: 199 Miscellaneous warning<br>WWW-Authenticate    表明客户端请求实体应该使用的授权方案    WWW-Authenticate: Basic</p>
-]]></content>
   </entry>
   <entry>
     <title>文件组件</title>
@@ -6142,6 +6122,16 @@ git clone <a href="https://github.com/litten/hexo-theme-yilia.git">https://githu
       <categories>
         <category>java</category>
       </categories>
+  </entry>
+  <entry>
+    <title></title>
+    <url>/2021/11/09/java/java%E7%BB%84%E4%BB%B6/file-content-type/</url>
+    <content><![CDATA[<p>[toc]</p>
+<h3 id="一、比较全面的contentType的类型值"><a href="#一、比较全面的contentType的类型值" class="headerlink" title="一、比较全面的contentType的类型值"></a>一、比较全面的contentType的类型值</h3><p><a href="https://blog.csdn.net/qq_37651267/article/details/91380351">参考</a></p>
+<p>文件扩展名    Content-Type(Mime-Type)    文件扩展名    Content-Type(Mime-Type)<br>.<em>（ 二进制流，不知道下载文件类型）    application/octet-stream    .tif    image/tiff<br>.asp    text/asp    .asx    video/x-ms-asf<br>.au    audio/basic    .avi    video/avi<br>.awf    application/vnd.adobe.workflow    .biz    text/xml<br>.bmp    application/x-bmp    .bot    application/x-bot<br>.cit    application/x-cit    .class    java/</em><br>.csi    application/x-csi    .css    text/css<br>.dcd    text/xml    .dcx    application/x-dcx<br>.dib    application/x-dib    .dll    application/x-msdownload<br>.doc    application/msword    .dot    application/msword<br>.drw    application/x-drw    .dtd    text/xml<br>.dwf    Model/vnd.dwf    .dwf    application/x-dwf<br>.etd    application/x-ebx    .exe    application/x-msdownload<br>.gif    image/gif    .gl2    application/x-gl2<br>.hrf    application/x-hrf    .hta    application/hta<br>.htc    text/x-component    .htm    text/html<br>.html    text/html    .htt    text/webviewhtml<br>.htx    text/html    .icb    application/x-icb<br>.ico    image/x-icon    .ico    application/x-ico<br>.iff    application/x-iff    .ig4    application/x-g4<br>.igs    application/x-igs    .iii    application/x-iphone<br>.img    application/x-img    .ins    application/x-internet-signup<br>.java    java/*    .jfif    image/jpeg<br>.jpe    image/jpeg    .jpe    application/x-jpe<br>.jpeg    image/jpeg    .jpg    image/jpeg<br>.jpg    application/x-jpg    .js    application/x-javascript<br>.jsp    text/html    .la1    audio/x-liquid-file<br>.mdb    application/msaccess    .mdb    application/x-mdb<br>.mfp    application/x-shockwave-flash    .mht    message/rfc822<br>.mhtml    message/rfc822    .mi    application/x-mi<br>.mid    audio/mid    .midi    audio/mid<br>.mil    application/x-mil    .mml    text/xml<br>.mnd    audio/x-musicnet-download    .mns    audio/x-musicnet-stream<br>.mocha    application/x-javascript    .movie    video/x-sgi-movie<br>.mp1    audio/mp1    .mp2    audio/mp2<br>.mp2v    video/mpeg    .mp3    audio/mp3<br>.mp4    video/mpeg4    .mpa    video/x-mpg<br>.mpd    application/vnd.ms-project    .mpe    video/x-mpeg<br>.mpeg    video/mpg    .mpg    video/mpg<br>.mpga    audio/rn-mpeg    .mpp    application/vnd.ms-project<br>.mps    video/x-mpeg    .mpt    application/vnd.ms-project<br>.mpv    video/mpg    .mpv2    video/mpeg<br>.mpw    application/vnd.ms-project    .mpx    application/vnd.ms-project<br>.mtx    text/xml    .mxp    application/x-mmxp<br>.net    image/pnetvue    .nrf    application/x-nrf<br>.nws    message/rfc822    .odc    text/x-ms-odc<br>.out    application/x-out    .p10    application/pkcs10<br>.p12    application/x-pkcs12    .p7b    application/x-pkcs7-certificates<br>.p7c    application/pkcs7-mime    .p7m    application/pkcs7-mime<br>.p7r    application/x-pkcs7-certreqresp    .p7s    application/pkcs7-signature<br>.pc5    application/x-pc5    .pci    application/x-pci<br>.pcl    application/x-pcl    .pcx    application/x-pcx<br>.pdf    application/pdf    .pdf    application/pdf<br>.pdx    application/vnd.adobe.pdx    .pfx    application/x-pkcs12<br>.pgl    application/x-pgl    .pic    application/x-pic<br>.pko    application/vnd.ms-pki.pko    .pl    application/x-perl<br>.plg    text/html    .pls    audio/scpls<br>.plt    application/x-plt    .png    image/png<br>.png    application/x-png    .pot    application/vnd.ms-powerpoint<br>.ppa    application/vnd.ms-powerpoint    .ppm    application/x-ppm<br>.pps    application/vnd.ms-powerpoint    .ppt    application/vnd.ms-powerpoint<br>.ppt    application/x-ppt    .pr    application/x-pr<br>.prf    application/pics-rules    .prn    application/x-prn<br>.prt    application/x-prt    .ps    application/x-ps<br>.ps    application/postscript    .ptn    application/x-ptn<br>.pwz    application/vnd.ms-powerpoint    .r3t    text/vnd.rn-realtext3d<br>.ra    audio/vnd.rn-realaudio    .ram    audio/x-pn-realaudio<br>.ras    application/x-ras    .rat    application/rat-file<br>.rdf    text/xml    .rec    application/vnd.rn-recording<br>.red    application/x-red    .rgb    application/x-rgb<br>.rjs    application/vnd.rn-realsystem-rjs    .rjt    application/vnd.rn-realsystem-rjt<br>.rlc    application/x-rlc    .rle    application/x-rle<br>.rm    application/vnd.rn-realmedia    .rmf    application/vnd.adobe.rmf<br>.rmi    audio/mid    .rmj    application/vnd.rn-realsystem-rmj<br>.rmm    audio/x-pn-realaudio    .rmp    application/vnd.rn-rn_music_package<br>.rms    application/vnd.rn-realmedia-secure    .rmvb    application/vnd.rn-realmedia-vbr<br>.rmx    application/vnd.rn-realsystem-rmx    .rnx    application/vnd.rn-realplayer<br>.rp    image/vnd.rn-realpix    .rpm    audio/x-pn-realaudio-plugin<br>.rsml    application/vnd.rn-rsml    .rt    text/vnd.rn-realtext<br>.rtf    application/msword    .rtf    application/x-rtf<br>.rv    video/vnd.rn-realvideo    .sam    application/x-sam<br>.sat    application/x-sat    .sdp    application/sdp<br>.sdw    application/x-sdw    .sit    application/x-stuffit<br>.slb    application/x-slb    .sld    application/x-sld<br>.slk    drawing/x-slk    .smi    application/smil<br>.smil    application/smil    .smk    application/x-smk<br>.snd    audio/basic    .sol    text/plain<br>.sor    text/plain    .spc    application/x-pkcs7-certificates<br>.spl    application/futuresplash    .spp    text/xml<br>.ssm    application/streamingmedia    .sst    application/vnd.ms-pki.certstore<br>.stl    application/vnd.ms-pki.stl    .stm    text/html<br>.sty    application/x-sty    .svg    text/xml<br>.swf    application/x-shockwave-flash    .tdf    application/x-tdf<br>.tg4    application/x-tg4    .tga    application/x-tga<br>.tif    image/tiff    .tif    application/x-tif<br>.tiff    image/tiff    .tld    text/xml<br>.top    drawing/x-top    .torrent    application/x-bittorrent<br>.tsd    text/xml    .txt    text/plain<br>.uin    application/x-icq    .uls    text/iuls<br>.vcf    text/x-vcard    .vda    application/x-vda<br>.vdx    application/vnd.visio    .vml    text/xml<br>.vpg    application/x-vpeg005    .vsd    application/vnd.visio<br>.vsd    application/x-vsd    .vss    application/vnd.visio<br>.vst    application/vnd.visio    .vst    application/x-vst<br>.vsw    application/vnd.visio    .vsx    application/vnd.visio<br>.vtx    application/vnd.visio    .vxml    text/xml<br>.wav    audio/wav    .wax    audio/x-ms-wax<br>.wb1    application/x-wb1    .wb2    application/x-wb2<br>.wb3    application/x-wb3    .wbmp    image/vnd.wap.wbmp<br>.wiz    application/msword    .wk3    application/x-wk3<br>.wk4    application/x-wk4    .wkq    application/x-wkq<br>.wks    application/x-wks    .wm    video/x-ms-wm<br>.wma    audio/x-ms-wma    .wmd    application/x-ms-wmd<br>.wmf    application/x-wmf    .wml    text/vnd.wap.wml<br>.wmv    video/x-ms-wmv    .wmx    video/x-ms-wmx<br>.wmz    application/x-ms-wmz    .wp6    application/x-wp6<br>.wpd    application/x-wpd    .wpg    application/x-wpg<br>.wpl    application/vnd.ms-wpl    .wq1    application/x-wq1<br>.wr1    application/x-wr1    .wri    application/x-wri<br>.wrk    application/x-wrk    .ws    application/x-ws<br>.ws2    application/x-ws    .wsc    text/scriptlet<br>.wsdl    text/xml    .wvx    video/x-ms-wvx<br>.xdp    application/vnd.adobe.xdp    .xdr    text/xml<br>.xfd    application/vnd.adobe.xfd    .xfdf    application/vnd.adobe.xfdf<br>.xhtml    text/html    .xls    application/vnd.ms-excel<br>.xls    application/x-xls    .xlw    application/x-xlw<br>.xml    text/xml    .xpl    audio/scpls<br>.xq    text/xml    .xql    text/xml<br>.xquery    text/xml    .xsd    text/xml<br>.xsl    text/xml    .xslt    text/xml<br>.xwd    application/x-xwd    .x_b    application/x-x_b<br>.sis    application/vnd.symbian.install    .sisx    application/vnd.symbian.install<br>.x_t    application/x-x_t    .ipa    application/vnd.iphone<br>.apk    application/vnd.android.package-archive    .xap    application/x-silverlight-app</p>
+<h3 id="二、Requests"><a href="#二、Requests" class="headerlink" title="二、Requests"></a>二、Requests</h3><p>Heade r    解释    示例<br>Accept    指定客户端能够接收的内容类型    Accept: text/plain, text/html<br>Accept-Charset    浏览器可以接受的字符编码集。    Accept-Charset: iso-8859-5<br>Accept-Encoding    指定浏览器可以支持的web服务器返回内容压缩编码类型。    Accept-Encoding: compress, gzip<br>Accept-Language    浏览器可接受的语言    Accept-Language: en,zh<br>Accept-Ranges    可以请求网页实体的一个或者多个子范围字段    Accept-Ranges: bytes<br>Authorization    HTTP授权的授权证书    Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==<br>Cache-Control    指定请求和响应遵循的缓存机制    Cache-Control: no-cache<br>Connection    表示是否需要持久连接。    （HTTP 1.1默认进行持久连接）<br>Cookie    HTTP请求发送时，会把保存在该请求域名下的所有cookie值一起发送给web服务器。    Cookie: $Version=1; Skin=new;<br>Content-Length    请求的内容长度    Content-Length: 348<br>Content-Type    请求的与实体对应的MIME信息    Content-Type: application/x-www-form-urlencoded<br>Date    请求发送的日期和时间    Date: Tue, 15 Nov 2010 08:12:31 GMT<br>Expect    请求的特定的服务器行为    Expect: 100-continue<br>From    发出请求的用户的Email    From: <a href="mailto:&#x75;&#115;&#x65;&#x72;&#64;&#x65;&#109;&#x61;&#x69;&#x6c;&#x2e;&#x63;&#111;&#x6d;">&#x75;&#115;&#x65;&#x72;&#64;&#x65;&#109;&#x61;&#x69;&#x6c;&#x2e;&#x63;&#111;&#x6d;</a><br>Host    指定请求的服务器的域名和端口号    Host: <a href="http://www.zcmhi.com/">www.zcmhi.com</a><br>If-Match    只有请求内容与实体相匹配才有效    If-Match: “737060cd8c284d8af7ad3082f209582d”<br>If-Modified-Since    如果请求的部分在指定时间之后被修改则请求成功，未被修改则返回304代码    If-Modified-Since: Sat, 29 Oct 2010 19:43:31 GMT<br>If-None-Match    如果内容未改变返回304代码，参数为服务器先前发送的Etag，与服务器回应的Etag比较判断是否改变    If-None-Match: “737060cd8c284d8af7ad3082f209582d”<br>If-Range    如果实体未改变，服务器发送客户端丢失的部分，否则发送整个实体。参数也为Etag    If-Range: “737060cd8c284d8af7ad3082f209582d”<br>If-Unmodified-Since    只在实体在指定时间之后未被修改才请求成功    If-Unmodified-Since: Sat, 29 Oct 2010 19:43:31 GMT<br>Max-Forwards    限制信息通过代理和网关传送的时间    Max-Forwards: 10<br>Pragma    用来包含实现特定的指令    Pragma: no-cache<br>Proxy-Authorization    连接到代理的授权证书    Proxy-Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==<br>Range    只请求实体的一部分，指定范围    Range: bytes=500-999<br>Referer    先前网页的地址，当前请求网页紧随其后,即来路    Referer: <a href="http://www.zcmhi.com/archives/71.html">http://www.zcmhi.com/archives/71.html</a><br>TE    客户端愿意接受的传输编码，并通知服务器接受接受尾加头信息    TE: trailers,deflate;q=0.5<br>Upgrade    向服务器指定某种传输协议以便服务器进行转换（如果支持）    Upgrade: HTTP/2.0, SHTTP/1.3, IRC/6.9, RTA/x11<br>User-Agent    User-Agent的内容包含发出请求的用户信息    User-Agent: Mozilla/5.0 (Linux; X11)<br>Via    通知中间网关或代理服务器地址，通信协议    Via: 1.0 fred, 1.1 nowhere.com (Apache/1.1)<br>Warning    关于消息实体的警告信息    Warn: 199 Miscellaneous warning</p>
+<h3 id="三、Responses"><a href="#三、Responses" class="headerlink" title="三、Responses"></a>三、Responses</h3><p>Heade r    解释    示例<br>Accept-Ranges    表明服务器是否支持指定范围请求及哪种类型的分段请求    Accept-Ranges: bytes<br>Age    从原始服务器到代理缓存形成的估算时间（以秒计，非负）    Age: 12<br>Allow    对某网络资源的有效的请求行为，不允许则返回405    Allow: GET, HEAD<br>Cache-Control    告诉所有的缓存机制是否可以缓存及哪种类型    Cache-Control: no-cache<br>Content-Encoding    web服务器支持的返回内容压缩编码类型。    Content-Encoding: gzip<br>Content-Language    响应体的语言    Content-Language: en,zh<br>Content-Length    响应体的长度    Content-Length: 348<br>Content-Location    请求资源可替代的备用的另一地址    Content-Location: /index.htm<br>Content-MD5    返回资源的MD5校验值    Content-MD5: Q2hlY2sgSW50ZWdyaXR5IQ==<br>Content-Range    在整个返回体中本部分的字节位置    Content-Range: bytes 21010-47021/47022<br>Content-Type    返回内容的MIME类型    Content-Type: text/html; charset=utf-8<br>Date    原始服务器消息发出的时间    Date: Tue, 15 Nov 2010 08:12:31 GMT<br>ETag    请求变量的实体标签的当前值    ETag: “737060cd8c284d8af7ad3082f209582d”<br>Expires    响应过期的日期和时间    Expires: Thu, 01 Dec 2010 16:00:00 GMT<br>Last-Modified    请求资源的最后修改时间    Last-Modified: Tue, 15 Nov 2010 12:45:26 GMT<br>Location    用来重定向接收方到非请求URL的位置来完成请求或标识新的资源    Location: <a href="http://www.zcmhi.com/archives/94.html">http://www.zcmhi.com/archives/94.html</a><br>Pragma    包括实现特定的指令，它可应用到响应链上的任何接收方    Pragma: no-cache<br>Proxy-Authenticate    它指出认证方案和可应用到代理的该URL上的参数    Proxy-Authenticate: Basic<br>refresh    应用于重定向或一个新的资源被创造，在5秒之后重定向（由网景提出，被大部分浏览器支持）    Refresh: 5; url=<a href="http://www.zcmhi.com/archives/94.html">http://www.zcmhi.com/archives/94.html</a><br>Retry-After    如果实体暂时不可取，通知客户端在指定时间之后再次尝试    Retry-After: 120<br>Server    web服务器软件名称    Server: Apache/1.3.27 (Unix) (Red-Hat/Linux)<br>Set-Cookie    设置Http Cookie    Set-Cookie: UserID=JohnDoe; Max-Age=3600; Version=1<br>Trailer    指出头域在分块传输编码的尾部存在    Trailer: Max-Forwards<br>Transfer-Encoding    文件传输编码    Transfer-Encoding:chunked<br>Vary    告诉下游代理是使用缓存响应还是从原始服务器请求    Vary: *<br>Via    告知代理客户端响应是通过哪里发送的    Via: 1.0 fred, 1.1 nowhere.com (Apache/1.1)<br>Warning    警告实体可能存在的问题    Warning: 199 Miscellaneous warning<br>WWW-Authenticate    表明客户端请求实体应该使用的授权方案    WWW-Authenticate: Basic</p>
+]]></content>
   </entry>
   <entry>
     <title>时间组件</title>
@@ -6206,6 +6196,29 @@ git clone <a href="https://github.com/litten/hexo-theme-yilia.git">https://githu
       </categories>
   </entry>
   <entry>
+    <title>自定义配置文件</title>
+    <url>/2021/10/30/spring/%E9%85%8D%E7%BD%AE/%E8%87%AA%E5%AE%9A%E4%B9%89%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/</url>
+    <content><![CDATA[<h3 id="properties文件"><a href="#properties文件" class="headerlink" title="properties文件"></a>properties文件</h3><ol>
+<li><p>创建文件</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211030115341905.png" alt="image-20211030115341905"></p>
+</li>
+<li><p>加上注解</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@PropertySource(&quot;classpath:config/values.properties&quot;)</span>+<span class="meta">@Configuration</span>读取</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span></li>
+<li><p>implements InitializingBean 饿汉式加载</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211030115459989.png" alt="image-20211030115459989"></p>
+</li>
+<li><p>@Value(“${name}”)获取属性</p>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>spring</category>
+        <category>配置</category>
+      </categories>
+  </entry>
+  <entry>
     <title>pom配置</title>
     <url>/2021/11/05/spring/%E9%85%8D%E7%BD%AE/pom/</url>
     <content><![CDATA[<h3 id="基本依赖"><a href="#基本依赖" class="headerlink" title="基本依赖"></a>基本依赖</h3><ol>
@@ -6253,29 +6266,6 @@ git clone <a href="https://github.com/litten/hexo-theme-yilia.git">https://githu
 
 <h3 id="格式说明参考"><a href="#格式说明参考" class="headerlink" title="格式说明参考"></a>格式说明<a href="https://www.cnblogs.com/q1359720840/p/10465933.html">参考</a></h3><figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">project</span> <span class="attr">xmlns</span>=<span class="string">&quot;http://maven.apache.org/POM/4.0.0&quot;</span> <span class="attr">xmlns:xsi</span>=<span class="string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xsi:schemaLocation</span>=<span class="string">&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd&quot;</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!--指定了当前pom的版本，4.0.0是固定的 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">modelVersion</span>&gt;</span>4.0.0<span class="tag">&lt;/<span class="name">modelVersion</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 主项目标识，用来定义当前maven属于哪个实际的项目 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>反写的公司网址 + 项目名<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 模块名，maven项目和实际的项目不是一一对应的关系，maven项目提现的是模块化的概念，一个实际项目往往会被划分为很多个模块 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>项目名 + 模块名<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 当前项目版本号，一般有三个数字组成 第一个数字：大版本号 第二个数字：分支版本号 第三个数字：先版本号 snapshot: 快照 alpha： </span></span><br><span class="line"><span class="comment">        内测版本 beta： 公测版本 Release： 稳定版本 GA： 正式发布版本 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>0.0.1snapshot<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- maven项目打包方式，默认情况为jar，还可打包为war，zip，pom等 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">packaging</span>&gt;</span><span class="tag">&lt;/<span class="name">packaging</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 项目描述名 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span><span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 项目地址 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">url</span>&gt;</span><span class="tag">&lt;/<span class="name">url</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 项目描述 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">description</span>&gt;</span><span class="tag">&lt;/<span class="name">description</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 开发人员列表 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">developers</span>&gt;</span><span class="tag">&lt;/<span class="name">developers</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 许可证信息 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">licenses</span>&gt;</span><span class="tag">&lt;/<span class="name">licenses</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 组织信息 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">organization</span>&gt;</span><span class="tag">&lt;/<span class="name">organization</span>&gt;</span></span><br><span class="line"> </span><br><span class="line">    <span class="comment">&lt;!-- 依赖列表 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- 依赖项目 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>junit<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>junit<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.8.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">type</span>&gt;</span><span class="tag">&lt;/<span class="name">type</span>&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- 依赖范围，控制依赖与三种依赖范围的关系 --&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- 开发中要使用某一个jar，就要将该jar包引入到项目的classpath中 --&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- maven提供了三种classpath： 1.编译 2.测试 3.运行 --&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- 下面的test表明junit只存在于测试的classpath中 --&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- maven为scope提供了六个属性：</span></span><br><span class="line"><span class="comment">                                    compile（默认，编译测试运行都有效）， </span></span><br><span class="line"><span class="comment">                                    provided（编译和测试）servlet, </span></span><br><span class="line"><span class="comment">                                    runtime（测试和运行）jdbc, </span></span><br><span class="line"><span class="comment">                                    test（测试）junit, </span></span><br><span class="line"><span class="comment">                                    system（编译和测试，与本机系统相关联，可移植性差）, </span></span><br><span class="line"><span class="comment">                                    import（导入的范围，只使用在dependencyManagerment中，表示从其他的pom中导入dependency的配置） --&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">scope</span>&gt;</span>test<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- 设置依赖是否可选 --&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- 有两个值，true和false，默认是false，继承，若为true，子项目必须显式的引用该依赖 --&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">optional</span>&gt;</span><span class="tag">&lt;/<span class="name">optional</span>&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- 排除依赖传递的列表 --&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">exclusions</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">exclusion</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">exclusion</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">exclusions</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br><span class="line"> </span><br><span class="line">    <span class="comment">&lt;!-- 依赖管理 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependencyManagement</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- 这里定义的依赖不会被运行，即不会被引用为实际的依赖，主要是供子模块集成用 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">dependency</span>&gt;</span><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependencyManagement</span>&gt;</span></span><br><span class="line"> </span><br><span class="line">    <span class="comment">&lt;!-- 为构建行为提供相应的支持 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">build</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- 插件列表 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">plugins</span>&gt;</span></span><br><span class="line">            <span class="comment">&lt;!-- 插件 --&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">groupId</span>&gt;</span><span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span><span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">version</span>&gt;</span><span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">build</span>&gt;</span></span><br><span class="line"> </span><br><span class="line">    <span class="comment">&lt;!-- 用于子模块中对于父模块的继承 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">parent</span>&gt;</span><span class="tag">&lt;/<span class="name">parent</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 聚合运行多个maven项目 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">modules</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">module</span>&gt;</span><span class="tag">&lt;/<span class="name">module</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">modules</span>&gt;</span></span><br><span class="line"> </span><br><span class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
-]]></content>
-      <categories>
-        <category>spring</category>
-        <category>配置</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>自定义配置文件</title>
-    <url>/2021/10/30/spring/%E9%85%8D%E7%BD%AE/%E8%87%AA%E5%AE%9A%E4%B9%89%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/</url>
-    <content><![CDATA[<h3 id="properties文件"><a href="#properties文件" class="headerlink" title="properties文件"></a>properties文件</h3><ol>
-<li><p>创建文件</p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211030115341905.png" alt="image-20211030115341905"></p>
-</li>
-<li><p>加上注解</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@PropertySource(&quot;classpath:config/values.properties&quot;)</span>+<span class="meta">@Configuration</span>读取</span><br></pre></td></tr></table></figure>
-
-<span id="more"></span></li>
-<li><p>implements InitializingBean 饿汉式加载</p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211030115459989.png" alt="image-20211030115459989"></p>
-</li>
-<li><p>@Value(“${name}”)获取属性</p>
-</li>
-</ol>
 ]]></content>
       <categories>
         <category>spring</category>
