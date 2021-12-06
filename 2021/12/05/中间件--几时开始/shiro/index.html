@@ -22,15 +22,15 @@
     var CONFIG = {"hostname":"wang-yonggan.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":true,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="[toc] 组件 Subjetc Shiro SecurityManager Realm   实体 user userName,pasword,List&lt;String&gt;，List&lt;String&gt;roles    功能 认证 授权 会话管理 加密  RDBC模型 role based access control">
+  <meta name="description" content="[toc] 一、功能 认证 授权 方法加权 自定义过滤 会话管理：Session Manager  一次登录，所有信息保存在session中 加密  1.1 Authentication 用户密码认证1.2 Authorization 验证是否有权限访问该方法 MyRealm extends AuthorizingRealm  123456789@Override&#x2F;&#x2F;授权protected Aut">
 <meta property="og:type" content="article">
 <meta property="og:title" content="shiro">
 <meta property="og:url" content="https://wang-yonggan.github.io/2021/12/05/%E4%B8%AD%E9%97%B4%E4%BB%B6--%E5%87%A0%E6%97%B6%E5%BC%80%E5%A7%8B/shiro/index.html">
 <meta property="og:site_name" content="十二峒">
-<meta property="og:description" content="[toc] 组件 Subjetc Shiro SecurityManager Realm   实体 user userName,pasword,List&lt;String&gt;，List&lt;String&gt;roles    功能 认证 授权 会话管理 加密  RDBC模型 role based access control">
+<meta property="og:description" content="[toc] 一、功能 认证 授权 方法加权 自定义过滤 会话管理：Session Manager  一次登录，所有信息保存在session中 加密  1.1 Authentication 用户密码认证1.2 Authorization 验证是否有权限访问该方法 MyRealm extends AuthorizingRealm  123456789@Override&#x2F;&#x2F;授权protected Aut">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-12-05T04:51:42.000Z">
-<meta property="article:modified_time" content="2021-12-05T05:36:38.280Z">
+<meta property="article:modified_time" content="2021-12-05T16:07:18.771Z">
 <meta property="article:author" content="勇敢">
 <meta name="twitter:card" content="summary">
 
@@ -212,10 +212,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2021-12-05 12:51:42 / 修改时间：13:36:38" itemprop="dateCreated datePublished" datetime="2021-12-05T12:51:42+08:00">2021-12-05</time>
+              <time title="创建时间：2021-12-05 12:51:42" itemprop="dateCreated datePublished" datetime="2021-12-05T12:51:42+08:00">2021-12-05</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-12-06 00:07:18" itemprop="dateModified" datetime="2021-12-06T00:07:18+08:00">2021-12-06</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -248,14 +254,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>144</span>
+              <span>2.3k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
+              <span>2 分钟</span>
             </span>
 
         </div>
@@ -268,27 +274,109 @@
 
       
         <p>[toc]</p>
-<h3 id="组件"><a href="#组件" class="headerlink" title="组件"></a>组件</h3><ol>
-<li>Subjetc</li>
-<li>Shiro SecurityManager</li>
-<li>Realm </li>
+<h2 id="一、功能"><a href="#一、功能" class="headerlink" title="一、功能"></a>一、功能</h2><ol>
+<li>认证</li>
+<li>授权</li>
+<li>方法加权</li>
+<li>自定义过滤</li>
+<li>会话管理：Session Manager  一次登录，所有信息保存在session中</li>
+<li>加密</li>
 </ol>
-<h3 id="实体"><a href="#实体" class="headerlink" title="实体"></a>实体</h3><ol>
-<li>user<ol>
-<li>userName,pasword,List&lt;String&gt;，List&lt;String&gt;roles</li>
+<h3 id="1-1-Authentication-用户密码认证"><a href="#1-1-Authentication-用户密码认证" class="headerlink" title="1.1 Authentication 用户密码认证"></a>1.1 Authentication 用户密码认证</h3><h3 id="1-2-Authorization-验证是否有权限访问该方法"><a href="#1-2-Authorization-验证是否有权限访问该方法" class="headerlink" title="1.2 Authorization 验证是否有权限访问该方法"></a>1.2 Authorization 验证是否有权限访问该方法</h3><ol>
+<li><p>MyRealm extends AuthorizingRealm</p>
+<blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span><span class="comment">//授权</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> AuthorizationInfo <span class="title">doGetAuthorizationInfo</span><span class="params">(PrincipalCollection principalCollection)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//获得令牌/用户</span></span><br><span class="line">    User user=(User)principalCollection.asList().get(<span class="number">0</span>);</span><br><span class="line">    SimpleAuthorizationInfo authorizationInfo=<span class="keyword">new</span> SimpleAuthorizationInfo();</span><br><span class="line">    authorizationInfo.addRoles(user.getUserRoles());<span class="comment">//添加用户-授权</span></span><br><span class="line">    authorizationInfo.addStringPermissions(user.getUserPerms());<span class="comment">//添加权限-授权</span></span><br><span class="line">    <span class="keyword">return</span> authorizationInfo;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></blockquote>
+</li>
+</ol>
+<h3 id="1-3-其他功能"><a href="#1-3-其他功能" class="headerlink" title="1.3 其他功能"></a>1.3 其他功能</h3><h4 id="1-3-1-方法加权"><a href="#1-3-1-方法加权" class="headerlink" title="1.3.1 方法加权"></a>1.3.1 方法加权</h4><ol>
+<li><p>硬编码</p>
+<p>在每个方法体里面进行手动获取当前用户权限，然后和该方法的权限进行对比。</p>
+</li>
+<li><p>ShiroConfig添加路径</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">filterFactoryBean.setUnauthorizedUrl(<span class="string">&quot;/wq.html&quot;</span>);<span class="comment">//无权限跳到指定路径</span></span><br></pre></td></tr></table></figure></li>
+<li><p>注解</p>
+<ol>
+<li>RequiresAuthentication 需要登录</li>
+<li>RequiresUser 需要reamberMe</li>
+<li>RequiresPermissions 需要权限</li>
+</ol>
+<ul>
+<li>没权限会直接报500错误</li>
+<li>需要异常处理机制</li>
+</ul>
+</li>
+</ol>
+<h4 id="1-3-2-自定义过滤"><a href="#1-3-2-自定义过滤" class="headerlink" title="1.3.2 自定义过滤"></a>1.3.2 自定义过滤</h4><ol>
+<li><p>@Componet注册过滤器</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">F1</span> <span class="keyword">implements</span> <span class="title">Filter</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doFilter</span><span class="params">(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)</span> <span class="keyword">throws</span> IOException, ServletException </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;自定义过滤开始&quot;</span>);</span><br><span class="line">        filterChain.doFilter(servletRequest,servletResponse);</span><br><span class="line">        System.out.println(<span class="string">&quot;自定义过滤结束&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>加入到请求过滤器</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">filters.put(<span class="string">&quot;oauth2&quot;</span>, <span class="keyword">new</span> F1());</span><br><span class="line">filterFactoryBean.setFilters(filters);</span><br></pre></td></tr></table></figure></li>
+<li></li>
+</ol>
+<h4 id="1-3-3-获取当前线程用户"><a href="#1-3-3-获取当前线程用户" class="headerlink" title="1.3.3 获取当前线程用户"></a>1.3.3 获取当前线程用户</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Subject subject = SecurityUtils.getSubject();</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li><p>认证</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">UsernamePasswordToken token = <span class="keyword">new</span> <span class="constructor">UsernamePasswordToken(<span class="params">user</span>.<span class="params">getUsername</span>()</span>, user.get<span class="constructor">Password()</span>);</span><br><span class="line">subject.login(token);</span><br></pre></td></tr></table></figure></li>
+<li><p>登录设置令牌</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">subject.getSession().setAttribute(<span class="string">&quot;currentUser&quot;</span>, subject.getPrincipal());</span><br></pre></td></tr></table></figure></li>
+<li><p>登出</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">subject.logout();<span class="comment">//或者在过滤器中配置   filterMap.put(&quot;/aaa&quot;,&quot;logout&quot;);</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="二、组件"><a href="#二、组件" class="headerlink" title="二、组件"></a>二、组件</h2><h3 id="2-1-核心组件"><a href="#2-1-核心组件" class="headerlink" title="2.1 核心组件"></a>2.1 核心组件</h3><ol>
+<li>Subjetc： 当前进程obj</li>
+<li>Shiro SecurityManager</li>
+<li>Realm ：安全中心，提供认证授权服务</li>
+<li>ShiroFilterFactoryBean：请求过滤器<ol>
+<li>设置Map&lt;路径，权限&gt;的过滤器Map</li>
+<li>设置自定义过滤器</li>
+<li>设置无权路径</li>
 </ol>
 </li>
 </ol>
-<h3 id="功能"><a href="#功能" class="headerlink" title="功能"></a>功能</h3><ol>
-<li>认证</li>
-<li>授权</li>
-<li>会话管理</li>
-<li>加密</li>
+<h3 id="2-2-注解模式"><a href="#2-2-注解模式" class="headerlink" title="2.2 注解模式"></a>2.2 注解模式</h3><blockquote>
+<p>对于Map&lt;路径，权限&gt;</p>
+</blockquote>
+<ol>
+<li>@RequiresAuthentication 登录</li>
+<li>@RequiresPermissions(“b”)  权限</li>
+<li>@RequiresRoles(“admin”)  角色</li>
 </ol>
-<h3 id="RDBC模型-role-based-access-control"><a href="#RDBC模型-role-based-access-control" class="headerlink" title="RDBC模型 role based access control"></a>RDBC模型 role based access control</h3><ol>
-<li></li>
+<h3 id="2-3-user"><a href="#2-3-user" class="headerlink" title="2.3 user"></a>2.3 user</h3><ol>
+<li>user<ol>
+<li>userName</li>
+<li>pasword</li>
+<li>List&lt;String&gt;roles</li>
+<li>List&lt;String&gt;perms</li>
 </ol>
-
+</li>
+</ol>
+<h2 id="三、原理"><a href="#三、原理" class="headerlink" title="三、原理"></a>三、原理</h2><h3 id="3-1-基于token"><a href="#3-1-基于token" class="headerlink" title="3.1 基于token"></a>3.1 基于token</h3><h3 id="3-2-安全中心-MyRealm"><a href="#3-2-安全中心-MyRealm" class="headerlink" title="3.2 安全中心 MyRealm"></a>3.2 安全中心 MyRealm</h3><ul>
+<li><p>认证中心  AuthenticationInfo(username,password)</p>
+<ul>
+<li>登录的时候会用有一次</li>
+<li>传入账号信息，通过数据库获得用户信息，返回token(user，passwod，Nmae)</li>
+</ul>
+</li>
+<li><p>权限中心  AuthorizationInfo(user)</p>
+<ul>
+<li><p>每次访问需要权限的地方会用到</p>
+</li>
+<li><p>格式化user的权限</p>
+</li>
+<li><p>然后根据user权限对比[需要访问的方法]的权限，如果有权限，就退回到对应界面</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">filterFactoryBean.setLoginUrl(<span class="string">&quot;/login.html&quot;</span>);<span class="comment">//登录页面</span></span><br><span class="line">filterFactoryBean.setUnauthorizedUrl(<span class="string">&quot;/wq.html&quot;</span>);<span class="comment">//无权限</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h2 id="四、集成-改进"><a href="#四、集成-改进" class="headerlink" title="四、集成-改进"></a>四、集成-改进</h2><h3 id="5-1-shiro-redis集成"><a href="#5-1-shiro-redis集成" class="headerlink" title="5.1 shiro+redis集成"></a>5.1 shiro+redis集成</h3><h2 id="五、其他"><a href="#五、其他" class="headerlink" title="五、其他"></a>五、其他</h2><ol>
+<li><p>过滤顺序问题</p>
+<blockquote>
+<p>过滤设置规则是从上到下，详细的规则配在前面，大范围的配在后面。</p>
+</blockquote>
+</li>
+</ol>
+<h2 id="六、RDBC模型-role-based-access-control"><a href="#六、RDBC模型-role-based-access-control" class="headerlink" title="六、RDBC模型 role based access control"></a>六、RDBC模型 role based access control</h2>
     </div>
 
     
@@ -303,8 +391,8 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2021/12/04/IO/NIO/" rel="prev" title="">
-      <i class="fa fa-chevron-left"></i> 
+    <a href="/2021/12/04/IO/NIO/" rel="prev" title="NIO">
+      <i class="fa fa-chevron-left"></i> NIO
     </a></div>
       <div class="post-nav-item">
     <a href="/2021/12/05/spring/%E9%85%8D%E7%BD%AE-%E6%B3%A8%E8%A7%A3/%E9%9D%99%E6%80%81%E8%B5%84%E6%BA%90%E9%85%8D%E7%BD%AE/" rel="next" title="spring静态资源配置">
@@ -373,7 +461,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%84%E4%BB%B6"><span class="nav-number">1.</span> <span class="nav-text">组件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E4%BD%93"><span class="nav-number">2.</span> <span class="nav-text">实体</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%9F%E8%83%BD"><span class="nav-number">3.</span> <span class="nav-text">功能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RDBC%E6%A8%A1%E5%9E%8B-role-based-access-control"><span class="nav-number">4.</span> <span class="nav-text">RDBC模型 role based access control</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E5%8A%9F%E8%83%BD"><span class="nav-number">1.</span> <span class="nav-text">一、功能</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-Authentication-%E7%94%A8%E6%88%B7%E5%AF%86%E7%A0%81%E8%AE%A4%E8%AF%81"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 Authentication 用户密码认证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-Authorization-%E9%AA%8C%E8%AF%81%E6%98%AF%E5%90%A6%E6%9C%89%E6%9D%83%E9%99%90%E8%AE%BF%E9%97%AE%E8%AF%A5%E6%96%B9%E6%B3%95"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 Authorization 验证是否有权限访问该方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-%E5%85%B6%E4%BB%96%E5%8A%9F%E8%83%BD"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 其他功能</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-1-%E6%96%B9%E6%B3%95%E5%8A%A0%E6%9D%83"><span class="nav-number">1.3.1.</span> <span class="nav-text">1.3.1 方法加权</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-2-%E8%87%AA%E5%AE%9A%E4%B9%89%E8%BF%87%E6%BB%A4"><span class="nav-number">1.3.2.</span> <span class="nav-text">1.3.2 自定义过滤</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-3-%E8%8E%B7%E5%8F%96%E5%BD%93%E5%89%8D%E7%BA%BF%E7%A8%8B%E7%94%A8%E6%88%B7"><span class="nav-number">1.3.3.</span> <span class="nav-text">1.3.3 获取当前线程用户</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E7%BB%84%E4%BB%B6"><span class="nav-number">2.</span> <span class="nav-text">二、组件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E6%A0%B8%E5%BF%83%E7%BB%84%E4%BB%B6"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 核心组件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E6%B3%A8%E8%A7%A3%E6%A8%A1%E5%BC%8F"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 注解模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-user"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 user</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E5%8E%9F%E7%90%86"><span class="nav-number">3.</span> <span class="nav-text">三、原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E5%9F%BA%E4%BA%8Etoken"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 基于token</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E5%AE%89%E5%85%A8%E4%B8%AD%E5%BF%83-MyRealm"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 安全中心 MyRealm</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E9%9B%86%E6%88%90-%E6%94%B9%E8%BF%9B"><span class="nav-number">4.</span> <span class="nav-text">四、集成-改进</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-shiro-redis%E9%9B%86%E6%88%90"><span class="nav-number">4.1.</span> <span class="nav-text">5.1 shiro+redis集成</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E5%85%B6%E4%BB%96"><span class="nav-number">5.</span> <span class="nav-text">五、其他</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81RDBC%E6%A8%A1%E5%9E%8B-role-based-access-control"><span class="nav-number">6.</span> <span class="nav-text">六、RDBC模型 role based access control</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -389,14 +477,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">159</span>
+          <span class="site-state-item-count">161</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-count">24</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>
@@ -440,12 +528,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">191k</span>
+    <span title="站点总字数">194k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">2:54</span>
+    <span title="站点阅读时长">2:57</span>
 </div>
 
         
