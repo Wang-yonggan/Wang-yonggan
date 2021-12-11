@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/chrome2.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"wang-yonggan.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":true,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="[toc] 一、配置型注解1.1 @Bean参考  @Bean  @Bean是一个方法级别上的注解，主要用在@Configuration注解的类里，也可以用在@Component注解的类里。添加的bean的id为方法名 对于依赖型的@Bean，直接用参数注入   注入IOC 12345678910111213141516171819202122@Configurationpublic class">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spring配置注解">
+<meta property="og:url" content="https://wang-yonggan.github.io/2021/11/13/spring/%E6%B3%A8%E8%A7%A3/spring%E9%85%8D%E7%BD%AE%E6%B3%A8%E8%A7%A3/index.html">
+<meta property="og:site_name" content="十二峒">
+<meta property="og:description" content="[toc] 一、配置型注解1.1 @Bean参考  @Bean  @Bean是一个方法级别上的注解，主要用在@Configuration注解的类里，也可以用在@Component注解的类里。添加的bean的id为方法名 对于依赖型的@Bean，直接用参数注入   注入IOC 12345678910111213141516171819202122@Configurationpublic class">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-11-13T02:40:15.000Z">
+<meta property="article:modified_time" content="2021-12-11T09:06:41.711Z">
+<meta property="article:author" content="勇敢">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://wang-yonggan.github.io/2021/11/13/spring/%E6%B3%A8%E8%A7%A3/spring%E9%85%8D%E7%BD%AE%E6%B3%A8%E8%A7%A3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>spring配置注解 | 十二峒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">十二峒</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">取上得中，取中得下</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://gitee.com/wang_yonggan" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/11/13/spring/%E6%B3%A8%E8%A7%A3/spring%E9%85%8D%E7%BD%AE%E6%B3%A8%E8%A7%A3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="十二峒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          spring配置注解
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-11-13 10:40:15" itemprop="dateCreated datePublished" datetime="2021-11-13T10:40:15+08:00">2021-11-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-12-11 17:06:41" itemprop="dateModified" datetime="2021-12-11T17:06:41+08:00">2021-12-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2021/11/13/spring/%E6%B3%A8%E8%A7%A3/spring%E9%85%8D%E7%BD%AE%E6%B3%A8%E8%A7%A3/#SOHUCS" itemprop="discussionUrl">
+        <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="2021/11/13/spring/注解/spring配置注解/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.9k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>[toc]</p>
+<h2 id="一、配置型注解"><a href="#一、配置型注解" class="headerlink" title="一、配置型注解"></a>一、配置型注解</h2><h3 id="1-1-Bean"><a href="#1-1-Bean" class="headerlink" title="1.1 @Bean"></a>1.1 @Bean</h3><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/feiyu127/p/7700090.html">参考</a></p>
+<ol>
+<li><p>@Bean</p>
+<ul>
+<li>@Bean是一个方法级别上的注解，主要用在@Configuration注解的类里，也可以用在@Component注解的类里。添加的bean的id为方法名</li>
+<li>对于依赖型的@Bean，直接用参数注入</li>
+</ul>
+</li>
+<li><p>注入IOC</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">IOC</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Bean2 <span class="title">bean2</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Bean2();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Bean3 <span class="title">getBean3</span><span class="params">(Bean2 bean2)</span> </span>&#123;</span><br><span class="line">        Bean3 bean3 = <span class="keyword">new</span> Bean3();</span><br><span class="line">        bean3.setName(<span class="string">&quot;zhang&quot;</span>);</span><br><span class="line">        bean3.setBean2(bean2);</span><br><span class="line">        <span class="keyword">return</span> bean3;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Bean3 <span class="title">needBean3</span><span class="params">(Bean2 bean2)</span> </span>&#123;</span><br><span class="line">        Bean3 bean3 = <span class="keyword">new</span> Bean3();</span><br><span class="line">        bean3.setName(<span class="string">&quot;wang&quot;</span>);</span><br><span class="line">        bean3.setBean2(bean2);</span><br><span class="line">        <span class="keyword">return</span> bean3;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>Controller</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BeanController</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="meta">@Qualifier(&quot;needBean3&quot;)</span></span><br><span class="line">    Bean3 bean31;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="meta">@Qualifier(&quot;getBean3&quot;)</span></span><br><span class="line">    Bean3 bean32;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@ApiOperation(&quot;获得bean&quot;)</span></span><br><span class="line">    <span class="meta">@GetMapping(&quot;bean1&quot;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ApiResult <span class="title">bean1</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(bean31);</span><br><span class="line">        System.out.println(bean32);</span><br><span class="line">        <span class="keyword">return</span> ApiResult.ok();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Bean3(name=wang, age=<span class="number">0</span>, bean2=com.wyg.boottest.config.bean.Bean2@<span class="number">50906524</span>)</span><br><span class="line">Bean3(name=zhang, age=<span class="number">0</span>, bean2=com.wyg.boottest.config.bean.Bean2@<span class="number">50906524</span>)</span><br></pre></td></tr></table></figure>
+
+<p>等同于</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">&quot;getBean3&quot;</span> <span class="attr">class</span>=<span class="string">&quot;com.wyg.epidemicsituation.entity.vo.Bean3&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;Bean2&quot;</span> <span class="attr">ref</span>=<span class="string">&quot;bean2&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>属性</p>
+<ul>
+<li><p>name 自定义名字</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Bean(name = &#123;&quot;myFoo&quot;,&quot;y&quot;&#125;)</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Foo <span class="title">foo</span><span class="params">()</span> </span></span><br><span class="line"><span class="function">    return new <span class="title">Foo</span><span class="params">()</span></span>;</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>获取@Configruation的beans见@Configruation</p>
+</li>
+</ol>
+<h3 id="1-2-Configruation"><a href="#1-2-Configruation" class="headerlink" title="1.2 @Configruation"></a>1.2 @Configruation</h3><ol>
+<li><p>获取Context,这种方法相当于另创一个@Configruation，里面的@Bean需要重新创建一遍</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">AnnotationConfigApplicationContext applicationContext2 = <span class="keyword">new</span> AnnotationConfigApplicationContext(BeanConfig.class);</span><br></pre></td></tr></table></figure></li>
+<li><p>从Spring3.0，@Configuration用于定义配置类，可替换xml配置文件，被注解的类内部包含有一个或多个被@Bean注解的方法，这些方法将会被AnnotationConfigApplicationContext或AnnotationConfigWebApplicationContext类进行扫描，并用于构建bean定义，初始化Spring容器。</p>
+<ol>
+<li>@Configuration不可以是final类型；</li>
+<li>@Configuration不可以是匿名类；</li>
+<li>嵌套的configuration必须是静态类</li>
+</ol>
+</li>
+<li><p>一个@Configuration下面可以定义多个@Bean</p>
+</li>
+<li><p>基于java而没注解@Configuration的注册方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">AnnotationConfigApplicationContext cxt=<span class="keyword">new</span> AnnotationConfigApplicationContext();</span><br><span class="line">cxt.register(MyConfig.class);</span><br><span class="line">cxt.getBean(<span class="string">&quot;aaa&quot;</span>)</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="1-3-Service-controller-repository和-Component区别"><a href="#1-3-Service-controller-repository和-Component区别" class="headerlink" title="1.3 @Service,controller,repository和@Component区别"></a>1.3 @Service,controller,repository和@Component区别</h3><ol>
+<li>前三者含有特定功能的Component 比如<ol>
+<li>dispatchServlet寻找的是@Conroller的GetMapping而不是@Component的mapping</li>
+</ol>
+</li>
+<li>后者可用前三者代替</li>
+</ol>
+<h3 id="1-4-Mapper和-Repository的区别"><a href="#1-4-Mapper和-Repository的区别" class="headerlink" title="1.4 @Mapper和@Repository的区别"></a>1.4 @Mapper和@Repository的区别</h3><ol>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_36816062/article/details/108086097">相同点</a><br>@Mapper和@Repository都是作用在dao层接口，使得其生成代理对象bean，交给spring 容器管理<br>对于mybatis来说，都可以不用写mapper.xml文件</li>
+<li>不同点<br>@Mapper不需要配置扫描地址，通过xml里面的namespace里面的接口地址，生成了Bean后注入到Service层中。@MapperScan(“mapper文件所在包”)，这样就不需要每个mapper文件都加@Mapper注解了<br>而@Repository不可以单独使用,需要配置@MapperScan(“com.anson.dao”) </li>
+</ol>
+<h3 id="1-5-Bean和-Component区别"><a href="#1-5-Bean和-Component区别" class="headerlink" title="1.5 @Bean和@Component区别"></a>1.5 @Bean和@Component区别</h3><ol>
+<li><p>前者作用于methon，后者作用于class</p>
+</li>
+<li><p>@Component通过@ComponentScan扫描得到</p>
+</li>
+<li><p>@Bean在@Configuration Class下</p>
+</li>
+<li><p>@Bean更灵活—&gt;配置文件调控的时候就只能用@Bean</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">Student</span><span class="params">(<span class="keyword">int</span> status)</span></span>&#123;</span><br><span class="line">    <span class="keyword">switch</span>(status):</span><br><span class="line">    <span class="keyword">case</span> <span class="number">1</span>: <span class="keyword">return</span> <span class="keyword">new</span> Student(<span class="number">1</span>,<span class="string">&quot;王&quot;</span>);</span><br><span class="line">    <span class="keyword">case</span> <span class="number">2</span>: <span class="keyword">return</span> <span class="keyword">new</span> Student(<span class="number">2</span>,<span class="string">&quot;张&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="1-6-Autowire和-Resource的区别"><a href="#1-6-Autowire和-Resource的区别" class="headerlink" title="1.6 @Autowire和@Resource的区别"></a>1.6 @Autowire和@Resource的区别</h3><ol>
+<li>作用域相同<ol>
+<li>属性</li>
+<li>setter</li>
+</ol>
+</li>
+<li>@Autowire 默认先按类型装配</li>
+<li>@Resource 默认先按名称装配</li>
+<li>@Resource =@Autowrie+@Qualifier</li>
+</ol>
+<h3 id="1-7-ComponentScan与ComponentScans"><a href="#1-7-ComponentScan与ComponentScans" class="headerlink" title="1.7 @ComponentScan与ComponentScans"></a>1.7 @ComponentScan与ComponentScans</h3><ol>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/jiafa/p/13800766.html">@ComponentScan和@ComponentScans注解</a></li>
+</ol>
+<h3 id="1-8-ControllerAdvice"><a href="#1-8-ControllerAdvice" class="headerlink" title="1.8 @ControllerAdvice"></a>1.8 @ControllerAdvice</h3><ol>
+<li>全局异常处理器</li>
+</ol>
+<h3 id="1-9-ConfigurationProperties"><a href="#1-9-ConfigurationProperties" class="headerlink" title="1.9 @ConfigurationProperties"></a>1.9 @ConfigurationProperties</h3><ol>
+<li>前缀配置–更灵活</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/11/13/spring/javaConfig/" rel="prev" title="">
+      <i class="fa fa-chevron-left"></i> 
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/11/14/java/JavaSE/%E5%8F%8D%E5%B0%84%E7%9A%84%E5%BA%94%E7%94%A8/" rel="next" title="反射的应用">
+      反射的应用 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="SOHUCS"></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E9%85%8D%E7%BD%AE%E5%9E%8B%E6%B3%A8%E8%A7%A3"><span class="nav-number">1.</span> <span class="nav-text">一、配置型注解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-Bean"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 @Bean</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-Configruation"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 @Configruation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-Service-controller-repository%E5%92%8C-Component%E5%8C%BA%E5%88%AB"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 @Service,controller,repository和@Component区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-Mapper%E5%92%8C-Repository%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">1.4.</span> <span class="nav-text">1.4 @Mapper和@Repository的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-5-Bean%E5%92%8C-Component%E5%8C%BA%E5%88%AB"><span class="nav-number">1.5.</span> <span class="nav-text">1.5 @Bean和@Component区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-6-Autowire%E5%92%8C-Resource%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">1.6.</span> <span class="nav-text">1.6 @Autowire和@Resource的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-7-ComponentScan%E4%B8%8EComponentScans"><span class="nav-number">1.7.</span> <span class="nav-text">1.7 @ComponentScan与ComponentScans</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-8-ControllerAdvice"><span class="nav-number">1.8.</span> <span class="nav-text">1.8 @ControllerAdvice</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-9-ConfigurationProperties"><span class="nav-number">1.9.</span> <span class="nav-text">1.9 @ConfigurationProperties</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="勇敢"
+      src="/images/t.png">
+  <p class="site-author-name" itemprop="name">勇敢</p>
+  <div class="site-description" itemprop="description">学无止境</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">161</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/wang_yonggan" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;wang_yonggan" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>Gitee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:2245316014@qq.com" title="E-Mail → mailto:2245316014@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">勇敢</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">203k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">3:05</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script size="300" alpha="0.6" zIndex="-1" src="/lib/canvas-ribbon/canvas-ribbon.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  <script>
+  NexT.utils.loadComments(document.querySelector('#SOHUCS'), () => {
+    var appid = 'cyvGB7eAg';
+    var conf = 'e6246a7464cec504b3ea8361e3a3ff72';
+    var width = window.innerWidth || document.documentElement.clientWidth;
+    if (width < 960) {
+      window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>');
+    } else {
+      var loadJs=function(d,a){var c=document.getElementsByTagName("head")[0]||document.head||document.documentElement;var b=document.createElement("script");b.setAttribute("type","text/javascript");b.setAttribute("charset","UTF-8");b.setAttribute("src",d);if(typeof a==="function"){if(window.attachEvent){b.onreadystatechange=function(){var e=b.readyState;if(e==="loaded"||e==="complete"){b.onreadystatechange=null;a()}}}else{b.onload=a}}c.appendChild(b)};loadJs("https://changyan.sohu.com/upload/changyan.js",function(){window.changyan.api.config({appid:appid,conf:conf})});
+    }
+  });
+  </script>
+  <script src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+
+</body>
+</html>
