@@ -187,6 +187,635 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/12/11/java/java%E8%AE%BE%E8%AE%A1/SPI%E6%9C%BA%E5%88%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="十二峒">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/12/11/java/java%E8%AE%BE%E8%AE%A1/SPI%E6%9C%BA%E5%88%B6/" class="post-title-link" itemprop="url">SPI机制</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-12-11 15:02:02 / 修改时间：16:43:19" itemprop="dateCreated datePublished" datetime="2021-12-11T15:02:02+08:00">2021-12-11</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java%E9%AB%98%E7%BA%A7/" itemprop="url" rel="index"><span itemprop="name">java高级</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2021/12/11/java/java%E8%AE%BE%E8%AE%A1/SPI%E6%9C%BA%E5%88%B6/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2021/12/11/java/java%E8%AE%BE%E8%AE%A1/SPI%E6%9C%BA%E5%88%B6/" class="cy_cmt_count" data-xid="2021/12/11/java/java设计/SPI机制/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>908</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="一、概念"><a href="#一、概念" class="headerlink" title="一、概念"></a>一、概念</h2><p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/51b0cf78210f">参考-JavaSPI</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/97c01234ba79">参考-SpringSPI</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/3a3edbcd8f24">参考-jdbcSPI</a></p>
+<blockquote>
+<p>SPI , Service Provider Interface，是一种服务发现机制。它通过在ClassPath路径下的META-INF/services文件夹查找文件，自动加载文件里所定义的类</p>
+</blockquote>
+<h3 id="Class-forName"><a href="#Class-forName" class="headerlink" title="Class.forName"></a>Class.forName</h3><ol>
+<li><p>jdbc执行Class.forName(‘com.mysql.cj.jdbc.Driver’)是加载Driver的意思</p>
+<p>但是再Driver这个类有个静态代码块（再类信息第一次加载到内存的时候会运行一次）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> &#123; </span><br><span class="line">	DriverManager.registerDriver(<span class="keyword">new</span> Driver());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">//registerDriver会根据一系列过程把driver加进来</span></span><br><span class="line">Object[] newElements = Arrays.copyOf(current, len + <span class="number">1</span>);</span><br><span class="line">newElements[len] = e;<span class="comment">//e就是driver</span></span><br><span class="line">setArray(newElements);</span><br></pre></td></tr></table></figure></li>
+<li><p>DriverManager.getConnection(url,info)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(DriverInfo aDriver : registeredDrivers) &#123;</span><br><span class="line">    Connection con = aDriver.driver.connect(url, info);</span><br><span class="line">    <span class="keyword">if</span> (con != <span class="keyword">null</span>) </span><br><span class="line">        <span class="keyword">return</span> (con);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="加入SPI机制之后"><a href="#加入SPI机制之后" class="headerlink" title="加入SPI机制之后"></a>加入SPI机制之后</h3><ol>
+<li><p>DriverManager的static代码块 拿到drivers</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">  drivers = AccessController.doPrivileged(<span class="keyword">new</span> PrivilegedAction&lt;String&gt;() &#123;</span><br><span class="line">      <span class="function"><span class="keyword">public</span> String <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">          <span class="keyword">return</span> System.getProperty(<span class="string">&quot;jdbc.drivers&quot;</span>);</span><br><span class="line">      &#125;</span><br><span class="line">&#125;);		</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="System-getProperty-与-System-getenv"><a href="#System-getProperty-与-System-getenv" class="headerlink" title="System.getProperty 与 System.getenv"></a>System.getProperty 与 System.getenv</h3><ol>
+<li>System.getProperty  获得JVM中的环境属性</li>
+<li>System.getenv 获得操作系统的环境变量</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/12/10/%E5%BC%80%E5%8F%91/%E9%A1%B9%E7%9B%AE/%E8%B0%B7%E7%B2%92%E5%AD%A6%E9%99%A2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="十二峒">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/12/10/%E5%BC%80%E5%8F%91/%E9%A1%B9%E7%9B%AE/%E8%B0%B7%E7%B2%92%E5%AD%A6%E9%99%A2/" class="post-title-link" itemprop="url">谷粒学院</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-12-10 20:39:20 / 修改时间：20:39:37" itemprop="dateCreated datePublished" datetime="2021-12-10T20:39:20+08:00">2021-12-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%A1%B9%E7%9B%AE/" itemprop="url" rel="index"><span itemprop="name">项目</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2021/12/10/%E5%BC%80%E5%8F%91/%E9%A1%B9%E7%9B%AE/%E8%B0%B7%E7%B2%92%E5%AD%A6%E9%99%A2/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2021/12/10/%E5%BC%80%E5%8F%91/%E9%A1%B9%E7%9B%AE/%E8%B0%B7%E7%B2%92%E5%AD%A6%E9%99%A2/" class="cy_cmt_count" data-xid="2021/12/10/开发/项目/谷粒学院/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>0</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/12/09/spring/springBoot/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="十二峒">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/12/09/spring/springBoot/" class="post-title-link" itemprop="url">springBoot</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-12-09 21:08:13" itemprop="dateCreated datePublished" datetime="2021-12-09T21:08:13+08:00">2021-12-09</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2021/12/09/spring/springBoot/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2021/12/09/spring/springBoot/" class="cy_cmt_count" data-xid="2021/12/09/spring/springBoot/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>517</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>[toc]</p>
+<h2 id="一、配置"><a href="#一、配置" class="headerlink" title="一、配置"></a>一、配置</h2><h3 id="1-1-Banner"><a href="#1-1-Banner" class="headerlink" title="1.1 Banner"></a>1.1 Banner</h3><ol>
+<li><p>网址<a target="_blank" rel="noopener" href="http://patorjk.com/software/taag">http://patorjk.com/software/taag</a></p>
+</li>
+<li><p>选择</p>
+<ol>
+<li>3D-ASCLL</li>
+<li>Do</li>
+</ol>
+</li>
+<li><p>配置： src/main/resouces/banner.txt</p>
+</li>
+<li><p>关闭banner</p>
+<p>​    ```</p>
+</li>
+<li><p>Banner的变量</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$&#123;AnsiColor.BRIGHT_YELLOW&#125;。</span><br><span class="line">$&#123;AnsiColor.BRIGHT_RED&#125;：设置控制台中输出内容的颜色</span><br><span class="line">$&#123;application.version&#125;：用来获取MANIFEST.MF文件中的版本号</span><br><span class="line">&#123;application.version&#125;版本信息</span><br><span class="line">$&#123;spring-boot.version&#125;：Spring Boot的版本号</span><br><span class="line">&#123;spring-boot.version&#125;版本信息</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="九、依赖理解"><a href="#九、依赖理解" class="headerlink" title="九、依赖理解"></a>九、依赖理解</h2><h3 id="9-1-spring-boot-starter"><a href="#9-1-spring-boot-starter" class="headerlink" title="9.1 spring-boot-starter"></a>9.1 spring-boot-starter</h3><ol>
+<li>可以认为starter是一种服务（和JS的插件类似）——使得使用某个功能的开发者不需要关注各种依赖库的处理，不需要具体的配置信息，由Spring Boot自动通过classpath路径下的类发现需要的Bean，并织入bean</li>
+</ol>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/12/09/spring/springBoot/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/12/09/utils/vuepress/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="十二峒">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/12/09/utils/vuepress/" class="post-title-link" itemprop="url">vuepress</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-12-09 17:18:44" itemprop="dateCreated datePublished" datetime="2021-12-09T17:18:44+08:00">2021-12-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-12-13 20:49:15" itemprop="dateModified" datetime="2021-12-13T20:49:15+08:00">2021-12-13</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/util/" itemprop="url" rel="index"><span itemprop="name">util</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2021/12/09/utils/vuepress/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2021/12/09/utils/vuepress/" class="cy_cmt_count" data-xid="2021/12/09/utils/vuepress/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>3.2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="一、基本使用"><a href="#一、基本使用" class="headerlink" title="一、基本使用"></a>一、基本使用</h2><ol>
+<li><p>.vuepress文件夹，所有 VuePress 相关的文件都将会被放在这里</p>
+<ol>
+<li><p>一个 VuePress 网站必要的配置文件是 <code>.vuepress/config.js</code>，它应该导出一个 JavaScript 对象：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="attr">title</span>: <span class="string">&#x27;Hello VuePress&#x27;</span>,</span><br><span class="line">  <span class="attr">description</span>: <span class="string">&#x27;Just playing around&#x27;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+</ol>
+<h2 id="二、md文件内配置"><a href="#二、md文件内配置" class="headerlink" title="二、md文件内配置"></a>二、md文件内配置</h2><p>默认主题提供了一些选项，让你可以去自定义导航栏（navbar）、 侧边栏（sidebar）和 首页（homepage） </p>
+<h3 id="2-1-Header"><a href="#2-1-Header" class="headerlink" title="2.1 Header"></a>2.1 Header</h3><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">home:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">heroImage:</span> <span class="string">/hero.png</span></span><br><span class="line"><span class="attr">heroText:</span> <span class="string">Hero</span> <span class="string">标题</span></span><br><span class="line"><span class="attr">tagline:</span> <span class="string">Hero</span> <span class="string">副标题</span></span><br><span class="line"><span class="comment"># navbar: false 禁用导航栏</span></span><br><span class="line"><span class="attr">actionText:</span> <span class="string">快速上手</span> <span class="string">→</span></span><br><span class="line"><span class="attr">actionLink:</span> <span class="string">/zh/guide/</span></span><br><span class="line"><span class="attr">features:</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">title:</span> <span class="string">简洁至上</span></span><br><span class="line">  <span class="attr">details:</span> <span class="string">以</span> <span class="string">Markdown</span> <span class="string">为中心的项目结构，以最少的配置帮助你专注于写作。</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">title:</span> <span class="string">Vue驱动</span></span><br><span class="line">  <span class="attr">details:</span> <span class="string">享受</span> <span class="string">Vue</span> <span class="string">+</span> <span class="string">webpack</span> <span class="string">的开发体验，在</span> <span class="string">Markdown</span> <span class="string">中使用</span> <span class="string">Vue</span> <span class="string">组件，同时可以使用</span> <span class="string">Vue</span> <span class="string">来开发自定义主题。</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">title:</span> <span class="string">高性能</span></span><br><span class="line">  <span class="attr">details:</span> <span class="string">VuePress</span> <span class="string">为每个页面预渲染生成静态的</span> <span class="string">HTML，同时在页面被加载的时候，将作为</span> <span class="string">SPA</span> <span class="string">运行。</span></span><br><span class="line"><span class="attr">footer:</span> <span class="string">MIT</span> <span class="string">Licensed</span> <span class="string">|</span> <span class="string">Copyright</span> <span class="string">©</span> <span class="number">2018</span><span class="string">-present</span> <span class="string">Evan</span> <span class="string">You</span></span><br><span class="line"><span class="meta">---</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-Frontmatter"><a href="#2-2-Frontmatter" class="headerlink" title="2.2 Frontmatter"></a>2.2 Frontmatter</h3><h4 id="2-2-1-首页"><a href="#2-2-1-首页" class="headerlink" title="2.2.1 首页"></a>2.2.1 首页</h4><table>
+<thead>
+<tr>
+<th>关键字</th>
+<th>功能</th>
+<th>用例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>home</td>
+<td>是否首页</td>
+<td>home: true</td>
+</tr>
+<tr>
+<td>heroImage</td>
+<td>首页图片的 URL</td>
+<td># Public 文件路径 heroImage: /images/hero.png</td>
+</tr>
+<tr>
+<td>heroText</td>
+<td>首页标题</td>
+<td></td>
+</tr>
+<tr>
+<td>tagline</td>
+<td>首页标语,则默认使用站点 <a target="_blank" rel="noopener" href="https://v2.vuepress.vuejs.org/zh/reference/config.html#description">description</a></td>
+<td></td>
+</tr>
+<tr>
+<td>actions</td>
+<td>首页按钮</td>
+<td>actions:   - text: 快速上手     link: /zh/guide/getting-started.html     type: primary</td>
+</tr>
+<tr>
+<td>features</td>
+<td>首页下三件简述</td>
+<td></td>
+</tr>
+<tr>
+<td>footer</td>
+<td>首页页脚</td>
+<td></td>
+</tr>
+<tr>
+<td>footerHtml</td>
+<td>是否允许页脚中使用 HTML</td>
+<td></td>
+</tr>
+</tbody></table>
+<h4 id="2-2-2-普通页面"><a href="#2-2-2-普通页面" class="headerlink" title="2.2.2 普通页面"></a>2.2.2 普通页面</h4><table>
+<thead>
+<tr>
+<th>关键字</th>
+<th>功能</th>
+<th>用例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>editLink</td>
+<td>编辑此页</td>
+<td></td>
+</tr>
+<tr>
+<td>editLinkPattern</td>
+<td>本页面中 <em>编辑此页</em> 链接的 Pattern</td>
+<td><a target="_blank" rel="noopener" href="https://v2.vuepress.vuejs.org/zh/reference/default-theme/config.html#editlinkpattern">三项</a></td>
+</tr>
+<tr>
+<td>sidebar</td>
+<td>配置侧边栏</td>
+<td></td>
+</tr>
+<tr>
+<td>navbar</td>
+<td>导航栏配置</td>
+<td></td>
+</tr>
+<tr>
+<td>contributors</td>
+<td>贡献者列表</td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id="2-3-搜索框"><a href="#2-3-搜索框" class="headerlink" title="2.3 搜索框"></a>2.3 搜索框</h3><h4 id="1-内置搜索"><a href="#1-内置搜索" class="headerlink" title="1. 内置搜索"></a>1. 内置搜索</h4><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// .vuepress/config.js</span></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="attr">themeConfig</span>: &#123;</span><br><span class="line">    <span class="attr">search</span>: <span class="literal">false</span>,</span><br><span class="line">    <span class="attr">searchMaxSuggestions</span>: <span class="number">10</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="页面滚动"><a href="#页面滚动" class="headerlink" title="页面滚动"></a>页面滚动</h3><h3 id="自定义页面类"><a href="#自定义页面类" class="headerlink" title="自定义页面类"></a>自定义页面类</h3><h3 id="特定页面的自定义布局"><a href="#特定页面的自定义布局" class="headerlink" title="特定页面的自定义布局"></a>特定页面的自定义布局</h3><h2 id="三、配置"><a href="#三、配置" class="headerlink" title="三、配置"></a>三、配置</h2><h3 id="3-1-基本项"><a href="#3-1-基本项" class="headerlink" title="3.1 基本项"></a>3.1 基本项</h3><table>
+<thead>
+<tr>
+<th>关键字</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>lang</td>
+<td>语言</td>
+</tr>
+<tr>
+<td>title</td>
+<td>标题</td>
+</tr>
+<tr>
+<td>description</td>
+<td>描述</td>
+</tr>
+<tr>
+<td>base</td>
+<td>git-page相对地址</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id="3-2主题配置"><a href="#3-2主题配置" class="headerlink" title="3.2主题配置"></a>3.2主题配置</h3><ol>
+<li> logo logo地址</li>
+<li>navbar 导航栏</li>
+<li>sidebar 侧边栏</li>
+</ol>
+<h4 id="3-2-1-导航栏"><a href="#3-2-1-导航栏" class="headerlink" title="3.2.1 导航栏"></a>3.2.1 导航栏</h4><ol>
+<li><p>logo</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">   </span><br></pre></td></tr></table></figure></li>
+<li><p>导航栏连接</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// .vuepress/config.js</span></span><br><span class="line"><span class="keyword">module</span>.<span class="keyword">exports</span> = &#123;</span><br><span class="line">  themeConfig: &#123;</span><br><span class="line">    nav: [</span><br><span class="line">      &#123; text: <span class="string">&#x27;Home&#x27;</span>, link: <span class="string">&#x27;/&#x27;</span> &#125;,</span><br><span class="line">      &#123; text: <span class="string">&#x27;Guide&#x27;</span>, link: <span class="string">&#x27;/guide/&#x27;</span> &#125;,</span><br><span class="line">      &#123; text: <span class="string">&#x27;External&#x27;</span>, link: <span class="string">&#x27;https://google.com&#x27;</span> &#125;,</span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>当你提供了一个 <code>items</code> 数组而不是一个单一的 <code>link</code> 时，它将显示为一个 <code>下拉列表</code> </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// .vuepress/config.js</span></span><br><span class="line"><span class="keyword">module</span>.<span class="keyword">exports</span> = &#123;</span><br><span class="line">  themeConfig: &#123;</span><br><span class="line">    nav: [</span><br><span class="line">      &#123;</span><br><span class="line">        text: <span class="string">&#x27;Languages&#x27;</span>,</span><br><span class="line">        ariaLabel: <span class="string">&#x27;Language Menu&#x27;</span>,</span><br><span class="line">        items: [</span><br><span class="line">          &#123; text: <span class="string">&#x27;Chinese&#x27;</span>, link: <span class="string">&#x27;/language/chinese/&#x27;</span> &#125;,</span><br><span class="line">          &#123; text: <span class="string">&#x27;Japanese&#x27;</span>, link: <span class="string">&#x27;/language/japanese/&#x27;</span> &#125;</span><br><span class="line">        ]</span><br><span class="line">      &#125;</span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>此外，你还可以通过嵌套的 <code>items</code> 来在 <code>下拉列表</code> 中设置分组：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// .vuepress/config.js</span></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="attr">themeConfig</span>: &#123;</span><br><span class="line">    <span class="attr">nav</span>: [</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="attr">text</span>: <span class="string">&#x27;Languages&#x27;</span>,</span><br><span class="line">        <span class="attr">items</span>: [</span><br><span class="line">          &#123; <span class="attr">text</span>: <span class="string">&#x27;Group1&#x27;</span>, <span class="attr">items</span>: [<span class="comment">/*  */</span>] &#125;,</span><br><span class="line">          &#123; <span class="attr">text</span>: <span class="string">&#x27;Group2&#x27;</span>, <span class="attr">items</span>: [<span class="comment">/*  */</span>] &#125;</span><br><span class="line">        ]</span><br><span class="line">      &#125;</span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>禁用</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">themeConfig: &#123;</span><br><span class="line">  navbar: <span class="keyword">false</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h4 id="3-2-2-侧边栏"><a href="#3-2-2-侧边栏" class="headerlink" title="3.2.2 侧边栏"></a>3.2.2 侧边栏</h4><h5 id="3-2-2-1-基本配置"><a href="#3-2-2-1-基本配置" class="headerlink" title="3.2.2.1 基本配置"></a>3.2.2.1 基本配置</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">sidebar: [</span><br><span class="line">     &#123;</span><br><span class="line">       text: <span class="string">&#x27;Guide&#x27;</span>,</span><br><span class="line">       link: <span class="string">&#x27;/guide/&#x27;</span>,</span><br><span class="line">       children: [</span><br><span class="line">         &#123;</span><br><span class="line">           text: <span class="string">&#x27;github&#x27;</span>,</span><br><span class="line">           link: <span class="string">&#x27;https://github.com&#x27;</span>,</span><br><span class="line">           children: [],</span><br><span class="line">         &#125;,</span><br><span class="line">         <span class="string">&#x27;/guide/a.md&#x27;</span>,</span><br><span class="line">         <span class="string">&#x27;/guide/b.md&#x27;</span>,</span><br><span class="line">         <span class="string">&#x27;/guide/c.md&#x27;</span></span><br><span class="line">       ],</span><br><span class="line">     &#125;,</span><br><span class="line">     <span class="string">&#x27;/bar/README.md&#x27;</span>,</span><br><span class="line">   ],</span><br></pre></td></tr></table></figure>
+
+<h5 id="3-2-2-2-注意"><a href="#3-2-2-2-注意" class="headerlink" title="3.2.2.2 注意"></a>3.2.2.2 注意</h5><p>‘/bar/README.md’ 像这种直接写路径的一定要写title</p>
+<h5 id="3-2-2-3-侧边栏分组"><a href="#3-2-2-3-侧边栏分组" class="headerlink" title="3.2.2.3 侧边栏分组"></a>3.2.2.3 侧边栏分组</h5><h5 id="3-2-2-4-自动生成侧栏"><a href="#3-2-2-4-自动生成侧栏" class="headerlink" title="3.2.2.4 自动生成侧栏"></a>3.2.2.4 自动生成侧栏</h5><h5 id="3-2-2-5-禁用侧边栏"><a href="#3-2-2-5-禁用侧边栏" class="headerlink" title="3.2.2.5 禁用侧边栏"></a>3.2.2.5 禁用侧边栏</h5><h2 id="四、新增Md渲染"><a href="#四、新增Md渲染" class="headerlink" title="四、新增Md渲染"></a>四、新增Md渲染</h2><h3 id="4-1-内置组件"><a href="#4-1-内置组件" class="headerlink" title="4.1 内置组件"></a>4.1 内置组件</h3><h4 id="4-1-1-Badge-标识"><a href="#4-1-1-Badge-标识" class="headerlink" title="4.1.1 Badge 标识"></a>4.1.1 Badge 标识</h4><ol>
+<li><p>语法</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">-</span> VuePress - <span class="xml"><span class="tag">&lt;<span class="name">Badge</span> <span class="attr">type</span>=<span class="string">&quot;warning&quot;</span> <span class="attr">text</span>=<span class="string">&quot;v2&quot;</span> <span class="attr">vertical</span>=<span class="string">&quot;middle&quot;</span> /&gt;</span></span></span><br></pre></td></tr></table></figure></li>
+<li><p>属性</p>
+<ol>
+<li>type 类型：’tip’ | ‘warning’ | ‘danger’</li>
+<li>vertical 位置：’top’ | ‘middle’ | ‘bottom’ | undefined</li>
+</ol>
+</li>
+</ol>
+<h4 id="4-1-2-CodeGroup-多类型代码"><a href="#4-1-2-CodeGroup-多类型代码" class="headerlink" title="4.1.2 CodeGroup 多类型代码"></a>4.1.2 CodeGroup 多类型代码</h4><h4 id="4-1-3-自定义容器"><a href="#4-1-3-自定义容器" class="headerlink" title="4.1.3 自定义容器"></a>4.1.3 自定义容器</h4><ol>
+<li><p>语法</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">::: <span class="xml"><span class="tag">&lt;<span class="name">type</span>&gt;</span></span> [title]</span><br><span class="line">[content]</span><br><span class="line">:::</span><br></pre></td></tr></table></figure></li>
+<li><p>属性</p>
+<ol>
+<li>type 类型：tip、warning、danger、details</li>
+<li>title 标题  容器提示语</li>
+<li>content 内容</li>
+</ol>
+</li>
+</ol>
+<h4 id="4-2-渲染"><a href="#4-2-渲染" class="headerlink" title="4.2 渲染"></a>4.2 渲染</h4><h4 id="4-2-1-链接"><a href="#4-2-1-链接" class="headerlink" title="4.2.1 链接"></a>4.2.1 链接</h4><ol>
+<li>绝对路径链接 带外链接符号 </li>
+<li>相对路径链接 不带</li>
+</ol>
+<h4 id="4-2-2-标题锚点"><a href="#4-2-2-标题锚点" class="headerlink" title="4.2.2 标题锚点"></a>4.2.2 标题锚点</h4><h4 id="4-2-3-Emoji"><a href="#4-2-3-Emoji" class="headerlink" title="4.2.3 Emoji"></a>4.2.3 <a target="_blank" rel="noopener" href="https://github.com/ikatyang/emoji-cheat-sheet">Emoji</a></h4><h4 id="4-2-4-目录"><a href="#4-2-4-目录" class="headerlink" title="4.2.4 目录"></a>4.2.4 目录</h4><h4 id="4-2-5-代码块"><a href="#4-2-5-代码块" class="headerlink" title="4.2.5 代码块"></a>4.2.5 代码块</h4><ol>
+<li>行高亮</li>
+<li>可编译</li>
+</ol>
+<h2 id="五、插件"><a href="#五、插件" class="headerlink" title="五、插件"></a>五、插件</h2><h3 id="5-1-google-analytics-网络流量分析"><a href="#5-1-google-analytics-网络流量分析" class="headerlink" title="5.1  google-analytics 网络流量分析"></a>5.1  google-analytics 网络流量分析</h3><h3 id="5-2-search-搜索"><a href="#5-2-search-搜索" class="headerlink" title="5.2 search 搜索"></a>5.2 search 搜索</h3><ol>
+<li><p>下载</p>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install vuepress-<span class="keyword">plugin</span>-fulltext-<span class="keyword">search</span></span><br></pre></td></tr></table></figure></li>
+<li><p> vi docs/.vuepress/config.js</p>
+</li>
+</ol>
+   <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">module</span>.<span class="keyword">exports</span> = &#123;</span><br><span class="line"><span class="comment">// .</span></span><br><span class="line">plugins: [<span class="string">&#x27;fulltext-search&#x27;</span>],</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-3-pwa-渐进式web"><a href="#5-3-pwa-渐进式web" class="headerlink" title="5.3  pwa 渐进式web"></a>5.3  pwa 渐进式web</h3><h2 id="六、主题"><a href="#六、主题" class="headerlink" title="六、主题"></a>六、主题</h2>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/12/09/%E5%BC%80%E5%8F%91/%E9%A1%B9%E7%9B%AE/%E5%B0%9A%E5%8C%BB%E9%80%9A/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -345,607 +974,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/12/09/%E9%9D%A2%E8%AF%95/m1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="十二峒">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/12/09/%E9%9D%A2%E8%AF%95/m1/" class="post-title-link" itemprop="url">未命名</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2021-12-09 00:38:39 / 修改时间：01:08:11" itemprop="dateCreated datePublished" datetime="2021-12-09T00:38:39+08:00">2021-12-09</time>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2021/12/09/%E9%9D%A2%E8%AF%95/m1/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2021/12/09/%E9%9D%A2%E8%AF%95/m1/" class="cy_cmt_count" data-xid="2021/12/09/面试/m1/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>650</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <ol>
-<li>是否多学一门语言</li>
-<li>引用和指针的区别</li>
-</ol>
-<h4 id="1-String-编码UTF-8-和GBK的区别"><a href="#1-String-编码UTF-8-和GBK的区别" class="headerlink" title="1. String 编码UTF-8 和GBK的区别"></a>1. String 编码UTF-8 和GBK的区别</h4><ol>
-<li><p>常见字符：</p>
-<ol>
-<li>GBK编码：是指中国的中文字符，其实它包含了简体中文与繁体中文字符</li>
-<li>gb2312：这种字符仅能存储简体中文字符</li>
-<li>UTF-8编码：它是一种全国家通过的一种编码。</li>
-</ol>
-</li>
-<li><p>选择：如果你的网站涉及到多个国家的 语言，那么建议你选择UTF-8编码。 </p>
-</li>
-<li><p>GBK和UTF8有什么区别：UTF8编码格式很强大，支持所有国家的语言，正是因为它的强大，才会导致它占用的空间大 小要比GBK大，对于网站打开速度而言，也是有一定影响的。 GBK编码格式，它的功能少，仅限于中文字符，当然它所占用的空间大小会随着它的功能而 减少，打开网页的速度比较快。</p>
-</li>
-<li><p>gbk中文2个字节，英文1个字节；utf-8中文3个字节，英文1个字节</p>
-</li>
-</ol>
-<h4 id="2-什么时候使用字节流、什么时候使用字符流"><a href="#2-什么时候使用字节流、什么时候使用字符流" class="headerlink" title="2. 什么时候使用字节流、什么时候使用字符流"></a>2. 什么时候使用字节流、什么时候使用字符流</h4><ol>
-<li>字符流处理的单元为2个字节的Unicode字符，操作字符、字符数组或字符串，<br>字节流处理单元为1个字节，操作字节和字节数组。</li>
-<li>底层：<ul>
-<li>字节流在操作时不会用到缓冲区（内存），是直接对文件本身进行操作的</li>
-<li>而字符流在操作时使用了缓冲区，通过缓冲区再操作文件。</li>
-</ul>
-</li>
-<li>实际应用<ul>
-<li>如果是音频文件、图片、歌曲，就用字节流好点</li>
-<li>如果是文本的，用字符流好点</li>
-</ul>
-</li>
-</ol>
-<h4 id="3-Java并发和并行"><a href="#3-Java并发和并行" class="headerlink" title="3. Java并发和并行"></a>3. Java并发和并行</h4><ul>
-<li>并发 : 是指两个或多个事件在同一时间间隔发生,在一台处理器上“同时”处理多 个任务</li>
-<li> 并行 : 是指两个或者多个事件在同一时刻发生,在多台处理器上同时处理多个任 务。</li>
-</ul>
-<h4 id="4-怎么提高并发量，请列举你所知道的方案？"><a href="#4-怎么提高并发量，请列举你所知道的方案？" class="headerlink" title="4. 怎么提高并发量，请列举你所知道的方案？"></a>4. 怎么提高并发量，请列举你所知道的方案？</h4><ol>
-<li><strong>负载均衡</strong></li>
-<li><strong>缓存</strong></li>
-<li>优化数据库<ol>
-<li>索引</li>
-<li>分库分表</li>
-</ol>
-</li>
-<li>优化Java代码<ol>
-<li>数据结构</li>
-<li>连接池</li>
-</ol>
-</li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/12/08/java/javaUtils/Date/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="十二峒">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/12/08/java/javaUtils/Date/" class="post-title-link" itemprop="url">java_Date</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2021-12-08 21:04:16 / 修改时间：21:05:51" itemprop="dateCreated datePublished" datetime="2021-12-08T21:04:16+08:00">2021-12-08</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2021/12/08/java/javaUtils/Date/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2021/12/08/java/javaUtils/Date/" class="cy_cmt_count" data-xid="2021/12/08/java/javaUtils/Date/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>152</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="SimpleDateFormat"><a href="#SimpleDateFormat" class="headerlink" title="SimpleDateFormat"></a>SimpleDateFormat</h3><ol>
-<li><p>格式化时间</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Date date = <span class="keyword">new</span> Date();</span><br><span class="line">SimpleDateFormat sdf = <span class="keyword">new</span> SimpleDateFormat(<span class="string">&quot;yyyy-MM-dd HH:mm:ss&quot;</span>);</span><br><span class="line">System.out.println(sdf.format(date));</span><br></pre></td></tr></table></figure></li>
-<li></li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/12/08/java/java%E9%AB%98%E7%BA%A7/new-equll==/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="十二峒">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/12/08/java/java%E9%AB%98%E7%BA%A7/new-equll==/" class="post-title-link" itemprop="url">java_equals_==_new</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-12-08 18:05:22" itemprop="dateCreated datePublished" datetime="2021-12-08T18:05:22+08:00">2021-12-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-12-12 00:58:22" itemprop="dateModified" datetime="2021-12-12T00:58:22+08:00">2021-12-12</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java%E9%AB%98%E7%BA%A7/" itemprop="url" rel="index"><span itemprop="name">java高级</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2021/12/08/java/java%E9%AB%98%E7%BA%A7/new-equll==/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2021/12/08/java/java%E9%AB%98%E7%BA%A7/new-equll==/" class="cy_cmt_count" data-xid="2021/12/08/java/java高级/new-equll==/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>451</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="equals和"><a href="#equals和" class="headerlink" title="equals和=="></a>equals和==</h3><ol>
-<li>==<ul>
-<li>对于基本类型，==号比较的是是值相等</li>
-<li>对于引用类型比较的就是是否为同一个对象: id</li>
-</ul>
-</li>
-<li>equals: 自己定义的等比较,<font color="red">一般先确定是否为同一个对象，就是＝＝，然后判断是否为同一个类</font>，然后判断细节<ol>
-<li>String <ol>
-<li>先判断是否为同类</li>
-<li>每个index的值都相等</li>
-</ol>
-</li>
-<li>Integer<ol>
-<li>先判断是否为同类</li>
-<li>比较value</li>
-</ol>
-</li>
-<li></li>
-</ol>
-</li>
-</ol>
-<h3 id="hashcode"><a href="#hashcode" class="headerlink" title="hashcode"></a>hashcode</h3><ol>
-<li>String：每个Σ value*2^index</li>
-<li>Integer long byte：  都是返回值本身</li>
-<li>Object：native方法，根据地址计算得到的</li>
-</ol>
-<h4 id="获得地址"><a href="#获得地址" class="headerlink" title="获得地址"></a>获得地址</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">System.identityHashCode(a);</span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="Integer"><a href="#Integer" class="headerlink" title="Integer"></a>Integer</h3><ol>
-<li>Integer a=1,b=1,new c=1则永远有 a==b,a.equals(b),因为<font color="red">==号基本类型比较的是值</font></li>
-<li>但是他们的地址不一样</li>
-<li>new创建的方式地址永远不一样</li>
-<li>常量池问题<ol>
-<li>Integer a=1; 其实是Integer.valueOf(1)的简化。</li>
-<li>Integer.valueOf(1)会从Integer(-128,127)中选出1</li>
-<li>这样他们其实是同一个对象，地址也一样</li>
-</ol>
-</li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/12/08/java/java%E9%AB%98%E7%BA%A7/%E5%A4%9A%E7%BA%BF%E7%A8%8B/JUC/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="十二峒">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/12/08/java/java%E9%AB%98%E7%BA%A7/%E5%A4%9A%E7%BA%BF%E7%A8%8B/JUC/" class="post-title-link" itemprop="url">JUC</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-12-08 09:41:17" itemprop="dateCreated datePublished" datetime="2021-12-08T09:41:17+08:00">2021-12-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-12-13 11:59:21" itemprop="dateModified" datetime="2021-12-13T11:59:21+08:00">2021-12-13</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java%E9%AB%98%E7%BA%A7/" itemprop="url" rel="index"><span itemprop="name">java高级</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2021/12/08/java/java%E9%AB%98%E7%BA%A7/%E5%A4%9A%E7%BA%BF%E7%A8%8B/JUC/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2021/12/08/java/java%E9%AB%98%E7%BA%A7/%E5%A4%9A%E7%BA%BF%E7%A8%8B/JUC/" class="cy_cmt_count" data-xid="2021/12/08/java/java高级/多线程/JUC/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>833</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <ol>
-<li>PraperStatment的优点</li>
-<li>线程和进程概念<ol>
-<li>进程与线程<ol>
-<li>进程是分配资源的基本单元，运行的一个程序</li>
-<li>线程是cpu调度的基本单元，程序执行的基本单位</li>
-</ol>
-</li>
-<li>线程的状态<ol>
-<li>新建</li>
-<li>就绪</li>
-<li>等待</li>
-<li>运行</li>
-<li>死亡</li>
-</ol>
-</li>
-<li>wati和sleep<ol>
-<li>Object.wait<ol>
-<li>释放锁</li>
-</ol>
-</li>
-<li>Thread.sleep<ol>
-<li>不释放当前锁</li>
-</ol>
-</li>
-</ol>
-</li>
-<li>并发和并行<ol>
-<li>串行：排队执行</li>
-<li>并行：一并执行</li>
-<li>并发：一个cpu表面上运行多个线程</li>
-<li>并行：多个cpu</li>
-</ol>
-</li>
-</ol>
-</li>
-<li>Lock<ol>
-<li>synchronize，同步锁<ol>
-<li>修饰代码块<ol>
-<li>作用于对象是调用这个代码块的对象</li>
-</ol>
-</li>
-<li>修饰方法<ol>
-<li>被修饰的方法称为同步方法，其</li>
-<li>作用的对象是调用这个方法的对象； </li>
-</ol>
-</li>
-<li>修饰静态方法<ol>
-<li>作用的对象是这个类的所有对象</li>
-</ol>
-</li>
-<li>修饰类<ol>
-<li>作用主的对象是这个类的所有对象</li>
-</ol>
-</li>
-</ol>
-</li>
-<li>lock和synchronized区别<ol>
-<li>lock可获得更广泛的锁</li>
-<li>lock是类，不是java内置</li>
-<li>lock是手动锁，synchronized是自动锁</li>
-<li>synchronized发生异常或者结束会自动释放，而lock发生了异常会一直占用锁</li>
-<li>lock可以判断是否得到了锁</li>
-<li>lock可以在竞争激烈的情况下提高效率</li>
-</ol>
-</li>
-</ol>
-</li>
-<li>管程:<ol>
-<li>Monitor、监视器、锁</li>
-<li>同步机制，保证只有一个线程能访问资源</li>
-<li></li>
-</ol>
-</li>
-<li>用户线程和守护线程<ol>
-<li>用户线程：普通的线程，main结束了，用户线程还会继续运行</li>
-<li>守护线程：后台默默运行的线程 isDaemon，main结束，收回线程会结束</li>
-</ol>
-</li>
-<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/134235964">Java Thread的start和run方法的区别</a><ol>
-<li>start()会导致run()方法被调用</li>
-<li>run()方法中的内容称为线程体，它就是这个线程需要执行的工作。<br>用start()来启动线程，实现了真正意义上的启动线程，此时会出现<strong>异步执行</strong>的效果，即在线程的创建和启动中所述的随机性。 而如果使用<strong>run()来启动线程</strong>，就不是异步执行了，而是<strong>同步执行</strong>，不会达到使用线程的意义</li>
-</ol>
-</li>
-</ol>
-<h3 id="多线程编程步骤"><a href="#多线程编程步骤" class="headerlink" title="多线程编程步骤"></a>多线程编程步骤</h3><ol>
-<li>创建资源类</li>
-<li>资源类的消费和供给方法<ol>
-<li>判断<ol>
-<li>否：wait等待其他线程的natify</li>
-<li>是：干活<ol>
-<li>通知</li>
-</ol>
-</li>
-</ol>
-</li>
-</ol>
-</li>
-<li>创建线程，调用消费、共给方法</li>
-</ol>
-<h2 id="线程间通信"><a href="#线程间通信" class="headerlink" title="线程间通信"></a>线程间通信</h2><h3 id="线程间定制化通信"><a href="#线程间定制化通信" class="headerlink" title="线程间定制化通信"></a>线程间定制化通信</h3><ol>
-<li>标志位</li>
-</ol>
-<h3 id="特殊"><a href="#特殊" class="headerlink" title="特殊"></a>特殊</h3><ol>
-<li>wait 需要用while循环放置虚假唤醒</li>
-</ol>
-<h3 id="疑惑"><a href="#疑惑" class="headerlink" title="疑惑"></a>疑惑</h3><ol>
-<li>lock原理</li>
-<li>wait</li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/33/">33</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/34/">34</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1013,14 +1045,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">163</span>
+          <span class="site-state-item-count">167</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-count">32</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>
@@ -1064,12 +1096,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">206k</span>
+    <span title="站点总字数">210k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">3:07</span>
+    <span title="站点阅读时长">3:11</span>
 </div>
 
         
