@@ -22,19 +22,21 @@
     var CONFIG = {"hostname":"wang-yonggan.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":true,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="第一天 2021-10-7 雨 公交一个小时到亚太商谷，20分钟才找到7栋，这个通勤暂时不适应，但我想我会喜欢这种在公交车上一个小时的感觉。 下午 15:30。 公司像是个外包公司，三间房子，一个员工工作空间，一个办公室，一个会议室。很像重邮信科楼研究生实验室。 BOSS是个10届校友，5-6个同事年龄大概25岁(20-30岁很难分辨)。 先是交流了一个小时，说了很多，关键就是要完成任务，没有考试">
+  <meta name="description" content="[toc]  痛点-转载 但是随着CPU技术的发展，CPU的执行速度越来越快。而由于内存的技术并没有太大的变化，所以从内存中读取和写入数据的过程和CPU的执行速度比起来差距就会越来越大,这就导致CPU每次操作内存都要耗费很多等待时间。  所以，人们想出来了一个好的办法，就是在CPU和内存之间增加高速缓存。缓存的概念大家都知道，就是保存一份数据拷贝。他的特点是速度快，内存小，并且昂贵。  当程序在运">
 <meta property="og:type" content="article">
-<meta property="og:title" content="实习日记">
-<meta property="og:url" content="https://wang-yonggan.github.io/2021/10/07/other/unpub/%E5%AE%9E%E4%B9%A0%E6%97%A5%E8%AE%B0/index.html">
+<meta property="og:title" content="java内存模型">
+<meta property="og:url" content="https://wang-yonggan.github.io/2021/12/14/java/java%E9%AB%98%E7%BA%A7/jvm/java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/index.html">
 <meta property="og:site_name" content="十二峒">
-<meta property="og:description" content="第一天 2021-10-7 雨 公交一个小时到亚太商谷，20分钟才找到7栋，这个通勤暂时不适应，但我想我会喜欢这种在公交车上一个小时的感觉。 下午 15:30。 公司像是个外包公司，三间房子，一个员工工作空间，一个办公室，一个会议室。很像重邮信科楼研究生实验室。 BOSS是个10届校友，5-6个同事年龄大概25岁(20-30岁很难分辨)。 先是交流了一个小时，说了很多，关键就是要完成任务，没有考试">
+<meta property="og:description" content="[toc]  痛点-转载 但是随着CPU技术的发展，CPU的执行速度越来越快。而由于内存的技术并没有太大的变化，所以从内存中读取和写入数据的过程和CPU的执行速度比起来差距就会越来越大,这就导致CPU每次操作内存都要耗费很多等待时间。  所以，人们想出来了一个好的办法，就是在CPU和内存之间增加高速缓存。缓存的概念大家都知道，就是保存一份数据拷贝。他的特点是速度快，内存小，并且昂贵。  当程序在运">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2021-10-07T13:57:25.000Z">
-<meta property="article:modified_time" content="2021-10-07T14:19:16.855Z">
+<meta property="og:image" content="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211214014833316.png">
+<meta property="article:published_time" content="2021-12-13T17:42:27.000Z">
+<meta property="article:modified_time" content="2021-12-14T04:15:42.857Z">
 <meta property="article:author" content="勇敢">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211214014833316.png">
 
-<link rel="canonical" href="https://wang-yonggan.github.io/2021/10/07/other/unpub/%E5%AE%9E%E4%B9%A0%E6%97%A5%E8%AE%B0/">
+<link rel="canonical" href="https://wang-yonggan.github.io/2021/12/14/java/java%E9%AB%98%E7%BA%A7/jvm/java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/">
 
 
 <script id="page-configurations">
@@ -47,7 +49,7 @@
   };
 </script>
 
-  <title>实习日记 | 十二峒</title>
+  <title>java内存模型 | 十二峒</title>
   
 
 
@@ -190,7 +192,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/10/07/other/unpub/%E5%AE%9E%E4%B9%A0%E6%97%A5%E8%AE%B0/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/12/14/java/java%E9%AB%98%E7%BA%A7/jvm/java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t.png">
@@ -203,7 +205,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          实习日记
+          java内存模型
         </h1>
 
         <div class="post-meta">
@@ -214,7 +216,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2021-10-07 21:57:25 / 修改时间：22:19:16" itemprop="dateCreated datePublished" datetime="2021-10-07T21:57:25+08:00">2021-10-07</time>
+              <time title="创建时间：2021-12-14 01:42:27 / 修改时间：12:15:42" itemprop="dateCreated datePublished" datetime="2021-12-14T01:42:27+08:00">2021-12-14</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -222,7 +224,11 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%97%A5%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">日记</span></a>
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/jvm/" itemprop="url" rel="index"><span itemprop="name">jvm</span></a>
                 </span>
             </span>
 
@@ -236,8 +242,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2021/10/07/other/unpub/%E5%AE%9E%E4%B9%A0%E6%97%A5%E8%AE%B0/#SOHUCS" itemprop="discussionUrl">
-        <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="2021/10/07/other/unpub/实习日记/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2021/12/14/java/java%E9%AB%98%E7%BA%A7/jvm/java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/#SOHUCS" itemprop="discussionUrl">
+        <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="2021/12/14/java/java高级/jvm/java内存模型/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -248,7 +254,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>454</span>
+              <span>557</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -267,26 +273,22 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h3 id="第一天"><a href="#第一天" class="headerlink" title="第一天"></a>第一天</h3><ol>
-<li>2021-10-7 雨</li>
-<li>公交一个小时到亚太商谷，20分钟才找到7栋，这个通勤暂时不适应，但我想我会喜欢这种在公交车上一个小时的感觉。</li>
-<li>下午 15:30。</li>
-<li>公司像是个外包公司，三间房子，一个员工工作空间，一个办公室，一个会议室。很像重邮信科楼研究生实验室。</li>
-<li>BOSS是个10届校友，5-6个同事年龄大概25岁(20-30岁很难分辨)。</li>
-<li>先是交流了一个小时，说了很多，关键就是要完成任务，没有考试，这也不算是面试。</li>
-<li>讲了项目现状和需求，发现这些项目都很像，应该都是从一个开放版本修改得来的。</li>
-<li>需求是数据字典操作—&gt;数据库</li>
-<li>拉进code.aliyun.com项目组，连接git，拿到项目代码</li>
-<li>讲了怎么调试代码，增加需求。</li>
-<li>当时感觉很简单，但是，但是，我现在的困难就是，里面有很多@interface @configruaion我都不认识，这个项目怎么启动，数据库怎么连接我想我一时半会是解决不了的。</li>
-<li>今天掉了很多头发，明显的可怕。</li>
-<li>需求的解决<ol>
-<li>打算不启动项目，先硬写一个，明天交接任务再设定接口。<ol>
-<li>或者启动了，因为我发现有swagger</li>
-</ol>
+        <p>[toc]</p>
+<ol>
+<li><p><a target="_blank" rel="noopener" href="https://www.hollischuang.com/archives/2550">痛点-转载</a></p>
+<p>但是随着CPU技术的发展，CPU的执行速度越来越快。而由于内存的技术并没有太大的变化，所以从内存中读取和写入数据的过程和CPU的执行速度比起来差距就会越来越大,这就导致CPU每次操作内存都要耗费很多等待时间。</p>
 </li>
-<li></li>
-</ol>
+<li><p>所以，人们想出来了一个好的办法，就是在CPU和内存之间增加高速缓存。缓存的概念大家都知道，就是保存一份数据拷贝。他的特点是速度快，内存小，并且昂贵。</p>
+</li>
+<li><p><strong>当程序在运行过程中，会将运算需要的数据从主存复制一份到CPU的高速缓存当中，那么CPU进行计算时就可以直接从它的高速缓存读取数据和向其中写入数据，当运算结束之后，再将高速缓存中的数据刷新到主存当中。</strong></p>
+</li>
+<li><p>而随着CPU能力的不断提升，一层缓存就慢慢的无法满足要求了，就逐渐的衍生出多级缓存。</p>
+<p>按照数据读取顺序和与CPU结合的紧密程度，CPU缓存可以分为一级缓存（L1），二级缓存（L3），部分高端CPU还具有三级缓存（L3），每一级缓存中所储存的全部数据都是下一级缓存的一部分</p>
+</li>
+<li><p><strong>当CPU要读取一个数据时，首先从一级缓存中查找，如果没有找到再从二级缓存中查找，如果还是没有就从三级缓存或内存中查找。</strong></p>
+</li>
+<li><p>单核CPU只含有一套L1，L2，L3缓存；如果CPU含有多个核心，即多核CPU，则每个核心都含有一套L1（甚至和L2）缓存，而共享L3（或者和L2）缓存。</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211214014833316.png" alt="image-20211214014833316"></p>
 </li>
 </ol>
 
@@ -304,12 +306,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2021/10/07/utils/maven/" rel="prev" title="maven的使用">
-      <i class="fa fa-chevron-left"></i> maven的使用
+    <a href="/2021/12/14/java/java%E9%AB%98%E7%BA%A7/%E5%A4%9A%E7%BA%BF%E7%A8%8B/%E5%85%B3%E9%94%AE%E5%AD%97%E7%90%86%E8%A7%A3/" rel="prev" title="java多线程关键字理解">
+      <i class="fa fa-chevron-left"></i> java多线程关键字理解
     </a></div>
       <div class="post-nav-item">
-    <a href="/2021/10/07/other/project/Restful/" rel="next" title="restful">
-      restful <i class="fa fa-chevron-right"></i>
+    <a href="/2021/12/14/java/java%E9%AB%98%E7%BA%A7/jvm/%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B2/" rel="next" title="JVM内存模型">
+      JVM内存模型 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -374,7 +376,6 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E5%A4%A9"><span class="nav-number">1.</span> <span class="nav-text">第一天</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
