@@ -187,7 +187,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/11/25/%E7%AE%97%E6%B3%95/%E5%90%AF%E5%8F%91%E5%BC%8F%E6%90%9C%E7%B4%A2/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/12/04/spring/%E6%B3%A8%E8%A7%A3/spring%E6%B3%A8%E8%A7%A32/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -201,7 +201,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/11/25/%E7%AE%97%E6%B3%95/%E5%90%AF%E5%8F%91%E5%BC%8F%E6%90%9C%E7%B4%A2/" class="post-title-link" itemprop="url">启发式搜索</a>
+            <a href="/2021/12/04/spring/%E6%B3%A8%E8%A7%A3/spring%E6%B3%A8%E8%A7%A32/" class="post-title-link" itemprop="url">spring注解2</a>
         </h2>
 
         <div class="post-meta">
@@ -210,17 +210,23 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2021-11-25 01:06:58 / 修改时间：20:58:53" itemprop="dateCreated datePublished" datetime="2021-11-25T01:06:58+08:00">2021-11-25</time>
+              <time title="创建时间：2021-12-04 13:52:36" itemprop="dateCreated datePublished" datetime="2021-12-04T13:52:36+08:00">2021-12-04</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-12-05 20:31:08" itemprop="dateModified" datetime="2021-12-05T20:31:08+08:00">2021-12-05</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
                 </span>
             </span>
 
@@ -234,8 +240,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2021/11/25/%E7%AE%97%E6%B3%95/%E5%90%AF%E5%8F%91%E5%BC%8F%E6%90%9C%E7%B4%A2/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2021/11/25/%E7%AE%97%E6%B3%95/%E5%90%AF%E5%8F%91%E5%BC%8F%E6%90%9C%E7%B4%A2/" class="cy_cmt_count" data-xid="2021/11/25/算法/启发式搜索/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2021/12/04/spring/%E6%B3%A8%E8%A7%A3/spring%E6%B3%A8%E8%A7%A32/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2021/12/04/spring/%E6%B3%A8%E8%A7%A3/spring%E6%B3%A8%E8%A7%A32/" class="cy_cmt_count" data-xid="2021/12/04/spring/注解/spring注解2/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -246,7 +252,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>25</span>
+              <span>872</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -265,9 +271,53 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h3><ol>
-<li>数组的话先把n=len确定了</li>
-<li>递归一定要有Dep</li>
+          <p>[toc]</p>
+<h2 id="一、Spring缓存"><a href="#一、Spring缓存" class="headerlink" title="一、Spring缓存"></a>一、Spring缓存</h2><h3 id="1-1-注意"><a href="#1-1-注意" class="headerlink" title="1.1 注意"></a>1.1 注意</h3><ol>
+<li>前提<ul>
+<li>entity要implements Serializable </li>
+<li>连接redis</li>
+</ul>
+</li>
+<li>就算数据库没查到，方法返回Null，也会存入数据库null</li>
+</ol>
+<h3 id="1-2-CacheConfig"><a href="#1-2-CacheConfig" class="headerlink" title="1.2 @CacheConfig"></a>1.2 @CacheConfig</h3><p>类级别注解，设置全局cacheName，如果方法已经设置了value，那么这个值就会被忽略.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@CacheConfig(cacheNames = &quot;studenta&quot;)</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="1-3-Cacheable"><a href="#1-3-Cacheable" class="headerlink" title="1.3 @Cacheable"></a>1.3 @Cacheable</h3><p>每次操作这个函数，设置k=value::key，</p>
+<ul>
+<li><font color="red">查找redis有没有这个key，如果有，那么直接返回</font></li>
+<li>如果没有，mysql查询得到，然后向redis插入（k：放回值）</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Cacheable(cacheNames = &quot;studentb&quot;,key = &quot;#p0&quot;)</span><span class="comment">//cacheNames和value是等价的</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="1-4-CachePut"><a href="#1-4-CachePut" class="headerlink" title="1.4 @CachePut"></a>1.4 @CachePut</h3><p>每次操作这个函数，设置k=value::key，然后去redis查找又没有k,有的话就把（k:原来的v），换成（k:<font color="red">返回的值</font>）</p>
+<h3 id="1-5-ChacheEvict"><a href="#1-5-ChacheEvict" class="headerlink" title="1.5 @ChacheEvict"></a>1.5 @ChacheEvict</h3><p>每次操作这个函数，设置k=value::key，然后去redis查找又没有k，有的话就把这个数据删掉</p>
+<h3 id="1-6-缓存参数"><a href="#1-6-缓存参数" class="headerlink" title="1.6 缓存参数"></a>1.6 缓存参数</h3><ol>
+<li>value = “studentc”   设置k前缀</li>
+<li>cacheName 等价于value</li>
+<li> key = “#p0”   设置k后缀  前后缀用::分割  </li>
+<li>这是个el表达式</li>
+<li>#p0表示参数</li>
+<li> “#p0.id” 第一个参数的id</li>
+<li>condition=”el”<ol>
+<li>#student.id&gt;100 表示参数student的id大于100才进行缓存操作             </li>
+</ol>
+</li>
+<li> allEntries = true</li>
+<li>sync异步</li>
+</ol>
+<h2 id="二、Bean"><a href="#二、Bean" class="headerlink" title="二、Bean"></a>二、Bean</h2><h3 id="Scope-Bean作用域"><a href="#Scope-Bean作用域" class="headerlink" title="@Scope Bean作用域"></a>@Scope Bean作用域</h3><p>@Scope(value=”prototype”) 多例   默认单例</p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><h3 id="1-事务"><a href="#1-事务" class="headerlink" title="1. 事务"></a>1. 事务</h3><p>@Transactional</p>
+<blockquote>
+<p>方法/类级别，报错会撤回所有操作</p>
+</blockquote>
+<p>原理: <a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_20597727/article/details/84868035">https://blog.csdn.net/qq_20597727/article/details/84868035</a></p>
+<ol start="2">
+<li>发现：<ol>
+<li>只对mysql有事务回滚</li>
+<li>所有猜想是基于mysql的log回滚</li>
+</ol>
+</li>
 </ol>
 
       
@@ -288,7 +338,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/11/23/utils/python/python%E6%93%8D%E4%BD%9C%E6%95%B0%E6%8D%AE%E5%BA%93/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/12/04/spring/Spring%E5%85%B6%E4%BB%96/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -302,7 +352,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/11/23/utils/python/python%E6%93%8D%E4%BD%9C%E6%95%B0%E6%8D%AE%E5%BA%93/" class="post-title-link" itemprop="url">python操作数据库</a>
+            <a href="/2021/12/04/spring/Spring%E5%85%B6%E4%BB%96/" class="post-title-link" itemprop="url">Spring其他</a>
         </h2>
 
         <div class="post-meta">
@@ -311,17 +361,23 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2021-11-23 20:01:31 / 修改时间：21:19:04" itemprop="dateCreated datePublished" datetime="2021-11-23T20:01:31+08:00">2021-11-23</time>
+              <time title="创建时间：2021-12-04 01:04:40" itemprop="dateCreated datePublished" datetime="2021-12-04T01:04:40+08:00">2021-12-04</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-12-20 18:55:42" itemprop="dateModified" datetime="2021-12-20T18:55:42+08:00">2021-12-20</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/utils/" itemprop="url" rel="index"><span itemprop="name">utils</span></a>
+                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
                 </span>
             </span>
 
@@ -335,8 +391,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2021/11/23/utils/python/python%E6%93%8D%E4%BD%9C%E6%95%B0%E6%8D%AE%E5%BA%93/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2021/11/23/utils/python/python%E6%93%8D%E4%BD%9C%E6%95%B0%E6%8D%AE%E5%BA%93/" class="cy_cmt_count" data-xid="2021/11/23/utils/python/python操作数据库/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2021/12/04/spring/Spring%E5%85%B6%E4%BB%96/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2021/12/04/spring/Spring%E5%85%B6%E4%BB%96/" class="cy_cmt_count" data-xid="2021/12/04/spring/Spring其他/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -347,7 +403,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>863</span>
+              <span>285</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -366,19 +422,11 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h3><h3 id="连接"><a href="#连接" class="headerlink" title="连接"></a>连接</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># !pip install pymssql</span></span><br><span class="line"><span class="keyword">import</span> pymysql</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line">conn = pymysql.connect(host=<span class="string">&#x27;localhost&#x27;</span>, user=<span class="string">&#x27;root&#x27;</span>, password=<span class="string">&#x27;root&#x27;</span>, port=<span class="number">3306</span>, db=<span class="string">&#x27;py&#x27;</span>)</span><br><span class="line">cursor = conn.cursor()</span><br><span class="line"><span class="keyword">if</span> (cursor.execute(<span class="string">&#x27;select version()&#x27;</span>)):</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&#x27;数据库连接成功，版本号为：&#x27;</span>, cursor.fetchone())</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&#x27;数据库连接失败&#x27;</span>)</span><br><span class="line">c= conn.cursor()  <span class="comment"># 获取游标 </span></span><br></pre></td></tr></table></figure>
-
-<h3 id="查询"><a href="#查询" class="headerlink" title="查询"></a>查询</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">studentIter=c.execute(<span class="string">&quot;select * from students&quot;</span>)<span class="comment"># 查询  获得迭代器</span></span><br><span class="line">cursor.fetchmany(<span class="number">2</span>)  <span class="comment"># 获取2个</span></span><br><span class="line">cursor.fetchall()  <span class="comment">#  获取全部</span></span><br><span class="line">cursor.fetchone() <span class="comment"># 获取一个</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="插入"><a href="#插入" class="headerlink" title="插入"></a>插入</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sql2 = <span class="string">&#x27;&#x27;&#x27;insert into students values(1,&#x27;Tom&#x27;,20)&#x27;&#x27;&#x27;</span></span><br><span class="line">c.execute(sql2)</span><br><span class="line">conn.commit()  <span class="comment">#提交</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="占位符"><a href="#占位符" class="headerlink" title="占位符"></a>占位符</h3><ol>
-<li><p>%s + %</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sql = <span class="string">&quot;select count(*) from record where createtime&gt;&#x27;%s&#x27; and createtime&lt;&#x27;%s&#x27; and payStatus=&#x27;2&#x27;;&quot;</span> %(timeStart, timeEnd)</span><br></pre></td></tr></table></figure></li>
-<li><p>%s + args</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cursor.execute(<span class="string">&quot;insert into user values(%s, %s, %s)&quot;</span>,(<span class="number">1</span>,<span class="number">80</span>,<span class="string">&quot;zhang&quot;</span>))</span><br></pre></td></tr></table></figure></li>
+          <ol>
+<li><p>获得当先线程的request对象</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> HttpServletRequreest <span class="title">getHttpServletRequest</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest();</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//因为RequestAttributes对象在RequestContextHolder中是与线程对应的，每次请求都会产生一个新的，所有该方法能在任意地方获得线程的r</span></span><br></pre></td></tr></table></figure></li>
 </ol>
-<h3 id="中文问题"><a href="#中文问题" class="headerlink" title="中文问题"></a>中文问题</h3>
+
       
     </div>
 
@@ -397,7 +445,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/11/23/javaWeb/%E5%9B%9B%E5%A4%A7%E5%9F%9F%E5%AF%B9%E8%B1%A1/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/12/03/javaWeb/JavaWeb%E5%88%9B%E5%BB%BA/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -411,7 +459,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/11/23/javaWeb/%E5%9B%9B%E5%A4%A7%E5%9F%9F%E5%AF%B9%E8%B1%A1/" class="post-title-link" itemprop="url">java四大域对象</a>
+            <a href="/2021/12/03/javaWeb/JavaWeb%E5%88%9B%E5%BB%BA/" class="post-title-link" itemprop="url">Idea的JavaWeb创建</a>
         </h2>
 
         <div class="post-meta">
@@ -422,7 +470,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2021-11-23 15:39:19 / 修改时间：15:39:43" itemprop="dateCreated datePublished" datetime="2021-11-23T15:39:19+08:00">2021-11-23</time>
+              <time title="创建时间：2021-12-03 16:31:17 / 修改时间：19:26:27" itemprop="dateCreated datePublished" datetime="2021-12-03T16:31:17+08:00">2021-12-03</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -444,8 +492,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2021/11/23/javaWeb/%E5%9B%9B%E5%A4%A7%E5%9F%9F%E5%AF%B9%E8%B1%A1/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2021/11/23/javaWeb/%E5%9B%9B%E5%A4%A7%E5%9F%9F%E5%AF%B9%E8%B1%A1/" class="cy_cmt_count" data-xid="2021/11/23/javaWeb/四大域对象/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2021/12/03/javaWeb/JavaWeb%E5%88%9B%E5%BB%BA/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2021/12/03/javaWeb/JavaWeb%E5%88%9B%E5%BB%BA/" class="cy_cmt_count" data-xid="2021/12/03/javaWeb/JavaWeb创建/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -456,14 +504,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>813</span>
+              <span>4.6k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
+              <span>4 分钟</span>
             </span>
 
         </div>
@@ -475,58 +523,56 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="java四大域对象-转载"><a href="#java四大域对象-转载" class="headerlink" title="java四大域对象-转载"></a><a target="_blank" rel="noopener" href="https://blog.csdn.net/u014253011/article/details/85718649">java四大域对象-转载</a></h3><ol>
-<li><p>request HttpServletContext </p>
-<ol>
-<li><p>生命周期：</p>
-<p>在Service方法调用前由服务器创建，传入service方法。整个请求结束，request生命结束。<br>用户发送一个请求，开始，服务器返回响应，请求结束，生命周期结束；</p>
+          <p>[toc]</p>
+<h3 id="发现"><a href="#发现" class="headerlink" title="发现"></a>发现</h3><ol>
+<li>Filter是单例的，hashcode都一样,并且这个进程和正在使用这个过滤器的Servlet的进程是一样的</li>
+<li>Servlet是多例的，每次访问都会创建一个新的</li>
+<li>Filter用注解的时候，不会</li>
+<li>JavaWeb会自动给每个访问添加cookie(“JSESSIONID”,”id”)</li>
+<li>response.addCookie(c)  setMaxAge(1000) 单位是s</li>
+<li>对于javaWeb或者springMvc的错误,可以参考运行旁边的 tomcat Localhost，tomcat catlina日志</li>
+<li>mvc运行失败可能是war包部署错误</li>
+</ol>
+<h3 id="基本创建"><a href="#基本创建" class="headerlink" title="基本创建"></a>基本创建</h3><ol>
+<li><p>Maven项目，从原型创建，选择</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">org.apache.maven.archetypes:maven-archetype-webapp</span><br></pre></td></tr></table></figure></li>
+<li><p>在main下创建源文件夹java，资源文件夹resources</p>
 </li>
-<li><p>作用范围：整个请求链（请求转发也存在）/一次请求转发的范围</p>
-</li>
-<li><p>作用：获取请求数据，共享数据，请求转发。</p>
+<li><p>重写WEB-INF/web.xml</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">web-app</span> <span class="attr">xmlns:xsi</span>=<span class="string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">xmlns</span>=<span class="string">&quot;http://java.sun.com/xml/ns/javaee&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">xsi:schemaLocation</span>=<span class="string">&quot;http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">version</span>=<span class="string">&quot;3.0&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">web-app</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>编辑运行配置，添加本地:tomcat&gt;8.0，部署:添加工件 war exploaded</p>
 </li>
 </ol>
-</li>
-<li><p>session HttpSession</p>
-<ol>
-<li><p>生命周期</p>
-<p>在第一次调用request.getSession()方法时，服务器会检查是否已经有对应的session，如果没有就在内存中创建一个session并返回。<br>（1）当一段时间内session没有被使用（默认为30分钟），则服务器会销毁该session。<br>（2）如果服务器非正常关闭，没有到期的session也会跟着销毁。<br>（3）如果调用session提供的invalidate()，可以立即销毁session。</p>
-</li>
-<li></li>
-</ol>
-</li>
-<li><p>application ServletContext</p>
-<ol>
-<li>生命周期：整个web服务</li>
-<li>作用范围：整个web应用</li>
-<li>作用：<ol>
-<li>读取配置文件</li>
-<li>在不同Servlet 之间转发</li>
-</ol>
+<h3 id="注解-WebServlet"><a href="#注解-WebServlet" class="headerlink" title="注解@WebServlet"></a>注解@WebServlet</h3><ol>
+<li><p>加入依赖 javax.servlet-api-4.0.1.jar</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>javax.servlet<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>javax.servlet-api<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>4.0.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>注意@WebServlet的url需要/</p>
 </li>
 </ol>
-</li>
-<li><p>page(jsp)   pageContext</p>
-<ol>
-<li>可以作为入口对象获取其他三大域对象的引用，获取其所有域中的数据</li>
-<li>作用于整个JSP页面，是四大作用域中最小的一个</li>
+<h3 id="过滤器"><a href="#过滤器" class="headerlink" title="过滤器"></a>过滤器</h3><ol>
+<li><p>class</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> filter;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> util.StringUtil;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.servlet.*;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServlet;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletRequest;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Author</span>: WangYongGan</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Date</span>: 2021/12/3 17:06</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Description</span>:</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyFilter1</span> <span class="keyword">implements</span> <span class="title">Filter</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">(FilterConfig filterConfig)</span> <span class="keyword">throws</span> ServletException </span>&#123;</span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">        <span class="comment">/** FilterConfig 方法</span></span><br><span class="line"><span class="comment">         * getFilterName</span></span><br><span class="line"><span class="comment">         * getServletContext</span></span><br><span class="line"><span class="comment">         * getInitParameter</span></span><br><span class="line"><span class="comment">         * getInitParameterNames</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doFilter</span><span class="params">(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)</span> <span class="keyword">throws</span> IOException, ServletException </span>&#123;</span><br><span class="line">        System.out.println(StringUtil.getLastName(getClass().getName())+<span class="string">&quot; id &quot;</span>+<span class="keyword">this</span>.hashCode());</span><br><span class="line">        System.out.println(servletRequest.getRemoteAddr());</span><br><span class="line">        HttpServletRequest request= (HttpServletRequest) servletRequest;</span><br><span class="line">        System.out.println(request.getServletPath());</span><br><span class="line">        System.out.println(request.getContextPath());</span><br><span class="line">        filterChain.doFilter(servletRequest,servletResponse);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>注册 注解: @WebFilter(“/*”)</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">filter</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">filter-name</span>&gt;</span>f1<span class="tag">&lt;/<span class="name">filter-name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">filter-class</span>&gt;</span>filter.MyFilter1<span class="tag">&lt;/<span class="name">filter-class</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">filter</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">filter-mapping</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">filter-name</span>&gt;</span>f1<span class="tag">&lt;/<span class="name">filter-name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>/*<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">filter-mapping</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
 </ol>
+<h3 id="Cookie"><a href="#Cookie" class="headerlink" title="Cookie"></a>Cookie</h3><h3 id="Session"><a href="#Session" class="headerlink" title="Session"></a>Session</h3><h2 id="MVC"><a href="#MVC" class="headerlink" title="MVC"></a>MVC</h2><h3 id="MVC创建"><a href="#MVC创建" class="headerlink" title="MVC创建"></a>MVC创建</h3><ol>
+<li><p>创建自定义配置maven工程</p>
 </li>
-<li><p>特点</p>
-<ol>
-<li>之所以他们是域对象，原因是他们都内置了map集合，都有setAttribute和getAttribute方法。</li>
-<li>都有生命周期，servlet{init,service,destory}也有生命周期。</li>
+<li><p>加入依赖</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>javax.servlet<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>javax.servlet-api<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>4.0.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-webmvc<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>5.3.10<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>配置web资源文件 </p>
+<ul>
+<li>项目结构-&gt;Facet 加号 web</li>
+<li>部署描述符 src/main/webapp/web.xml</li>
+<li>Web资源目录 src/main/webapp</li>
+</ul>
+</li>
+<li><p>web.xml配置文件</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">servlet</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>dispatchServlet<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">servlet-class</span>&gt;</span>org.springframework.web.servlet.DispatcherServlet<span class="tag">&lt;/<span class="name">servlet-class</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">init-param</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">param-name</span>&gt;</span>contextConfigLocation<span class="tag">&lt;/<span class="name">param-name</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">param-value</span>&gt;</span>classpath:spring.xml<span class="tag">&lt;/<span class="name">param-value</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">init-param</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;/<span class="name">servlet</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">servlet-mapping</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>dispatchServlet<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>/<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;/<span class="name">servlet-mapping</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>resources/spring.xml</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">&quot;http://www.springframework.org/schema/beans&quot;</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xmlns:xsi</span>=<span class="string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xmlns:context</span>=<span class="string">&quot;http://www.springframework.org/schema/context&quot;</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xmlns:mvc</span>=<span class="string">&quot;http://www.springframework.org/schema/mvc&quot;</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xsi:schemaLocation</span>=<span class="string">&quot;http://www.springframework.org/schema/beans</span></span></span><br><span class="line"><span class="string"><span class="tag">       http://www.springframework.org/schema/beans/spring-beans-4.2.xsd  http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd&quot;</span>&gt;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">context:component-scan</span> <span class="attr">base-package</span>=<span class="string">&quot;com.wyg.controller&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">context:component-scan</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">class</span>=<span class="string">&quot;org.springframework.web.servlet.view.InternalResourceViewResolver&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;prefix&quot;</span> <span class="attr">value</span>=<span class="string">&quot;/WEB-INF/view/&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">property</span>&gt;</span><span class="comment">&lt;!--一定要写对这个//--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;suffix&quot;</span> <span class="attr">value</span>=<span class="string">&quot;.jsp&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">bean</span>&gt;</span><span class="comment">&lt;!--视图解析器  自定义前缀 后缀--&gt;</span></span><br><span class="line">    <span class="comment">&lt;!--注解驱动--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">mvc:annotation-driven</span>&gt;</span><span class="tag">&lt;/<span class="name">mvc:annotation-driven</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!--静态资源  images/a.jpg   images/xx/a.jpg--&gt;</span></span><br><span class="line">    <span class="comment">&lt;!--mapping：访问路径    localtion：真实路径,第一个/是webapp根目录--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">mvc:resources</span> <span class="attr">mapping</span>=<span class="string">&quot;/images/**&quot;</span> <span class="attr">location</span>=<span class="string">&quot;/images/&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">mvc:resources</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
 </ol>
-</li>
-<li><p>如果一个数据只在当前jsp页面使用，可以使用pageContext域</p>
-<p>如果一个数据，除了在当前Servlet中使用，还要在请求转发中使用，使用request域</p>
-<p>如果一个数据，除了现在我自己要用，过一会我自己还要用，存在session域</p>
-<p>如果一个数据，除了我自己用其他人也要用，存在ServleContext域中</p>
-</li>
-<li><p>域对象：能够在自己的作用范围共享数据。</p>
-</li>
-</ol>
-
+<h3 id="注解驱动"><a href="#注解驱动" class="headerlink" title="注解驱动"></a>注解驱动</h3><h3 id="资源路径"><a href="#资源路径" class="headerlink" title="资源路径"></a>资源路径</h3>
       
     </div>
 
@@ -545,7 +591,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/11/23/%E7%AE%97%E6%B3%95/%E5%8F%8C%E6%8C%87%E9%92%88/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/12/02/408/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E6%A0%91/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -559,7 +605,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/11/23/%E7%AE%97%E6%B3%95/%E5%8F%8C%E6%8C%87%E9%92%88/" class="post-title-link" itemprop="url">双指针</a>
+            <a href="/2021/12/02/408/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E6%A0%91/" class="post-title-link" itemprop="url">树</a>
         </h2>
 
         <div class="post-meta">
@@ -568,16 +614,10 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2021-11-23 14:22:44" itemprop="dateCreated datePublished" datetime="2021-11-23T14:22:44+08:00">2021-11-23</time>
+              <time title="创建时间：2021-12-02 15:14:25 / 修改时间：15:14:58" itemprop="dateCreated datePublished" datetime="2021-12-02T15:14:25+08:00">2021-12-02</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-12-27 16:00:55" itemprop="dateModified" datetime="2021-12-27T16:00:55+08:00">2021-12-27</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -598,8 +638,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2021/11/23/%E7%AE%97%E6%B3%95/%E5%8F%8C%E6%8C%87%E9%92%88/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2021/11/23/%E7%AE%97%E6%B3%95/%E5%8F%8C%E6%8C%87%E9%92%88/" class="cy_cmt_count" data-xid="2021/11/23/算法/双指针/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2021/12/02/408/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E6%A0%91/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2021/12/02/408/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E6%A0%91/" class="cy_cmt_count" data-xid="2021/12/02/408/数据结构/树/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -610,7 +650,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>729</span>
+              <span>9</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -629,21 +669,9 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="注意点"><a href="#注意点" class="headerlink" title="注意点"></a>注意点</h3><ol>
-<li><p>变量1和1匹配</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">nums1[begin1] nums2[begin2]</span><br><span class="line">而不是nums2[begin1] nums1[begin2]</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h3 id="特殊"><a href="#特殊" class="headerlink" title="特殊"></a>特殊</h3><ol>
-<li><p>双遍历避免越界的处理</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//d</span></span><br><span class="line"><span class="keyword">while</span> ((begin1 + begin2) &lt; len / <span class="number">2</span> &amp;&amp; begin1 &lt; nums1.length || begin2 &lt; nums2.length) &#123;</span><br><span class="line">    <span class="keyword">if</span> (begin1 &lt; nums1.length &amp;&amp; begin2 &gt;= nums2.length || nums1[begin1] &lt; nums2[begin2]) &#123;</span><br><span class="line">        res = nums1[begin1];</span><br><span class="line">        begin1++;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        res = nums2[begin2];</span><br><span class="line">        begin2++;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p>偶数的处理</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">return</span> len % <span class="number">2</span> == <span class="number">0</span> ? <span class="number">1.0</span> * (next + res) / <span class="number">2</span> : next;<span class="comment">//第四题</span></span><br></pre></td></tr></table></figure></li>
-<li><p>正负处理</p>
-</li>
-<li><p>大数处理</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//29题  所有的中间值都是l </span></span><br><span class="line"><span class="keyword">long</span> d1 = dividend, d2 = divisor;</span><br><span class="line">        <span class="keyword">long</span> res = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> sign = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">if</span> ((d1 &gt; <span class="number">0</span> &amp;&amp; d2 &lt; <span class="number">0</span>) || (d1 &lt; <span class="number">0</span> &amp;&amp; d2 &gt; <span class="number">0</span>))</span><br><span class="line">            sign = -<span class="number">1</span>;</span><br><span class="line">        d1 = Math.abs(d1);</span><br><span class="line">        d2 = Math.abs(d2);</span><br><span class="line">        <span class="keyword">long</span> now = res;</span><br><span class="line">        <span class="keyword">while</span> (now + d2 &lt;= d1) &#123;</span><br><span class="line">            now += d2;</span><br><span class="line">            res++;</span><br><span class="line">        &#125;</span><br><span class="line"><span class="keyword">return</span> res&gt;Integer.MAX_VALUE?Integer.MAX_VALUE:(<span class="keyword">int</span>) (res * sign);</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h3 id="二分查找"><a href="#二分查找" class="headerlink" title="二分查找"></a>二分查找</h3><h4 id="爬坡法"><a href="#爬坡法" class="headerlink" title="爬坡法"></a>爬坡法</h4>
+          <p>[toc]</p>
+<h3 id="懒树"><a href="#懒树" class="headerlink" title="懒树"></a>懒树</h3><p>1. </p>
+
       
     </div>
 
@@ -662,7 +690,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/11/22/utils/python/python%E7%A5%9E%E6%8A%80/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/12/02/%E5%88%86%E5%B8%83%E5%BC%8F/docker/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -676,7 +704,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/11/22/utils/python/python%E7%A5%9E%E6%8A%80/" class="post-title-link" itemprop="url">python神技</a>
+            <a href="/2021/12/02/%E5%88%86%E5%B8%83%E5%BC%8F/docker/" class="post-title-link" itemprop="url">docker</a>
         </h2>
 
         <div class="post-meta">
@@ -687,20 +715,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2021-11-22 00:11:46 / 修改时间：00:14:06" itemprop="dateCreated datePublished" datetime="2021-11-22T00:11:46+08:00">2021-11-22</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/utils/" itemprop="url" rel="index"><span itemprop="name">utils</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/utils/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
-                </span>
+              <time title="创建时间：2021-12-02 01:42:24 / 修改时间：15:49:21" itemprop="dateCreated datePublished" datetime="2021-12-02T01:42:24+08:00">2021-12-02</time>
             </span>
 
           
@@ -713,8 +728,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2021/11/22/utils/python/python%E7%A5%9E%E6%8A%80/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2021/11/22/utils/python/python%E7%A5%9E%E6%8A%80/" class="cy_cmt_count" data-xid="2021/11/22/utils/python/python神技/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2021/12/02/%E5%88%86%E5%B8%83%E5%BC%8F/docker/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2021/12/02/%E5%88%86%E5%B8%83%E5%BC%8F/docker/" class="cy_cmt_count" data-xid="2021/12/02/分布式/docker/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -725,7 +740,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>81</span>
+              <span>1.2k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -744,9 +759,93 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <ol>
-<li><p>list(map(f,a))</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">list</span>(<span class="built_in">map</span>(<span class="keyword">lambda</span> x, y: x + y, [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>], [-<span class="number">1</span>, -<span class="number">2</span>, -<span class="number">3</span>, -<span class="number">4</span>, -<span class="number">5</span>]))</span><br><span class="line"><span class="comment"># [0, 0, 0, 0, 0]</span></span><br></pre></td></tr></table></figure></li>
+          <h3 id="docker本身"><a href="#docker本身" class="headerlink" title="docker本身"></a>docker本身</h3><ol>
+<li><p>启动</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl start docker </span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="镜像"><a href="#镜像" class="headerlink" title="镜像"></a>镜像</h3><ol>
+<li><p>查看镜像</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker images</span><br></pre></td></tr></table></figure></li>
+<li><p>查找镜像</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker search 镜像名称</span><br></pre></td></tr></table></figure></li>
+<li><p>从docker.hub拉取远程镜像</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull redis:<span class="number">3.4</span></span><br></pre></td></tr></table></figure></li>
+<li><p>删除镜像</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker rmi 镜像id / 删除指定本地镜像</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="远程仓库"><a href="#远程仓库" class="headerlink" title="远程仓库"></a>远程仓库</h3><h3 id="容器"><a href="#容器" class="headerlink" title="容器"></a>容器</h3><ol>
+<li><p>创建/启动容器</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker run -it --name=c1 redis:5 /bin/bash # -id创建不会直接进入，-it会进入，退出也会直接exit</span><br><span class="line">docker run -it -p 9000:8080 app # 用9000映射8080i</span><br></pre></td></tr></table></figure></li>
+<li><p>查看容器</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker ps # 查看正在运行的容器</span><br><span class="line">docker ps –a # 查看所有容器</span><br></pre></td></tr></table></figure></li>
+<li><p>进入容器</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker exec -it name /bin/bash</span><br></pre></td></tr></table></figure></li>
+<li><p>停止/启动</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker stop name</span><br><span class="line">docker start name</span><br></pre></td></tr></table></figure></li>
+<li><p>删除</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker -rm name</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="数据卷"><a href="#数据卷" class="headerlink" title="数据卷"></a>数据卷</h3><h4 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h4><ol>
+<li><p>数据卷是宿主机中的一个目录或文件</p>
+</li>
+<li><p>当容器目录和数据卷目录绑定后，对方的修改会立即同步</p>
+</li>
+<li><p>一个数据卷可以被多个容器同时挂载</p>
+</li>
+<li><p>一个容器也可以被挂载多个数据卷</p>
+</li>
+</ol>
+<h4 id="数据卷作用"><a href="#数据卷作用" class="headerlink" title="数据卷作用"></a>数据卷作用</h4><ol>
+<li>容器数据持久化</li>
+<li>外部机器和容器间通信</li>
+<li>容器之间通信</li>
+</ol>
+<h4 id="数据卷操作"><a href="#数据卷操作" class="headerlink" title="数据卷操作"></a>数据卷操作</h4><ol>
+<li><p>创建数据卷 /v</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -it --name=c1 –v ~/java:/root/test imageName  </span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>目录必须是绝对路径</li>
+<li> 如果目录不存在，会自动创建</li>
+<li>可以挂载多个数据卷 </li>
+</ol>
+</li>
+</ol>
+<h4 id="数据卷容器"><a href="#数据卷容器" class="headerlink" title="数据卷容器"></a>数据卷容器</h4><ol>
+<li><p>创建数据卷容器 -v /volume</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run –it --name=c3 –v /volume centos:<span class="number">7</span> /bin/bash </span><br></pre></td></tr></table></figure></li>
+<li><p>创建容器并挂载   –volumes-from c3</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker run –it --name=c1 --volumes-from c3 centos:<span class="number">7</span> /bin/bash</span><br><span class="line">docker run –it --name=c2 --volumes-from c3 centos:<span class="number">7</span> /bin/bash  </span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="docker安装软件"><a href="#docker安装软件" class="headerlink" title="docker安装软件"></a>docker安装软件</h3><h4 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h4><ol>
+<li><p>搜索镜像</p>
+<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">docker search mysql</span></span><br></pre></td></tr></table></figure></li>
+<li><p>拉取镜像</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">docker</span> pull mysql:<span class="number">5</span>.<span class="number">7</span></span><br></pre></td></tr></table></figure></li>
+<li><p>创建容器</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mkdir mysql</span><br><span class="line">cd mysql</span><br><span class="line">docker run -id -p 3307:3306 -v $PWD/conf:/etc/mysql/conf.d -v $PWD/logs:/logs \</span><br><span class="line">-v $PWD/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=root mysql:5.7</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h4 id="mysql"><a href="#mysql" class="headerlink" title="mysql"></a>mysql</h4><h4 id="redis"><a href="#redis" class="headerlink" title="redis"></a>redis</h4><h4 id="nginx"><a href="#nginx" class="headerlink" title="nginx"></a>nginx</h4><h3 id="dockerFile–-gt-指令文件"><a href="#dockerFile–-gt-指令文件" class="headerlink" title="dockerFile–&gt;指令文件"></a>dockerFile–&gt;指令文件</h3><ol>
+<li><p>dockerfile语法</p>
+</li>
+<li><p>dickerfile 构建镜像</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker build -f app.jar -t appName:version</span><br><span class="line"># -f 指定df路径  -t指定新的镜像的名字和版本</span><br></pre></td></tr></table></figure></li>
+<li><p>镜像启动（创建容器）</p>
+</li>
+</ol>
+<h3 id="docker-compose-服务编排"><a href="#docker-compose-服务编排" class="headerlink" title="docker compose 服务编排"></a>docker compose 服务编排</h3><blockquote>
+<p>按照一定规则批量管理容器</p>
+<p>比如 定义启动顺序，</p>
+</blockquote>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><ol>
+<li><p>容器转换成镜像</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker commit id name:version</span><br></pre></td></tr></table></figure></li>
+<li><p>压缩</p>
+<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">docker</span> </span><br></pre></td></tr></table></figure></li>
+</ol>
+<h4 id="docker镜像原理"><a href="#docker镜像原理" class="headerlink" title="docker镜像原理"></a>docker镜像原理</h4><ol>
+<li>docker镜像其实是一个文件层次系统</li>
+<li></li>
 </ol>
 
       
@@ -766,7 +865,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/14/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/">14</a><span class="page-number current">15</span><a class="page-number" href="/page/16/">16</a><span class="space">&hellip;</span><a class="page-number" href="/page/40/">40</a><a class="extend next" rel="next" href="/page/16/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/14/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/">14</a><span class="page-number current">15</span><a class="page-number" href="/page/16/">16</a><span class="space">&hellip;</span><a class="page-number" href="/page/42/">42</a><a class="extend next" rel="next" href="/page/16/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -834,14 +933,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">199</span>
+          <span class="site-state-item-count">209</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-count">35</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>
@@ -885,12 +984,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">236k</span>
+    <span title="站点总字数">242k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">3:34</span>
+    <span title="站点阅读时长">3:40</span>
 </div>
 
         

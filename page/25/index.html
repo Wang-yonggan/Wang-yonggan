@@ -187,7 +187,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/11/04/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/hashcode%E7%9A%84%E5%88%86%E6%9E%90/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/11/05/spring/spring%E6%8E%A5%E5%8F%A3/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -201,7 +201,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/11/04/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/hashcode%E7%9A%84%E5%88%86%E6%9E%90/" class="post-title-link" itemprop="url">hashcode分析</a>
+            <a href="/2021/11/05/spring/spring%E6%8E%A5%E5%8F%A3/" class="post-title-link" itemprop="url">未命名</a>
         </h2>
 
         <div class="post-meta">
@@ -211,24 +211,15 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2021-11-04 12:31:54" itemprop="dateCreated datePublished" datetime="2021-11-04T12:31:54+08:00">2021-11-04</time>
+              <time title="创建时间：2021-11-05 20:34:54" itemprop="dateCreated datePublished" datetime="2021-11-05T20:34:54+08:00">2021-11-05</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-12-21 18:21:54" itemprop="dateModified" datetime="2021-12-21T18:21:54+08:00">2021-12-21</time>
+                <time title="修改时间：2021-11-13 01:47:43" itemprop="dateModified" datetime="2021-11-13T01:47:43+08:00">2021-11-13</time>
               </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
-                </span>
-            </span>
 
           
   
@@ -240,8 +231,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2021/11/04/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/hashcode%E7%9A%84%E5%88%86%E6%9E%90/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2021/11/04/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/hashcode%E7%9A%84%E5%88%86%E6%9E%90/" class="cy_cmt_count" data-xid="2021/11/04/java/java源码解读/hashcode的分析/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2021/11/05/spring/spring%E6%8E%A5%E5%8F%A3/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2021/11/05/spring/spring%E6%8E%A5%E5%8F%A3/" class="cy_cmt_count" data-xid="2021/11/05/spring/spring接口/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -252,7 +243,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>656</span>
+              <span>499</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -271,61 +262,21 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="hashcode的由来"><a href="#hashcode的由来" class="headerlink" title="hashcode的由来"></a>hashcode的由来</h3><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/zhangyuan19880606/article/details/51240372">参考1</a></p>
-<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/be943b4958f4">参考2-Java Object.hashCode()返回的是对象内存地址？</a></p>
-<ol>
-<li><p>object直接输出类名+hashcode的16进制</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span>:</span></span><br><span class="line"><span class="function">	return <span class="title">getClass</span><span class="params">()</span>.<span class="title">getName</span><span class="params">()</span> + &quot;@&quot; + Integer.<span class="title">toHexString</span><span class="params">(hashCode()</span>)</span>;</span><br></pre></td></tr></table></figure></li>
-<li><p>jvm生成hashcode的算法是不稳定算法</p>
-<blockquote>
-<p>分为五种策略,默认五种</p>
-</blockquote>
-<ol>
-<li><p>第一种策略</p>
-<ol>
-<li><p>获取内存地址，然后根据地址进行一定计算</p>
-<figure class="highlight nim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">addr</span>=intptr&gt;&gt;<span class="number">3</span></span><br><span class="line"><span class="keyword">return</span> <span class="keyword">addr</span>^(<span class="keyword">addr</span>&gt;&gt;<span class="number">5</span>)^<span class="type">RandomInt</span></span><br></pre></td></tr></table></figure></li>
+          <h3 id="1-InitializingBean"><a href="#1-InitializingBean" class="headerlink" title="1. InitializingBean"></a>1. InitializingBean</h3><ol>
+<li>afterProperies(){//加载配置文件后}</li>
 </ol>
+<h3 id="2-FactoryBean"><a href="#2-FactoryBean" class="headerlink" title="2. FactoryBean"></a>2. FactoryBean</h3><ol>
+<li><p>FactoryBean与BeanFactory</p>
+<ul>
+<li>FactoryBean是一个工厂Bean，可以生成某一个类型Bean实例，它最大的一个作用是：可以让我们自定义Bean的创建过程,需要与@Component共同使用</li>
+<li>BeanFactory是Spring容器中的一个基本类也是很重要的一个类，在BeanFactory中可以创建和管理Spring容器中的Bean，它对于Bean的创建有一个统一的流程。下面我们先看一下FactoryBean中有什么东西：</li>
+</ul>
 </li>
-<li><p>策略2</p>
-<blockquote>
-<p>固定返回1，用于测试</p>
-</blockquote>
-</li>
-<li><p>策略3</p>
-<blockquote>
-<p>自增</p>
-</blockquote>
-</li>
-<li><p>策略4</p>
-<blockquote>
-<p>直接指针地址</p>
-</blockquote>
-</li>
-<li><p>策略5</p>
-</li>
+<li><p>方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">FactoryBean</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">    <span class="comment">//返回的对象实例</span></span><br><span class="line">    <span class="function">T <span class="title">getObject</span><span class="params">()</span> <span class="keyword">throws</span> Exception</span>;</span><br><span class="line">    <span class="comment">//Bean的类型</span></span><br><span class="line">    Class&lt;?&gt; getObjectType();</span><br><span class="line">    <span class="comment">//true是单例，false是非单例  在Spring5.0中此方法利用了JDK1.8的新特性变成了default方法，返回true</span></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">isSingleton</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li></li>
 </ol>
-</li>
-<li><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/zjq_1314520/article/details/78955104">其他情况</a></p>
-<ol>
-<li><p>int  的hashcode就是他们的</p>
-</li>
-<li><p>string的hashcode</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> h = hash;<span class="comment">//默认为0</span></span><br><span class="line">        <span class="keyword">if</span> (h == <span class="number">0</span> &amp;&amp; value.length &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">char</span> val[] = value;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; value.length; i++) &#123;</span><br><span class="line">                h = <span class="number">31</span> * h + val[i];&#125;</span><br><span class="line">            hash = h;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> h;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 
-<blockquote>
-<p>‘1’ -&gt; 49</p>
-<p>‘0’ -&gt; 48</p>
-<p>h=31*0+49=49 *</p>
-<p><em>h=31</em>49+48=1567</p>
-</blockquote>
-</li>
-<li><p>long</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">return</span> (<span class="keyword">int</span>)(value ^ (value &gt;&gt;&gt; <span class="number">32</span>));</span><br></pre></td></tr></table></figure></li>
-</ol>
-</li>
-</ol>
-<h3 id="hashcode是否会相等"><a href="#hashcode是否会相等" class="headerlink" title="hashcode是否会相等"></a>hashcode是否会相等</h3>
       
     </div>
 
@@ -344,7 +295,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/11/03/linux/%E9%85%8D%E7%BD%AE%E7%8E%AF%E5%A2%83/linuxWeb%E7%8E%AF%E5%A2%83/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/%E9%85%8D%E7%BD%AEsql/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -358,7 +309,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/11/03/linux/%E9%85%8D%E7%BD%AE%E7%8E%AF%E5%A2%83/linuxWeb%E7%8E%AF%E5%A2%83/" class="post-title-link" itemprop="url">linux部署web</a>
+            <a href="/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/%E9%85%8D%E7%BD%AEsql/" class="post-title-link" itemprop="url">DAL数据库</a>
         </h2>
 
         <div class="post-meta">
@@ -368,14 +319,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2021-11-03 12:00:41" itemprop="dateCreated datePublished" datetime="2021-11-03T12:00:41+08:00">2021-11-03</time>
+              <time title="创建时间：2021-11-05 20:29:53" itemprop="dateCreated datePublished" datetime="2021-11-05T20:29:53+08:00">2021-11-05</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-12-06 22:43:50" itemprop="dateModified" datetime="2021-12-06T22:43:50+08:00">2021-12-06</time>
+                <time title="修改时间：2021-12-28 16:06:16" itemprop="dateModified" datetime="2021-12-28T16:06:16+08:00">2021-12-28</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -383,118 +334,11 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/os/" itemprop="url" rel="index"><span itemprop="name">os</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2021/11/03/linux/%E9%85%8D%E7%BD%AE%E7%8E%AF%E5%A2%83/linuxWeb%E7%8E%AF%E5%A2%83/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2021/11/03/linux/%E9%85%8D%E7%BD%AE%E7%8E%AF%E5%A2%83/linuxWeb%E7%8E%AF%E5%A2%83/" class="cy_cmt_count" data-xid="2021/11/03/linux/配置环境/linuxWeb环境/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="基础"><a href="#基础" class="headerlink" title="基础"></a>基础</h3><ol>
-<li><p>安装wget</p>
-<p>yum -y install wget</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/11/03/linux/%E9%85%8D%E7%BD%AE%E7%8E%AF%E5%A2%83/linuxWeb%E7%8E%AF%E5%A2%83/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/11/03/utils/bat/bat%E5%91%BD%E4%BB%A41/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/11/03/utils/bat/bat%E5%91%BD%E4%BB%A41/" class="post-title-link" itemprop="url">bat</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2021-11-03 00:48:13 / 修改时间：01:20:49" itemprop="dateCreated datePublished" datetime="2021-11-03T00:48:13+08:00">2021-11-03</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/utils/" itemprop="url" rel="index"><span itemprop="name">utils</span></a>
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
                 </span>
                   ，
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/utils/bat/" itemprop="url" rel="index"><span itemprop="name">bat</span></a>
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/sql%E8%AF%AD%E5%8F%A5/" itemprop="url" rel="index"><span itemprop="name">sql语句</span></a>
                 </span>
             </span>
 
@@ -508,8 +352,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2021/11/03/utils/bat/bat%E5%91%BD%E4%BB%A41/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2021/11/03/utils/bat/bat%E5%91%BD%E4%BB%A41/" class="cy_cmt_count" data-xid="2021/11/03/utils/bat/bat命令1/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/%E9%85%8D%E7%BD%AEsql/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/%E9%85%8D%E7%BD%AEsql/" class="cy_cmt_count" data-xid="2021/11/05/数据库/sql/配置sql/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -520,7 +364,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>732</span>
+              <span>322</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -539,25 +383,33 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="bat常见命令"><a href="#bat常见命令" class="headerlink" title="bat常见命令"></a>bat常见命令</h3><ol>
-<li><p>REM 和 :: 注释</p>
-</li>
-<li><p>ECHO 和 @</p>
+          <p>[toc]</p>
+<h3 id="查看"><a href="#查看" class="headerlink" title="查看"></a>查看</h3><ol>
+<li>查看表的构造  show create  table name;</li>
+<li>查看所有数据库/表  show databases/tables;</li>
+<li>查看表每个字段的约束  desc(describe缩写) tablename;</li>
+</ol>
+<h3 id="variables"><a href="#variables" class="headerlink" title="variables"></a>variables</h3><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/goldenstones/p/6362434.html">参考</a></p>
 <ol>
-<li><p>@字符放在命令前将关闭该命令回显，无论此时echo是否为打开状态。</p>
+<li><p>全部</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">show</span> variables</span><br></pre></td></tr></table></figure></li>
+<li><p>查看字符编码 character 注意客户端和服务端的编码要一样</p>
 </li>
-<li><p>@ echo off 关闭off 并将这句话不会回显</p>
+<li><p>查看是否日志 log </p>
+<ol>
+<li>max_binlog_size 最大log，默认1g</li>
+</ol>
 </li>
-<li><p>打印空行 echo.</p>
+<li><p>查看事务等级</p>
 </li>
-<li><p>echo | 管道传参(将echo的输出当作|后面的输入)</p>
+<li><p>最大连接数</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">show</span> variables <span class="keyword">like</span> <span class="string">&#x27;max_connections&#x27;</span>;</span><br><span class="line"># 理想值  max_used_connections <span class="operator">/</span> max_connections <span class="operator">*</span> <span class="number">100</span><span class="operator">%</span> <span class="operator">=</span> <span class="number">85</span><span class="operator">%</span> </span><br></pre></td></tr></table></figure></li>
+<li><p>排序用到的字节数 max_sort_length </p>
 </li>
-<li><p>新建文件 echo aaa &gt; a.txt</p>
-</li>
-<li><p>@echo off 关闭cmd的文件路径</p>
+</ol>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2021/11/03/utils/bat/bat%E5%91%BD%E4%BB%A41/#more" rel="contents">
+              <a class="btn" href="/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/%E9%85%8D%E7%BD%AEsql/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -581,7 +433,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/11/02/%E7%BB%84%E4%BB%B6/ORM/mybatis-%E5%8A%A8%E6%80%81sql/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/%E4%BC%98%E5%8C%96sql/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -595,7 +447,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/11/02/%E7%BB%84%E4%BB%B6/ORM/mybatis-%E5%8A%A8%E6%80%81sql/" class="post-title-link" itemprop="url">mybatis之动态sql</a>
+            <a href="/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/%E4%BC%98%E5%8C%96sql/" class="post-title-link" itemprop="url">优化sql</a>
         </h2>
 
         <div class="post-meta">
@@ -605,14 +457,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2021-11-02 16:23:20" itemprop="dateCreated datePublished" datetime="2021-11-02T16:23:20+08:00">2021-11-02</time>
+              <time title="创建时间：2021-11-05 20:27:13" itemprop="dateCreated datePublished" datetime="2021-11-05T20:27:13+08:00">2021-11-05</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-11-06 11:45:48" itemprop="dateModified" datetime="2021-11-06T11:45:48+08:00">2021-11-06</time>
+                <time title="修改时间：2021-12-30 15:55:49" itemprop="dateModified" datetime="2021-12-30T15:55:49+08:00">2021-12-30</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -620,7 +472,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%BB%84%E4%BB%B6/" itemprop="url" rel="index"><span itemprop="name">组件</span></a>
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
                 </span>
             </span>
 
@@ -634,8 +486,130 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2021/11/02/%E7%BB%84%E4%BB%B6/ORM/mybatis-%E5%8A%A8%E6%80%81sql/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2021/11/02/%E7%BB%84%E4%BB%B6/ORM/mybatis-%E5%8A%A8%E6%80%81sql/" class="cy_cmt_count" data-xid="2021/11/02/组件/ORM/mybatis-动态sql/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/%E4%BC%98%E5%8C%96sql/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/%E4%BC%98%E5%8C%96sql/" class="cy_cmt_count" data-xid="2021/11/05/数据库/sql/优化sql/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>610</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="sql语句优化"><a href="#sql语句优化" class="headerlink" title="sql语句优化"></a>sql语句优化</h1><h2 id="selete"><a href="#selete" class="headerlink" title="selete"></a>selete</h2><ol>
+<li>selete尽量使用字段而不是*。</li>
+</ol>
+<h2 id="update、delete"><a href="#update、delete" class="headerlink" title="update、delete"></a>update、delete</h2><ol>
+<li><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_21454973/article/details/109162528">在 delete 和 update 后面加 limit 1 绝对是个好习惯</a></p>
+<blockquote>
+<p>比如，在删除执行中，第一条就命中了删除行，如果 SQL 中有 limit 1；这时就 return 了，否则还会执行完全表扫描才结束。</p>
+</blockquote>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/%E4%BC%98%E5%8C%96sql/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DML/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DML/" class="post-title-link" itemprop="url">DML数据库，操纵语言</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-11-05 20:26:51" itemprop="dateCreated datePublished" datetime="2021-11-05T20:26:51+08:00">2021-11-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-12-09 15:06:43" itemprop="dateModified" datetime="2021-12-09T15:06:43+08:00">2021-12-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/sql%E8%AF%AD%E5%8F%A5/" itemprop="url" rel="index"><span itemprop="name">sql语句</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DML/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DML/" class="cy_cmt_count" data-xid="2021/11/05/数据库/sql/DML/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -665,26 +639,25 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="mybatis之动态sql"><a href="#mybatis之动态sql" class="headerlink" title="mybatis之动态sql"></a>mybatis之动态sql</h1><p>动态sql是Mybatis增加mapper.xml的sql语句的灵活性而设计的。</p>
-<p>[toc]</p>
-<h3 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h3><ol>
-<li><p>date-string转换函数</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">update</span> <span class="attr">id</span>=<span class="string">&quot;updateInventory&quot;</span> <span class="attr">parameterType</span>=<span class="string">&quot;com.docc.model.Inventory&quot;</span>&gt;</span></span><br><span class="line">update BUS_INVENTORY</span><br><span class="line">set orgcode = #&#123;orgcode,jdbcType=VARCHAR&#125;,</span><br><span class="line">    reportdate = #&#123;reportdate,jdbcType=CHAR&#125;,</span><br><span class="line">    checkname = &#x27;$&#123;checkname&#125;&#x27;,</span><br><span class="line">    archivetime = to_date(#&#123;archivetime,jdbcType=DATE&#125;,&#x27;yyyy-mm-dd&#x27;)      </span><br><span class="line">where id = #&#123;id,jdbcType=DECIMAL&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">update</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-</ol>
-<h3 id="条件"><a href="#条件" class="headerlink" title="条件"></a>条件</h3><ol>
-<li><p>条件if</p>
-<p> 一定要注意多if于单if下where,and所在位置，但条件的话where就要在if里面，且不需要and，下面用trim解决</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;findActiveBlogWithTitleLike&quot;</span> <span class="attr">resultType</span>=<span class="string">&quot;Blog&quot;</span>&gt;</span></span><br><span class="line">  SELECT * FROM BLOG</span><br><span class="line">  WHERE state = ‘ACTIVE’</span><br><span class="line">  <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">&quot;title != null&quot;</span>&gt;</span></span><br><span class="line">    AND title like #&#123;title&#125;</span><br><span class="line">  <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-<li><p>优先条件 choose-when-otherwise</p>
-<p>优先条件查询：繁杂的when&lt;—-&gt;繁杂的if-else</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;findActiveBlogLike&quot;</span> <span class="attr">resultType</span>=<span class="string">&quot;Blog&quot;</span>&gt;</span></span><br><span class="line">  SELECT * FROM BLOG WHERE state = ‘ACTIVE’</span><br><span class="line">  <span class="tag">&lt;<span class="name">choose</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">when</span> <span class="attr">test</span>=<span class="string">&quot;title != null&quot;</span>&gt;</span></span><br><span class="line">      AND title like #&#123;title&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">when</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">when</span> <span class="attr">test</span>=<span class="string">&quot;author != null and author.name != null&quot;</span>&gt;</span></span><br><span class="line">      AND author_name like #&#123;author.name&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">when</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">otherwise</span>&gt;</span></span><br><span class="line">      AND featured = 1</span><br><span class="line">    <span class="tag">&lt;/<span class="name">otherwise</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">choose</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-<li><p>为null条件trim-where-set</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;findActiveBlogLike&quot;</span> <span class="attr">resultType</span>=<span class="string">&quot;Blog&quot;</span>&gt;</span></span><br><span class="line">  SELECT * FROM BLOG WHERE</span><br><span class="line">  <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">&quot;state != null&quot;</span>&gt;</span></span><br><span class="line">    state = #&#123;state&#125;</span><br><span class="line">  <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">&quot;title != null&quot;</span>&gt;</span></span><br><span class="line">    AND title like #&#123;title&#125;</span><br><span class="line">  <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">&quot;author != null and author.name != null&quot;</span>&gt;</span></span><br><span class="line">    AND author_name like #&#123;author.name&#125;</span><br><span class="line">  <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-<li><p>集合遍历—foreach  (in)</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;selectPostIn&quot;</span> <span class="attr">resultType</span>=<span class="string">&quot;domain.blog.Post&quot;</span>&gt;</span></span><br><span class="line">  SELECT * FROM POST P</span><br><span class="line">  WHERE ID in</span><br><span class="line">  <span class="tag">&lt;<span class="name">foreach</span> <span class="attr">item</span>=<span class="string">&quot;item&quot;</span> <span class="attr">index</span>=<span class="string">&quot;index&quot;</span> <span class="attr">collection</span>=<span class="string">&quot;list&quot;</span></span></span><br><span class="line"><span class="tag">      <span class="attr">open</span>=<span class="string">&quot;(&quot;</span> <span class="attr">separator</span>=<span class="string">&quot;,&quot;</span> <span class="attr">close</span>=<span class="string">&quot;)&quot;</span>&gt;</span></span><br><span class="line">        #&#123;item&#125;</span><br><span class="line">  <span class="tag">&lt;/<span class="name">foreach</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-<li></li>
-</ol>
-<h3 id=""><a href="#" class="headerlink" title=""></a></h3><h3 id="传参"><a href="#传参" class="headerlink" title="传参"></a>传参</h3><h3 id="注入攻击"><a href="#注入攻击" class="headerlink" title="注入攻击"></a>注入攻击</h3>
+          <p>[toc]</p>
+<h3 id="一、Select"><a href="#一、Select" class="headerlink" title="一、Select"></a>一、Select</h3><h4 id="1-1-where-like-and-or-between-in"><a href="#1-1-where-like-and-or-between-in" class="headerlink" title="1.1 where  like  and  or  between  in"></a>1.1 where  like  and  or  between  in</h4><ol>
+<li><p>select * from name where  age &lt;&gt; 18; 查询年龄不等于18的人</p>
+</li>
+<li><p>select * from name where age&gt;18 and sex=’男’ </p>
+</li>
+<li><p>update name set age =18 where not id =10;  按条件修改</p>
+</li>
+<li><p>select * from name where age between 4 and 10; 查询4-10岁  前闭后开</p>
+</li>
+<li><p>select * from name where age in (3,4,10)  查询3，4，10 岁数据</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DML/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -703,7 +676,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/11/02/javaWeb/%E7%BD%91%E5%85%B3/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DCL/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -717,7 +690,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/11/02/javaWeb/%E7%BD%91%E5%85%B3/" class="post-title-link" itemprop="url">未命名</a>
+            <a href="/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DCL/" class="post-title-link" itemprop="url">DCL数据库控制语言</a>
         </h2>
 
         <div class="post-meta">
@@ -727,7 +700,27 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2021-11-02 14:13:04" itemprop="dateCreated datePublished" datetime="2021-11-02T14:13:04+08:00">2021-11-02</time>
+              <time title="创建时间：2021-11-05 20:26:45" itemprop="dateCreated datePublished" datetime="2021-11-05T20:26:45+08:00">2021-11-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-12-29 17:17:28" itemprop="dateModified" datetime="2021-12-29T17:17:28+08:00">2021-12-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/" itemprop="url" rel="index"><span itemprop="name">sql</span></a>
+                </span>
             </span>
 
           
@@ -740,8 +733,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2021/11/02/javaWeb/%E7%BD%91%E5%85%B3/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2021/11/02/javaWeb/%E7%BD%91%E5%85%B3/" class="cy_cmt_count" data-xid="2021/11/02/javaWeb/网关/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DCL/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DCL/" class="cy_cmt_count" data-xid="2021/11/05/数据库/sql/DCL/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -752,7 +745,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>0</span>
+              <span>382</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -771,7 +764,22 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          
+          <p>[toc]</p>
+<h2 id="一、Alter"><a href="#一、Alter" class="headerlink" title="一、Alter"></a>一、Alter</h2><blockquote>
+<p>添加，修改，删除表的列，约束等表的定义</p>
+</blockquote>
+<h3 id="1-1-修改约束"><a href="#1-1-修改约束" class="headerlink" title="1.1 修改约束"></a>1.1 修改约束</h3><ol>
+<li><p>字段唯一  alter table name ADD UNIQUE (aaa);  </p>
+</li>
+<li><p>删除唯一  alter table test drop index aaa</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DCL/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -789,7 +797,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/24/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/24/">24</a><span class="page-number current">25</span><a class="page-number" href="/page/26/">26</a><span class="space">&hellip;</span><a class="page-number" href="/page/40/">40</a><a class="extend next" rel="next" href="/page/26/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/24/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/24/">24</a><span class="page-number current">25</span><a class="page-number" href="/page/26/">26</a><span class="space">&hellip;</span><a class="page-number" href="/page/42/">42</a><a class="extend next" rel="next" href="/page/26/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -857,14 +865,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">199</span>
+          <span class="site-state-item-count">209</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-count">35</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>
@@ -908,12 +916,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">236k</span>
+    <span title="站点总字数">242k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">3:34</span>
+    <span title="站点阅读时长">3:40</span>
 </div>
 
         

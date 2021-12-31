@@ -187,7 +187,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/12/14/java/java%E9%AB%98%E7%BA%A7/jvm/Java%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/12/21/%E7%BB%84%E4%BB%B6/ORM/mybatis-plus%E5%A4%8D%E6%9D%82%E8%87%AA%E5%AE%9A%E4%B9%89%E6%9F%A5%E8%AF%A2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -201,7 +201,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/12/14/java/java%E9%AB%98%E7%BA%A7/jvm/Java%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84/" class="post-title-link" itemprop="url">JVM内存模型</a>
+            <a href="/2021/12/21/%E7%BB%84%E4%BB%B6/ORM/mybatis-plus%E5%A4%8D%E6%9D%82%E8%87%AA%E5%AE%9A%E4%B9%89%E6%9F%A5%E8%AF%A2/" class="post-title-link" itemprop="url">mybatis-plus自定义查询</a>
         </h2>
 
         <div class="post-meta">
@@ -212,7 +212,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2021-12-14 03:48:00 / 修改时间：20:07:02" itemprop="dateCreated datePublished" datetime="2021-12-14T03:48:00+08:00">2021-12-14</time>
+              <time title="创建时间：2021-12-21 12:41:44 / 修改时间：13:00:28" itemprop="dateCreated datePublished" datetime="2021-12-21T12:41:44+08:00">2021-12-21</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -220,11 +220,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/JVM/" itemprop="url" rel="index"><span itemprop="name">JVM</span></a>
+                  <a href="/categories/ORM%E6%A1%86%E6%9E%B6/" itemprop="url" rel="index"><span itemprop="name">ORM框架</span></a>
                 </span>
             </span>
 
@@ -238,8 +234,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2021/12/14/java/java%E9%AB%98%E7%BA%A7/jvm/Java%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2021/12/14/java/java%E9%AB%98%E7%BA%A7/jvm/Java%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84/" class="cy_cmt_count" data-xid="2021/12/14/java/java高级/jvm/Java内存结构/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2021/12/21/%E7%BB%84%E4%BB%B6/ORM/mybatis-plus%E5%A4%8D%E6%9D%82%E8%87%AA%E5%AE%9A%E4%B9%89%E6%9F%A5%E8%AF%A2/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2021/12/21/%E7%BB%84%E4%BB%B6/ORM/mybatis-plus%E5%A4%8D%E6%9D%82%E8%87%AA%E5%AE%9A%E4%B9%89%E6%9F%A5%E8%AF%A2/" class="cy_cmt_count" data-xid="2021/12/21/组件/ORM/mybatis-plus复杂自定义查询/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -250,14 +246,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>3.3k</span>
+              <span>357</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>3 分钟</span>
+              <span>1 分钟</span>
             </span>
 
         </div>
@@ -269,115 +265,255 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>[toc]</p>
-<h2 id="一、JVM内存结构"><a href="#一、JVM内存结构" class="headerlink" title="一、JVM内存结构"></a>一、JVM内存结构</h2><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211214035039329.png" alt="image-20211214035039329"></p>
+          <h3 id="count"><a href="#count" class="headerlink" title="count"></a>count</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">wrapper.select(<span class="string">&quot;count(*)regSort&quot;</span>).gt(<span class="string">&quot;all_num&quot;</span>,countOfCompany.getAllNum());</span><br><span class="line">Map&lt;String, Object&gt; map = getMap(wrapper);</span><br><span class="line">Object regSort = map.get(<span class="string">&quot;regSort&quot;</span>);</span><br></pre></td></tr></table></figure>
+
 <blockquote>
+<p>count 需要转换成java的long</p>
 </blockquote>
-<h3 id="1-1-JVM栈"><a href="#1-1-JVM栈" class="headerlink" title="1.1 JVM栈 "></a>1.1 <a target="_blank" rel="noopener" href="https://blog.csdn.net/heart_mine/article/details/79495032">JVM栈 </a></h3><p> 每当启动一个新线程的时候，java虚拟机都会为它分配一个java栈。java以栈帧为单位保存线程的运行状态。虚拟机只会对java栈执行两种操作：以栈帧为单位的压栈或者出栈。每个线程包含一个栈区，栈中只保存基础数据类型的对象和自定义对象的引用(不是对象)，对象都存放在堆区中 。每个栈中的数据(原始类型和对象引用)都是私有的，其他栈不能访问。 栈分为3个部分：基本类型变量区、执行环境上下文、操作指令区(存放操作指令)。</p>
-<h3 id="1-2-堆内存"><a href="#1-2-堆内存" class="headerlink" title="1.2 堆内存"></a>1.2 堆内存</h3><h4 id="1-2-1-存储内容"><a href="#1-2-1-存储内容" class="headerlink" title="1.2.1 存储内容"></a>1.2.1 存储内容</h4><ol>
-<li><p>全部是对象，每个对象包含一个与之对应的class信息–class的目的是得到操作指令。</p>
-</li>
-<li><p>JDK7之后存储静态变量、字符常量池，JDK7之前存在方法区</p>
-</li>
+<h3 id="group-by"><a href="#group-by" class="headerlink" title="group by"></a>group by</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wrapper.select(<span class="string">&quot;count(*) as nums,,open_id,rank&quot;</span>).eq(<span class="string">&quot;rank&quot;</span>,<span class="number">5</span>).groupBy(<span class="string">&quot;file_name&quot;</span>).orderByDesc(<span class="string">&quot;nums&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/12/21/javaWeb/javaWeb/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/12/21/javaWeb/javaWeb/" class="post-title-link" itemprop="url">javaWeb</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-12-21 00:46:45 / 修改时间：00:48:17" itemprop="dateCreated datePublished" datetime="2021-12-21T00:46:45+08:00">2021-12-21</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/javaWeb/" itemprop="url" rel="index"><span itemprop="name">javaWeb</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2021/12/21/javaWeb/javaWeb/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2021/12/21/javaWeb/javaWeb/" class="cy_cmt_count" data-xid="2021/12/21/javaWeb/javaWeb/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>24</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/xdp-gacl/p/3798347.html">参考</a></p>
+<h2 id="一、格式约定"><a href="#一、格式约定" class="headerlink" title="一、格式约定"></a>一、格式约定</h2><h3 id="1-1-util类"><a href="#1-1-util类" class="headerlink" title="1.1 util类"></a>1.1 util类</h3><ol>
+<li>介绍</li>
+<li>属性</li>
+<li>方法</li>
+<li>细节</li>
 </ol>
-<h4 id="1-2-2-堆内存特点"><a href="#1-2-2-堆内存特点" class="headerlink" title="1.2.2 堆内存特点"></a>1.2.2 堆内存特点</h4><p>jvm只有一个堆区（heap）被所有线程共享，堆区中不存放基本类型和对象引用，只存放对象本身。  </p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/12/20/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JNI/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/12/20/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JNI/" class="post-title-link" itemprop="url">JNI</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-12-20 01:03:25" itemprop="dateCreated datePublished" datetime="2021-12-20T01:03:25+08:00">2021-12-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-12-21 18:22:14" itemprop="dateModified" datetime="2021-12-21T18:22:14+08:00">2021-12-21</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2021/12/20/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JNI/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2021/12/20/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JNI/" class="cy_cmt_count" data-xid="2021/12/20/java/java源码解读/JNI/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>764</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="Native"><a href="#Native" class="headerlink" title="Native"></a>Native</h2><p>其中Java调用Nativie方法通常的步骤是：</p>
 <ul>
-<li>堆的优势是可以动态地分配内存大小，生存期也不必事先告诉编译器，因为它是在运行时动态分配内存的，Java的垃圾收集器会自动收走这些不再使用的数据。 </li>
-<li>缺点是，由于要在运行时动态分配内存，存取速度较慢。</li>
+<li><ol>
+<li>声明native方法： <code>private native void sayHello();</code></li>
+</ol>
+</li>
+<li><ol>
+<li>通过<code>javah</code> 生成native程序的头文件<code>HelloJNI.h</code></li>
+</ol>
+</li>
+<li><ol>
+<li>实现对应的navtive方法</li>
+</ol>
+</li>
 </ul>
-<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/shamo89/p/9775122.html">Java堆完全是自动化管理</a>，通过垃圾收集机制，垃圾对象会自动清理，不需自己去释放</p>
-<p>Java堆分为新生代(Young Gen)和老年代(Tenured Gen)</p>
-<h3 id="1-3-方法区"><a href="#1-3-方法区" class="headerlink" title="1.3 方法区"></a>1.3 方法区</h3><blockquote>
-<p>方法区看作是一块独立于Java堆的内存空间，属于共享内存</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/Saintyyu/article/details/90452826">参考1</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/216a41352fd8">参考2-JNI 学习笔记——通过RegisterNatives注册原生方法</a></p>
+<p>Java有两种方法：</p>
+<ul>
+<li>Java方法是由Java语言编写，Java方法是平台无关的，编译成字节码，存储在class文件中。本地方法是由其他语言（比如C，C++，或者汇编）编写的，编译成和处理器相关的机器代码。</li>
+<li>本地方法保存在动态连接库中，格式是各个平台专有的。本地方法却不是，运行中的Java程序调用本地方法时，虚拟机装载包含这个本地方法的动态库，并调用这个方法。本地方法是联系Java程序和底层主机操作系统的连接方法。</li>
+</ul>
+<h3 id="registerNatives"><a href="#registerNatives" class="headerlink" title="registerNatives"></a>registerNatives</h3><blockquote>
+<p>当包含registerNatives()方法的类被加载的时候，注册的方法就是该类所包含的除了registerNatives()方法以外的所有本地方法</p>
 </blockquote>
-<h4 id="1-3-1-存储内容"><a href="#1-3-1-存储内容" class="headerlink" title="1.3.1 存储内容"></a>1.3.1 存储内容</h4><ol>
-<li>类头信息<ol>
-<li>名称</li>
-<li>父类</li>
-<li>修饰符</li>
-<li>接口</li>
-</ol>
-</li>
-<li>类域信息：字段信息、</li>
-<li>类方法信息<ol>
-<li>名称</li>
-<li>参数数量、类型</li>
-<li>修饰符</li>
-<li>方法字节码(操作+局部变量)</li>
-<li>异常表</li>
-</ol>
-</li>
-<li>运行时常量，它是每一个类或接口的常量池的运行时表示形式，在类和接口被加载到JVM后，对应的运行时常量池就被创建出来。在运行期间也可将新的常量放入运行时常量池中，比如String的intern方法。虽然JVM规范把方法区描述为堆的一个逻辑部分， 但它却有个别名non-heap（非堆）。方法区的大小决定了系统可以加载多少个类， 如果系统定义的类太多，可能会产生OOM</li>
-</ol>
-<h4 id="1-3-2-常量池"><a href="#1-3-2-常量池" class="headerlink" title="1.3.2 常量池"></a>1.3.2 常量池</h4><p> 运行时常量池与常量池的区别</p>
+<blockquote>
+<p>Object,Class,System,Unsafe,ClassLoader都要这个方法</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">native</span> <span class="keyword">void</span> <span class="title">registerNatives</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        registerNatives();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p> Java调用本地方法步骤</p>
 <ol>
-<li>存放内容：存放编译期间生成的<ol>
-<li>各种字面量（字符串和final常量）</li>
-<li>字段表、方法表、属性表</li>
-<li>符号引用（类和接口的全限定名、字段的名称和描述符、方法句柄和方法类型、方法的名称和描述符 ）</li>
+<li>通过System.loadLibrary()将包含本地方法实现的动态文件加载进内存</li>
+<li>当Java程序需要调用本地方法时，虚拟机在加载的动态文件中定位并链接该本地方法，从而得以执行本地方法。registerNatives()方法的作用就是取代第二步，让程序主动将本地方法链接到调用方，当Java程序需要调用本地方法时就可以直接调用，而不需要虚拟机再去定位并链接。</li>
 </ol>
-</li>
-<li>区别<ul>
-<li>常量池：存放在.class文件中</li>
-<li>运行时常量池：内存中</li>
-</ul>
-</li>
-<li>运行时常量池是常量池表在运行时的表现形式，通过ClassLoader将字节码文件的常量池中的信息加载到内存中，存储在了方法区的运行时常量池中。</li>
-</ol>
-<h4 id="1-3-3-方法区的演进"><a href="#1-3-3-方法区的演进" class="headerlink" title="1.3.3 方法区的演进"></a>1.3.3 方法区的演进</h4><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211214042049855.png" alt="image-20211214042049855"></p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211214042305858.png" alt="image-20211214042305858"></p>
-<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_43232955/article/details/107411378">图片来源</a></p>
-<h4 id="1-3-4-元空间与永久代"><a href="#1-3-4-元空间与永久代" class="headerlink" title="1.3.4 元空间与永久代"></a>1.3.4 元空间与永久代</h4><p>​    元空间不在虚拟机设置的内存中，而是使用本地内存，相对于虚拟机的内存，本地内存空间更大,元空间的大小仅受本地内存限制，更不容易出现OOM</p>
-<h4 id="1-3-5-新生代与老年代"><a href="#1-3-5-新生代与老年代" class="headerlink" title="1.3.5 新生代与老年代"></a>1.3.5 <a target="_blank" rel="noopener" href="https://www.cnblogs.com/shamo89/p/9775122.html">新生代与老年代</a></h4><blockquote>
-<p>新生代存放新生的对象或者年龄不大的对象，老年代则存放老年对象。</p>
-</blockquote>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211214110956494.png" alt="image-20211214110956494"></p>
-<ol>
-<li><p>新生代分为edn区，s0区，s1区</p>
-<p>s0和s1也被称为from和to区域，他们是两块大小相等，并且可以互相转换的空间。</p>
-</li>
-<li><p>绝大多数情况下，对象首先分配在edn区，在新生代回收后，如果对象还存活，则进入s0或s1区，之后每经过一次新生代回收，如果对象存活则他的年龄就加1，对象达到一定的年龄后，则进入老年代。</p>
-</li>
-</ol>
-<p>举例：A a=new A()；首先把对象存放到堆内存当中，发现这个A只用了一次，首先会进入新生代里边去，存放到edn区域里面，因为Java堆自动化管理，垃圾收集机制，发现这个a只用了一次，如果a又被一段代码引用，垃圾回收机制有算法，每引用一次记录一次，就会马上进入到s0或者是s1区域，一旦a这个对象引用次数非常多了，就会存放到老年代里去。</p>
-<h3 id="1-4-本地方法栈"><a href="#1-4-本地方法栈" class="headerlink" title="1.4 本地方法栈"></a>1.4 本地方法栈</h3><p>和java栈的作用差不多，只不过是为JVM使用到的native方法服务的。</p>
-<p>Java官方对于本地方法的定义为methods written in a language other than the Java programming language，就是使用非Java语言实现的方法，但是通常我们指的一般为C或者C++，因此这个栈也有着C栈这一称号。一个不支持本地方法执行的JVM没有必要实现这个数据区域。本地方法栈基本和JVM栈一样，其大小也是可以设置为固定值或者动态增加，因此也会对应抛出StackOverflowError和OutOfMemoryError错误。 </p>
-<p>在HotSopt虚拟机中直接就把本地方法栈和Java栈合二为一。</p>
-<h3 id="1-5-程序计数器"><a href="#1-5-程序计数器" class="headerlink" title="1.5 程序计数器"></a>1.5 程序计数器</h3><p>用于保存当前线程执行的内存地址。</p>
-<p>由于JVM程序是多线程执行的（线程轮流切换），所以为了保证线程切换回来后，还能恢复到原先状态，就需要一个独立的计数器，记录之前中断的地方，可见程序计数器也是线程私有的。</p>
-<p>注意这个区域是唯一一个不抛出OutOfMemoryError的运行时数据区。</p>
-<h2 id="二、Java内存模型"><a href="#二、Java内存模型" class="headerlink" title="二、Java内存模型"></a>二、Java内存模型</h2><blockquote>
-<p>JMM，只是一个抽象的概念，是和多线程相关的，他描述了一组规则或规范，这个规范定义了一个线程对共享变量的写入时对另一个线程是可见的。</p>
-</blockquote>
-<p>Java堆和方法区的区域是多个线程共享的数据区域，多个线程可能可以操作保存在堆或者方法区中的同一个数据。这也就是我们常说的“Java的线程间通过共享内存进行通信”。<br>在通信过程中会存在一系列如可见性、原子性、顺序性等问题，而JMM就是围绕着多线程通信以及与其相关的一系列特性而建立的模型，JMM定义了一些语法集，这些语法集映射到Java语言中就是volatile、synchronized等关键字。</p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211214040257190.png" alt="image-20211214040257190"></p>
-<h2 id="三、Java对象模型"><a href="#三、Java对象模型" class="headerlink" title="三、Java对象模型"></a>三、Java对象模型</h2><ol>
-<li>每一个Java类在被JVM加载的时候，JVM会给这个类创建一个<code>instanceKlass</code>，保存在方法区</li>
-<li>new一个对象的时候，JVM会创建一个<code>instanceOopDesc</code>对象，这个对象中包含了对象头以及实例数据。报保存在堆内</li>
-</ol>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211214040801845.png" alt="image-20211214040801845"></p>
-<p><a target="_blank" rel="noopener" href="https://www.hollischuang.com/archives/2509">图片来源</a></p>
-<h2 id="四、疑惑"><a href="#四、疑惑" class="headerlink" title="四、疑惑"></a>四、疑惑</h2><h3 id="4-1-为什么分栈、堆、方法区的区别"><a href="#4-1-为什么分栈、堆、方法区的区别" class="headerlink" title="4.1 为什么分栈、堆、方法区的区别"></a>4.1 <a target="_blank" rel="noopener" href="https://blog.csdn.net/JustKian/article/details/104559654?utm_medium=distribute.pc_aggpage_search_result.none-task-blog-2~aggregatepage~first_rank_ecpm_v1~rank_v31_ecpm-1-104559654.pc_agg_new_rank&utm_term=jvm%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E7%94%A8%E6%A0%88&spm=1000.2123.3001.4430">为什么分栈、堆、方法区的区别</a></h3><blockquote>
-<p>堆，栈，方法区等都有自己特有的内存管理方式，都有自己合适存储的内容，方便jvm去调用和进行内存管理</p>
-</blockquote>
-<p>​    人们发现 变量主要是两种形式，一种内容短小（比如一个int整数），需要频繁访问，但是生命周期很短，通常只在一个方法内存活，而另一种内容可能很多（比如很长一个字符串），可能不需要太频繁的访问，但生命周期较长，通常很多个方法中可能都要用到，那么自然将这两类变量分开就显得比较理性，一类存储在栈区，通常是局部变量、操作符栈、函数参数传递和返回值，另一类存储在堆区，通常是较大的结构体（或者OOP中的对象）、需要反复访问的全局变量。堆区就是各种慢，申请内存慢，访问慢，修改慢，释放慢，整理慢（或者说GC垃圾回收），但优点也不言而喻，访问随机灵活，空间超大，在不超可用内存的情况下你要多大就给多大</p>
-<h3 id="4-2-栈内存"><a href="#4-2-栈内存" class="headerlink" title="4.2 栈内存"></a>4.2 栈内存</h3><blockquote>
-<p>栈内存实际上就是满足先进后出的性质的数学或数据结构。</p>
-</blockquote>
-<h4 id="4-2-1-存储内容"><a href="#4-2-1-存储内容" class="headerlink" title="4.2.1 存储内容"></a>4.2.1 存储内容</h4><p>​    栈内存在函数中定义的一些基本类型的变量和对象的引用变量都在函数的栈内存中分配。当在一段代码块定义一个变量时，Java就在栈中为这个变量分配内存空间，当超过变量的作用域后，Java会自动释放掉为该变量所分配的内存空间，该内存空间可以立即被另作他用。栈中主要存放一些基本类型的变量（,int, short, long, byte, float, double, boolean, char）和对象句柄。栈有一个很重要的特殊性，就是存在栈中的数据可以共享。</p>
-<h4 id="4-2-2-特点"><a href="#4-2-2-特点" class="headerlink" title="4.2.2 特点"></a>4.2.2 特点</h4><ul>
-<li><p>优点</p>
-<p>存取速度比堆要快，仅次于寄存器，栈数据可以共享。</p>
-</li>
-<li><p>缺点</p>
-<p>存在栈中的数据大小与生存期必须是确定的，缺乏灵活性。</p>
-</li>
-</ul>
-<h3 id="4-2-堆内存"><a href="#4-2-堆内存" class="headerlink" title="4.2 堆内存"></a>4.2 堆内存</h3><blockquote>
-<p>内存实际上指的就是（满足堆内存性质的）<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E4%BC%98%E5%85%88%E9%98%9F%E5%88%97">优先队列</a>的一种数据结构</p>
-</blockquote>
-<h4 id="4-2-1-存储内容-1"><a href="#4-2-1-存储内容-1" class="headerlink" title="4.2.1 存储内容"></a>4.2.1 存储内容</h4><h4 id="4-2-2-特点-1"><a href="#4-2-2-特点-1" class="headerlink" title="4.2.2 特点"></a>4.2.2 特点</h4><p>允许程序在运行时动态地申请某个大小的内存空间</p>
-<p>​    使用堆内存就象是自己动手做喜欢吃的菜肴，比较麻烦，但是比较符合自己的口味，而且自由度大。使用栈内存就象我们去饭馆里吃饭，只管点菜（发出申请）、付钱和吃（使用），吃饱了就走，不必理会切菜、洗菜等准备工作和洗碗、刷锅等扫尾工作，他的好处是快捷，但是自由度小。<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/192">操作系统</a>中所说的堆内存和栈内存，在操作上有上述</p>
 
       
     </div>
@@ -397,7 +533,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/12/14/java/java%E9%AB%98%E7%BA%A7/jvm/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/12/20/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/readme/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -411,7 +547,101 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/12/14/java/java%E9%AB%98%E7%BA%A7/jvm/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/" class="post-title-link" itemprop="url">java内存模型</a>
+            <a href="/2021/12/20/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/readme/" class="post-title-link" itemprop="url">Java源码</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-12-20 00:09:06" itemprop="dateCreated datePublished" datetime="2021-12-20T00:09:06+08:00">2021-12-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-12-24 13:04:20" itemprop="dateModified" datetime="2021-12-24T13:04:20+08:00">2021-12-24</time>
+              </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2021/12/20/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/readme/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2021/12/20/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/readme/" class="cy_cmt_count" data-xid="2021/12/20/java/java源码解读/readme/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>30</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="一、介绍"><a href="#一、介绍" class="headerlink" title="一、介绍"></a>一、介绍</h2><h3 id="1-1-作用"><a href="#1-1-作用" class="headerlink" title="1.1 作用"></a>1.1 作用</h3><h3 id="1-2-原理"><a href="#1-2-原理" class="headerlink" title="1.2 原理"></a>1.2 原理</h3><h3 id="1-3-父"><a href="#1-3-父" class="headerlink" title="1.3 父"></a>1.3 父</h3><h2 id="二、属性"><a href="#二、属性" class="headerlink" title="二、属性"></a>二、属性</h2><h2 id="三、方法"><a href="#三、方法" class="headerlink" title="三、方法"></a>三、方法</h2><h2 id="四、细节"><a href="#四、细节" class="headerlink" title="四、细节"></a>四、细节</h2>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/12/17/javaWeb/%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/12/17/javaWeb/%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C/" class="post-title-link" itemprop="url">文件操作</a>
         </h2>
 
         <div class="post-meta">
@@ -422,7 +652,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2021-12-14 01:42:27 / 修改时间：15:53:41" itemprop="dateCreated datePublished" datetime="2021-12-14T01:42:27+08:00">2021-12-14</time>
+              <time title="创建时间：2021-12-17 18:53:45 / 修改时间：23:12:02" itemprop="dateCreated datePublished" datetime="2021-12-17T18:53:45+08:00">2021-12-17</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -430,11 +660,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/JVM/" itemprop="url" rel="index"><span itemprop="name">JVM</span></a>
+                  <a href="/categories/javaWeb/" itemprop="url" rel="index"><span itemprop="name">javaWeb</span></a>
                 </span>
             </span>
 
@@ -448,8 +674,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2021/12/14/java/java%E9%AB%98%E7%BA%A7/jvm/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2021/12/14/java/java%E9%AB%98%E7%BA%A7/jvm/Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/" class="cy_cmt_count" data-xid="2021/12/14/java/java高级/jvm/Java内存模型/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2021/12/17/javaWeb/%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2021/12/17/javaWeb/%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C/" class="cy_cmt_count" data-xid="2021/12/17/javaWeb/文件操作/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -460,7 +686,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>557</span>
+              <span>489</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -479,404 +705,11 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>[toc]</p>
-<ol>
-<li><p><a target="_blank" rel="noopener" href="https://www.hollischuang.com/archives/2550">痛点-转载</a></p>
-<p>但是随着CPU技术的发展，CPU的执行速度越来越快。而由于内存的技术并没有太大的变化，所以从内存中读取和写入数据的过程和CPU的执行速度比起来差距就会越来越大,这就导致CPU每次操作内存都要耗费很多等待时间。</p>
+          <ol>
+<li><p>文件下载中文名问题</p>
 </li>
-<li><p>所以，人们想出来了一个好的办法，就是在CPU和内存之间增加高速缓存。缓存的概念大家都知道，就是保存一份数据拷贝。他的特点是速度快，内存小，并且昂贵。</p>
-</li>
-<li><p><strong>当程序在运行过程中，会将运算需要的数据从主存复制一份到CPU的高速缓存当中，那么CPU进行计算时就可以直接从它的高速缓存读取数据和向其中写入数据，当运算结束之后，再将高速缓存中的数据刷新到主存当中。</strong></p>
-</li>
-<li><p>而随着CPU能力的不断提升，一层缓存就慢慢的无法满足要求了，就逐渐的衍生出多级缓存。</p>
-<p>按照数据读取顺序和与CPU结合的紧密程度，CPU缓存可以分为一级缓存（L1），二级缓存（L3），部分高端CPU还具有三级缓存（L3），每一级缓存中所储存的全部数据都是下一级缓存的一部分</p>
-</li>
-<li><p><strong>当CPU要读取一个数据时，首先从一级缓存中查找，如果没有找到再从二级缓存中查找，如果还是没有就从三级缓存或内存中查找。</strong></p>
-</li>
-<li><p>单核CPU只含有一套L1，L2，L3缓存；如果CPU含有多个核心，即多核CPU，则每个核心都含有一套L1（甚至和L2）缓存，而共享L3（或者和L2）缓存。</p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211214014833316.png" alt="image-20211214014833316"></p>
-</li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/12/14/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/Java%E5%85%B3%E9%94%AE%E5%AD%97/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/12/14/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/Java%E5%85%B3%E9%94%AE%E5%AD%97/" class="post-title-link" itemprop="url">java多线程关键字理解</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-12-14 01:38:02" itemprop="dateCreated datePublished" datetime="2021-12-14T01:38:02+08:00">2021-12-14</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-12-23 00:02:56" itemprop="dateModified" datetime="2021-12-23T00:02:56+08:00">2021-12-23</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/JUC/" itemprop="url" rel="index"><span itemprop="name">JUC</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2021/12/14/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/Java%E5%85%B3%E9%94%AE%E5%AD%97/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2021/12/14/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/Java%E5%85%B3%E9%94%AE%E5%AD%97/" class="cy_cmt_count" data-xid="2021/12/14/java/java源码解读/Java关键字/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.1k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>[toc]</p>
-<h2 id="一、synchronized"><a href="#一、synchronized" class="headerlink" title="一、synchronized"></a>一、synchronized</h2><p><a href="(http://hollischuang.gitee.io/tobetopjavaer/#/basics/concurrent-coding/synchronized?id=synchronized%E7%9A%84%E7%94%A8%E6%B3%95)">参考</a></p>
-<blockquote>
-<p> 当我们想要保证一个共享资源在同一时间只会被一个线程访问到时，我们可以在代码中使用<code>synchronized</code>关键字对类或者对象加锁/同步。</p>
-</blockquote>
-<blockquote>
-<p><code>synchronized</code>关键字在需要原子性、可见性和有序性这三种特性的时候都可以作为其中一种解决方案，看起来是“万能”的。的确，大部分并发控制操作都能使用synchronized来完成。</p>
-</blockquote>
-<h3 id="1-1-用法"><a href="#1-1-用法" class="headerlink" title="1.1 用法"></a>1.1 用法</h3><h3 id="1-2-原理"><a href="#1-2-原理" class="headerlink" title="1.2 原理"></a>1.2 原理</h3><h3 id="1-3-CSA"><a href="#1-3-CSA" class="headerlink" title="1.3 CSA"></a>1.3 CSA</h3><h3 id="可见性"><a href="#可见性" class="headerlink" title="可见性"></a>可见性</h3><blockquote>
-<p>可见性是指当多个线程访问同一个变量时，一个线程修改了这个变量的值，其他线程能够立即看得到修改的值。</p>
-</blockquote>
-<h2 id="二、volatile"><a href="#二、volatile" class="headerlink" title="二、volatile"></a>二、volatile</h2><h3 id="锁机制缺点"><a href="#锁机制缺点" class="headerlink" title="锁机制缺点"></a>锁机制缺点</h3><p>（1）在多线程竞争下，加锁、释放锁会导致比较多的上下文切换和调度延时，引起性能问题。</p>
-<p>（2）一个线程持有锁会导致其它所有需要此锁的线程挂起。</p>
-<p>（3）如果一个优先级高的线程等待一个优先级低的线程释放锁会导致优先级倒置，引起性能风险。</p>
-<p>volatile是不错的机制，但是volatile不能保证原子性。因此对于同步最终还是要回到锁机制上来。</p>
-<p>独占锁是一种悲观锁，synchronized就是一种独占锁，会导致其它所有需要锁的线程挂起，等待持有锁的线程释放锁。而另一个更加有效的锁就是乐观锁。所谓乐观锁就是，每次不加锁而是假设没有冲突而去完成某项操作，如果因为冲突失败就重试，直到成功为止。乐观锁用到的机制就是CAS，Compare and Swap。</p>
-<h3 id="三、"><a href="#三、" class="headerlink" title="三、= ="></a>三、= =</h3><blockquote>
-<p>双等号</p>
-</blockquote>
-<p>java中的数据类型，可分为两类：</p>
-<ol>
-<li>基本数据类型：比较的是他们的值。</li>
-<li>引用类型<br>比较的是他们在内存中的存放地址，所以，除非是同一个new出来的对象，他们的比较后的结果为true，否则比较后结果为false。 JAVA当中所有的类都是继承于Object这个基类的，在Object中的基类中定义了一个equals的方法，这个方法的初始行为是比较对象的内存地 址，但在一些类库当中这个方法被覆盖掉了，如String,Integer,Date在这些类当中equals有其自身的实现，而不再是比较类在堆内存中的存放地址了。<br> 对于复合数据类型之间进行equals比较，在没有覆写equals方法的情况下，他们之间的比较还是基于他们在内存中的存放位置的地址值的，因为Object的equals方法也是用双等号（==）进行比较的，所以比较后的结果跟双等号（==）的结果相同。</li>
-</ol>
-<h2 id="三、transient"><a href="#三、transient" class="headerlink" title="三、transient"></a>三、<a target="_blank" rel="noopener" href="http://hollischuang.gitee.io/tobetopjavaer/#/basics/java-basic/transient-in-java?id=transient">transient</a></h2><blockquote>
-<p>​    transient修饰的成员变量，在序列化的时候其值会被忽略，在被反序列化后， transient 变量的值被设为初始值， 如 int 型的是 0，对象型的是 null。</p>
-</blockquote>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/12/13/%E5%BC%80%E5%8F%91/%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/12/13/%E5%BC%80%E5%8F%91/%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F/" class="post-title-link" itemprop="url">缓存</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2021-12-13 17:49:56 / 修改时间：18:01:50" itemprop="dateCreated datePublished" datetime="2021-12-13T17:49:56+08:00">2021-12-13</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%BC%80%E5%8F%91/" itemprop="url" rel="index"><span itemprop="name">开发</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2021/12/13/%E5%BC%80%E5%8F%91/%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2021/12/13/%E5%BC%80%E5%8F%91/%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F/" class="cy_cmt_count" data-xid="2021/12/13/开发/缓存穿透/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>182</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="一、缓存穿透"><a href="#一、缓存穿透" class="headerlink" title="一、缓存穿透"></a>一、缓存穿透</h2><h3 id="1-1-缓存穿透概念"><a href="#1-1-缓存穿透概念" class="headerlink" title="1.1 缓存穿透概念"></a>1.1 缓存穿透概念</h3><blockquote>
-<p>​    高并发场景下缓存的某一个key被高并发访问但没有命中，于是并发访问数据库，导致数据库并发的执行大量查询操作，对数据库造成巨大的压力</p>
-</blockquote>
-<h3 id="2-2-解决方案"><a href="#2-2-解决方案" class="headerlink" title="2.2 解决方案"></a>2.2 解决方案</h3><h4 id="2-2-1"><a href="#2-2-1" class="headerlink" title="2.2.1"></a>2.2.1</h4><h2 id="二、缓存击穿"><a href="#二、缓存击穿" class="headerlink" title="二、缓存击穿"></a>二、缓存击穿</h2><blockquote>
-<p>​    一个key非常热点，在不停的扛着大并发，大并发集中对这一个点进行访问，当这个key在失效的瞬间，持续的大并发就穿破缓存，直接请求数据库，就像在一个屏障上凿开了一个洞</p>
-</blockquote>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/12/12/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%9F%A5%E8%AF%863/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/12/12/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%9F%A5%E8%AF%863/" class="post-title-link" itemprop="url">mysql知识3</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-12-12 00:40:28" itemprop="dateCreated datePublished" datetime="2021-12-12T00:40:28+08:00">2021-12-12</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-12-13 12:06:57" itemprop="dateModified" datetime="2021-12-13T12:06:57+08:00">2021-12-13</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2021/12/12/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%9F%A5%E8%AF%863/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2021/12/12/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%9F%A5%E8%AF%863/" class="cy_cmt_count" data-xid="2021/12/12/数据库/mysql知识3/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>592</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="细节"><a href="#细节" class="headerlink" title="细节"></a>细节</h3><h4 id="null值"><a href="#null值" class="headerlink" title="null值"></a>null值</h4><ol>
-<li><p>null和空值的区别：</p>
-<ol>
-<li>null占空间，空值不占空间</li>
-<li>&lt;&gt;’’会同时过滤空值和null值</li>
-<li>定义为NOT NULL的字段只能插入空值，不能插入null值</li>
-<li>对于timestamp数据类型，如果往这个数据类型插入的列插入NULL值，则出现的值是当前系统时间。插入空值，则会出现 ‘0000-00-00 00:00:00’ </li>
-</ol>
-</li>
-<li><p>注意插入的null是 不带引号的</p>
-</li>
-<li><p>&lt;=&gt; 比较操作符（不同于 = 运算符），当比较的的两个值相等或者都为 NULL 时返回 true。</p>
-</li>
-<li><p>count()统计某列的记录数的时候，不会记录NULL值</p>
-</li>
-<li><p>order by()  null值最小</p>
-</li>
-<li><p>group by() null为一组</p>
-</li>
-<li><p>索引不会包含有NULL值的列</p>
-<blockquote>
-<p>只要列中包含有NULL值都将不会被包含在索引中，复合索引中只要有一列含有NULL值，那么这一列对于此复合索引将失效。所以在数据库设计时尽量不让字段的默认值为NULL</p>
-</blockquote>
-</li>
-</ol>
-<h4 id="change和modify"><a href="#change和modify" class="headerlink" title="change和modify"></a>change和modify</h4><ol>
-<li><p>modify改类型和约束   alter table  name  modify old_name 类型 </p>
-</li>
-<li><p>change修改类型   alter table name change old_name  new_name  类型</p>
-<ol>
-<li><p>modify和change的区别: modify是原地换，change是去掉以前的新建一个所以</p>
-<ol>
-<li>change修改需要指定两次表名</li>
-<li>只有change可以修改表名 </li>
-</ol>
-</li>
-<li><p>注意 修改类型原来的类型会被去除 (除了primary key)</p>
-</li>
-</ol>
-</li>
+<li><p>文件下载问题</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">response.setHeader(<span class="string">&quot;content-disposition&quot;</span>, <span class="string">&quot;attachment; filename=&quot;</span> +fileName);</span><br><span class="line">response.setCharacterEncoding(<span class="string">&quot;utf-8&quot;</span>);</span><br><span class="line"><span class="comment">//获取要下载的文件输入流</span></span><br><span class="line">InputStream in = <span class="keyword">new</span> FileInputStream(filePath);</span><br><span class="line"><span class="keyword">int</span> len = <span class="number">0</span>;</span><br><span class="line"><span class="comment">//创建数据缓冲区</span></span><br><span class="line"><span class="keyword">byte</span>[] buffer = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">1024</span>];</span><br><span class="line"><span class="comment">//通过response对象获取outputStream流</span></span><br><span class="line">OutputStream out = response.getOutputStream();</span><br><span class="line"><span class="comment">//将FileInputStream流写入到buffer缓冲区</span></span><br><span class="line"><span class="keyword">while</span> ((len = in.read(buffer)) &gt; <span class="number">0</span>)</span><br><span class="line">    out.write(buffer, <span class="number">0</span>, len);<span class="comment">//使用OutputStream将缓冲区的数据输出到浏览器</span></span><br><span class="line">in.close();</span><br><span class="line"><span class="keyword">return</span> <span class="keyword">true</span>;</span><br></pre></td></tr></table></figure></li>
 </ol>
 
       
@@ -896,7 +729,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/7/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><span class="page-number current">8</span><a class="page-number" href="/page/9/">9</a><span class="space">&hellip;</span><a class="page-number" href="/page/40/">40</a><a class="extend next" rel="next" href="/page/9/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/7/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><span class="page-number current">8</span><a class="page-number" href="/page/9/">9</a><span class="space">&hellip;</span><a class="page-number" href="/page/42/">42</a><a class="extend next" rel="next" href="/page/9/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -964,14 +797,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">199</span>
+          <span class="site-state-item-count">209</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-count">35</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>
@@ -1015,12 +848,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">236k</span>
+    <span title="站点总字数">242k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">3:34</span>
+    <span title="站点阅读时长">3:40</span>
 </div>
 
         
