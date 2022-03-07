@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/chrome2.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"wang-yonggan.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":true,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="[toc] 一、IO概述 同步阻塞IO-面向流-BIO 一个请求连接一个线程， 问题：需要创建很多的线程，所有的线程还是同步的 解决：线程池，但是线程池数量有上限 适合请求少的场景，程序简单   同步非阻塞IO-多路复用器-NIO 一个线程可以处理多个请求 selector 选择器(复用器) 适合请求多，请求时间短：聊天，弹幕   异步非阻塞IO–AIO(NIO2.0) 一个请求一个线程 适合请求">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NIO">
+<meta property="og:url" content="https://wang-yonggan.github.io/2022/03/08/java/java%E9%AB%98%E7%BA%A7/NIO/index.html">
+<meta property="og:site_name" content="MySoul">
+<meta property="og:description" content="[toc] 一、IO概述 同步阻塞IO-面向流-BIO 一个请求连接一个线程， 问题：需要创建很多的线程，所有的线程还是同步的 解决：线程池，但是线程池数量有上限 适合请求少的场景，程序简单   同步非阻塞IO-多路复用器-NIO 一个线程可以处理多个请求 selector 选择器(复用器) 适合请求多，请求时间短：聊天，弹幕   异步非阻塞IO–AIO(NIO2.0) 一个请求一个线程 适合请求">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211207225509511.png">
+<meta property="article:published_time" content="2022-03-07T16:33:39.000Z">
+<meta property="article:modified_time" content="2021-12-11T16:58:26.808Z">
+<meta property="article:author" content="勇敢">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211207225509511.png">
+
+<link rel="canonical" href="https://wang-yonggan.github.io/2022/03/08/java/java%E9%AB%98%E7%BA%A7/NIO/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>NIO | MySoul</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">MySoul</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">取上得中，取中得下</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://gitee.com/wang_yonggan" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/java/java%E9%AB%98%E7%BA%A7/NIO/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          NIO
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-12-12 00:58:26" itemprop="dateModified" datetime="2021-12-12T00:58:26+08:00">2021-12-12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java%E9%AB%98%E7%BA%A7/" itemprop="url" rel="index"><span itemprop="name">java高级</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/08/java/java%E9%AB%98%E7%BA%A7/NIO/#SOHUCS" itemprop="discussionUrl">
+        <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="2022/03/08/java/java高级/NIO/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.9k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>[toc]</p>
+<h2 id="一、IO概述"><a href="#一、IO概述" class="headerlink" title="一、IO概述"></a>一、IO概述</h2><ol>
+<li>同步阻塞IO-面向流-BIO<ol>
+<li>一个请求连接一个线程，</li>
+<li>问题：需要创建很多的线程，所有的线程还是同步的</li>
+<li>解决：线程池，但是线程池数量有上限</li>
+<li>适合请求少的场景，程序简单</li>
+</ol>
+</li>
+<li>同步非阻塞IO-多路复用器-NIO<ol>
+<li>一个线程可以处理多个请求</li>
+<li>selector 选择器(复用器)</li>
+<li>适合请求多，请求时间短：聊天，弹幕</li>
+</ol>
+</li>
+<li>异步非阻塞IO–AIO(NIO2.0)<ol>
+<li>一个请求一个线程</li>
+<li>适合请求较多，且请求时间长场景</li>
+</ol>
+</li>
+</ol>
+<h2 id="二、BIO"><a href="#二、BIO" class="headerlink" title="二、BIO"></a>二、BIO</h2><ol>
+<li>java.io</li>
+</ol>
+<h3 id="2-1-一对一"><a href="#2-1-一对一" class="headerlink" title="2.1 一对一"></a>2.1 一对一</h3><blockquote>
+<p>服务端只有一个线程，只能处理唯一一个请求</p>
+</blockquote>
+<h4 id="2-1-1-服务端"><a href="#2-1-1-服务端" class="headerlink" title="2.1.1 服务端"></a>2.1.1 服务端</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">ServerSocket serverSocket=<span class="keyword">new</span> ServerSocket(<span class="number">8888</span>);</span><br><span class="line"><span class="comment">//开启监听</span></span><br><span class="line">Socket accept = serverSocket.accept();</span><br><span class="line"><span class="comment">//从socket获得流</span></span><br><span class="line">InputStream inputStream = accept.getInputStream();</span><br><span class="line"><span class="comment">//包装缓冲区</span></span><br><span class="line">String msg= FileUtil.readFile(inputStream);</span><br><span class="line">System.out.println(msg);</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-1-2-客户端"><a href="#2-1-2-客户端" class="headerlink" title="2.1.2 客户端"></a>2.1.2 客户端</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">Socket socket=<span class="keyword">new</span> Socket(<span class="string">&quot;127.0.0.1&quot;</span>,<span class="number">8888</span>);</span><br><span class="line"><span class="comment">//获得输出流</span></span><br><span class="line">OutputStream outputStream = socket.getOutputStream();</span><br><span class="line">PrintWriter printWriter=<span class="keyword">new</span> PrintWriter(outputStream);</span><br><span class="line">Scanner scanner=<span class="keyword">new</span> Scanner(System.in);</span><br><span class="line"><span class="keyword">while</span> (<span class="keyword">true</span>)&#123;</span><br><span class="line">    System.out.print(<span class="string">&quot;发送:&quot;</span>);</span><br><span class="line">    String s = scanner.nextLine();</span><br><span class="line">    <span class="keyword">if</span>(s.equals(<span class="string">&quot;-1&quot;</span>))</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    printWriter.println(s);</span><br><span class="line">    printWriter.flush();</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-多对多"><a href="#2-2-多对多" class="headerlink" title="2.2 多对多"></a>2.2 多对多</h3><blockquote>
+<p>每个请求创建一个线程去处理请求</p>
+</blockquote>
+<h4 id="2-2-1-服务端"><a href="#2-2-1-服务端" class="headerlink" title="2.2.1 服务端"></a>2.2.1 服务端</h4><h4 id="2-2-2-客户端"><a href="#2-2-2-客户端" class="headerlink" title="2.2.2 客户端"></a>2.2.2 客户端</h4><h4 id="2-2-3-缺陷"><a href="#2-2-3-缺陷" class="headerlink" title="2.2.3 缺陷"></a>2.2.3 缺陷</h4><ol>
+<li>每个请求都创建线程，线程的切换、竞争会浪费资源</li>
+<li>线程本身也占用cpu资源</li>
+<li>并不是每个请求线程</li>
+</ol>
+<h3 id="2-3-伪异步"><a href="#2-3-伪异步" class="headerlink" title="2.3 伪异步"></a>2.3 伪异步</h3><ul>
+<li>优：创建线程池，能避免创建线程的资源消耗问题</li>
+<li>缺：底层还是阻塞的，如果请求处理较慢，那么新的请求就会长时间的再请求队列中，产生大量超时</li>
+<li>适应：小批量，请求处理快速的场景</li>
+</ul>
+<h3 id="BIO总结"><a href="#BIO总结" class="headerlink" title="BIO总结"></a>BIO总结</h3><ol>
+<li><p>发送</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dataOutputStream.flush();</span><br></pre></td></tr></table></figure></li>
+<li><p>发送结束声明</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socket.shutdownOutput();</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="三、NIO"><a href="#三、NIO" class="headerlink" title="三、NIO"></a>三、NIO</h2><h3 id="3-1-NIO概述"><a href="#3-1-NIO概述" class="headerlink" title="3.1 NIO概述"></a>3.1 NIO概述</h3><h4 id="3-1-1-基本概念"><a href="#3-1-1-基本概念" class="headerlink" title="3.1.1 基本概念"></a>3.1.1 基本概念</h4><ol>
+<li>since JDK1.4</li>
+<li>基于通道的非阻塞IO，IO复用</li>
+<li>支持面向缓冲区</li>
+</ol>
+<h4 id="3-1-2-三大核心组件"><a href="#3-1-2-三大核心组件" class="headerlink" title="3.1.2 三大核心组件"></a>3.1.2 三大核心组件</h4><ol>
+<li>Channel 通道</li>
+<li>Buffer 缓冲区</li>
+<li>Selector 选择器(多路复用器)<ol>
+<li>轮询每个通道</li>
+</ol>
+</li>
+</ol>
+<h4 id="3-1-3-非阻塞模式"><a href="#3-1-3-非阻塞模式" class="headerlink" title="3.1.3 非阻塞模式"></a>3.1.3 非阻塞模式</h4><p>一个线程可以同时处理很多请求，基于监听器</p>
+<h4 id="3-1-4-NIO模型图"><a href="#3-1-4-NIO模型图" class="headerlink" title="3.1.4 NIO模型图"></a>3.1.4 NIO模型图</h4><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211207225509511.png" alt="image-20211207225509511"></p>
+<h4 id="3-1-5-NIO-vs-BIO"><a href="#3-1-5-NIO-vs-BIO" class="headerlink" title="3.1.5 NIO  vs  BIO"></a>3.1.5 NIO  vs  BIO</h4><table>
+<thead>
+<tr>
+<th>BIO</th>
+<th>NIO</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>数据流(字节，字符)</td>
+<td>数据块(缓冲区，通道)</td>
+</tr>
+<tr>
+<td>流：单向</td>
+<td>通道：双向</td>
+</tr>
+<tr>
+<td>阻塞</td>
+<td>非阻塞</td>
+</tr>
+<tr>
+<td>一个请求需要一个线程</td>
+<td>一个线程处理处理多个请求(选择器监听)</td>
+</tr>
+</tbody></table>
+<h3 id="3-2-Buffer"><a href="#3-2-Buffer" class="headerlink" title="3.2 Buffer"></a>3.2 Buffer</h3><h4 id="3-2-2-Buffer属性"><a href="#3-2-2-Buffer属性" class="headerlink" title="3.2.2 Buffer属性"></a>3.2.2 Buffer属性</h4><ol>
+<li>容量：数组大小,不可更改<ol>
+<li>通过allocate分配</li>
+</ol>
+</li>
+<li>限制：可操作的最后位置<ol>
+<li>读：表示有数据的最后位置</li>
+<li>写：表示容量</li>
+</ol>
+</li>
+<li>位置：写入、读取的当前位置索引<ol>
+<li>标记：mark该位置</li>
+<li>重置：重置到mark位置</li>
+</ol>
+</li>
+</ol>
+<h4 id="3-2-3-Buffer-Api"><a href="#3-2-3-Buffer-Api" class="headerlink" title="3.2.3 Buffer Api"></a>3.2.3 Buffer Api</h4><ol>
+<li>clear 清空缓存区</li>
+<li>flip：转换成可读模式</li>
+<li>Remaining：获得缓冲区长度</li>
+<li>hasRemaining：是否有数据</li>
+<li>rewind：将位置置0清除mark</li>
+</ol>
+<h4 id="3-2-4-缓冲区分类"><a href="#3-2-4-缓冲区分类" class="headerlink" title="3.2.4 缓冲区分类"></a>3.2.4 缓冲区分类</h4><h5 id="3-2-4-1-直接缓冲区"><a href="#3-2-4-1-直接缓冲区" class="headerlink" title="3.2.4.1 直接缓冲区"></a>3.2.4.1 直接缓冲区</h5><blockquote>
+<p>写入到直接内存，高并发场景</p>
+</blockquote>
+<h5 id="3-2-4-2-非直接缓冲区"><a href="#3-2-4-2-非直接缓冲区" class="headerlink" title="3.2.4.2 非直接缓冲区"></a>3.2.4.2 非直接缓冲区</h5><blockquote>
+<p>写入堆内存</p>
+</blockquote>
+<h3 id="3-3-Channel"><a href="#3-3-Channel" class="headerlink" title="3.3 Channel"></a>3.3 Channel</h3><h4 id="3-3-1-特点"><a href="#3-3-1-特点" class="headerlink" title="3.3.1 特点"></a>3.3.1 特点</h4><ol>
+<li>双向的</li>
+<li>不能直接数据交互，需借助buffer</li>
+<li>异步读写</li>
+</ol>
+<h4 id="3-3-2-Channel实现"><a href="#3-3-2-Channel实现" class="headerlink" title="3.3.2 Channel实现"></a>3.3.2 Channel实现</h4><ol>
+<li>FileChannel 文件</li>
+<li>DatagramChannel  UDP</li>
+<li>SocketChannel  TCP</li>
+<li>ServerSockeChannel  监听Web的TCP连接，每一个连接创建一个Channel</li>
+</ol>
+<h3 id="3-4-Selector"><a href="#3-4-Selector" class="headerlink" title="3.4 Selector"></a>3.4 Selector</h3><h4 id="3-4-1-工作方式"><a href="#3-4-1-工作方式" class="headerlink" title="3.4.1 工作方式"></a>3.4.1 工作方式</h4><blockquote>
+<p>多个 Channel 以事件的方式可以注册到同一个Selector，如果有事件发生，便获取事件然后针对每个事件进行相应的处理。这样就可以只用一个单线程去管理多个通道，也就是管理多个连接和请求。避免了多线程之间的上下文切换导致的开销</p>
+</blockquote>
+<h4 id="3-4-2-选择器作用"><a href="#3-4-2-选择器作用" class="headerlink" title="3.4.2 选择器作用"></a>3.4.2 选择器作用</h4><ol>
+<li>轮询Channel选出可用的Channel</li>
+</ol>
+<h3 id="3-5-Reactor模式"><a href="#3-5-Reactor模式" class="headerlink" title="3.5 Reactor模式"></a>3.5 Reactor模式</h3><ol>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/93612337">参考</a></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/03/08/java/java%E9%AB%98%E7%BA%A7/new-equll==/" rel="prev" title="java_equals_==_new">
+      <i class="fa fa-chevron-left"></i> java_equals_==_new
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/03/08/java/java%E9%AB%98%E7%BA%A7/java%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86/" rel="next" title="动态代理">
+      动态代理 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="SOHUCS"></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81IO%E6%A6%82%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">一、IO概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81BIO"><span class="nav-number">2.</span> <span class="nav-text">二、BIO</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E4%B8%80%E5%AF%B9%E4%B8%80"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 一对一</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-1-%E6%9C%8D%E5%8A%A1%E7%AB%AF"><span class="nav-number">2.1.1.</span> <span class="nav-text">2.1.1 服务端</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-2-%E5%AE%A2%E6%88%B7%E7%AB%AF"><span class="nav-number">2.1.2.</span> <span class="nav-text">2.1.2 客户端</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E5%A4%9A%E5%AF%B9%E5%A4%9A"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 多对多</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-1-%E6%9C%8D%E5%8A%A1%E7%AB%AF"><span class="nav-number">2.2.1.</span> <span class="nav-text">2.2.1 服务端</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-2-%E5%AE%A2%E6%88%B7%E7%AB%AF"><span class="nav-number">2.2.2.</span> <span class="nav-text">2.2.2 客户端</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-3-%E7%BC%BA%E9%99%B7"><span class="nav-number">2.2.3.</span> <span class="nav-text">2.2.3 缺陷</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E4%BC%AA%E5%BC%82%E6%AD%A5"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 伪异步</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BIO%E6%80%BB%E7%BB%93"><span class="nav-number">2.4.</span> <span class="nav-text">BIO总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81NIO"><span class="nav-number">3.</span> <span class="nav-text">三、NIO</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-NIO%E6%A6%82%E8%BF%B0"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 NIO概述</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-1-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">3.1.1.</span> <span class="nav-text">3.1.1 基本概念</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-2-%E4%B8%89%E5%A4%A7%E6%A0%B8%E5%BF%83%E7%BB%84%E4%BB%B6"><span class="nav-number">3.1.2.</span> <span class="nav-text">3.1.2 三大核心组件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-3-%E9%9D%9E%E9%98%BB%E5%A1%9E%E6%A8%A1%E5%BC%8F"><span class="nav-number">3.1.3.</span> <span class="nav-text">3.1.3 非阻塞模式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-4-NIO%E6%A8%A1%E5%9E%8B%E5%9B%BE"><span class="nav-number">3.1.4.</span> <span class="nav-text">3.1.4 NIO模型图</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-5-NIO-vs-BIO"><span class="nav-number">3.1.5.</span> <span class="nav-text">3.1.5 NIO  vs  BIO</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-Buffer"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 Buffer</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-2-Buffer%E5%B1%9E%E6%80%A7"><span class="nav-number">3.2.1.</span> <span class="nav-text">3.2.2 Buffer属性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-3-Buffer-Api"><span class="nav-number">3.2.2.</span> <span class="nav-text">3.2.3 Buffer Api</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-4-%E7%BC%93%E5%86%B2%E5%8C%BA%E5%88%86%E7%B1%BB"><span class="nav-number">3.2.3.</span> <span class="nav-text">3.2.4 缓冲区分类</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#3-2-4-1-%E7%9B%B4%E6%8E%A5%E7%BC%93%E5%86%B2%E5%8C%BA"><span class="nav-number">3.2.3.1.</span> <span class="nav-text">3.2.4.1 直接缓冲区</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-2-4-2-%E9%9D%9E%E7%9B%B4%E6%8E%A5%E7%BC%93%E5%86%B2%E5%8C%BA"><span class="nav-number">3.2.3.2.</span> <span class="nav-text">3.2.4.2 非直接缓冲区</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-Channel"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 Channel</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-1-%E7%89%B9%E7%82%B9"><span class="nav-number">3.3.1.</span> <span class="nav-text">3.3.1 特点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-2-Channel%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.3.2.</span> <span class="nav-text">3.3.2 Channel实现</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-Selector"><span class="nav-number">3.4.</span> <span class="nav-text">3.4 Selector</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-4-1-%E5%B7%A5%E4%BD%9C%E6%96%B9%E5%BC%8F"><span class="nav-number">3.4.1.</span> <span class="nav-text">3.4.1 工作方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-4-2-%E9%80%89%E6%8B%A9%E5%99%A8%E4%BD%9C%E7%94%A8"><span class="nav-number">3.4.2.</span> <span class="nav-text">3.4.2 选择器作用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5-Reactor%E6%A8%A1%E5%BC%8F"><span class="nav-number">3.5.</span> <span class="nav-text">3.5 Reactor模式</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="勇敢"
+      src="/images/t2.png">
+  <p class="site-author-name" itemprop="name">勇敢</p>
+  <div class="site-description" itemprop="description">学无止境</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">247</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">37</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/wang_yonggan" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;wang_yonggan" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>Gitee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:2245316014@qq.com" title="E-Mail → mailto:2245316014@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">勇敢</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">261k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">3:57</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script size="300" alpha="0.6" zIndex="-1" src="/lib/canvas-ribbon/canvas-ribbon.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  <script>
+  NexT.utils.loadComments(document.querySelector('#SOHUCS'), () => {
+    var appid = 'cyvGB7eAg';
+    var conf = 'e6246a7464cec504b3ea8361e3a3ff72';
+    var width = window.innerWidth || document.documentElement.clientWidth;
+    if (width < 960) {
+      window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>');
+    } else {
+      var loadJs=function(d,a){var c=document.getElementsByTagName("head")[0]||document.head||document.documentElement;var b=document.createElement("script");b.setAttribute("type","text/javascript");b.setAttribute("charset","UTF-8");b.setAttribute("src",d);if(typeof a==="function"){if(window.attachEvent){b.onreadystatechange=function(){var e=b.readyState;if(e==="loaded"||e==="complete"){b.onreadystatechange=null;a()}}}else{b.onload=a}}c.appendChild(b)};loadJs("https://changyan.sohu.com/upload/changyan.js",function(){window.changyan.api.config({appid:appid,conf:conf})});
+    }
+  });
+  </script>
+  <script src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+
+</body>
+</html>

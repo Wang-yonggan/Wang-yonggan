@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/chrome2.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"wang-yonggan.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":true,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="[toc] 一、基本概念 Spring是  1. 核心 IOC 控制反转  DI 依赖注入   AOP 面向切面  proxy 代理    2. 优点 降低组件之间的耦合度（互相依赖）  方便开发，降低复杂度: 提供了很多已经实现的辅佐组件  提供了AOP技术，利用它很容易实现如权限拦截，运行期监控等功能   IOC技术容器提供单例模式支持，开发人员不需要自己编写实现代码.  方便整合其他框架">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spring概念解析">
+<meta property="og:url" content="https://wang-yonggan.github.io/2022/03/08/spring/spring%E6%A6%82%E5%BF%B5/index.html">
+<meta property="og:site_name" content="MySoul">
+<meta property="og:description" content="[toc] 一、基本概念 Spring是  1. 核心 IOC 控制反转  DI 依赖注入   AOP 面向切面  proxy 代理    2. 优点 降低组件之间的耦合度（互相依赖）  方便开发，降低复杂度: 提供了很多已经实现的辅佐组件  提供了AOP技术，利用它很容易实现如权限拦截，运行期监控等功能   IOC技术容器提供单例模式支持，开发人员不需要自己编写实现代码.  方便整合其他框架">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-03-07T16:33:39.000Z">
+<meta property="article:modified_time" content="2022-02-22T09:55:25.371Z">
+<meta property="article:author" content="勇敢">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://wang-yonggan.github.io/2022/03/08/spring/spring%E6%A6%82%E5%BF%B5/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>spring概念解析 | MySoul</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">MySoul</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">取上得中，取中得下</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://gitee.com/wang_yonggan" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/spring/spring%E6%A6%82%E5%BF%B5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          spring概念解析
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-02-22 17:55:25" itemprop="dateModified" datetime="2022-02-22T17:55:25+08:00">2022-02-22</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/08/spring/spring%E6%A6%82%E5%BF%B5/#SOHUCS" itemprop="discussionUrl">
+        <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="2022/03/08/spring/spring概念/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>8.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>8 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>[toc]</p>
+<h2 id="一、基本概念"><a href="#一、基本概念" class="headerlink" title="一、基本概念"></a>一、基本概念</h2><blockquote>
+<p>Spring是</p>
+</blockquote>
+<h3 id="1-核心"><a href="#1-核心" class="headerlink" title="1. 核心"></a>1. 核心</h3><ol>
+<li><p>IOC 控制反转</p>
+<ol>
+<li>DI 依赖注入</li>
+</ol>
+</li>
+<li><p>AOP 面向切面</p>
+<ol>
+<li>proxy 代理</li>
+</ol>
+</li>
+</ol>
+<h3 id="2-优点"><a href="#2-优点" class="headerlink" title="2. 优点"></a>2. 优点</h3><ol>
+<li><p>降低组件之间的耦合度（互相依赖）</p>
+</li>
+<li><p>方便开发，降低复杂度: 提供了很多已经实现的辅佐组件</p>
+</li>
+<li><p>提供了AOP技术，利用它很容易实现如权限拦截，运行期监控等功能 </p>
+</li>
+<li><p>IOC技术容器提供单例模式支持，开发人员不需要自己编写实现代码.</p>
+</li>
+<li><p>方便整合其他框架</p>
+</li>
+<li><p>spring源码是</p>
+</li>
+<li><p>方便事务操作</p>
+</li>
+</ol>
+<h2 id="二、IOC-控制反转"><a href="#二、IOC-控制反转" class="headerlink" title="二、IOC(控制反转)"></a>二、IOC(控制反转)</h2><h3 id="1-IOC介绍"><a href="#1-IOC介绍" class="headerlink" title="1. IOC介绍"></a>1. IOC介绍</h3><ol>
+<li><p>平常</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Person s=<span class="keyword">new</span> Person();<span class="comment">//耦合度太高</span></span><br></pre></td></tr></table></figure></li>
+<li><p>现在：引入Ioc，将创建对象的控制权交给spring的ioc，如果需要使用，就用DI(依赖注入)@Autowired.</p>
+</li>
+</ol>
+<span id="more"></span>
+
+<ol start="3">
+<li><p>优点：集中管理对象，方便维护，降低了耦合度。</p>
+</li>
+<li><p>IOC和DI区别</p>
+<ol>
+<li><p>ioc控制了对象创建的权力。</p>
+</li>
+<li><p>di是ioc的实现的一步骤。</p>
+</li>
+</ol>
+</li>
+<li><p>哪些类放入ioc</p>
+<ol>
+<li>放入：工具类，dao,service,controller</li>
+<li>不放人：实体类，servlet,listener,filter</li>
+</ol>
+</li>
+</ol>
+<h3 id="2-IOC配置Bean"><a href="#2-IOC配置Bean" class="headerlink" title="2. IOC配置Bean"></a>2. IOC配置Bean</h3><ol>
+<li><p>xml配置：&lt;bean class:path&gt;</p>
+<ol>
+<li><p>属性</p>
+<ol>
+<li>set +&lt;properity name value&gt;</li>
+<li>set+&lt;properity name ref&gt;</li>
+<li>构造注入：&lt;constructor-arg&gt;+index</li>
+</ol>
+</li>
+<li><p>代码</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">&quot;aa&quot;</span> <span class="attr">class</span>=<span class="string">&quot;com.example.spring_tech.entity.user&quot;</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;age&quot;</span><span class="attr">value</span>=<span class="string">&quot;11222&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+<li><p>注解@Component(@Controller,@Service,@Repostory)</p>
+</li>
+<li><p>javaConfig:@Configtursion+@Bean，这像是自己实现的ioc，更灵活。</p>
+</li>
+<li><p>@import</p>
+</li>
+</ol>
+<h3 id="3-IOC获取Bean"><a href="#3-IOC获取Bean" class="headerlink" title="3. IOC获取Bean"></a>3. IOC获取Bean</h3><p>ioc两种获取(接口)</p>
+<ul>
+<li><p>BeanFactory 内置</p>
+<ul>
+<li>懒加载，加载配置文件不会创建对象，只有getBean才会创建bean，</li>
+</ul>
+</li>
+<li><p>ApplicationContext </p>
+<ul>
+<li>饿汉式，加载配置文件的时候就会创建对象</li>
+<li>实现类</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ApplicationContext ioc=<span class="keyword">new</span> ClassPathXmlApplicationContext(<span class="string">&quot;/config/beans.xml&quot;</span>);</span><br><span class="line">Student mybean = (Student) ioc.getBean(<span class="string">&quot;mybean&quot;</span>);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="4-ioc原理"><a href="#4-ioc原理" class="headerlink" title="4. ioc原理"></a>4. ioc原理</h3><ol>
+<li><p>简单工厂+反射</p>
+</li>
+<li><p>code:beanfactory.getBean+(强制类型转换+Class.forName) </p>
+</li>
+<li><p>ioc实现原理DI技术–&gt;map.put(name,new)</p>
+</li>
+<li><p>ioc的对象是创建ioc的时候一起同时创建的，不是启动时创建的，也不是使用的时候创建的。</p>
+</li>
+</ol>
+<h3 id="5-紧耦合-松耦合-DIP"><a href="#5-紧耦合-松耦合-DIP" class="headerlink" title="5.紧耦合 松耦合(DIP)"></a>5.紧耦合 松耦合(DIP)</h3><ol>
+<li>紧耦合：类之间的高度依赖</li>
+<li>松耦合：单一职责原则–&gt;接口分离原则–&gt;依赖倒置原则。</li>
+</ol>
+<h2 id="二、Bean"><a href="#二、Bean" class="headerlink" title="二、Bean"></a>二、Bean</h2><h3 id="1-bean概念"><a href="#1-bean概念" class="headerlink" title="1. bean概念"></a>1. bean概念</h3><h4 id="2-1-IOC-bean-行为"><a href="#2-1-IOC-bean-行为" class="headerlink" title="2.1 IOC bean 行为"></a>2.1 IOC bean 行为</h4><h5 id="1-Bean注册"><a href="#1-Bean注册" class="headerlink" title="1. Bean注册"></a>1. Bean注册</h5><blockquote>
+<p>@Component , @Repository , @ Controller , @Service , @Configration这些注解都是把你要实例化的对象转化成一个Bean，放在IoC容器中，等你要用的时候，它会和上面的@Autowired , @Resource配合到一起，把对象、属性、方法完美组装。</p>
+</blockquote>
+<h5 id="2-依赖注入"><a href="#2-依赖注入" class="headerlink" title="2. 依赖注入"></a>2. 依赖注入</h5><blockquote>
+<p>   @Autowired , @Resource，可以通过byTYPE（@Autowired）、byNAME（@Resource）的方式获取Bean；</p>
+</blockquote>
+<ol>
+<li> 依赖注入的优点</li>
+</ol>
+<p>   如果没有DI，那么每次都有需要 xmlApplication.getBean()来获取bean</p>
+<ol start="2">
+<li><p>使用</p>
+<ol>
+<li><p>通过setter</p>
+<p>普通：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">&quot;UserService&quot;</span> <span class="attr">class</span>=<span class="string">&quot;com.example.spring_tech.service.UserServiceImpl&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;userMapper&quot;</span> <span class="attr">ref</span>=<span class="string">&quot;userMapper&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>p命名空间</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">&quot;UserService&quot;</span> <span class="attr">class</span>=<span class="string">&quot;com.example.spring_tech.service.UserServiceImpl&quot;</span> </span></span><br><span class="line"><span class="tag">      <span class="attr">p:userMapper-ref</span>=<span class="string">&quot;userMapper&quot;</span>/&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>通过构造方法</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">&quot;UserService&quot;</span> <span class="attr">class</span>=<span class="string">&quot;com.example.spring_tech.service.UserServiceImpl&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">name</span>=<span class="string">&quot;userMapper&quot;</span> <span class="attr">ref</span>=<span class="string">&quot;userMapper&quot;</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+</ol>
+<h3 id="2-2-Bean属性"><a href="#2-2-Bean属性" class="headerlink" title="2.2 Bean属性"></a>2.2 Bean属性</h3><ol>
+<li>bean元素:使用该元素描述需要spring容器管理对象</li>
+<li>name属性:给被管理的对象起个名字,获得对象时getBean(“name值”)</li>
+<li>Class/Type属性:被管理对象的完整类名  </li>
+<li>id属性:与name属性一模一样，名称不可重复，不能使用特殊字符</li>
+</ol>
+<h3 id="2-bean加载过程"><a href="#2-bean加载过程" class="headerlink" title="2. bean加载过程"></a>2. bean加载过程</h3><h3 id="3-bean生命周期"><a href="#3-bean生命周期" class="headerlink" title="3. bean生命周期"></a>3. bean生命周期</h3><h5 id="3-1-scope属性"><a href="#3-1-scope属性" class="headerlink" title="3.1 scope属性"></a>3.1 scope属性</h5><blockquote>
+<p>​    绝大多数情况下，使用单例singleton(默认值)，但是在与struts整合时候，务必要用prototype多例，因为struts2在每次请求都会创建一个新的Action，若为单例，在多请求情况下，每个请求找找spring拿的都是同一个action。</p>
+</blockquote>
+<ol>
+<li>singleton   默认值<br>单例对象   :被标识为单例的对象在spring容器中只会存在一个实例</li>
+<li>prototype<br>多例原型:被标识为多例的对象,每次在获得才会被创建,每次创建都是新的对象</li>
+<li>request<br>Web环境下,对象与request生命周期一致    </li>
+<li>session<br>Web环境下,对象与session生命周期一致</li>
+</ol>
+<h3 id="4-java-bean-和spring-bean的区别"><a href="#4-java-bean-和spring-bean的区别" class="headerlink" title="4.java bean 和spring bean的区别"></a>4.java bean 和spring bean的区别</h3><ol>
+<li>由spring ioc实例化，管理的对象叫做bean.</li>
+<li>java bean 是new出来的</li>
+<li>都有getter setter</li>
+</ol>
+<h3 id="5-bean实例化方式"><a href="#5-bean实例化方式" class="headerlink" title="5. bean实例化方式"></a>5. bean实例化方式</h3><ol>
+<li><p>无参构造</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">&quot;userMapper&quot;</span> <span class="attr">class</span>=<span class="string">&quot;com.wyg.mapper.UserMapperImpl&quot;</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>这样的话就可以通过context获得bean，内部用的是无参构造</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ClassPathXmlApplicationContext app=<span class="keyword">new</span> ClassPathXmlApplicationContext(<span class="string">&quot;applicationConfig.xml&quot;</span>);</span><br><span class="line">Object userMapper = app.getBean(<span class="string">&quot;userMapper&quot;</span>)</span><br></pre></td></tr></table></figure></li>
+<li><p>工厂静态方法</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">&quot;userMapper&quot;</span> <span class="attr">class</span>=<span class="string">&quot;com.wyg.factory.StaticFactory&quot;</span> </span></span><br><span class="line"><span class="tag">      <span class="attr">factory-mothon</span>=<span class="string">&quot;getUserMapper&quot;</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>这样就可以在创建mapper之前多做些事情(传入参数)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> UserMapper <span class="title">getUserMapper</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="comment">//do something</span></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> UserMapper(args);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>工厂实例方法</p>
+</li>
+</ol>
+<h2 id="四、AOP"><a href="#四、AOP" class="headerlink" title="四、AOP"></a>四、AOP</h2><blockquote>
+<p>​    aop就是将动态代理规范化，约定大于配置。</p>
+</blockquote>
+<h3 id="1-动态代理"><a href="#1-动态代理" class="headerlink" title="1.动态代理"></a>1.动态代理</h3><ol>
+<li><p>作用：创建对象，不改变类的情况下实现功能增强。</p>
+</li>
+<li><p>两种实现方式：</p>
+<ol>
+<li>JDK<ol>
+<li>要求目标类有接口</li>
+<li>若没有接口。可用CGlib，</li>
+</ol>
+</li>
+<li>Proxy</li>
+</ol>
+</li>
+</ol>
+<h3 id="2-AOP四要素"><a href="#2-AOP四要素" class="headerlink" title="2. AOP四要素"></a>2. AOP四要素</h3><ol>
+<li><p>aspect:切面，增强的功能的代码。</p>
+<p>三要素：</p>
+<ol>
+<li>功能代码函数def doLog()</li>
+<li>代码位置(切入点)，一般就是业务代码函数。execution(path.def)</li>
+<li>执行时间（before/after）</li>
+</ol>
+</li>
+<li><p>joinpoint:连接点，业务代码。</p>
+</li>
+<li><p>pointCut切入点,连接点的结合</p>
+</li>
+<li><p>advice 通知，表示切面功能执行的时间</p>
+</li>
+</ol>
+<h3 id="3-AOP实现"><a href="#3-AOP实现" class="headerlink" title="3. AOP实现"></a>3. AOP实现</h3><ol>
+<li>spring,事务处理常用aop（代码多，不常用）</li>
+<li>aspectJ:专业aop框架。spring集成了这个框架。<ol>
+<li>xml实现：用于事务</li>
+<li>注解实现：常见环境下都用注解。<ol>
+<li>@Before</li>
+<li>@AfterReturn</li>
+<li>@Around</li>
+<li>@AfterThrowing</li>
+<li>@After</li>
+</ol>
+</li>
+<li>切入点表达式execution(public pString]* [com.wyg.user.]getName(..)* exception)</li>
+</ol>
+</li>
+</ol>
+<h3 id="4-AOP实现步骤"><a href="#4-AOP实现步骤" class="headerlink" title="4. AOP实现步骤:"></a>4. AOP实现步骤:</h3><ol>
+<li><p>加入依赖spring,aspect</p>
+</li>
+<li><p>创建目标类(接口，实现)</p>
+</li>
+<li><p>创建切面类</p>
+<ol>
+<li>加如@aspect</li>
+<li>定义增强功能方法，并在方法上加入注解</li>
+</ol>
+</li>
+<li><p>创建spring配置文件：声明对象，交予ioc管理  加入aop标志生成代理类<a href="aop:aspectj-autoproxy/">aop:aspectj-autoproxy/</a>。</p>
+</li>
+<li><p>xml配最后的<strong>自动代理生成器</strong>标志还是牵线人进行切面类和目标类.业务函数的联系。</p>
+</li>
+<li><p>execution简化</p>
+<ol>
+<li>去掉public</li>
+<li>用*..</li>
+<li>..代替arg</li>
+<li>do*代替业务函数</li>
+</ol>
+</li>
+</ol>
+<h3 id="spring使用步骤"><a href="#spring使用步骤" class="headerlink" title="spring使用步骤"></a>spring使用步骤</h3><ol>
+<li>依赖denpendcy</li>
+<li>创建类，dao,service,controller</li>
+<li>创建配置文件<bean></li>
+<li>创建容器对象ClassPathXmlAppicationContext.getBean()</li>
+</ol>
+<h4 id="集成mybatis"><a href="#集成mybatis" class="headerlink" title="集成mybatis"></a>集成mybatis</h4><ol>
+<li><p>mybatis步骤</p>
+<ol>
+<li><p>创建对象dao</p>
+</li>
+<li><p>mapper.xml</p>
+</li>
+<li><p>创建代理</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//创建工厂</span></span><br><span class="line"><span class="comment">//xml实现</span></span><br><span class="line">String resource = <span class="string">&quot;org/mybatis/example/mybatis-config.xml&quot;</span>;</span><br><span class="line">InputStream inputStream = Resources.getResourceAsStream(resource);</span><br><span class="line">SqlSessionFactory sqlSessionFactory = <span class="keyword">new</span> SqlSessionFactoryBuilder().build(inputStream);</span><br><span class="line"></span><br><span class="line"><span class="comment">//java实现</span></span><br><span class="line">DataSource dataSource = BlogDataSourceFactory.getBlogDataSource();</span><br><span class="line">TransactionFactory transactionFactory = <span class="keyword">new</span> JdbcTransactionFactory();</span><br><span class="line">Environment environment = <span class="keyword">new</span> Environment(<span class="string">&quot;development&quot;</span>, transactionFactory, dataSource);</span><br><span class="line">Configuration configuration = <span class="keyword">new</span> Configuration(environment);</span><br><span class="line">configuration.addMapper(BlogMapper.class);</span><br><span class="line">SqlSessionFactory sqlSessionFactory = <span class="keyword">new</span> SqlSessionFactoryBuilder().build(configuration);</span><br><span class="line"></span><br><span class="line"><span class="comment">//获取sqlsession</span></span><br><span class="line">SqlSession session = sqlSessionFactory.openSession()</span><br><span class="line"><span class="comment">//创建mapper实例</span></span><br><span class="line">UserMapper mapper = session.getMapper(UserMapper.class);</span><br></pre></td></tr></table></figure></li>
+<li><p>mybatis步骤</p>
+<ol>
+<li><p>依赖mysql-connector-java mybatis</p>
+</li>
+<li><p>mybatis.config.xml </p>
+<ol>
+<li>&lt;dataSource&gt;&lt;driver,url,username,password&gt;</li>
+<li>&lt;mappers&gt;&lt;mapper resource=”com.wyg.mapper.*.xml”&gt;</li>
+</ol>
+</li>
+<li><p>mapper.xml—-&gt;&lt;select,insert&gt;</p>
+</li>
+<li><p>javaTest</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span>创建文件流</span><br><span class="line">in=org.apache.ibatis.io.Resources.getResourceAsStream(<span class="string">&quot;.xml&quot;</span>);</span><br><span class="line"><span class="number">2.</span>创建工厂</span><br><span class="line">SqlSessionFactory factory=<span class="keyword">new</span> SqlSessionFactoryBuilder().build(in);</span><br><span class="line"><span class="number">3.</span>创建session</span><br><span class="line">SqlSession sqlsession=factory.openSession();</span><br><span class="line"><span class="number">4.</span>创建mapper</span><br><span class="line">UserMapper userMapper=sqlSession.getMapper(UserMapper.class);</span><br><span class="line"><span class="number">5.</span>调用mapper</span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+<li></li>
+</ol>
+</li>
+</ol>
+<h3 id="常用注解"><a href="#常用注解" class="headerlink" title="常用注解"></a>常用注解</h3><ol>
+<li><p>@Componet —-&gt;一个bean</p>
+</li>
+<li><p>@Configration —&gt;一本beans，一堆bean</p>
+</li>
+<li><p>@Bean—&gt;一个生成bean的方法，若干个@Bean常放在@Configration/@Component中，可以加载Conponent不能加载的自定义类。</p>
+</li>
+<li><p>bean的各个注解</p>
+</li>
+<li><p>MapperScan:执行类上加入@MapperScan(“com.example.springsecruity.mapper”)</p>
+<p>需要加入依赖</p>
+<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">mybatis-spring-boot-starter</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="依赖"><a href="#依赖" class="headerlink" title="依赖"></a>依赖</h3><ol>
+<li><p>mysql</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>mysql<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mysql-connector-java<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>mybatis</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--mybatis-plus--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.baomidou<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mybatis-plus-boot-starter<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- velocity 模板引擎, Mybatis Plus 代码生成器需要 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.velocity<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>velocity-engine-core<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>spring</p>
+</li>
+<li><p>springBoot</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>springCloud</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--服务注册nacos--&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-alibaba-nacos-discovery<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-netflix-ribbon<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!--服务调用--&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-openfeign<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">                <span class="comment">&lt;!--hystrix依赖，主要是用  @HystrixCommand --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-netflix-hystrix<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">       </span><br></pre></td></tr></table></figure></li>
+<li><p>swagger</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--swagger--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>io.springfox<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>springfox-swagger2<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>io.springfox<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>springfox-swagger-ui<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>单元测试</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>junit<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>junit<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>4.12<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>json数据转换</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.google.code.gson<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>gson<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="alibaba依赖"><a href="#alibaba依赖" class="headerlink" title="alibaba依赖"></a>alibaba依赖</h4><ol>
+<li><p>oss</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.aliyun.oss<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>aliyun-sdk-oss<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>视频点播</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.aliyun<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>aliyun-java-sdk-core<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>easyExcel</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>easyexcel<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.1.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>json</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>fastjson<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.aliyun<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>aliyun-java-sdk-core<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        &lt;/dependency</span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/03/08/utils/blog/" rel="prev" title="hexo使用">
+      <i class="fa fa-chevron-left"></i> hexo使用
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/03/08/spring/spring%E6%96%B0%E7%89%B9%E6%80%A7/" rel="next" title="spring新特性">
+      spring新特性 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="SOHUCS"></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">1.</span> <span class="nav-text">一、基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E6%A0%B8%E5%BF%83"><span class="nav-number">1.1.</span> <span class="nav-text">1. 核心</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E4%BC%98%E7%82%B9"><span class="nav-number">1.2.</span> <span class="nav-text">2. 优点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81IOC-%E6%8E%A7%E5%88%B6%E5%8F%8D%E8%BD%AC"><span class="nav-number">2.</span> <span class="nav-text">二、IOC(控制反转)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-IOC%E4%BB%8B%E7%BB%8D"><span class="nav-number">2.1.</span> <span class="nav-text">1. IOC介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-IOC%E9%85%8D%E7%BD%AEBean"><span class="nav-number">2.2.</span> <span class="nav-text">2. IOC配置Bean</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-IOC%E8%8E%B7%E5%8F%96Bean"><span class="nav-number">2.3.</span> <span class="nav-text">3. IOC获取Bean</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-ioc%E5%8E%9F%E7%90%86"><span class="nav-number">2.4.</span> <span class="nav-text">4. ioc原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E7%B4%A7%E8%80%A6%E5%90%88-%E6%9D%BE%E8%80%A6%E5%90%88-DIP"><span class="nav-number">2.5.</span> <span class="nav-text">5.紧耦合 松耦合(DIP)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81Bean"><span class="nav-number">3.</span> <span class="nav-text">二、Bean</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-bean%E6%A6%82%E5%BF%B5"><span class="nav-number">3.1.</span> <span class="nav-text">1. bean概念</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-IOC-bean-%E8%A1%8C%E4%B8%BA"><span class="nav-number">3.1.1.</span> <span class="nav-text">2.1 IOC bean 行为</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-Bean%E6%B3%A8%E5%86%8C"><span class="nav-number">3.1.1.1.</span> <span class="nav-text">1. Bean注册</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5"><span class="nav-number">3.1.1.2.</span> <span class="nav-text">2. 依赖注入</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-Bean%E5%B1%9E%E6%80%A7"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 Bean属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-bean%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B"><span class="nav-number">3.3.</span> <span class="nav-text">2. bean加载过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-bean%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F"><span class="nav-number">3.4.</span> <span class="nav-text">3. bean生命周期</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#3-1-scope%E5%B1%9E%E6%80%A7"><span class="nav-number">3.4.0.1.</span> <span class="nav-text">3.1 scope属性</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-java-bean-%E5%92%8Cspring-bean%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">3.5.</span> <span class="nav-text">4.java bean 和spring bean的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-bean%E5%AE%9E%E4%BE%8B%E5%8C%96%E6%96%B9%E5%BC%8F"><span class="nav-number">3.6.</span> <span class="nav-text">5. bean实例化方式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81AOP"><span class="nav-number">4.</span> <span class="nav-text">四、AOP</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86"><span class="nav-number">4.1.</span> <span class="nav-text">1.动态代理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-AOP%E5%9B%9B%E8%A6%81%E7%B4%A0"><span class="nav-number">4.2.</span> <span class="nav-text">2. AOP四要素</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-AOP%E5%AE%9E%E7%8E%B0"><span class="nav-number">4.3.</span> <span class="nav-text">3. AOP实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-AOP%E5%AE%9E%E7%8E%B0%E6%AD%A5%E9%AA%A4"><span class="nav-number">4.4.</span> <span class="nav-text">4. AOP实现步骤:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#spring%E4%BD%BF%E7%94%A8%E6%AD%A5%E9%AA%A4"><span class="nav-number">4.5.</span> <span class="nav-text">spring使用步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%9B%86%E6%88%90mybatis"><span class="nav-number">4.5.1.</span> <span class="nav-text">集成mybatis</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3"><span class="nav-number">4.6.</span> <span class="nav-text">常用注解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%9D%E8%B5%96"><span class="nav-number">4.7.</span> <span class="nav-text">依赖</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#alibaba%E4%BE%9D%E8%B5%96"><span class="nav-number">4.7.1.</span> <span class="nav-text">alibaba依赖</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="勇敢"
+      src="/images/t2.png">
+  <p class="site-author-name" itemprop="name">勇敢</p>
+  <div class="site-description" itemprop="description">学无止境</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">247</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">37</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://gitee.com/wang_yonggan" title="Gitee → https:&#x2F;&#x2F;gitee.com&#x2F;wang_yonggan" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>Gitee</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:2245316014@qq.com" title="E-Mail → mailto:2245316014@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">勇敢</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">261k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">3:57</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script size="300" alpha="0.6" zIndex="-1" src="/lib/canvas-ribbon/canvas-ribbon.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  <script>
+  NexT.utils.loadComments(document.querySelector('#SOHUCS'), () => {
+    var appid = 'cyvGB7eAg';
+    var conf = 'e6246a7464cec504b3ea8361e3a3ff72';
+    var width = window.innerWidth || document.documentElement.clientWidth;
+    if (width < 960) {
+      window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>');
+    } else {
+      var loadJs=function(d,a){var c=document.getElementsByTagName("head")[0]||document.head||document.documentElement;var b=document.createElement("script");b.setAttribute("type","text/javascript");b.setAttribute("charset","UTF-8");b.setAttribute("src",d);if(typeof a==="function"){if(window.attachEvent){b.onreadystatechange=function(){var e=b.readyState;if(e==="loaded"||e==="complete"){b.onreadystatechange=null;a()}}}else{b.onload=a}}c.appendChild(b)};loadJs("https://changyan.sohu.com/upload/changyan.js",function(){window.changyan.api.config({appid:appid,conf:conf})});
+    }
+  });
+  </script>
+  <script src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+
+</body>
+</html>

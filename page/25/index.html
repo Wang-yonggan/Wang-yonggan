@@ -187,7 +187,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/11/05/spring/spring%E6%8E%A5%E5%8F%A3/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/java/java8/java8%E4%B9%8Boptional/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -201,7 +201,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/11/05/spring/spring%E6%8E%A5%E5%8F%A3/" class="post-title-link" itemprop="url">未命名</a>
+            <a href="/2022/03/08/java/java8/java8%E4%B9%8Boptional/" class="post-title-link" itemprop="url">optional类</a>
         </h2>
 
         <div class="post-meta">
@@ -211,15 +211,24 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2021-11-05 20:34:54" itemprop="dateCreated datePublished" datetime="2021-11-05T20:34:54+08:00">2021-11-05</time>
+              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-11-13 01:47:43" itemprop="dateModified" datetime="2021-11-13T01:47:43+08:00">2021-11-13</time>
+                <time title="修改时间：2021-12-17 20:07:19" itemprop="dateModified" datetime="2021-12-17T20:07:19+08:00">2021-12-17</time>
               </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+                </span>
+            </span>
 
           
   
@@ -231,8 +240,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2021/11/05/spring/spring%E6%8E%A5%E5%8F%A3/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2021/11/05/spring/spring%E6%8E%A5%E5%8F%A3/" class="cy_cmt_count" data-xid="2021/11/05/spring/spring接口/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/03/08/java/java8/java8%E4%B9%8Boptional/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/java/java8/java8%E4%B9%8Boptional/" class="cy_cmt_count" data-xid="2022/03/08/java/java8/java8之optional/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -243,7 +252,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>499</span>
+              <span>825</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -262,20 +271,174 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="1-InitializingBean"><a href="#1-InitializingBean" class="headerlink" title="1. InitializingBean"></a>1. InitializingBean</h3><ol>
-<li>afterProperies(){//加载配置文件后}</li>
+          <h3 id="属性"><a href="#属性" class="headerlink" title="属性"></a>属性</h3><ol>
+<li>```java<br>private final T value;//值<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="number">2</span>. ```java</span><br><span class="line">   <span class="keyword">private</span> <span class="built_in">static</span> <span class="keyword">final</span> Optional<span class="meta">&lt;?</span>&gt; <span class="keyword">EMPTY</span> = <span class="keyword">new</span> Optional&lt;&gt;();<span class="comment">//空值常量</span></span><br></pre></td></tr></table></figure></li>
 </ol>
-<h3 id="2-FactoryBean"><a href="#2-FactoryBean" class="headerlink" title="2. FactoryBean"></a>2. FactoryBean</h3><ol>
-<li><p>FactoryBean与BeanFactory</p>
-<ul>
-<li>FactoryBean是一个工厂Bean，可以生成某一个类型Bean实例，它最大的一个作用是：可以让我们自定义Bean的创建过程,需要与@Component共同使用</li>
-<li>BeanFactory是Spring容器中的一个基本类也是很重要的一个类，在BeanFactory中可以创建和管理Spring容器中的Bean，它对于Bean的创建有一个统一的流程。下面我们先看一下FactoryBean中有什么东西：</li>
-</ul>
+<h3 id="API"><a href="#API" class="headerlink" title="API"></a>API</h3><ol>
+<li><p>构建：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Optional.of()<span class="comment">// 不能传null</span></span><br><span class="line">Optional.ofNullable() <span class="comment">//可以传null</span></span><br><span class="line">Optional.empty()<span class="comment">//返回一个空的optional</span></span><br></pre></td></tr></table></figure></li>
+<li><p> 检查</p>
 </li>
-<li><p>方法</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">FactoryBean</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">    <span class="comment">//返回的对象实例</span></span><br><span class="line">    <span class="function">T <span class="title">getObject</span><span class="params">()</span> <span class="keyword">throws</span> Exception</span>;</span><br><span class="line">    <span class="comment">//Bean的类型</span></span><br><span class="line">    Class&lt;?&gt; getObjectType();</span><br><span class="line">    <span class="comment">//true是单例，false是非单例  在Spring5.0中此方法利用了JDK1.8的新特性变成了default方法，返回true</span></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">isSingleton</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+   <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">o.isPresent() <span class="comment">//判断是否存在值</span></span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><p>取值</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">o.get()  <span class="comment">//如果o为null就会报错</span></span><br><span class="line">o.orElse(abc)<span class="comment">// 取值，如果为Null，返回同类对象abc</span></span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/03/08/java/java8/java8%E4%B9%8Boptional/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/java/java8/java8%E4%B9%8B%E5%87%BD%E6%95%B0%E5%BC%8F%E6%8E%A5%E5%8F%A3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/08/java/java8/java8%E4%B9%8B%E5%87%BD%E6%95%B0%E5%BC%8F%E6%8E%A5%E5%8F%A3/" class="post-title-link" itemprop="url">函数式接口</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-11-16 02:22:09" itemprop="dateModified" datetime="2021-11-16T02:22:09+08:00">2021-11-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/08/java/java8/java8%E4%B9%8B%E5%87%BD%E6%95%B0%E5%BC%8F%E6%8E%A5%E5%8F%A3/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/java/java8/java8%E4%B9%8B%E5%87%BD%E6%95%B0%E5%BC%8F%E6%8E%A5%E5%8F%A3/" class="cy_cmt_count" data-xid="2022/03/08/java/java8/java8之函数式接口/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>718</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h3><ol>
+<li><p>标准函数式接口在这个包下</p>
+<p>java.util.function</p>
+</li>
+<li><p>@FuntionalInterface</p>
+</li>
+<li><p>面向函数范式编程(FOP)(SQL)</p>
+</li>
+<li><p>面向接口编程</p>
+</li>
+<li><p><strong>面向过程编程（<code>Procedure Oriented</code>、简称<code>PO</code>）</strong> 和 <strong>面向对象编程（<code>Object Oriented</code>、简称<code>OO</code>）</strong> 我们一定听过，然而实际企业级开发里受用更多的一种编程思想那就是：<strong>面向接口编程（<code>Interface-Oriented</code>）</strong>！</p>
+</li>
+</ol>
+<p>&lt;!–&gt;</p>
+<h3 id="四大函数式接口"><a href="#四大函数式接口" class="headerlink" title="四大函数式接口"></a>四大函数式接口</h3><ol>
+<li><p>Consumer<T> </p>
+<p>​    消费型：有参无返回 </p>
+<p>​    void accept(T t)</p>
+</li>
+<li><p>Suppiier<T> 它是一个可以获取任意值的接口而已</p>
+<p>​    供给型：无参有返回</p>
+<p>​    T get()</p>
+</li>
+<li><p>Functional&lt;T,R&gt;</p>
+<p>​    函数型：处理参数</p>
+<p>​    R apply(T t)</p>
+</li>
+<li><p>Prediate<T></p>
+<p>​    断定型：有参判定返回bool</p>
+<p>​    boolean test(T t)</p>
+</li>
 <li></li>
 </ol>
+<h3 id="其他常见函数式接口"><a href="#其他常见函数式接口" class="headerlink" title="其他常见函数式接口"></a>其他常见函数式接口</h3><p><a target="_blank" rel="noopener" href="https://www.runoob.com/java/java8-functional-interfaces.html">菜鸟教程</a></p>
+<h3 id="我对函数式接口的理解与发现"><a href="#我对函数式接口的理解与发现" class="headerlink" title="我对函数式接口的理解与发现"></a>我对函数式接口的理解与发现</h3><ol>
+<li><p>java的函数式接口就是为了弥补java中<strong>万物皆对象</strong>,但函数却不是对象的缺憾而产生的。</p>
+<p>比如 一个函数对象</p>
+<figure class="highlight coffeescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Supplier&lt; Integer&gt; a = <span class="function"><span class="params">()</span> -&gt;</span> <span class="number">10</span> + <span class="number">1</span>; <span class="regexp">//</span>这个生产者函数就是一个对象。</span><br></pre></td></tr></table></figure></li>
+<li><p>传出的函数对象的参数一定是形参或者final引用(不会add,remove,但可以update)的参数，比如</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Paper&gt; list = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">List&lt;Paper&gt; finalList = list;</span><br><span class="line">map.values().forEach(o -&gt; finalList.addAll(o.values()));</span><br></pre></td></tr></table></figure>
+
+<p>这里就需要用一个list的final引用才能放进lambda表达式</p>
+</li>
+</ol>
 
       
     </div>
@@ -295,7 +458,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/%E9%85%8D%E7%BD%AEsql/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/java/java8/java8%E6%96%B0%E7%89%B9%E6%80%A7/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -309,7 +472,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/%E9%85%8D%E7%BD%AEsql/" class="post-title-link" itemprop="url">DAL数据库</a>
+            <a href="/2022/03/08/java/java8/java8%E6%96%B0%E7%89%B9%E6%80%A7/" class="post-title-link" itemprop="url">java8新特性</a>
         </h2>
 
         <div class="post-meta">
@@ -319,14 +482,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2021-11-05 20:29:53" itemprop="dateCreated datePublished" datetime="2021-11-05T20:29:53+08:00">2021-11-05</time>
+              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-12-28 16:06:16" itemprop="dateModified" datetime="2021-12-28T16:06:16+08:00">2021-12-28</time>
+                <time title="修改时间：2022-02-26 15:27:05" itemprop="dateModified" datetime="2022-02-26T15:27:05+08:00">2022-02-26</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -334,11 +497,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/sql%E8%AF%AD%E5%8F%A5/" itemprop="url" rel="index"><span itemprop="name">sql语句</span></a>
+                  <a href="/categories/java%E9%AB%98%E9%98%B6/" itemprop="url" rel="index"><span itemprop="name">java高阶</span></a>
                 </span>
             </span>
 
@@ -352,8 +511,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/%E9%85%8D%E7%BD%AEsql/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/%E9%85%8D%E7%BD%AEsql/" class="cy_cmt_count" data-xid="2021/11/05/数据库/sql/配置sql/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/03/08/java/java8/java8%E6%96%B0%E7%89%B9%E6%80%A7/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/java/java8/java8%E6%96%B0%E7%89%B9%E6%80%A7/" class="cy_cmt_count" data-xid="2022/03/08/java/java8/java8新特性/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -364,14 +523,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>322</span>
+              <span>3.9k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
+              <span>4 分钟</span>
             </span>
 
         </div>
@@ -383,151 +542,20 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>[toc]</p>
-<h3 id="查看"><a href="#查看" class="headerlink" title="查看"></a>查看</h3><ol>
-<li>查看表的构造  show create  table name;</li>
-<li>查看所有数据库/表  show databases/tables;</li>
-<li>查看表每个字段的约束  desc(describe缩写) tablename;</li>
-</ol>
-<h3 id="variables"><a href="#variables" class="headerlink" title="variables"></a>variables</h3><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/goldenstones/p/6362434.html">参考</a></p>
-<ol>
-<li><p>全部</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">show</span> variables</span><br></pre></td></tr></table></figure></li>
-<li><p>查看字符编码 character 注意客户端和服务端的编码要一样</p>
-</li>
-<li><p>查看是否日志 log </p>
-<ol>
-<li>max_binlog_size 最大log，默认1g</li>
-</ol>
-</li>
-<li><p>查看事务等级</p>
-</li>
-<li><p>最大连接数</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">show</span> variables <span class="keyword">like</span> <span class="string">&#x27;max_connections&#x27;</span>;</span><br><span class="line"># 理想值  max_used_connections <span class="operator">/</span> max_connections <span class="operator">*</span> <span class="number">100</span><span class="operator">%</span> <span class="operator">=</span> <span class="number">85</span><span class="operator">%</span> </span><br></pre></td></tr></table></figure></li>
-<li><p>排序用到的字节数 max_sort_length </p>
-</li>
-</ol>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/%E9%85%8D%E7%BD%AEsql/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/%E4%BC%98%E5%8C%96sql/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/%E4%BC%98%E5%8C%96sql/" class="post-title-link" itemprop="url">优化sql</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-11-05 20:27:13" itemprop="dateCreated datePublished" datetime="2021-11-05T20:27:13+08:00">2021-11-05</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-12-30 15:55:49" itemprop="dateModified" datetime="2021-12-30T15:55:49+08:00">2021-12-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/%E4%BC%98%E5%8C%96sql/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/%E4%BC%98%E5%8C%96sql/" class="cy_cmt_count" data-xid="2021/11/05/数据库/sql/优化sql/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>610</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="sql语句优化"><a href="#sql语句优化" class="headerlink" title="sql语句优化"></a>sql语句优化</h1><h2 id="selete"><a href="#selete" class="headerlink" title="selete"></a>selete</h2><ol>
-<li>selete尽量使用字段而不是*。</li>
-</ol>
-<h2 id="update、delete"><a href="#update、delete" class="headerlink" title="update、delete"></a>update、delete</h2><ol>
-<li><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_21454973/article/details/109162528">在 delete 和 update 后面加 limit 1 绝对是个好习惯</a></p>
-<blockquote>
-<p>比如，在删除执行中，第一条就命中了删除行，如果 SQL 中有 limit 1；这时就 return 了，否则还会执行完全表扫描才结束。</p>
+          <h1 id="java8新特性"><a href="#java8新特性" class="headerlink" title="java8新特性"></a>java8新特性</h1><h3 id="一、lambda-参数式函数-代码更少"><a href="#一、lambda-参数式函数-代码更少" class="headerlink" title="一、lambda(参数式函数) 代码更少"></a>一、lambda(参数式函数) 代码更少</h3><blockquote>
+<p>lambda含义：Runnable runnable=()-&gt; System.out.println(“”);</p>
+<p>创建一个类，并new出来，看成一个方法对象</p>
 </blockquote>
+<p>fun1(fun2())</p>
+<ol>
+<li><p>参数式函数，参数式lambda。</p>
+</li>
+<li><p>java中 lambda是实现了函数的对象，而不像其他语言一样是一个函数。一般用于接口，这个接口只有一个函数需要重写。这个接口的实例就是lambda。</p>
+</li>
+<li><p>但是用到的lambda还是写的那个重写的函数，也就是说我们需要某个功能的时候，我们可以根据四大函数式接口写出自己的函数，将这个接口传入，就完成了一个功能器。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/%E4%BC%98%E5%8C%96sql/#more" rel="contents">
+              <a class="btn" href="/2022/03/08/java/java8/java8%E6%96%B0%E7%89%B9%E6%80%A7/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -551,7 +579,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DML/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/java/javaOOP/javaOOP/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -565,7 +593,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DML/" class="post-title-link" itemprop="url">DML数据库，操纵语言</a>
+            <a href="/2022/03/08/java/javaOOP/javaOOP/" class="post-title-link" itemprop="url">OOP</a>
         </h2>
 
         <div class="post-meta">
@@ -575,14 +603,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2021-11-05 20:26:51" itemprop="dateCreated datePublished" datetime="2021-11-05T20:26:51+08:00">2021-11-05</time>
+              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-12-09 15:06:43" itemprop="dateModified" datetime="2021-12-09T15:06:43+08:00">2021-12-09</time>
+                <time title="修改时间：2021-11-12 09:05:48" itemprop="dateModified" datetime="2021-11-12T09:05:48+08:00">2021-11-12</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -590,11 +618,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/sql%E8%AF%AD%E5%8F%A5/" itemprop="url" rel="index"><span itemprop="name">sql语句</span></a>
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
                 </span>
             </span>
 
@@ -608,8 +632,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DML/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DML/" class="cy_cmt_count" data-xid="2021/11/05/数据库/sql/DML/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/03/08/java/javaOOP/javaOOP/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/java/javaOOP/javaOOP/" class="cy_cmt_count" data-xid="2022/03/08/java/javaOOP/javaOOP/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -620,7 +644,130 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>2k</span>
+              <span>188</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id=""><a href="#" class="headerlink" title=""></a></h3><ol>
+<li><p>对象=数据+操作，数据就是属性，操作就是函数，而Class是对两者的封装。</p>
+</li>
+<li><p>成员变量是私有的</p>
+</li>
+<li><p>package,public,import是一套的</p>
+<blockquote>
+<ol>
+<li>只有public类才能在不同package下使用</li>
+<li>不用package下别的类需要import</li>
+</ol>
+</blockquote>
+</li>
+</ol>
+<p>​        </p>
+<h3 id="访问权限"><a href="#访问权限" class="headerlink" title="访问权限"></a>访问权限</h3><ol>
+<li>public&gt;protected&gt;default&gt;private</li>
+<li>只有 同一个包下面，可以访问default</li>
+<li>不同包下，子类</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/java/javaOOP/java%E7%9F%A5%E8%AF%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/08/java/javaOOP/java%E7%9F%A5%E8%AF%86/" class="post-title-link" itemprop="url">java知识</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-12-03 23:33:15" itemprop="dateModified" datetime="2021-12-03T23:33:15+08:00">2021-12-03</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/08/java/javaOOP/java%E7%9F%A5%E8%AF%86/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/java/javaOOP/java%E7%9F%A5%E8%AF%86/" class="cy_cmt_count" data-xid="2022/03/08/java/javaOOP/java知识/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.8k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -640,141 +787,25 @@
 
       
           <p>[toc]</p>
-<h3 id="一、Select"><a href="#一、Select" class="headerlink" title="一、Select"></a>一、Select</h3><h4 id="1-1-where-like-and-or-between-in"><a href="#1-1-where-like-and-or-between-in" class="headerlink" title="1.1 where  like  and  or  between  in"></a>1.1 where  like  and  or  between  in</h4><ol>
-<li><p>select * from name where  age &lt;&gt; 18; 查询年龄不等于18的人</p>
+<h2 id="一、java分析"><a href="#一、java分析" class="headerlink" title="一、java分析"></a>一、java分析</h2><ol>
+<li><p>基本代码分析</p>
+<ol>
+<li>调试–栈</li>
+<li>语法糖、注解等：javac编译+javap反编译</li>
+</ol>
 </li>
-<li><p>select * from name where age&gt;18 and sex=’男’ </p>
+<li><p>判断两个obj是否同类  print obj.getClass</p>
 </li>
-<li><p>update name set age =18 where not id =10;  按条件修改</p>
+<li><p>判断两个obj是否一样  print   obj.hashcode  但是可能hash碰撞</p>
 </li>
-<li><p>select * from name where age between 4 and 10; 查询4-10岁  前闭后开</p>
+<li><p>web功能分析：</p>
+<ol>
+<li><p>F12</p>
 </li>
-<li><p>select * from name where age in (3,4,10)  查询3，4，10 岁数据</p>
+<li><p>Postman Swagger RestfulTools</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DML/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DCL/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DCL/" class="post-title-link" itemprop="url">DCL数据库控制语言</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-11-05 20:26:45" itemprop="dateCreated datePublished" datetime="2021-11-05T20:26:45+08:00">2021-11-05</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-12-29 17:17:28" itemprop="dateModified" datetime="2021-12-29T17:17:28+08:00">2021-12-29</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/" itemprop="url" rel="index"><span itemprop="name">sql</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DCL/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DCL/" class="cy_cmt_count" data-xid="2021/11/05/数据库/sql/DCL/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>382</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>[toc]</p>
-<h2 id="一、Alter"><a href="#一、Alter" class="headerlink" title="一、Alter"></a>一、Alter</h2><blockquote>
-<p>添加，修改，删除表的列，约束等表的定义</p>
-</blockquote>
-<h3 id="1-1-修改约束"><a href="#1-1-修改约束" class="headerlink" title="1.1 修改约束"></a>1.1 修改约束</h3><ol>
-<li><p>字段唯一  alter table name ADD UNIQUE (aaa);  </p>
-</li>
-<li><p>删除唯一  alter table test drop index aaa</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/11/05/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DCL/#more" rel="contents">
+              <a class="btn" href="/2022/03/08/java/javaOOP/java%E7%9F%A5%E8%AF%86/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -797,7 +828,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/24/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/24/">24</a><span class="page-number current">25</span><a class="page-number" href="/page/26/">26</a><span class="space">&hellip;</span><a class="page-number" href="/page/42/">42</a><a class="extend next" rel="next" href="/page/26/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/24/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/24/">24</a><span class="page-number current">25</span><a class="page-number" href="/page/26/">26</a><span class="space">&hellip;</span><a class="page-number" href="/page/50/">50</a><a class="extend next" rel="next" href="/page/26/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -865,14 +896,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">209</span>
+          <span class="site-state-item-count">247</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">35</span>
+        <span class="site-state-item-count">37</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>
@@ -907,7 +938,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
@@ -916,12 +947,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">242k</span>
+    <span title="站点总字数">261k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">3:40</span>
+    <span title="站点阅读时长">3:57</span>
 </div>
 
         
