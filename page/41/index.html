@@ -187,6 +187,129 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/spring/spring%E5%AE%B6%E6%97%8F/springSecruity/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/08/spring/spring%E5%AE%B6%E6%97%8F/springSecruity/" class="post-title-link" itemprop="url">spring-secruity</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-12-06 22:41:44" itemprop="dateModified" datetime="2021-12-06T22:41:44+08:00">2021-12-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/08/spring/spring%E5%AE%B6%E6%97%8F/springSecruity/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/spring/spring%E5%AE%B6%E6%97%8F/springSecruity/" class="cy_cmt_count" data-xid="2022/03/08/spring/spring家族/springSecruity/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>755</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="project1"><a href="#project1" class="headerlink" title="project1"></a>project1</h3><ol>
+<li><p>database</p>
+<p>user</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">username,series,token,last_used</span><br></pre></td></tr></table></figure></li>
+<li><p>配置类</p>
+<ol>
+<li><p>注入数据库</p>
+</li>
+<li><p>@configuration</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Autowired</span></span><br><span class="line"><span class="keyword">private</span> DataSource dataSource;</span><br><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> PersistentTokenRepository <span class="title">persistentTokenRepository</span><span class="params">()</span></span>&#123;</span><br><span class="line">    JdbcTokenRepositoryImpl jdbcTokenRepository=<span class="keyword">new</span> JdbcTokenRepositoryImpl();</span><br><span class="line">    jdbcTokenRepository.setDataSource(dataSource);</span><br><span class="line">    <span class="comment">//        jdbcTokenRepository.setCreateTableOnStartup();</span></span><br><span class="line">    <span class="keyword">return</span> jdbcTokenRepository;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(HttpSecurity http)</span> </span></span><br><span class="line"><span class="function">.<span class="title">and</span><span class="params">()</span>.<span class="title">rememberMe</span><span class="params">()</span>.<span class="title">tokenRepository</span><span class="params">(persistentTokenRepository()</span>)<span class="comment">//配置数据库--token</span></span></span><br><span class="line"><span class="function">                .<span class="title">tokenValiditySeconds</span><span class="params">(<span class="number">4</span>)</span><span class="comment">//设置有效时长</span></span></span><br><span class="line"><span class="function">                .<span class="title">userDetailsService</span><span class="params">(userDetailsService)</span></span></span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+</ol>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/03/08/spring/spring%E5%AE%B6%E6%97%8F/springSecruity/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/spring/spring%E6%A0%B8%E5%BF%83/Bean%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -876,158 +999,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/spring/%E6%B3%A8%E8%A7%A3/spring%E6%B3%A8%E8%A7%A32/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/08/spring/%E6%B3%A8%E8%A7%A3/spring%E6%B3%A8%E8%A7%A32/" class="post-title-link" itemprop="url">spring注解2</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-01 18:40:17" itemprop="dateModified" datetime="2022-03-01T18:40:17+08:00">2022-03-01</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/08/spring/%E6%B3%A8%E8%A7%A3/spring%E6%B3%A8%E8%A7%A32/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/spring/%E6%B3%A8%E8%A7%A3/spring%E6%B3%A8%E8%A7%A32/" class="cy_cmt_count" data-xid="2022/03/08/spring/注解/spring注解2/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>942</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>[toc]</p>
-<h2 id="一、Spring缓存"><a href="#一、Spring缓存" class="headerlink" title="一、Spring缓存"></a>一、Spring缓存</h2><h3 id="1-1-注意"><a href="#1-1-注意" class="headerlink" title="1.1 注意"></a>1.1 注意</h3><ol>
-<li>前提<ul>
-<li>entity要implements Serializable </li>
-<li>连接redis</li>
-</ul>
-</li>
-<li>就算数据库没查到，方法返回Null，也会存入数据库null</li>
-</ol>
-<h3 id="1-2-CacheConfig"><a href="#1-2-CacheConfig" class="headerlink" title="1.2 @CacheConfig"></a>1.2 @CacheConfig</h3><p>类级别注解，设置全局cacheName，如果方法已经设置了value，那么这个值就会被忽略.</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@CacheConfig(cacheNames = &quot;studenta&quot;)</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="1-3-Cacheable"><a href="#1-3-Cacheable" class="headerlink" title="1.3 @Cacheable"></a>1.3 @Cacheable</h3><p>每次操作这个函数，设置k=value::key，</p>
-<ul>
-<li><font color="red">查找redis有没有这个key，如果有，那么直接返回</font></li>
-<li>如果没有，mysql查询得到，然后向redis插入（k：放回值）</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Cacheable(cacheNames = &quot;studentb&quot;,key = &quot;#p0&quot;)</span><span class="comment">//cacheNames和value是等价的</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="1-4-CachePut"><a href="#1-4-CachePut" class="headerlink" title="1.4 @CachePut"></a>1.4 @CachePut</h3><p>每次操作这个函数，设置k=value::key，然后去redis查找又没有k,有的话就把（k:原来的v），换成（k:<font color="red">返回的值</font>）</p>
-<h3 id="1-5-ChacheEvict"><a href="#1-5-ChacheEvict" class="headerlink" title="1.5 @ChacheEvict"></a>1.5 @ChacheEvict</h3><p>每次操作这个函数，设置k=value::key，然后去redis查找又没有k，有的话就把这个数据删掉</p>
-<h3 id="1-6-缓存参数"><a href="#1-6-缓存参数" class="headerlink" title="1.6 缓存参数"></a>1.6 缓存参数</h3><ol>
-<li>value = “studentc”   设置k前缀</li>
-<li>cacheName 等价于value</li>
-<li> key = “#p0”   设置k后缀  前后缀用::分割  </li>
-<li>这是个el表达式</li>
-<li>#p0表示参数</li>
-<li> “#p0.id” 第一个参数的id</li>
-<li>condition=”el”<ol>
-<li>#student.id&gt;100 表示参数student的id大于100才进行缓存操作             </li>
-</ol>
-</li>
-<li> allEntries = true</li>
-<li>sync异步</li>
-</ol>
-<h2 id="二、Bean"><a href="#二、Bean" class="headerlink" title="二、Bean"></a>二、Bean</h2><h3 id="Scope-Bean作用域"><a href="#Scope-Bean作用域" class="headerlink" title="@Scope Bean作用域"></a>@Scope Bean作用域</h3><p>@Scope(value=”prototype”) 多例   默认单例</p>
-<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><h3 id="1-事务"><a href="#1-事务" class="headerlink" title="1. 事务"></a>1. 事务</h3><p>@Transactional</p>
-<blockquote>
-<p>方法/类级别，报错会撤回所有操作，基于aop</p>
-</blockquote>
-<p>原理: <a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_20597727/article/details/84868035">https://blog.csdn.net/qq_20597727/article/details/84868035</a></p>
-<ol start="2">
-<li>发现：<ol>
-<li>只对mysql有事务回滚</li>
-<li>所有猜想是基于mysql的log回滚</li>
-</ol>
-</li>
-<li>IOException不会回滚，因为这个是个需检查异常：checkedException,可以在注解上加上异常类型来回滚该异常。</li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1099,7 +1070,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">271</span>
+          <span class="site-state-item-count">272</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1150,12 +1121,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">286k</span>
+    <span title="站点总字数">295k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">4:20</span>
+    <span title="站点阅读时长">4:28</span>
 </div>
 
         
