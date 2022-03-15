@@ -187,7 +187,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/%E5%BC%80%E5%8F%91/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%A2%AB%E9%BB%91/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/%E5%88%86%E5%B8%83%E5%BC%8F/hadoop%E5%90%AF%E5%8A%A8/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -201,7 +201,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/03/08/%E5%BC%80%E5%8F%91/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%A2%AB%E9%BB%91/" class="post-title-link" itemprop="url">数据库被黑</a>
+            <a href="/2022/03/08/%E5%88%86%E5%B8%83%E5%BC%8F/hadoop%E5%90%AF%E5%8A%A8/" class="post-title-link" itemprop="url">hadoop的启动</a>
         </h2>
 
         <div class="post-meta">
@@ -218,8 +218,17 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-02-08 18:10:07" itemprop="dateModified" datetime="2022-02-08T18:10:07+08:00">2022-02-08</time>
+                <time title="修改时间：2021-11-14 13:55:49" itemprop="dateModified" datetime="2021-11-14T13:55:49+08:00">2021-11-14</time>
               </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/hadoop/" itemprop="url" rel="index"><span itemprop="name">hadoop</span></a>
+                </span>
+            </span>
 
           
   
@@ -231,8 +240,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/03/08/%E5%BC%80%E5%8F%91/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%A2%AB%E9%BB%91/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/%E5%BC%80%E5%8F%91/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%A2%AB%E9%BB%91/" class="cy_cmt_count" data-xid="2022/03/08/开发/数据库被黑/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/03/08/%E5%88%86%E5%B8%83%E5%BC%8F/hadoop%E5%90%AF%E5%8A%A8/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/%E5%88%86%E5%B8%83%E5%BC%8F/hadoop%E5%90%AF%E5%8A%A8/" class="cy_cmt_count" data-xid="2022/03/08/分布式/hadoop启动/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -243,14 +252,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>31</span>
+              <span>3.8k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
+              <span>3 分钟</span>
             </span>
 
         </div>
@@ -262,7 +271,22 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="经过"><a href="#经过" class="headerlink" title="经过"></a>经过</h2><h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><h2 id="防范"><a href="#防范" class="headerlink" title="防范"></a>防范</h2><h3 id="密码复杂化"><a href="#密码复杂化" class="headerlink" title="密码复杂化"></a>密码复杂化</h3><h3 id="数据加密"><a href="#数据加密" class="headerlink" title="数据加密"></a>数据加密</h3><h3 id="数据备份"><a href="#数据备份" class="headerlink" title="数据备份"></a>数据备份</h3><h3 id="单独数据库服务器"><a href="#单独数据库服务器" class="headerlink" title="单独数据库服务器"></a>单独数据库服务器</h3><h3 id="更改端口"><a href="#更改端口" class="headerlink" title="更改端口"></a>更改端口</h3>
+          <p>[toc]</p>
+<h2 id="一、-基本环境"><a href="#一、-基本环境" class="headerlink" title="一、 基本环境"></a>一、 基本环境</h2><ol>
+<li><p>获取主机名字 master、s1、s2</p>
+</li>
+<li><p>时钟同步</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="regexp">/usr/</span>sbin/ntpdate cn.pool.ntp.org</span><br></pre></td></tr></table></figure></li>
+<li><p>关闭防火墙</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl stop firewalld.service</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/03/08/%E5%88%86%E5%B8%83%E5%BC%8F/hadoop%E5%90%AF%E5%8A%A8/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -281,7 +305,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/%E5%BC%80%E5%8F%91/%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/%E5%88%86%E5%B8%83%E5%BC%8F/spark%E9%9B%86%E7%BE%A4%E5%90%AF%E5%8A%A8/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -295,7 +319,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/03/08/%E5%BC%80%E5%8F%91/%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F/" class="post-title-link" itemprop="url">缓存</a>
+            <a href="/2022/03/08/%E5%88%86%E5%B8%83%E5%BC%8F/spark%E9%9B%86%E7%BE%A4%E5%90%AF%E5%8A%A8/" class="post-title-link" itemprop="url">未命名</a>
         </h2>
 
         <div class="post-meta">
@@ -312,17 +336,8 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-12-13 18:01:50" itemprop="dateModified" datetime="2021-12-13T18:01:50+08:00">2021-12-13</time>
+                <time title="修改时间：2021-09-13 16:47:53" itemprop="dateModified" datetime="2021-09-13T16:47:53+08:00">2021-09-13</time>
               </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%BC%80%E5%8F%91/" itemprop="url" rel="index"><span itemprop="name">开发</span></a>
-                </span>
-            </span>
 
           
   
@@ -334,8 +349,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/03/08/%E5%BC%80%E5%8F%91/%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/%E5%BC%80%E5%8F%91/%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F/" class="cy_cmt_count" data-xid="2022/03/08/开发/缓存穿透/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/03/08/%E5%88%86%E5%B8%83%E5%BC%8F/spark%E9%9B%86%E7%BE%A4%E5%90%AF%E5%8A%A8/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/%E5%88%86%E5%B8%83%E5%BC%8F/spark%E9%9B%86%E7%BE%A4%E5%90%AF%E5%8A%A8/" class="cy_cmt_count" data-xid="2022/03/08/分布式/spark集群启动/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -346,7 +361,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>182</span>
+              <span>113</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -365,140 +380,12 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="一、缓存穿透"><a href="#一、缓存穿透" class="headerlink" title="一、缓存穿透"></a>一、缓存穿透</h2><h3 id="1-1-缓存穿透概念"><a href="#1-1-缓存穿透概念" class="headerlink" title="1.1 缓存穿透概念"></a>1.1 缓存穿透概念</h3><blockquote>
-<p>​    高并发场景下缓存的某一个key被高并发访问但没有命中，于是并发访问数据库，导致数据库并发的执行大量查询操作，对数据库造成巨大的压力</p>
-</blockquote>
-<h3 id="2-2-解决方案"><a href="#2-2-解决方案" class="headerlink" title="2.2 解决方案"></a>2.2 解决方案</h3><h4 id="2-2-1"><a href="#2-2-1" class="headerlink" title="2.2.1"></a>2.2.1</h4><h2 id="二、缓存击穿"><a href="#二、缓存击穿" class="headerlink" title="二、缓存击穿"></a>二、缓存击穿</h2><blockquote>
-<p>​    一个key非常热点，在不停的扛着大并发，大并发集中对这一个点进行访问，当这个key在失效的瞬间，持续的大并发就穿破缓存，直接请求数据库，就像在一个屏障上凿开了一个洞</p>
-</blockquote>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/%E5%BC%80%E5%8F%91/%E8%B7%A8%E5%9F%9F/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/08/%E5%BC%80%E5%8F%91/%E8%B7%A8%E5%9F%9F/" class="post-title-link" itemprop="url">跨域问题</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-01-23 13:56:36" itemprop="dateModified" datetime="2022-01-23T13:56:36+08:00">2022-01-23</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%BC%80%E6%94%BE/" itemprop="url" rel="index"><span itemprop="name">开放</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/08/%E5%BC%80%E5%8F%91/%E8%B7%A8%E5%9F%9F/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/%E5%BC%80%E5%8F%91/%E8%B7%A8%E5%9F%9F/" class="cy_cmt_count" data-xid="2022/03/08/开发/跨域/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>908</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="一、介绍"><a href="#一、介绍" class="headerlink" title="一、介绍"></a>一、介绍</h2><h3 id="1-1-跨域原因"><a href="#1-1-跨域原因" class="headerlink" title="1.1 跨域原因"></a>1.1 跨域原因</h3><ul>
-<li><strong>浏览器</strong>的同源策略限制：浏览器核心、基本的安全功能，如果缺少了同源策略，则浏览器的正常功能可能都会受到影响。</li>
-<li>同源策略：会阻止一个域的js和另外一个域的内容进行交互。http-host-port。</li>
-<li>前后端分离：前后端的域不一致。</li>
-</ul>
-<h3 id="1-2-没有同源策略会引发的问题"><a href="#1-2-没有同源策略会引发的问题" class="headerlink" title="1.2 没有同源策略会引发的问题"></a>1.2 没有同源策略会引发的问题</h3><p>​    一个网站用户Bob可能正在浏览聊天论坛，而同时另一个用户Alice也在此论坛中，并且后者刚刚发布了一个具有Bob银行链接的图片消息。设想一下，Alice编写了一个在Bob的银行站点上进行取款的form提交的链接，并将此链接作为图片src。如果Bob的银行在cookie中保存他的授权信息，并且此cookie没有过期，那么当Bob的浏览器尝试装载图片时将提交这个取款form和他的cookie，这样在没经Bob同意的情况下便授权了这次事务。</p>
-<ol>
-<li>病毒网站对cookie、session的<a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_37493556/article/details/106734689?utm_medium=distribute.pc_aggpage_search_result.none-task-blog-2~aggregatepage~first_rank_ecpm_v1~rank_v31_ecpm-1-106734689.pc_agg_new_rank&utm_term=%E8%B7%A8%E5%9F%9F%E7%9A%84%E6%9C%AC%E8%B4%A8%E6%98%AF%E4%BB%80%E4%B9%88&spm=1000.2123.3001.4430">盗用</a></li>
-<li>盗版网站对后台资源的复用</li>
+          <ol>
+<li>开启hdfs的储存功能 start-dfs.sh</li>
+<li>删除安全模式  hdfs dfsamin -safemdoe leave</li>
+<li>启动spark的start-all.sh</li>
+<li>启动spark-shell –master spark://master:7077</li>
 </ol>
-<h3 id="1-3-问题"><a href="#1-3-问题" class="headerlink" title="1.3 问题"></a>1.3 问题</h3><ol>
-<li>前端后端的代码需要部署到同一台服务器问题的跨域</li>
-<li><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/493164325/answer/2188756090">前后端不同服务器</a></li>
-</ol>
-<h2 id="二、跨域解决"><a href="#二、跨域解决" class="headerlink" title="二、跨域解决"></a>二、跨域解决</h2><h3 id="2-1-nginx反向代理"><a href="#2-1-nginx反向代理" class="headerlink" title="2.1 nginx反向代理"></a>2.1 nginx反向代理</h3><h4 id="2-2-1-原理"><a href="#2-2-1-原理" class="headerlink" title="2.2.1 原理"></a>2.2.1 原理</h4><p>​    实际就是把前端项目和后端接口项目放到一个域中，然后根据请求地址去请求不同服务器(真正使用的服务器)；</p>
-<h4 id="2-2-2-方案"><a href="#2-2-2-方案" class="headerlink" title="2.2.2 方案"></a>2.2.2 方案</h4><h3 id="2-2-后端配置WebMvcConfig"><a href="#2-2-后端配置WebMvcConfig" class="headerlink" title="2.2 后端配置WebMvcConfig"></a>2.2 后端配置WebMvcConfig</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addCorsMappings</span><span class="params">(CorsRegistry registry)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//添加映射路径</span></span><br><span class="line">        registry.addMapping(<span class="string">&quot;/**&quot;</span>)</span><br><span class="line">            <span class="comment">//是否发送Cookie</span></span><br><span class="line">            .allowCredentials(<span class="keyword">true</span>)</span><br><span class="line">            <span class="comment">//设置放行哪些原始域   SpringBoot2.4.4下低版本使用.allowedOrigins(&quot;*&quot;)</span></span><br><span class="line">            .allowedOrigins(<span class="string">&quot;*&quot;</span>)</span><br><span class="line">            <span class="comment">//.allowedMethods(&quot;*&quot;) //或者放行全部</span></span><br><span class="line">            <span class="comment">//放行哪些原始请求头部信息</span></span><br><span class="line">            .allowedHeaders(<span class="string">&quot;*&quot;</span>)</span><br><span class="line">            <span class="comment">//暴露哪些原始请求头部信息</span></span><br><span class="line">            .exposedHeaders(<span class="string">&quot;*&quot;</span>);</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-
-
-
-
 
       
     </div>
@@ -697,7 +584,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/%E7%AE%97%E6%B3%95/%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/%E6%95%B0%E6%8D%AE%E5%BA%93/jdbc-mybatis-druid/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -711,7 +598,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/03/08/%E7%AE%97%E6%B3%95/%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE/" class="post-title-link" itemprop="url">二分查找</a>
+            <a href="/2022/03/08/%E6%95%B0%E6%8D%AE%E5%BA%93/jdbc-mybatis-druid/" class="post-title-link" itemprop="url">数据库连接过程</a>
         </h2>
 
         <div class="post-meta">
@@ -728,7 +615,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-12-30 01:35:41" itemprop="dateModified" datetime="2021-12-30T01:35:41+08:00">2021-12-30</time>
+                <time title="修改时间：2021-12-13 12:17:44" itemprop="dateModified" datetime="2021-12-13T12:17:44+08:00">2021-12-13</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -736,7 +623,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
                 </span>
             </span>
 
@@ -750,8 +637,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/03/08/%E7%AE%97%E6%B3%95/%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/%E7%AE%97%E6%B3%95/%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE/" class="cy_cmt_count" data-xid="2022/03/08/算法/二分查找/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/03/08/%E6%95%B0%E6%8D%AE%E5%BA%93/jdbc-mybatis-druid/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/%E6%95%B0%E6%8D%AE%E5%BA%93/jdbc-mybatis-druid/" class="cy_cmt_count" data-xid="2022/03/08/数据库/jdbc-mybatis-druid/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -762,7 +649,121 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>661</span>
+              <span>5.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>5 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>[toc]</p>
+<h2 id="一、JDBC"><a href="#一、JDBC" class="headerlink" title="一、JDBC"></a>一、JDBC</h2><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211107122656442.png" alt="image-20211107122656442"></p>
+<h3 id="1-1代码"><a href="#1-1代码" class="headerlink" title="1.1代码"></a>1.1代码</h3><ol>
+<li><p>创建连接</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/03/08/%E6%95%B0%E6%8D%AE%E5%BA%93/jdbc-mybatis-druid/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%9F%A5%E8%AF%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/08/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%9F%A5%E8%AF%86/" class="post-title-link" itemprop="url">mysql知识</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-01 15:57:23" itemprop="dateModified" datetime="2022-03-01T15:57:23+08:00">2022-03-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/08/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%9F%A5%E8%AF%86/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%9F%A5%E8%AF%86/" class="cy_cmt_count" data-xid="2022/03/08/数据库/mysql知识/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.2k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -781,17 +782,16 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="关键"><a href="#关键" class="headerlink" title="关键"></a>关键</h3><ol>
-<li><p>while(begin &lt;= end)</p>
-</li>
-<li><p>关键还是返回end还是begin</p>
-<ul>
-<li>对于返回第一个比他小的，返回end</li>
-<li>对于返回第一个比他大的，返回begin</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span>[]nums=&#123;<span class="number">1</span>,<span class="number">3</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">66</span>&#125;;</span><br><span class="line">        System.out.println(binFind2(nums,<span class="number">0</span>,nums.length-<span class="number">1</span>,-<span class="number">1</span>));</span><br><span class="line">        System.out.println(binFind2(nums,<span class="number">0</span>,nums.length-<span class="number">1</span>,<span class="number">2</span>));</span><br><span class="line">        System.out.println(binFind2(nums,<span class="number">0</span>,nums.length-<span class="number">1</span>,<span class="number">7</span>));</span><br><span class="line">        System.out.println(binFind2(nums,<span class="number">0</span>,nums.length-<span class="number">1</span>,<span class="number">77</span>));</span><br><span class="line">    &#125; </span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">binFind2</span><span class="params">(<span class="keyword">int</span> nums[],<span class="keyword">int</span> begin,<span class="keyword">int</span> end,<span class="keyword">int</span> target)</span></span>&#123;</span><br><span class="line">        <span class="keyword">while</span>(begin&lt;=end)&#123;</span><br><span class="line">            <span class="keyword">int</span> pivot=begin+(end-begin)/<span class="number">2</span>;</span><br><span class="line">            <span class="keyword">if</span>(nums[pivot]==target)</span><br><span class="line">            &#123;</span><br><span class="line">                flag=<span class="keyword">true</span>;</span><br><span class="line">                <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span>(nums[pivot]&lt;target)</span><br><span class="line">                begin=pivot+<span class="number">1</span>;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                end=pivot-<span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> begin;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></li>
-</ol>
-
+          <p>[toc]</p>
+<h3 id="字符类型"><a href="#字符类型" class="headerlink" title="字符类型"></a>字符类型</h3>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/03/08/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%9F%A5%E8%AF%86/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -809,7 +809,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/24/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/24/">24</a><span class="page-number current">25</span><a class="page-number" href="/page/26/">26</a><span class="space">&hellip;</span><a class="page-number" href="/page/55/">55</a><a class="extend next" rel="next" href="/page/26/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/24/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/24/">24</a><span class="page-number current">25</span><a class="page-number" href="/page/26/">26</a><span class="space">&hellip;</span><a class="page-number" href="/page/56/">56</a><a class="extend next" rel="next" href="/page/26/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -877,7 +877,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">273</span>
+          <span class="site-state-item-count">276</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -928,12 +928,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">297k</span>
+    <span title="站点总字数">301k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">4:30</span>
+    <span title="站点阅读时长">4:33</span>
 </div>
 
         
