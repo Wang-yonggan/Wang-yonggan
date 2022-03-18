@@ -187,7 +187,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/13/java/javaSE/JUC/CountDownLatch/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/13/java/javaSE/JUC/%E9%98%BB%E5%A1%9E%E9%98%9F%E5%88%97/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -201,7 +201,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/03/13/java/javaSE/JUC/CountDownLatch/" class="post-title-link" itemprop="url">CountDownLatch</a>
+            <a href="/2022/03/13/java/javaSE/JUC/%E9%98%BB%E5%A1%9E%E9%98%9F%E5%88%97/" class="post-title-link" itemprop="url">阻塞队列BlockingQeque</a>
         </h2>
 
         <div class="post-meta">
@@ -212,7 +212,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2022-03-13 17:19:25 / 修改时间：18:13:22" itemprop="dateCreated datePublished" datetime="2022-03-13T17:19:25+08:00">2022-03-13</time>
+              <time title="创建时间：2022-03-13 18:29:58 / 修改时间：22:02:44" itemprop="dateCreated datePublished" datetime="2022-03-13T18:29:58+08:00">2022-03-13</time>
             </span>
 
           
@@ -225,8 +225,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/03/13/java/javaSE/JUC/CountDownLatch/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/13/java/javaSE/JUC/CountDownLatch/" class="cy_cmt_count" data-xid="2022/03/13/java/javaSE/JUC/CountDownLatch/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/03/13/java/javaSE/JUC/%E9%98%BB%E5%A1%9E%E9%98%9F%E5%88%97/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/13/java/javaSE/JUC/%E9%98%BB%E5%A1%9E%E9%98%9F%E5%88%97/" class="cy_cmt_count" data-xid="2022/03/13/java/javaSE/JUC/阻塞队列/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -237,14 +237,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>1.6k</span>
+              <span>2k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
+              <span>2 分钟</span>
             </span>
 
         </div>
@@ -256,47 +256,69 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="CountDownLatch"><a href="#CountDownLatch" class="headerlink" title="CountDownLatch"></a>CountDownLatch</h3><blockquote>
-<p>组线程 任务完成记录 技术</p>
+          <p>BlockingQeque </p>
+<p>put–&gt;[1,2,3,4,5]–&gt;take</p>
+<p>当队列为空，take操作会被阻塞，直到有元素</p>
+<p>当队列为满，put操作会被阻塞，直到有空位</p>
+<p>优点：把生产者、消费者进行了封装</p>
+<h2 id="二、类型"><a href="#二、类型" class="headerlink" title="二、类型"></a>二、类型</h2><p><strong>Deque</strong>是双向队列</p>
+<h3 id="2-1-ArrayBlockingQueue"><a href="#2-1-ArrayBlockingQueue" class="headerlink" title="2.1 ArrayBlockingQueue"></a>2.1 ArrayBlockingQueue</h3><blockquote>
+<p>基于数组结构的有界队列</p>
 </blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> n=<span class="number">30</span>;</span><br><span class="line">    CountDownLatch latch=<span class="keyword">new</span> CountDownLatch(n);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">        <span class="keyword">new</span> Thread(() -&gt; &#123;</span><br><span class="line">            System.out.println(Thread.currentThread().getName() + <span class="string">&quot;号离开&quot;</span>);<span class="comment">//任务</span></span><br><span class="line">            latch.countDown();<span class="comment">//每个线程完成就减少一次</span></span><br><span class="line">                         &#125;, String.valueOf(i)<span class="comment">//线程名称</span></span><br><span class="line"></span><br><span class="line">                  ).start();</span><br><span class="line">    &#125;</span><br><span class="line">    latch.await();<span class="comment">//还没减少到0，等待</span></span><br><span class="line">    System.out.println(Thread.currentThread().getName()+<span class="string">&quot;锁门&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="CyclicBarrier循环屏障"><a href="#CyclicBarrier循环屏障" class="headerlink" title="CyclicBarrier循环屏障"></a>CyclicBarrier循环屏障</h3><blockquote>
-<p>组线程 前后任务 技术</p>
+<h3 id="2-2-LinkedBlockingQueue"><a href="#2-2-LinkedBlockingQueue" class="headerlink" title="2.2 LinkedBlockingQueue"></a>2.2 LinkedBlockingQueue</h3><blockquote>
+<p>基于链表的有界队列</p>
 </blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//设置固定值</span></span><br><span class="line"> <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> NUM=<span class="number">10</span>;</span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">     CyclicBarrier cyclicBarrier=<span class="keyword">new</span> CyclicBarrier(NUM,()-&gt; System.out.println(<span class="string">&quot;收集完成&quot;</span>));<span class="comment">//</span></span><br><span class="line">     <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;NUM;i++)&#123;</span><br><span class="line">         <span class="keyword">int</span> finalI = i;</span><br><span class="line">         <span class="keyword">new</span> Thread(()-&gt;&#123;</span><br><span class="line">             System.out.println(Thread.currentThread().getName()+<span class="string">&quot;被收集&quot;</span>);</span><br><span class="line">             <span class="keyword">try</span> &#123;</span><br><span class="line">                 cyclicBarrier.await();</span><br><span class="line">             &#125; <span class="keyword">catch</span> (InterruptedException | BrokenBarrierException e) &#123;</span><br><span class="line">                 e.printStackTrace();</span><br><span class="line">             &#125;</span><br><span class="line">             System.out.println(<span class="string">&quot;结束&quot;</span>+finalI);<span class="comment">//都完成后</span></span><br><span class="line">         &#125;,String.valueOf(i)).start();</span><br><span class="line">     &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="Semaphore信号灯"><a href="#Semaphore信号灯" class="headerlink" title="Semaphore信号灯"></a>Semaphore信号灯</h3><blockquote>
-<p>资源抢占技术</p>
+<h3 id="2-3-LinkedBlockingDeque"><a href="#2-3-LinkedBlockingDeque" class="headerlink" title="2.3 LinkedBlockingDeque"></a>2.3 LinkedBlockingDeque</h3><blockquote>
+<p>基于链表的双向队列</p>
 </blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">Semaphore semaphore=<span class="keyword">new</span> Semaphore(<span class="number">3</span>);<span class="comment">//创建资源</span></span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;<span class="number">6</span>;i++)&#123;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">int</span> x=i;</span><br><span class="line">    <span class="keyword">new</span> Thread(()-&gt;&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            semaphore.acquire();<span class="comment">//抢占资源</span></span><br><span class="line">            System.out.println(x+<span class="string">&quot;抢到资源&quot;</span>);</span><br><span class="line">            TimeUnit.SECONDS.sleep(<span class="number">2</span>);<span class="comment">//占用资源</span></span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;<span class="keyword">finally</span> &#123;</span><br><span class="line">            semaphore.release();<span class="comment">//释放资源</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;).start();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="2-4-PriorityBlockingQueue"><a href="#2-4-PriorityBlockingQueue" class="headerlink" title="2.4 PriorityBlockingQueue"></a>2.4 PriorityBlockingQueue</h3><blockquote>
+<p>基于优先队列的，可延迟、无界</p>
+</blockquote>
+<h3 id="2-5-增删操作"><a href="#2-5-增删操作" class="headerlink" title="2.5 增删操作"></a>2.5 增删操作</h3><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>异常</th>
+<th>bool</th>
+<th>阻塞</th>
+<th>超时</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>插入</td>
+<td>add</td>
+<td>offer</td>
+<td>put</td>
+<td>offer(time,unit)</td>
+</tr>
+<tr>
+<td>删除</td>
+<td>remove</td>
+<td>poll</td>
+<td>take</td>
+<td>poll(time,unit)</td>
+</tr>
+<tr>
+<td>检查</td>
+<td>element</td>
+<td>peek</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>说明</td>
+<td>抛出异常</td>
+<td>成功：true</td>
+<td>一直等待成功</td>
+<td></td>
+</tr>
+</tbody></table>
+<h4 id="2-6-阻塞队列解决生产者消费者"><a href="#2-6-阻塞队列解决生产者消费者" class="headerlink" title="2.6 阻塞队列解决生产者消费者"></a>2.6 阻塞队列解决生产者消费者</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> 生产者消费者 </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//创建消费者</span></span><br><span class="line">        <span class="keyword">int</span> customerNum=<span class="number">2</span>;</span><br><span class="line">        <span class="keyword">int</span> producerNum=<span class="number">1</span>;</span><br><span class="line">        List&lt;Thread&gt;customers=<span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        List&lt;Thread&gt;producers=<span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;customerNum;i++)</span><br><span class="line">            customers.add(<span class="keyword">new</span> Thread(<span class="keyword">new</span> Customer()));</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;producerNum;i++)</span><br><span class="line">            producers.add(<span class="keyword">new</span> Thread(<span class="keyword">new</span> Producer()));</span><br><span class="line">        customers.forEach(Thread::start);</span><br><span class="line">        producers.forEach(Thread::start);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Foot</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Customer</span> <span class="keyword">extends</span> <span class="title">Resource</span> <span class="keyword">implements</span> <span class="title">Runnable</span></span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                queue.take();</span><br><span class="line">                System.out.println(<span class="string">&quot;消费了第&quot;</span> + customFoot++ + <span class="string">&quot;个foot,现在容量为:&quot;</span> + queue.size());</span><br><span class="line">                TimeUnit.MILLISECONDS.sleep(<span class="number">20</span>);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (InterruptedException ex) &#123;</span><br><span class="line">                ex.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Producer</span> <span class="keyword">extends</span> <span class="title">Resource</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                queue.put(<span class="keyword">new</span> 生产者消费者.Foot());</span><br><span class="line">                System.out.println(<span class="string">&quot;生产了第&quot;</span> + productFoot++ + <span class="string">&quot;个foot,现在容量为:&quot;</span> + queue.size());</span><br><span class="line">                TimeUnit.MILLISECONDS.sleep(<span class="number">20</span>);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Resource</span> </span>&#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> productFoot = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> customFoot = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> size = <span class="number">100</span>;</span><br><span class="line">    <span class="keyword">static</span> BlockingQueue&lt;生产者消费者.Foot&gt; queue = <span class="keyword">new</span> ArrayBlockingQueue&lt;&gt;(size);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 
 
-<h3 id="区别"><a href="#区别" class="headerlink" title="区别"></a>区别</h3><ul>
-<li><p>CountdownLatch执行流程</p>
-<ul>
-<li>执行一组线程</li>
-<li>CountdownLatch.awite()  阻塞主线程等待。知道全部完成</li>
-<li>没有总结线程，他的main线程可以近似总结线程</li>
-</ul>
-</li>
-<li><p>Syslicbarrier的执行流程是</p>
-<ul>
-<li><p>任务定义</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">work&#123;</span><br><span class="line">	beforeWork();</span><br><span class="line">	cyclicBarrier.await();</span><br><span class="line">	afterWork();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p>执行一组任务的beforeWork</p>
-</li>
-<li><p>全部完成后执行cyclicBarrier的<code>总结</code>线程</p>
-</li>
-<li><p>执行这组任务的afterWork()</p>
-</li>
-</ul>
-</li>
-</ul>
-
+<h2 id="BlockingDeque-阻塞双端队列"><a href="#BlockingDeque-阻塞双端队列" class="headerlink" title="BlockingDeque 阻塞双端队列"></a>BlockingDeque 阻塞双端队列</h2><p>deque: double ended queue 双端队列，可以从首部和尾部插入元素</p>
+<h2 id="BlockingQeque-阻塞队列"><a href="#BlockingQeque-阻塞队列" class="headerlink" title="BlockingQeque 阻塞队列"></a>BlockingQeque 阻塞队列</h2><h2 id="ArrayBlockingQueue"><a href="#ArrayBlockingQueue" class="headerlink" title="ArrayBlockingQueue"></a>ArrayBlockingQueue</h2><h2 id="ConcurrentHashMap"><a href="#ConcurrentHashMap" class="headerlink" title="ConcurrentHashMap"></a>ConcurrentHashMap</h2><h2 id="ConcurrentLinkedDeque"><a href="#ConcurrentLinkedDeque" class="headerlink" title="ConcurrentLinkedDeque"></a>ConcurrentLinkedDeque</h2><h2 id="ConcurrentLinkedQueue"><a href="#ConcurrentLinkedQueue" class="headerlink" title="ConcurrentLinkedQueue"></a>ConcurrentLinkedQueue</h2><h2 id="CopyOnWriteArrayList"><a href="#CopyOnWriteArrayList" class="headerlink" title="CopyOnWriteArrayList"></a>CopyOnWriteArrayList</h2><h2 id="CopyOnWriteArraySet"><a href="#CopyOnWriteArraySet" class="headerlink" title="CopyOnWriteArraySet"></a>CopyOnWriteArraySet</h2><h2 id="DelayQueue"><a href="#DelayQueue" class="headerlink" title="DelayQueue"></a>DelayQueue</h2>
       
     </div>
 
@@ -315,7 +337,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/13/java/javaSE/JUC/%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/13/%E6%95%B0%E6%8D%AE%E5%BA%93/MVCC/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -329,7 +351,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/03/13/java/javaSE/JUC/%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B/" class="post-title-link" itemprop="url">创建线程</a>
+            <a href="/2022/03/13/%E6%95%B0%E6%8D%AE%E5%BA%93/MVCC/" class="post-title-link" itemprop="url">MVCC</a>
         </h2>
 
         <div class="post-meta">
@@ -340,7 +362,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2022-03-13 16:59:26 / 修改时间：21:36:00" itemprop="dateCreated datePublished" datetime="2022-03-13T16:59:26+08:00">2022-03-13</time>
+              <time title="创建时间：2022-03-13 18:16:32 / 修改时间：18:16:40" itemprop="dateCreated datePublished" datetime="2022-03-13T18:16:32+08:00">2022-03-13</time>
             </span>
 
           
@@ -353,125 +375,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/03/13/java/javaSE/JUC/%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/13/java/javaSE/JUC/%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B/" class="cy_cmt_count" data-xid="2022/03/13/java/javaSE/JUC/创建线程/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>645</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="1-Thread"><a href="#1-Thread" class="headerlink" title="1. Thread"></a>1. Thread</h3><h4 id="1-1-特点"><a href="#1-1-特点" class="headerlink" title="1.1 特点"></a>1.1 特点</h4><ol>
-<li>可以在run方法中用this，而runable需要Thread.cuncruntThread()</li>
-</ol>
-<h3 id="2-Runnable"><a href="#2-Runnable" class="headerlink" title="2. Runnable"></a>2. Runnable</h3><blockquote>
-<p>函数式接口</p>
-</blockquote>
-<h4 id="2-1-特点"><a href="#2-1-特点" class="headerlink" title="2.1 特点"></a>2.1 特点</h4><ol>
-<li><p>可多继承</p>
-</li>
-<li><p>特殊：可共享变量：在实现类初始化static变量，那么这个实现类的实例们就能共享这个</p>
-</li>
-<li><p>可以减少重复代码</p>
-</li>
-<li><p>Runnable有个很关键的步骤就是创建Thread，那么我们可以 </p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Thread t1=<span class="keyword">new</span> Thread(runnable1,<span class="string">&quot;t1&quot;</span>);</span><br><span class="line">Thread t2=<span class="keyword">new</span> Thread(runnable1,<span class="string">&quot;t2&quot;</span>);</span><br><span class="line">Thread t3=<span class="keyword">new</span> Thread(runnable1,<span class="string">&quot;t3&quot;</span>);</span><br><span class="line"><span class="comment">//这样不仅能节省代码，hai&#x27;nen</span></span><br></pre></td></tr></table></figure></li>
-</ol>
-<h3 id="3-Callable"><a href="#3-Callable" class="headerlink" title="3 Callable"></a>3 Callable</h3><blockquote>
-<p>未来任务，有返回值</p>
-</blockquote>
-<h4 id="3-1-特点"><a href="#3-1-特点" class="headerlink" title="3.1 特点"></a>3.1 特点</h4><ol>
-<li>有返回值</li>
-<li>借助于中间人Feature进行Callable和</li>
-<li>可以抛出异常</li>
-</ol>
-<h4 id="3-2-代码"><a href="#3-2-代码" class="headerlink" title="3.2 代码"></a>3.2 代码</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">FutureTask&lt;Object&gt;futureTask=<span class="keyword">new</span> FutureTask&lt;&gt;(()-&gt;<span class="keyword">new</span> Object());</span><br><span class="line"><span class="comment">//等待一段时间</span></span><br><span class="line"><span class="keyword">while</span> (!futureTask.isDone())&#123;</span><br><span class="line">    System.out.println(<span class="string">&quot;等待&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line">Object res = futureTask.get();</span><br></pre></td></tr></table></figure>
-
-<h4 id="3-3"><a href="#3-3" class="headerlink" title="3.3"></a>3.3</h4><ol>
-<li>futureTask.get() 是阻塞的，如果没有Done，那么会卡在这里</li>
-</ol>
-<h3 id="实现Runnable和继承Thred区别"><a href="#实现Runnable和继承Thred区别" class="headerlink" title="实现Runnable和继承Thred区别"></a>实现Runnable和继承Thred区别</h3>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/13/%E7%BB%84%E4%BB%B6/netty/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/13/%E7%BB%84%E4%BB%B6/netty/" class="post-title-link" itemprop="url">netty</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2022-03-13 13:49:23 / 修改时间：13:49:36" itemprop="dateCreated datePublished" datetime="2022-03-13T13:49:23+08:00">2022-03-13</time>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/13/%E7%BB%84%E4%BB%B6/netty/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/13/%E7%BB%84%E4%BB%B6/netty/" class="cy_cmt_count" data-xid="2022/03/13/组件/netty/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/03/13/%E6%95%B0%E6%8D%AE%E5%BA%93/MVCC/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/13/%E6%95%B0%E6%8D%AE%E5%BA%93/MVCC/" class="cy_cmt_count" data-xid="2022/03/13/数据库/MVCC/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -520,7 +425,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/13/java/java%E9%9B%86%E5%90%88/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/13/java/javaSE/JUC/lock/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -534,7 +439,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/03/13/java/java%E9%9B%86%E5%90%88/" class="post-title-link" itemprop="url">java集合</a>
+            <a href="/2022/03/13/java/javaSE/JUC/lock/" class="post-title-link" itemprop="url">锁</a>
         </h2>
 
         <div class="post-meta">
@@ -543,16 +448,10 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2022-03-13 03:55:04" itemprop="dateCreated datePublished" datetime="2022-03-13T03:55:04+08:00">2022-03-13</time>
+              <time title="创建时间：2022-03-13 18:08:46 / 修改时间：21:28:16" itemprop="dateCreated datePublished" datetime="2022-03-13T18:08:46+08:00">2022-03-13</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-16 01:11:01" itemprop="dateModified" datetime="2022-03-16T01:11:01+08:00">2022-03-16</time>
-              </span>
 
           
   
@@ -564,8 +463,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/03/13/java/java%E9%9B%86%E5%90%88/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/13/java/java%E9%9B%86%E5%90%88/" class="cy_cmt_count" data-xid="2022/03/13/java/java集合/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/03/13/java/javaSE/JUC/lock/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/13/java/javaSE/JUC/lock/" class="cy_cmt_count" data-xid="2022/03/13/java/javaSE/JUC/lock/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -576,7 +475,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>657</span>
+              <span>1k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -595,63 +494,45 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="Map"><a href="#Map" class="headerlink" title="Map"></a>Map</h3><h3 id="Arrays"><a href="#Arrays" class="headerlink" title="Arrays"></a>Arrays</h3><ol>
-<li><p>Arrays.sort(nums)</p>
-<ol>
-<li>len&lt;286 用快排</li>
-<li>否则:检查是否已经接近有序</li>
-<li>如果不是接近有序,用快排</li>
-<li>用合并排序</li>
+          <h3 id="Lock的使用"><a href="#Lock的使用" class="headerlink" title="Lock的使用"></a>Lock的使用</h3><blockquote>
+<p>自增 lock上锁，condition 状态转换</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">Lock lock = <span class="keyword">new</span> ReentrantLock();<span class="comment">//可重入锁，lock.lock()上锁</span></span><br><span class="line">Condition condition = lock.newCondition();<span class="comment">//状态监视-转换器 await 等待， signalAll 唤醒全部</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">int</span> num;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">increment</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    lock.lock();<span class="comment">//上锁</span></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">while</span> (num != <span class="number">0</span>) &#123;</span><br><span class="line">            condition.await();<span class="comment">//等待</span></span><br><span class="line">        &#125;</span><br><span class="line">        num++;</span><br><span class="line">        condition.signal();<span class="comment">//唤醒</span></span><br><span class="line">    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line"></span><br><span class="line">    &#125;<span class="keyword">finally</span>&#123;</span><br><span class="line">    	lock.unlock();<span class="comment">//解锁</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h4><blockquote>
+<p>基于CSA</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (compareAndSetState(<span class="number">0</span>, <span class="number">1</span>))</span><br><span class="line">    setExclusiveOwnerThread(Thread.currentThread());</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    acquire(<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="精准唤醒"><a href="#精准唤醒" class="headerlink" title="精准唤醒"></a>精准唤醒</h4><h3 id="synchonized和Lock区别"><a href="#synchonized和Lock区别" class="headerlink" title="synchonized和Lock区别"></a>synchonized和Lock区别</h3><ol>
+<li>synchonized是一个关键字，Lock是一个类</li>
+<li>synchonized是隐式锁，自动上锁解锁，Lock是显式锁，手动操作</li>
+<li>synchonized无法获得所得状态，Lock可以判断是否获得了锁，更灵活</li>
+<li>synchonized是非公平锁，Lock默认是非公平锁，可设置</li>
+<li>synchonized适合锁少量的代码，Lock是否大量代码</li>
+<li>conditon可以精准唤醒</li>
 </ol>
-</li>
-</ol>
-<h3 id="ArrayList和LinkedArrayList区别"><a href="#ArrayList和LinkedArrayList区别" class="headerlink" title="ArrayList和LinkedArrayList区别"></a>ArrayList和LinkedArrayList区别</h3><blockquote>
-<p>数组初始大小为10,因为会copy,所以建议分配一个合适的的初始值</p>
+<h3 id="乐观锁"><a href="#乐观锁" class="headerlink" title="乐观锁"></a>乐观锁</h3><blockquote>
+<p>基于版本</p>
 </blockquote>
 <ol>
-<li>ArrayList基于数组<ol>
-<li>擅长下标访问</li>
-<li>数组内存连续</li>
-<li>插入元素在中间会移动数组</li>
-<li>会扩容copy 每次扩50%</li>
-<li>有序</li>
-</ol>
+<li><p>支持并发</p>
 </li>
-<li>LinkedArrayList基于双向链表<ol>
-<li></li>
-<li>擅长增加元素</li>
+<li><p>在提交任务之前比较版本号，不一致就放弃，再申请提交，知道提交完成</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">update t_goods </span><br><span class="line"><span class="keyword">set</span> status<span class="operator">=</span><span class="number">2</span>,version<span class="operator">=</span>version<span class="operator">+</span><span class="number">1</span></span><br><span class="line"><span class="keyword">where</span> id<span class="operator">=</span>#&#123;id&#125; <span class="keyword">and</span> version<span class="operator">=</span>#&#123;version&#125;;</span><br></pre></td></tr></table></figure></li>
 </ol>
-</li>
+<h3 id="悲观锁"><a href="#悲观锁" class="headerlink" title="悲观锁"></a>悲观锁</h3><ol>
+<li>串行化</li>
 </ol>
-<h3 id="扩容机制"><a href="#扩容机制" class="headerlink" title="扩容机制"></a>扩容机制</h3><ol>
-<li>ArrayList: size*1.5</li>
-<li>StringBuffer: size*2+2</li>
-</ol>
-<h3 id="序列化机制"><a href="#序列化机制" class="headerlink" title="序列化机制"></a>序列化机制</h3><ol>
-<li>ArrayList<ol>
-<li>elementData被transient修饰，不会被序列化，这是因为len&lt;size。</li>
-<li>实现：基于readObject和writeObject</li>
-</ol>
-</li>
-</ol>
-<h3 id="fast-fail机制"><a href="#fast-fail机制" class="headerlink" title="fast-fail机制"></a>fast-fail机制</h3><blockquote>
-<p>fast-fail是一种理念,是代码设计者预先知道某个地方会发生错误,而预先进行了if判断抛出自定义异常</p>
+<h3 id="表锁"><a href="#表锁" class="headerlink" title="表锁"></a>表锁</h3><h3 id="行锁"><a href="#行锁" class="headerlink" title="行锁"></a>行锁</h3><h3 id="读锁、共享锁、S锁、"><a href="#读锁、共享锁、S锁、" class="headerlink" title="读锁、共享锁、S锁、"></a>读锁、共享锁、S锁、</h3><blockquote>
+<p>如果事务T对数据A加上共享锁后，则其他事务只能对A再加共享锁，不能加排他锁。获准共享锁的事务只能读数据，不能修改数据。</p>
 </blockquote>
-<h4 id="触发机制"><a href="#触发机制" class="headerlink" title="触发机制"></a>触发机制</h4><ol>
-<li><p>foreach,for-each循环中的remove,add</p>
-<blockquote>
-<p>虽然for-each是基于iterator迭代是实现的,但是,你在for-each中没有拿到iter,删除元素还是需要list.remove</p>
+<h3 id="写锁、独占锁、排他锁、T锁"><a href="#写锁、独占锁、排他锁、T锁" class="headerlink" title="写锁、独占锁、排他锁、T锁"></a>写锁、独占锁、排他锁、T锁</h3><blockquote>
+<p>如果事务T对数据A加上排他锁后，则其他事务不能再对A加任任何类型的封锁。获准排他锁的事务既能读数据，又能修改数据。</p>
 </blockquote>
-</li>
-<li><p>iterator的add</p>
-</li>
-</ol>
-<h4 id="iter的reomove"><a href="#iter的reomove" class="headerlink" title="iter的reomove"></a>iter的reomove</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ArrayList.<span class="keyword">this</span>.remove(index);</span><br><span class="line">expectedModCount = modCount;<span class="comment">//x</span></span><br></pre></td></tr></table></figure>
 
-
-
-<h3 id="fast-safe机制"><a href="#fast-safe机制" class="headerlink" title="fast-safe机制"></a>fast-safe机制</h3><h3 id="线程安全的ArrayList"><a href="#线程安全的ArrayList" class="headerlink" title="线程安全的ArrayList"></a>线程安全的ArrayList</h3><h2 id="HashMap"><a href="#HashMap" class="headerlink" title="HashMap"></a>HashMap</h2><h3 id="结构"><a href="#结构" class="headerlink" title="结构"></a>结构</h3><p>jdk8：数组+链表+红黑树</p>
-<h3 id="红黑树"><a href="#红黑树" class="headerlink" title="红黑树"></a>红黑树</h3><h3 id="put流程"><a href="#put流程" class="headerlink" title="put流程"></a>put流程</h3><h3 id="get流程"><a href="#get流程" class="headerlink" title="get流程"></a>get流程</h3><h3 id="hash函数"><a href="#hash函数" class="headerlink" title="hash函数"></a>hash函数</h3><h3 id=""><a href="#" class="headerlink" title=""></a></h3>
       
     </div>
 
@@ -670,7 +551,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/13/java/%E5%BA%8F%E5%88%97%E5%8C%96/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/13/java/javaSE/JUC/atmoic/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -684,7 +565,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/03/13/java/%E5%BA%8F%E5%88%97%E5%8C%96/" class="post-title-link" itemprop="url">java序列化</a>
+            <a href="/2022/03/13/java/javaSE/JUC/atmoic/" class="post-title-link" itemprop="url">未命名</a>
         </h2>
 
         <div class="post-meta">
@@ -693,9 +574,8 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2022-03-13 01:24:36 / 修改时间：04:16:25" itemprop="dateCreated datePublished" datetime="2022-03-13T01:24:36+08:00">2022-03-13</time>
+              <time title="创建时间：2022-03-13 18:08:18" itemprop="dateCreated datePublished" datetime="2022-03-13T18:08:18+08:00">2022-03-13</time>
             </span>
 
           
@@ -708,8 +588,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/03/13/java/%E5%BA%8F%E5%88%97%E5%8C%96/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/13/java/%E5%BA%8F%E5%88%97%E5%8C%96/" class="cy_cmt_count" data-xid="2022/03/13/java/序列化/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/03/13/java/javaSE/JUC/atmoic/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/13/java/javaSE/JUC/atmoic/" class="cy_cmt_count" data-xid="2022/03/13/java/javaSE/JUC/atmoic/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -720,7 +600,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>308</span>
+              <span>0</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -739,17 +619,94 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="java自带序列化缺点"><a href="#java自带序列化缺点" class="headerlink" title="java自带序列化缺点"></a>java自带序列化缺点</h3><ol>
-<li>性能差</li>
-<li>序列化后的体积不佳(记录了类的信息)</li>
-<li>只能用在Java上，无法跨语言</li>
-<li>serializationID的存在造成向前兼容性不好，实践无法落地</li>
-</ol>
-<h3 id="自定义序列化"><a href="#自定义序列化" class="headerlink" title="自定义序列化"></a>自定义序列化</h3><p>如果一个类不仅实现了Serializable接口，而且定义了 readObject（ObjectInputStream in）和 writeObject(ObjectOutputStream out)方法，那么将按照如下的方式进行序列化和反序列化：</p>
-<blockquote>
-<p>ObjectOutputStream会调用这个类的writeObject方法进行序列化，ObjectInputStream会调用相应的readObject方法进行反序列化。</p>
-</blockquote>
-<h2 id="其他的序列化方式"><a href="#其他的序列化方式" class="headerlink" title="其他的序列化方式"></a>其他的序列化方式</h2><h3 id="json"><a href="#json" class="headerlink" title="json"></a>json</h3><h3 id="yml"><a href="#yml" class="headerlink" title="yml"></a>yml</h3>
+          
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/13/java/javaSE/JUC/TimeUnit/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/13/java/javaSE/JUC/TimeUnit/" class="post-title-link" itemprop="url">未命名</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-13 18:08:11" itemprop="dateCreated datePublished" datetime="2022-03-13T18:08:11+08:00">2022-03-13</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/13/java/javaSE/JUC/TimeUnit/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/13/java/javaSE/JUC/TimeUnit/" class="cy_cmt_count" data-xid="2022/03/13/java/javaSE/JUC/TimeUnit/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>0</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          
       
     </div>
 
@@ -767,7 +724,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/3/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/56/">56</a><a class="extend next" rel="next" href="/page/5/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/3/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/57/">57</a><a class="extend next" rel="next" href="/page/5/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -835,7 +792,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">280</span>
+          <span class="site-state-item-count">285</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -886,12 +843,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">304k</span>
+    <span title="站点总字数">308k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">4:36</span>
+    <span title="站点阅读时长">4:40</span>
 </div>
 
         

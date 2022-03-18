@@ -187,175 +187,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/ORM/mybatis/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/08/%E7%BB%84%E4%BB%B6/ORM/mybatis/" class="post-title-link" itemprop="url">未命名</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-08 00:33:40" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:40+08:00">2022-03-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-10 02:07:51" itemprop="dateModified" datetime="2022-03-10T02:07:51+08:00">2022-03-10</time>
-              </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/08/%E7%BB%84%E4%BB%B6/ORM/mybatis/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/ORM/mybatis/" class="cy_cmt_count" data-xid="2022/03/08/组件/ORM/mybatis/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>3.9k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>4 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>[toc]</p>
-<h3 id="大致步骤"><a href="#大致步骤" class="headerlink" title="大致步骤"></a>大致步骤</h3><ol>
-<li>sqlSessionFactoryBuilder   &lt;- sqlMapConfig</li>
-<li>sqlSessionFactory –&gt;sqlSession（Connection的封装，有增删改查功能）</li>
-<li>①生成代理对象          ② 定义通用的sql语句</li>
-<li>这地方没听会</li>
-<li>封装结果集</li>
-</ol>
-<h3 id="特别的"><a href="#特别的" class="headerlink" title="特别的"></a>特别的</h3><ol>
-<li><p>插入后对象会自动生成id</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Repo entity = <span class="keyword">new</span> Repo();</span><br><span class="line">BeanMapper.copy(reqDTO, entity);</span><br><span class="line"><span class="keyword">this</span>.saveOrUpdate(entity);</span><br><span class="line">RepoCategories repoCategories = <span class="keyword">new</span> RepoCategories();</span><br><span class="line">BeanMapper.copy(reqDTO, repoCategories);</span><br><span class="line"><span class="comment">//已经自动copy parentId</span></span><br><span class="line"><span class="comment">//插入entity已经自动形成id</span></span><br><span class="line">repoCategories.setId(entity.getId());</span><br></pre></td></tr></table></figure></li>
-<li><p>xml可以 arg0  param1 但是不能写参数类型</p>
-</li>
-<li><p>模糊查询</p>
-<ol>
-<li>传入前加入%%</li>
-<li>在mapper.xml中写    ‘%${arg0}%’</li>
-<li>like concat(‘%’,#{arg0},’%’)</li>
-</ol>
-</li>
-</ol>
-<h3 id="tree-查询"><a href="#tree-查询" class="headerlink" title="tree 查询"></a>tree 查询</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AppInfo</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> id;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> parentid;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">    <span class="keyword">private</span> List&lt;AppInfo&gt; childList;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">resultMap</span> <span class="attr">id</span>=<span class="string">&quot;appsTree&quot;</span> <span class="attr">type</span>=<span class="string">&quot;com.lg.business.common.ws.AppInfo&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">id</span> <span class="attr">column</span>=<span class="string">&quot;id&quot;</span> <span class="attr">property</span>=<span class="string">&quot;id&quot;</span> <span class="attr">javaType</span>=<span class="string">&quot;int&quot;</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">&quot;parentid&quot;</span> <span class="attr">property</span>=<span class="string">&quot;parentid&quot;</span> <span class="attr">javaType</span>=<span class="string">&quot;int&quot;</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">&quot;name&quot;</span> <span class="attr">property</span>=<span class="string">&quot;name&quot;</span> <span class="attr">javaType</span>=<span class="string">&quot;String&quot;</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">collection</span> <span class="attr">column</span>=<span class="string">&quot;id&quot;</span> <span class="attr">property</span>=<span class="string">&quot;childList&quot;</span> <span class="attr">select</span>=<span class="string">&quot;getAppsByPid&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">resultMap</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;getAllWsAppList&quot;</span> <span class="attr">resultMap</span>=<span class="string">&quot;appsTree&quot;</span>&gt;</span></span><br><span class="line">        select id,parentid,name from flow_app_info where parentid=0</span><br><span class="line">    <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;getAppsByPid&quot;</span> <span class="attr">resultMap</span>=<span class="string">&quot;appsTree&quot;</span>&gt;</span></span><br><span class="line">        select id,parentid,name from flow_app_info where parentid=#&#123;id&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="一、ORM框架介绍"><a href="#一、ORM框架介绍" class="headerlink" title="一、ORM框架介绍"></a>一、ORM框架介绍</h3><ol>
-<li><p>就好像抽掉各个部件的计算机主板，它没有实际作用，但是有许多部件接口，部件被装上后就能使用了</p>
-<p>优点：提高开发效率  统一规则，利于团队管理  灵活的配置，利于维护   </p>
-</li>
-<li><p>SSM框架  </p>
-<pre><code> spring      --框架的框架
- springMVC   --用于web应用分层
- mybatis     --小鸟：简化数据库的交互   JDBC的封装
-</code></pre>
-</li>
-</ol>
-<h3 id="二、类"><a href="#二、类" class="headerlink" title="二、类"></a>二、类</h3><ol>
-<li>sqlSessionFactory</li>
-<li>sqlSession   自定义mybatis和数据库交互的核心类   </li>
-<li>IuerDao<br> @select(“select * from name”)<br> List<user> findAll(); </li>
-</ol>
-<h3 id="三、类"><a href="#三、类" class="headerlink" title="三、类"></a>三、类</h3><ol>
-<li>class Resource  使用类加载器读取配置文件的类 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> inputstream <span class="title">getResourceStream</span><span class="params">(filePath)</span></span></span><br><span class="line"><span class="function">    return Resource.Class.getClassloader.<span class="title">getResourceAsStream</span><span class="params">(filePath)</span> <span class="comment">//获取字节码     获取字节码类加载器   根据类加载器读取配置</span></span></span><br></pre></td></tr></table></figure>
-</li>
-<li>class sqlSessionFactoryBuilder    //用于创建工厂对象  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> sqlSessionFactory <span class="title">build</span><span class="params">(Inputstream config)</span></span></span><br><span class="line"><span class="function">    configration cfg </span>=XMLConfigBuider.loadConfigration(config)</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> factory(config) </span><br></pre></td></tr></table></figure>
-</li>
-<li>class DefalutsqlSession impl sqlSession  创建代理对象，释放资源 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">pri configration cfg</span><br><span class="line">pri conn</span><br><span class="line"><span class="keyword">public</span> &lt;T&gt; <span class="function">T <span class="title">getMapper</span><span class="params">(class&lt;T&gt; daoInterClass)</span></span></span><br><span class="line"><span class="function">    proxy.<span class="title">newProxyInstace</span><span class="params">(daoInterClass.getClassloader()</span>,new Class[]</span>&#123;daoInterClass&#125;,<span class="keyword">new</span> MapperProxy(cfg.getmappers(),conn))          </span><br><span class="line">        <span class="comment">//proxy代理  ---&gt;  加载类   </span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">close</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    <span class="title">if</span><span class="params">(conn!=<span class="keyword">null</span>)</span></span></span><br></pre></td></tr></table></figure></li>
-</ol>
-<ol start="4">
-<li><p>class configration       </p>
- <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">pri driver</span></span><br><span class="line"><span class="function">pri url</span></span><br><span class="line"><span class="function">pri username</span></span><br><span class="line"><span class="function">pri password</span></span><br><span class="line"><span class="function">pri Map&lt;String,Mapper&gt; mappers</span></span><br><span class="line"><span class="function">getter and <span class="title">setter</span><span class="params">(mappers)</span></span></span><br><span class="line"><span class="function">setMapper</span></span><br><span class="line"><span class="function">    <span class="keyword">this</span>.mappers.<span class="title">putAll</span><span class="params">(mappers)</span>  追加放入</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>class Mapper    用于封装sql语句和全限定类名resultType<br> pri resultType<br> pri sql</p>
-</li>
-<li><p>class factory implements sqlSessionFactory<br> pri configration cfg<br> openSession</p>
-</li>
-<li><p>class MapperProxy impl InvocationHandler   增强seletelist方法    —&gt; DefalutsqlSession</p>
- <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">pri Map&lt;string,map&gt; mappers;</span><br><span class="line"><span class="function">pri conn</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(Object proxy,Method method,Object []args)</span></span></span><br><span class="line"><span class="function">    methodname </span>=method.getname                  获取方法名</span><br><span class="line">    classname=method.getdeclaringClass().getname(); 获取方法所在类名</span><br><span class="line">    key =classname+<span class="string">&#x27;.&#x27;</span>+methodname</span><br><span class="line">    mapper=mapper.get(key)</span><br><span class="line">    <span class="keyword">if</span>(mapper==<span class="keyword">null</span>) <span class="keyword">throw</span> <span class="function">out</span></span><br><span class="line"><span class="function">    return new <span class="title">Execute</span><span class="params">()</span>.<span class="title">selectlist</span><span class="params">(mapper,conn)</span></span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>class DatasourceUtil   创建数据源的类</p>
- <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> conn <span class="title">getconnection</span><span class="params">(configration cfg)</span></span></span><br><span class="line"><span class="function">    <span class="keyword">try</span> class.<span class="title">forname</span><span class="params">(daoInterClass.getClassloader()</span>)</span></span><br><span class="line"><span class="function">    return DriverMpper.<span class="title">getconnection</span><span class="params">(cfg.geturl,cfg,getusername,cfg.getpassword)</span></span></span><br></pre></td></tr></table></figure>
- <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">    </span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h3 id="四、配置文件"><a href="#四、配置文件" class="headerlink" title="四、配置文件"></a>四、配置文件</h3><h4 id="4-1-sqlMapConfig-xml"><a href="#4-1-sqlMapConfig-xml" class="headerlink" title="4.1 sqlMapConfig.xml"></a>4.1 sqlMapConfig.xml</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">conf</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">envs</span> <span class="attr">default</span>=<span class="string">&quot;mysql&quot;</span>&gt;</span>  <span class="comment">&lt;!--配置环境--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">env</span> <span class="attr">id</span>=<span class="string">&quot;mysql&quot;</span>&gt;</span>    <span class="comment">&lt;!--配置mysql环境--&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">transactionmanger</span> <span class="attr">type</span>=<span class="string">&quot;JDBC&quot;</span>&gt;</span><span class="comment">&lt;!--配置事物类型--&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">dataSource</span> <span class="attr">type</span>=<span class="string">&quot;POOLED&quot;</span>&gt;</span> <span class="comment">&lt;!--配置数据源--&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span> =<span class="string">&quot;driver&quot;</span> <span class="attr">value</span> <span class="attr">com.driver....</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">property</span> <span class="attr">url</span> &gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">property</span> <span class="attr">username</span> &gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">property</span> <span class="attr">password</span>&gt;</span></span><br><span class="line">             /&gt;   </span><br><span class="line">        /&gt;</span><br><span class="line">    /&gt;</span><br><span class="line">    <span class="tag">&lt;<span class="name">mappers</span>&gt;</span>   <span class="comment">&lt;!--指定映射文件--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">mapper</span> <span class="attr">resource</span> =<span class="string">&quot;iuserdao.xml&quot;</span>&gt;</span> <span class="comment">&lt;!--xml型--&gt;</span> </span><br><span class="line">        <span class="tag">&lt;<span class="name">mapper</span> <span class="attr">class</span> =<span class="string">&quot;com.wyg.dao.IuerDao&quot;</span>&gt;</span><span class="comment">&lt;!--注解型--&gt;</span></span><br><span class="line">    /&gt;</span><br><span class="line">/&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h4 id="4-2-mapper-xml"><a href="#4-2-mapper-xml" class="headerlink" title="4.2 mapper.xml"></a>4.2 mapper.xml</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">mapper</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;findAll&quot;</span> <span class="attr">resultType</span>=<span class="string">&quot;&quot;</span>&gt;</span>   <span class="comment">&lt;!--id 方法名  --&gt;</span></span><br><span class="line">    /&gt;</span><br><span class="line">/&gt;</span><br></pre></td></tr></table></figure>
-
-
-
-<ol start="2">
-<li></li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/ORM/redisTemplate/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -619,7 +450,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/ORM/spring-redis/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E5%A0%86-%E4%BC%98%E5%85%88%E9%98%9F%E5%88%97/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -633,7 +464,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/03/08/%E7%BB%84%E4%BB%B6/ORM/spring-redis/" class="post-title-link" itemprop="url">spring-redis</a>
+            <a href="/2022/03/08/%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E5%A0%86-%E4%BC%98%E5%85%88%E9%98%9F%E5%88%97/" class="post-title-link" itemprop="url">堆-优先队列</a>
         </h2>
 
         <div class="post-meta">
@@ -650,17 +481,8 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-12-04 13:08:59" itemprop="dateModified" datetime="2021-12-04T13:08:59+08:00">2021-12-04</time>
+                <time title="修改时间：2022-03-14 12:46:18" itemprop="dateModified" datetime="2022-03-14T12:46:18+08:00">2022-03-14</time>
               </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%BB%84%E4%BB%B6/" itemprop="url" rel="index"><span itemprop="name">组件</span></a>
-                </span>
-            </span>
 
           
   
@@ -672,8 +494,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/03/08/%E7%BB%84%E4%BB%B6/ORM/spring-redis/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/ORM/spring-redis/" class="cy_cmt_count" data-xid="2022/03/08/组件/ORM/spring-redis/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/03/08/%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E5%A0%86-%E4%BC%98%E5%85%88%E9%98%9F%E5%88%97/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E5%A0%86-%E4%BC%98%E5%85%88%E9%98%9F%E5%88%97/" class="cy_cmt_count" data-xid="2022/03/08/算法/数据结构/堆-优先队列/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -684,121 +506,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>3k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>3 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>[toc]</p>
-<h3 id="一、Redis"><a href="#一、Redis" class="headerlink" title="一、Redis"></a>一、Redis</h3><h4 id="1-1-使用步骤"><a href="#1-1-使用步骤" class="headerlink" title="1.1 使用步骤"></a>1.1 使用步骤</h4><ol>
-<li><p>依赖</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- reids by boot --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-data-redis<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- spring2.X集成redis所需common-pool2--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.commons<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>commons-pool2<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">version</span>&gt;</span>2.6.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/03/08/%E7%BB%84%E4%BB%B6/ORM/spring-redis/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/%E6%94%AF%E4%BB%98%E7%BB%84%E4%BB%B6/%E5%BE%AE%E4%BF%A1%E6%94%AF%E4%BB%98/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/08/%E7%BB%84%E4%BB%B6/%E6%94%AF%E4%BB%98%E7%BB%84%E4%BB%B6/%E5%BE%AE%E4%BF%A1%E6%94%AF%E4%BB%98/" class="post-title-link" itemprop="url">微信支付</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-08 00:33:40" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:40+08:00">2022-03-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-12-15 16:54:08" itemprop="dateModified" datetime="2021-12-15T16:54:08+08:00">2021-12-15</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%BB%84%E4%BB%B6/" itemprop="url" rel="index"><span itemprop="name">组件</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/08/%E7%BB%84%E4%BB%B6/%E6%94%AF%E4%BB%98%E7%BB%84%E4%BB%B6/%E5%BE%AE%E4%BF%A1%E6%94%AF%E4%BB%98/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/%E6%94%AF%E4%BB%98%E7%BB%84%E4%BB%B6/%E5%BE%AE%E4%BF%A1%E6%94%AF%E4%BB%98/" class="cy_cmt_count" data-xid="2022/03/08/组件/支付组件/微信支付/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>2</span>
+              <span>437</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -817,7 +525,12 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="一、"><a href="#一、" class="headerlink" title="一、"></a>一、</h2>
+          <blockquote>
+<p>java中叫PriorityQueue</p>
+</blockquote>
+<h3 id="找到第K大的元素"><a href="#找到第K大的元素" class="headerlink" title="找到第K大的元素"></a>找到第K大的元素</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span>[] findMinK(<span class="keyword">int</span>[]nums, <span class="keyword">int</span> k)&#123;</span><br><span class="line"></span><br><span class="line">        PriorityQueue&lt;Integer&gt;queue=<span class="keyword">new</span> PriorityQueue&lt;&gt;(</span><br><span class="line">            (integer, anotherInteger) -&gt; -integer.compareTo(anotherInteger));</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;k;i++)</span><br><span class="line">            queue.offer(nums[i]);</span><br><span class="line">        <span class="keyword">for</span>(;k&lt; nums.length;k++)&#123;</span><br><span class="line">            <span class="keyword">if</span>(queue.peek()&gt;nums[k])&#123;</span><br><span class="line">                queue.poll();</span><br><span class="line">                queue.offer(nums[k]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> queue.stream().mapToInt(Integer::valueOf).toArray();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+
       
     </div>
 
@@ -836,7 +549,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/javaWeb/%E7%BD%91%E5%85%B3/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E5%AD%97%E5%85%B8%E6%A0%91/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -850,7 +563,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/03/08/javaWeb/%E7%BD%91%E5%85%B3/" class="post-title-link" itemprop="url">未命名</a>
+            <a href="/2022/03/08/%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E5%AD%97%E5%85%B8%E6%A0%91/" class="post-title-link" itemprop="url">字典树</a>
         </h2>
 
         <div class="post-meta">
@@ -860,14 +573,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
+              <time title="创建时间：2022-03-08 00:33:40" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:40+08:00">2022-03-08</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-11-02 14:13:04" itemprop="dateModified" datetime="2021-11-02T14:13:04+08:00">2021-11-02</time>
+                <time title="修改时间：2022-03-14 01:56:16" itemprop="dateModified" datetime="2022-03-14T01:56:16+08:00">2022-03-14</time>
               </span>
 
           
@@ -880,8 +593,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/03/08/javaWeb/%E7%BD%91%E5%85%B3/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/javaWeb/%E7%BD%91%E5%85%B3/" class="cy_cmt_count" data-xid="2022/03/08/javaWeb/网关/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/03/08/%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E5%AD%97%E5%85%B8%E6%A0%91/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E5%AD%97%E5%85%B8%E6%A0%91/" class="cy_cmt_count" data-xid="2022/03/08/算法/数据结构/字典树/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -926,10 +639,267 @@
   
   
 
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E5%B9%B6%E6%9F%A5%E9%9B%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/08/%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E5%B9%B6%E6%9F%A5%E9%9B%86/" class="post-title-link" itemprop="url">并查集</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-08 00:33:40" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:40+08:00">2022-03-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-14 02:08:35" itemprop="dateModified" datetime="2022-03-14T02:08:35+08:00">2022-03-14</time>
+              </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/08/%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E5%B9%B6%E6%9F%A5%E9%9B%86/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E5%B9%B6%E6%9F%A5%E9%9B%86/" class="cy_cmt_count" data-xid="2022/03/08/算法/数据结构/并查集/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>262</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>·</p>
+<blockquote>
+<p>帮派，代表元素是帮主</p>
+</blockquote>
+<blockquote>
+<p>水珠的合并</p>
+</blockquote>
+<blockquote>
+<p>吞噬细胞的合并</p>
+</blockquote>
+<h4 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> fa[MAXN];<span class="comment">//主从关系 fa[a]=b 表示b是a的老大</span></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= n; ++i)</span><br><span class="line">    fa[i] = i;  <span class="comment">//初始的时候老大就是本身</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="查询-找老大"><a href="#查询-找老大" class="headerlink" title="查询-找老大"></a>查询-找老大</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">find</span><span class="params">(<span class="keyword">int</span> x)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(fa[x] == x)</span><br><span class="line">        <span class="keyword">return</span> x;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="keyword">return</span> find(fa[x]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="吞并–-gt-j所在的帮派吞并j所在帮派"><a href="#吞并–-gt-j所在的帮派吞并j所在帮派" class="headerlink" title="吞并–&gt; j所在的帮派吞并j所在帮派"></a>吞并–&gt; j所在的帮派吞并j所在帮派</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"> <span class="function"><span class="keyword">void</span> <span class="title">merge</span><span class="params">(<span class="keyword">int</span> i, <span class="keyword">int</span> j)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    fa[find(i)] = find(j);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E6%80%BB%E7%BB%93/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/08/%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E6%80%BB%E7%BB%93/" class="post-title-link" itemprop="url">数据结构总结</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-08 00:33:40" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:40+08:00">2022-03-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-01-06 14:03:04" itemprop="dateModified" datetime="2022-01-06T14:03:04+08:00">2022-01-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/08/%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E6%80%BB%E7%BB%93/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E6%80%BB%E7%BB%93/" class="cy_cmt_count" data-xid="2022/03/08/算法/数据结构/总结/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>504</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="各个结构方法"><a href="#各个结构方法" class="headerlink" title="各个结构方法"></a>各个结构方法</h3><ol>
+<li>树：<ol>
+<li>两颗树：比较、clone、<ul>
+<li>递归</li>
+</ul>
+</li>
+<li>遍历：<ol>
+<li>深度优先(栈)</li>
+<li>广度优先(队列)</li>
+<li>层次遍历(队列)</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>链表：快慢指针</li>
+<li>dp：数组<code>[][]</code></li>
+<li>图：类似树，但是因为各节点连通，需要map记录已经访问过的节点。</li>
+<li>栈、队列：考虑数学归纳法</li>
+<li>数组：一般关系<ol>
+<li>o(n): map后者双指针</li>
+<li>o(logn):二分</li>
+</ol>
+</li>
+<li>dfs 如果是list 考虑八皇后clone<ul>
+<li>java的list没有clone</li>
+<li>Collections.copy(dest,src);</li>
+</ul>
+</li>
+</ol>
+<h2 id="Java中结构"><a href="#Java中结构" class="headerlink" title="Java中结构"></a>Java中结构</h2><h3 id="Stack"><a href="#Stack" class="headerlink" title="Stack"></a>Stack</h3><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="title">pop</span><span class="params">()</span></span> 更好</span><br><span class="line"><span class="function"><span class="title">remove</span><span class="params">()</span></span> 没得话会报错</span><br><span class="line"><span class="function"><span class="title">peek</span><span class="params">()</span></span> </span><br><span class="line"><span class="function"><span class="title">isEmpty</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="title">add</span><span class="params">()</span></span> 满的话会报错</span><br><span class="line"><span class="function"><span class="title">push</span><span class="params">()</span></span>  更好</span><br></pre></td></tr></table></figure>
+
+<h3 id="Quene"><a href="#Quene" class="headerlink" title="Quene"></a>Quene</h3><h4 id="基于list模仿queue"><a href="#基于list模仿queue" class="headerlink" title="基于list模仿queue"></a>基于list模仿queue</h4><blockquote>
+<p>思想：基于len+index</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> end=<span class="number">1</span>;</span><br><span class="line"><span class="keyword">while</span>(end&gt;<span class="number">0</span>)&#123;</span><br><span class="line">    Node now=list.get(begin++);</span><br><span class="line">    <span class="keyword">if</span>(now.left!=<span class="keyword">null</span>)&#123;</span><br><span class="line">        list.add(now.left);</span><br><span class="line">        end++;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span>(now.right!=<span class="keyword">null</span>)&#123;</span><br><span class="line">        list.add(now.right);</span><br><span class="line">        end++;</span><br><span class="line">    &#125;</span><br><span class="line">    end--;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/13/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/13/">13</a><span class="page-number current">14</span><a class="page-number" href="/page/15/">15</a><span class="space">&hellip;</span><a class="page-number" href="/page/56/">56</a><a class="extend next" rel="next" href="/page/15/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/13/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/13/">13</a><span class="page-number current">14</span><a class="page-number" href="/page/15/">15</a><span class="space">&hellip;</span><a class="page-number" href="/page/57/">57</a><a class="extend next" rel="next" href="/page/15/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -997,7 +967,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">280</span>
+          <span class="site-state-item-count">285</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1048,12 +1018,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">304k</span>
+    <span title="站点总字数">308k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">4:36</span>
+    <span title="站点阅读时长">4:40</span>
 </div>
 
         
