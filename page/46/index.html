@@ -187,611 +187,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/spring/%E6%B3%A8%E8%A7%A3/spring%E6%B3%A8%E8%A7%A32/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/08/spring/%E6%B3%A8%E8%A7%A3/spring%E6%B3%A8%E8%A7%A32/" class="post-title-link" itemprop="url">spring注解2</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-01 18:40:17" itemprop="dateModified" datetime="2022-03-01T18:40:17+08:00">2022-03-01</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/08/spring/%E6%B3%A8%E8%A7%A3/spring%E6%B3%A8%E8%A7%A32/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/spring/%E6%B3%A8%E8%A7%A3/spring%E6%B3%A8%E8%A7%A32/" class="cy_cmt_count" data-xid="2022/03/08/spring/注解/spring注解2/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>942</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>[toc]</p>
-<h2 id="一、Spring缓存"><a href="#一、Spring缓存" class="headerlink" title="一、Spring缓存"></a>一、Spring缓存</h2><h3 id="1-1-注意"><a href="#1-1-注意" class="headerlink" title="1.1 注意"></a>1.1 注意</h3><ol>
-<li>前提<ul>
-<li>entity要implements Serializable </li>
-<li>连接redis</li>
-</ul>
-</li>
-<li>就算数据库没查到，方法返回Null，也会存入数据库null</li>
-</ol>
-<h3 id="1-2-CacheConfig"><a href="#1-2-CacheConfig" class="headerlink" title="1.2 @CacheConfig"></a>1.2 @CacheConfig</h3><p>类级别注解，设置全局cacheName，如果方法已经设置了value，那么这个值就会被忽略.</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@CacheConfig(cacheNames = &quot;studenta&quot;)</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="1-3-Cacheable"><a href="#1-3-Cacheable" class="headerlink" title="1.3 @Cacheable"></a>1.3 @Cacheable</h3><p>每次操作这个函数，设置k=value::key，</p>
-<ul>
-<li><font color="red">查找redis有没有这个key，如果有，那么直接返回</font></li>
-<li>如果没有，mysql查询得到，然后向redis插入（k：放回值）</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Cacheable(cacheNames = &quot;studentb&quot;,key = &quot;#p0&quot;)</span><span class="comment">//cacheNames和value是等价的</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="1-4-CachePut"><a href="#1-4-CachePut" class="headerlink" title="1.4 @CachePut"></a>1.4 @CachePut</h3><p>每次操作这个函数，设置k=value::key，然后去redis查找又没有k,有的话就把（k:原来的v），换成（k:<font color="red">返回的值</font>）</p>
-<h3 id="1-5-ChacheEvict"><a href="#1-5-ChacheEvict" class="headerlink" title="1.5 @ChacheEvict"></a>1.5 @ChacheEvict</h3><p>每次操作这个函数，设置k=value::key，然后去redis查找又没有k，有的话就把这个数据删掉</p>
-<h3 id="1-6-缓存参数"><a href="#1-6-缓存参数" class="headerlink" title="1.6 缓存参数"></a>1.6 缓存参数</h3><ol>
-<li>value = “studentc”   设置k前缀</li>
-<li>cacheName 等价于value</li>
-<li> key = “#p0”   设置k后缀  前后缀用::分割  </li>
-<li>这是个el表达式</li>
-<li>#p0表示参数</li>
-<li> “#p0.id” 第一个参数的id</li>
-<li>condition=”el”<ol>
-<li>#student.id&gt;100 表示参数student的id大于100才进行缓存操作             </li>
-</ol>
-</li>
-<li> allEntries = true</li>
-<li>sync异步</li>
-</ol>
-<h2 id="二、Bean"><a href="#二、Bean" class="headerlink" title="二、Bean"></a>二、Bean</h2><h3 id="Scope-Bean作用域"><a href="#Scope-Bean作用域" class="headerlink" title="@Scope Bean作用域"></a>@Scope Bean作用域</h3><p>@Scope(value=”prototype”) 多例   默认单例</p>
-<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><h3 id="1-事务"><a href="#1-事务" class="headerlink" title="1. 事务"></a>1. 事务</h3><p>@Transactional</p>
-<blockquote>
-<p>方法/类级别，报错会撤回所有操作，基于aop</p>
-</blockquote>
-<p>原理: <a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_20597727/article/details/84868035">https://blog.csdn.net/qq_20597727/article/details/84868035</a></p>
-<ol start="2">
-<li>发现：<ol>
-<li>只对mysql有事务回滚</li>
-<li>所有猜想是基于mysql的log回滚</li>
-</ol>
-</li>
-<li>IOException不会回滚，因为这个是个需检查异常：checkedException,可以在注解上加上异常类型来回滚该异常。</li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/spring/%E6%B3%A8%E8%A7%A3/spring%E9%85%8D%E7%BD%AE%E6%B3%A8%E8%A7%A3/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/08/spring/%E6%B3%A8%E8%A7%A3/spring%E9%85%8D%E7%BD%AE%E6%B3%A8%E8%A7%A3/" class="post-title-link" itemprop="url">spring配置注解</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-12-12 10:56:14" itemprop="dateModified" datetime="2021-12-12T10:56:14+08:00">2021-12-12</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/08/spring/%E6%B3%A8%E8%A7%A3/spring%E9%85%8D%E7%BD%AE%E6%B3%A8%E8%A7%A3/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/spring/%E6%B3%A8%E8%A7%A3/spring%E9%85%8D%E7%BD%AE%E6%B3%A8%E8%A7%A3/" class="cy_cmt_count" data-xid="2022/03/08/spring/注解/spring配置注解/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>2.9k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>3 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>[toc]</p>
-<h2 id="一、配置型注解"><a href="#一、配置型注解" class="headerlink" title="一、配置型注解"></a>一、配置型注解</h2><h3 id="1-1-Bean"><a href="#1-1-Bean" class="headerlink" title="1.1 @Bean"></a>1.1 @Bean</h3><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/feiyu127/p/7700090.html">参考</a></p>
-<ol>
-<li><p>@Bean</p>
-<ul>
-<li>@Bean是一个方法级别上的注解，主要用在@Configuration注解的类里，也可以用在@Component注解的类里。添加的bean的id为方法名</li>
-<li>对于依赖型的@Bean，直接用参数注入</li>
-</ul>
-</li>
-<li><p>注入IOC</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">IOC</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Bean2 <span class="title">bean2</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Bean2();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Bean3 <span class="title">getBean3</span><span class="params">(Bean2 bean2)</span> </span>&#123;</span><br><span class="line">        Bean3 bean3 = <span class="keyword">new</span> Bean3();</span><br><span class="line">        bean3.setName(<span class="string">&quot;zhang&quot;</span>);</span><br><span class="line">        bean3.setBean2(bean2);</span><br><span class="line">        <span class="keyword">return</span> bean3;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Bean3 <span class="title">needBean3</span><span class="params">(Bean2 bean2)</span> </span>&#123;</span><br><span class="line">        Bean3 bean3 = <span class="keyword">new</span> Bean3();</span><br><span class="line">        bean3.setName(<span class="string">&quot;wang&quot;</span>);</span><br><span class="line">        bean3.setBean2(bean2);</span><br><span class="line">        <span class="keyword">return</span> bean3;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>Controller</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BeanController</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="meta">@Qualifier(&quot;needBean3&quot;)</span></span><br><span class="line">    Bean3 bean31;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="meta">@Qualifier(&quot;getBean3&quot;)</span></span><br><span class="line">    Bean3 bean32;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@ApiOperation(&quot;获得bean&quot;)</span></span><br><span class="line">    <span class="meta">@GetMapping(&quot;bean1&quot;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ApiResult <span class="title">bean1</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(bean31);</span><br><span class="line">        System.out.println(bean32);</span><br><span class="line">        <span class="keyword">return</span> ApiResult.ok();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>输出</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Bean3(name=wang, age=<span class="number">0</span>, bean2=com.wyg.boottest.config.bean.Bean2@<span class="number">50906524</span>)</span><br><span class="line">Bean3(name=zhang, age=<span class="number">0</span>, bean2=com.wyg.boottest.config.bean.Bean2@<span class="number">50906524</span>)</span><br></pre></td></tr></table></figure>
-
-<p>等同于</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">&quot;getBean3&quot;</span> <span class="attr">class</span>=<span class="string">&quot;com.wyg.epidemicsituation.entity.vo.Bean3&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;Bean2&quot;</span> <span class="attr">ref</span>=<span class="string">&quot;bean2&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-<li><p>属性</p>
-<ul>
-<li><p>name 自定义名字</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Bean(name = &#123;&quot;myFoo&quot;,&quot;y&quot;&#125;)</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Foo <span class="title">foo</span><span class="params">()</span> </span></span><br><span class="line"><span class="function">    return new <span class="title">Foo</span><span class="params">()</span></span>;</span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-<li><p>获取@Configruation的beans见@Configruation</p>
-</li>
-</ol>
-<h3 id="1-2-Configruation"><a href="#1-2-Configruation" class="headerlink" title="1.2 @Configruation"></a>1.2 @Configruation</h3><ol>
-<li><p>获取Context,这种方法相当于另创一个@Configruation，里面的@Bean需要重新创建一遍</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">AnnotationConfigApplicationContext applicationContext2 = <span class="keyword">new</span> AnnotationConfigApplicationContext(BeanConfig.class);</span><br></pre></td></tr></table></figure></li>
-<li><p>从Spring3.0，@Configuration用于定义配置类，可替换xml配置文件，被注解的类内部包含有一个或多个被@Bean注解的方法，这些方法将会被AnnotationConfigApplicationContext或AnnotationConfigWebApplicationContext类进行扫描，并用于构建bean定义，初始化Spring容器。</p>
-<ol>
-<li>@Configuration不可以是final类型；</li>
-<li>@Configuration不可以是匿名类；</li>
-<li>嵌套的configuration必须是静态类</li>
-</ol>
-</li>
-<li><p>一个@Configuration下面可以定义多个@Bean</p>
-</li>
-<li><p>基于java而没注解@Configuration的注册方法</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">AnnotationConfigApplicationContext cxt=<span class="keyword">new</span> AnnotationConfigApplicationContext();</span><br><span class="line">cxt.register(MyConfig.class);</span><br><span class="line">cxt.getBean(<span class="string">&quot;aaa&quot;</span>)</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h3 id="1-3-Service-controller-repository和-Component区别"><a href="#1-3-Service-controller-repository和-Component区别" class="headerlink" title="1.3 @Service,controller,repository和@Component区别"></a>1.3 @Service,controller,repository和@Component区别</h3><ol>
-<li>前三者含有特定功能的Component 比如<ol>
-<li>dispatchServlet寻找的是@Conroller的GetMapping而不是@Component的mapping</li>
-</ol>
-</li>
-<li>后者可用前三者代替</li>
-</ol>
-<h3 id="1-4-Mapper和-Repository的区别"><a href="#1-4-Mapper和-Repository的区别" class="headerlink" title="1.4 @Mapper和@Repository的区别"></a>1.4 @Mapper和@Repository的区别</h3><ol>
-<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_36816062/article/details/108086097">相同点</a><br>@Mapper和@Repository都是作用在dao层接口，使得其生成代理对象bean，交给spring 容器管理<br>对于mybatis来说，都可以不用写mapper.xml文件</li>
-<li>不同点<br>@Mapper不需要配置扫描地址，通过xml里面的namespace里面的接口地址，生成了Bean后注入到Service层中。@MapperScan(“mapper文件所在包”)，这样就不需要每个mapper文件都加@Mapper注解了<br>而@Repository不可以单独使用,需要配置@MapperScan(“com.anson.dao”) </li>
-</ol>
-<h3 id="1-5-Bean和-Component区别"><a href="#1-5-Bean和-Component区别" class="headerlink" title="1.5 @Bean和@Component区别"></a>1.5 @Bean和@Component区别</h3><ol>
-<li><p>前者作用于methon，后者作用于class</p>
-</li>
-<li><p>@Component通过@ComponentScan扫描得到</p>
-</li>
-<li><p>@Bean在@Configuration Class下</p>
-</li>
-<li><p>@Bean更灵活—&gt;配置文件调控的时候就只能用@Bean</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">Student</span><span class="params">(<span class="keyword">int</span> status)</span></span>&#123;</span><br><span class="line">    <span class="keyword">switch</span>(status):</span><br><span class="line">    <span class="keyword">case</span> <span class="number">1</span>: <span class="keyword">return</span> <span class="keyword">new</span> Student(<span class="number">1</span>,<span class="string">&quot;王&quot;</span>);</span><br><span class="line">    <span class="keyword">case</span> <span class="number">2</span>: <span class="keyword">return</span> <span class="keyword">new</span> Student(<span class="number">2</span>,<span class="string">&quot;张&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h3 id="1-6-Autowire和-Resource的区别"><a href="#1-6-Autowire和-Resource的区别" class="headerlink" title="1.6 @Autowire和@Resource的区别"></a>1.6 @Autowire和@Resource的区别</h3><ol>
-<li>作用域相同<ol>
-<li>属性</li>
-<li>setter</li>
-</ol>
-</li>
-<li>@Autowire 默认先按类型装配</li>
-<li>@Resource 默认先按名称装配</li>
-<li>@Resource =@Autowrie+@Qualifier</li>
-</ol>
-<h3 id="1-7-ComponentScan与ComponentScans"><a href="#1-7-ComponentScan与ComponentScans" class="headerlink" title="1.7 @ComponentScan与ComponentScans"></a>1.7 @ComponentScan与ComponentScans</h3><ol>
-<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/jiafa/p/13800766.html">@ComponentScan和@ComponentScans注解</a></li>
-</ol>
-<h3 id="1-8-ControllerAdvice"><a href="#1-8-ControllerAdvice" class="headerlink" title="1.8 @ControllerAdvice"></a>1.8 @ControllerAdvice</h3><ol>
-<li>全局异常处理器</li>
-</ol>
-<h3 id="1-9-ConfigurationProperties"><a href="#1-9-ConfigurationProperties" class="headerlink" title="1.9 @ConfigurationProperties"></a>1.9 @ConfigurationProperties</h3><ol>
-<li>前缀配置–更灵活</li>
-</ol>
-<h3 id="1-10-ContextConfiguration"><a href="#1-10-ContextConfiguration" class="headerlink" title="1.10 @ContextConfiguration"></a>1.10 @ContextConfiguration</h3>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/spring/%E9%85%8D%E7%BD%AE/@value-%E8%87%AA%E5%AE%9A%E4%B9%89/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/08/spring/%E9%85%8D%E7%BD%AE/@value-%E8%87%AA%E5%AE%9A%E4%B9%89/" class="post-title-link" itemprop="url">spring-properties</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-12-11 16:58:12" itemprop="dateModified" datetime="2021-12-11T16:58:12+08:00">2021-12-11</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/08/spring/%E9%85%8D%E7%BD%AE/@value-%E8%87%AA%E5%AE%9A%E4%B9%89/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/spring/%E9%85%8D%E7%BD%AE/@value-%E8%87%AA%E5%AE%9A%E4%B9%89/" class="cy_cmt_count" data-xid="2022/03/08/spring/配置/@value-自定义/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>5.8k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>5 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>[toc]</p>
-<h3 id="一、调用值"><a href="#一、调用值" class="headerlink" title="一、调用值"></a>一、调用值</h3><ol>
-<li><p>引入@PropertySource</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@PropertySource(&quot;classpath:config.properties&quot;)</span></span><br></pre></td></tr></table></figure></li>
-<li><p>注入普通字符串</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Debug</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Value(&quot;normal&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String myDebug; <span class="comment">// 注入普通字符串</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/03/08/spring/%E9%85%8D%E7%BD%AE/@value-%E8%87%AA%E5%AE%9A%E4%B9%89/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/spring/%E9%85%8D%E7%BD%AE/WebMvcConfigurer/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/08/spring/%E9%85%8D%E7%BD%AE/WebMvcConfigurer/" class="post-title-link" itemprop="url">WebMvcConfigurer</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-02-25 21:02:55" itemprop="dateModified" datetime="2022-02-25T21:02:55+08:00">2022-02-25</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/08/spring/%E9%85%8D%E7%BD%AE/WebMvcConfigurer/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/spring/%E9%85%8D%E7%BD%AE/WebMvcConfigurer/" class="cy_cmt_count" data-xid="2022/03/08/spring/配置/WebMvcConfigurer/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>6.2k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>6 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>[toc]</p>
-<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/zhangpower1993/article/details/89016503">参考</a></p>
-<h2 id="一、概述"><a href="#一、概述" class="headerlink" title="一、概述"></a>一、概述</h2><h3 id="1-概念"><a href="#1-概念" class="headerlink" title="1. 概念"></a>1. 概念</h3><ol>
-<li><p>WebMvcConfigurer和spring，springBoot的关系</p>
-<p>WebMvcConfigurer和SpringBoot没啥关系，只不过原本在Spring中以xml配置文件中存在的相关配置，到SpringBoot中都会使用配置类的方式进行管理，即加了@Configuration注解的类。</p>
-</li>
-<li><p>WebMvcConfigurer配置类其实是<code>Spring</code>内部的一种配置方式，采用<code>JavaBean</code>的形式来代替传统的<code>xml</code>配置文件形式进行针对框架个性化定制，可以自定义一些Handler，Interceptor，ViewResolver，MessageConverter.</p>
-</li>
-<li><p>在Spring Boot 1.5版本都是靠重写<strong>WebMvcConfigurerAdapter</strong>的方法来添加自定义拦截器，消息转换器等</p>
-</li>
-</ol>
-<h3 id="2-接口方法"><a href="#2-接口方法" class="headerlink" title="2. 接口方法"></a>2. 接口方法</h3><ol>
-<li><p>所有方法</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">WebMvcConfigurer</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">configurePathMatch</span><span class="params">(PathMatchConfigurer var1)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">configureContentNegotiation</span><span class="params">(ContentNegotiationConfigurer var1)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">configureAsyncSupport</span><span class="params">(AsyncSupportConfigurer var1)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">configureDefaultServletHandling</span><span class="params">(DefaultServletHandlerConfigurer var1)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">addFormatters</span><span class="params">(FormatterRegistry var1)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">addInterceptors</span><span class="params">(InterceptorRegistry var1)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">addResourceHandlers</span><span class="params">(ResourceHandlerRegistry var1)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">addCorsMappings</span><span class="params">(CorsRegistry var1)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">addViewControllers</span><span class="params">(ViewControllerRegistry var1)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">configureViewResolvers</span><span class="params">(ViewResolverRegistry var1)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">addArgumentResolvers</span><span class="params">(List&lt;HandlerMethodArgumentResolver&gt; var1)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">addReturnValueHandlers</span><span class="params">(List&lt;HandlerMethodReturnValueHandler&gt; var1)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">configureMessageConverters</span><span class="params">(List&lt;HttpMessageConverter&lt;?&gt;&gt; var1)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">extendMessageConverters</span><span class="params">(List&lt;HttpMessageConverter&lt;?&gt;&gt; var1)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">configureHandlerExceptionResolvers</span><span class="params">(List&lt;HandlerExceptionResolver&gt; var1)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">extendHandlerExceptionResolvers</span><span class="params">(List&lt;HandlerExceptionResolver&gt; var1)</span></span>;</span><br><span class="line">    <span class="function">Validator <span class="title">getValidator</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function">MessageCodesResolver <span class="title">getMessageCodesResolver</span><span class="params">()</span></span>;&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p>常用方法</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">/* 拦截器配置 */</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">addInterceptors</span><span class="params">(InterceptorRegistry var1)</span></span>;</span><br><span class="line"><span class="comment">/* 视图跳转控制器 */</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">addViewControllers</span><span class="params">(ViewControllerRegistry registry)</span></span>;</span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     *静态资源处理</span></span><br><span class="line"><span class="comment">**/</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">addResourceHandlers</span><span class="params">(ResourceHandlerRegistry registry)</span></span>;</span><br><span class="line"><span class="comment">/* 默认静态资源处理器 */</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">configureDefaultServletHandling</span><span class="params">(DefaultServletHandlerConfigurer configurer)</span></span>;</span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 这里配置视图解析器</span></span><br><span class="line"><span class="comment"> **/</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">configureViewResolvers</span><span class="params">(ViewResolverRegistry registry)</span></span>;</span><br><span class="line"><span class="comment">/* 配置内容裁决的一些选项*/</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">configureContentNegotiation</span><span class="params">(ContentNegotiationConfigurer configurer)</span></span>;</span><br><span class="line"><span class="comment">/** 解决跨域问题 **/</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addCorsMappings</span><span class="params">(CorsRegistry registry)</span> </span>;</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h2 id="三、配件"><a href="#三、配件" class="headerlink" title="三、配件"></a>三、配件</h2><h3 id="1-addInterceptors：拦截器"><a href="#1-addInterceptors：拦截器" class="headerlink" title="1. addInterceptors：拦截器"></a>1. addInterceptors：拦截器</h3><ul>
-<li>addInterceptor：需要一个实现HandlerInterceptor接口的拦截器实例</li>
-<li>addPathPatterns：用于设置拦截器的过滤路径规则；<code>addPathPatterns(&quot;/**&quot;)</code>对所有请求都拦截</li>
-<li>excludePathPatterns：用于设置不需要拦截的过滤规则</li>
-<li>拦截器主要用途：进行用户登录状态的拦截，日志的拦截等。</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addInterceptors</span><span class="params">(InterceptorRegistry registry)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>.addInterceptors(registry);</span><br><span class="line">    registry.addInterceptor(<span class="keyword">new</span> TestInterceptor()).addPathPatterns(<span class="string">&quot;/**&quot;</span>).excludePathPatterns(<span class="string">&quot;/emp/toLogin&quot;</span>,<span class="string">&quot;/emp/login&quot;</span>,<span class="string">&quot;/js/**&quot;</span>,<span class="string">&quot;/css/**&quot;</span>,<span class="string">&quot;/images/**&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-addViewControllers：页面跳转"><a href="#2-addViewControllers：页面跳转" class="headerlink" title="2. addViewControllers：页面跳转"></a>2. addViewControllers：页面跳转</h3><p>​    以前写SpringMVC的时候，如果需要访问一个页面，必须要写Controller类，然后再写一个方法跳转到页面，感觉好麻烦，下面这种方法可以省略一个Controller的requestMapping</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addViewControllers</span><span class="params">(ViewControllerRegistry registry)</span> </span>&#123;</span><br><span class="line">    registry.addViewController(<span class="string">&quot;/toLogin&quot;</span>).setViewName(<span class="string">&quot;login&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>​    在这里重写addViewControllers方法，并不会覆盖<strong>WebMvcAutoConfiguration</strong>（Springboot自动配置）中的addViewControllers（在此方法中，Spring Boot将“/”映射至index.html），这也就意味着自己的配置和Spring Boot的自动配置同时有效，这也是我们推荐添加自己的MVC配置的方式。</p>
-</blockquote>
-<h3 id="3-addResourceHandlers：静态资源"><a href="#3-addResourceHandlers：静态资源" class="headerlink" title="3. addResourceHandlers：静态资源"></a>3. addResourceHandlers：静态资源</h3><p>比如，我们想自定义静态资源映射目录的话，只需重写addResourceHandlers方法即可。</p>
-<p>注：如果继承WebMvcConfigurationSupport类实现配置时必须要重写该方法，具体见其它文章</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyWebMvcConfigurerAdapter</span> <span class="keyword">implements</span> <span class="title">WebMvcConfigurer</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addResourceHandlers</span><span class="params">(ResourceHandlerRegistry registry)</span> </span>&#123;</span><br><span class="line">        registry.addResourceHandler(<span class="string">&quot;/my/**&quot;</span>).addResourceLocations(<span class="string">&quot;classpath:/my/&quot;</span>);</span><br><span class="line">        registry.addResourceHandler(<span class="string">&quot;/img/**&quot;</span>).addResourceLocations(<span class="string">&quot;classpath:/img/&quot;</span>);</span><br><span class="line">        registry.addResourceHandler(<span class="string">&quot;/img/**&quot;</span>).addResourceLocations(<span class="string">&quot;file:&quot;</span> + Constant.fileLoadPath + <span class="string">&quot;/&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>addResoureHandler：指的是对外暴露的访问路径</li>
-<li>addResourceLocations：指的是内部文件放置的目录</li>
-</ul>
-<h3 id="2-4-configureDefaultServletHandling：默认静态资源处理器Servlet"><a href="#2-4-configureDefaultServletHandling：默认静态资源处理器Servlet" class="headerlink" title="2.4 configureDefaultServletHandling：默认静态资源处理器Servlet"></a>2.4 configureDefaultServletHandling：默认静态资源处理器Servlet</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">configureDefaultServletHandling</span><span class="params">(DefaultServletHandlerConfigurer configurer)</span> </span>&#123;</span><br><span class="line">        configurer.enable();</span><br><span class="line">        configurer.enable(<span class="string">&quot;defaultServletName&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>​    此时会注册一个默认的Handler：DefaultServletHttpRequestHandler，这个Handler也是用来处理静态文件的，它会尝试映射/。当DispatcherServelt映射/时（/ 和/ 是有区别的），并且没有找到合适的Handler来处理请求时，就会交给DefaultServletHttpRequestHandler 来处理。注意：这里的静态资源是放置在web根目录下，而非WEB-INF 下。<br>　可能这里的描述有点不好懂（我自己也这么觉得），所以简单举个例子，例如：在webroot目录下有一个图片：1.png 我们知道Servelt规范中web根目录（webroot）下的文件可以直接访问的，但是由于DispatcherServlet配置了映射路径是：/ ，它几乎把所有的请求都拦截了，从而导致1.png 访问不到，这时注册一个DefaultServletHttpRequestHandler 就可以解决这个问题。其实可以理解为DispatcherServlet破坏了Servlet的一个特性（根目录下的文件可以直接访问），DefaultServletHttpRequestHandler是帮助回归这个特性的。</p>
-<h3 id="2-5-configureViewResolvers：视图解析器"><a href="#2-5-configureViewResolvers：视图解析器" class="headerlink" title="2.5 configureViewResolvers：视图解析器"></a>2.5 configureViewResolvers：视图解析器</h3><p>这个方法是用来配置视图解析器的，该方法的参数ViewResolverRegistry 是一个注册器，用来注册你想自定义的视图解析器等。ViewResolverRegistry 常用的几个方法：<a target="_blank" rel="noopener" href="https://blog.csdn.net/fmwind/article/details/81235401">https://blog.csdn.net/fmwind/article/details/81235401</a></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> InternalResourceViewResolver <span class="title">resourceViewResolver</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	InternalResourceViewResolver internalResourceViewResolver = <span class="keyword">new</span> InternalResourceViewResolver();</span><br><span class="line">	<span class="comment">//请求视图文件的前缀地址</span></span><br><span class="line">	internalResourceViewResolver.setPrefix(<span class="string">&quot;/WEB-INF/jsp/&quot;</span>);</span><br><span class="line">	<span class="comment">//请求视图文件的后缀</span></span><br><span class="line">	internalResourceViewResolver.setSuffix(<span class="string">&quot;.jsp&quot;</span>);</span><br><span class="line">	<span class="keyword">return</span> internalResourceViewResolver;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">configureViewResolvers</span><span class="params">(ViewResolverRegistry registry)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">super</span>.configureViewResolvers(registry);</span><br><span class="line">	registry.viewResolver(resourceViewResolver());</span><br><span class="line">	<span class="comment">/*registry.jsp(&quot;/WEB-INF/jsp/&quot;,&quot;.jsp&quot;);*/</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-6-configureContentNegotiation：配置内容裁决的一些参数"><a href="#2-6-configureContentNegotiation：配置内容裁决的一些参数" class="headerlink" title="2.6 configureContentNegotiation：配置内容裁决的一些参数"></a>2.6 configureContentNegotiation：配置内容裁决的一些参数</h3><h3 id="2-7-addCorsMappings：跨域"><a href="#2-7-addCorsMappings：跨域" class="headerlink" title="2.7 addCorsMappings：跨域"></a>2.7 addCorsMappings：跨域</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addCorsMappings</span><span class="params">(CorsRegistry registry)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>.addCorsMappings(registry);</span><br><span class="line">    registry.addMapping(<span class="string">&quot;/cors/**&quot;</span>)</span><br><span class="line">        </span><br><span class="line">            .allowedHeaders(<span class="string">&quot;*&quot;</span>)</span><br><span class="line">            .allowedMethods(<span class="string">&quot;POST&quot;</span>,<span class="string">&quot;GET&quot;</span>)</span><br><span class="line">            .allowedOrigins(<span class="string">&quot;*&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-8-configureMessageConverters：信息转换器"><a href="#2-8-configureMessageConverters：信息转换器" class="headerlink" title="2.8 configureMessageConverters：信息转换器"></a>2.8 configureMessageConverters：信息转换器</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//配置fastJson返回json转换</span></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">configureMessageConverters</span><span class="params">(List&lt;HttpMessageConverter&lt;?&gt;&gt; converters)</span> </span></span><br><span class="line"><span class="function">    <span class="keyword">super</span>.<span class="title">configureMessageConverters</span><span class="params">(converters)</span></span>;</span><br><span class="line">    <span class="comment">//创建fastJson消息转换器</span></span><br><span class="line">    FastJsonHttpMessageConverter fastConverter = <span class="keyword">new</span> FastJsonHttpMessageConverter();</span><br><span class="line">    <span class="comment">//创建配置类</span></span><br><span class="line">    FastJsonConfig fastJsonConfig = <span class="keyword">new</span> FastJsonConfig();</span><br><span class="line">    <span class="comment">//修改配置返回内容的过滤</span></span><br><span class="line">    fastJsonConfig.setSerializerFeatures(</span><br><span class="line">            SerializerFeature.DisableCircularReferenceDetect,</span><br><span class="line">            SerializerFeature.WriteMapNullValue,</span><br><span class="line">            SerializerFeature.WriteNullStringAsEmpty</span><br><span class="line">    );</span><br><span class="line">    fastConverter.setFastJsonConfig(fastJsonConfig);</span><br><span class="line">    <span class="comment">//将fastjson添加到视图消息转换器列表内</span></span><br><span class="line">    converters.add(fastConverter);</span><br></pre></td></tr></table></figure>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/spring/%E9%85%8D%E7%BD%AE/javaConfig/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -903,10 +298,541 @@
   
   
 
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/spring/%E9%85%8D%E7%BD%AE/%E6%B3%A8%E6%84%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/08/spring/%E9%85%8D%E7%BD%AE/%E6%B3%A8%E6%84%8F/" class="post-title-link" itemprop="url">spring配置注意点</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-12-11 17:03:50" itemprop="dateModified" datetime="2021-12-11T17:03:50+08:00">2021-12-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/08/spring/%E9%85%8D%E7%BD%AE/%E6%B3%A8%E6%84%8F/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/spring/%E9%85%8D%E7%BD%AE/%E6%B3%A8%E6%84%8F/" class="cy_cmt_count" data-xid="2022/03/08/spring/配置/注意/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>391</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <ol>
+<li><p>@MapperScan</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@MapperScan(basePackages = &#123;&quot;com.wyg.epidemicsituation.mapper&quot;,&quot;com.wyg.epidemicsituation.system.mapper&quot;&#125;)</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>这个注解一定要用对，除了指定的@Component，他会把这个包下面的所有类有注入到IOC，并且注入的类型都是com.baomidou.mybatisplus.core.override.MybatisMapperProxy。</p>
+</blockquote>
+</li>
+<li><p>如果不用@Service而是用@Component，发现也没问题</p>
+</li>
+<li><p>@RestController写成@Controller会报404</p>
+</li>
+<li><p>对于非@Compoent 如需要serviceImpl可以在构造函数中传入这个service如easyExcel的listener就需要</p>
+</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/spring/%E9%85%8D%E7%BD%AE/%E8%AF%BB%E5%8F%96%E8%87%AA%E5%AE%9A%E4%B9%89%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/08/spring/%E9%85%8D%E7%BD%AE/%E8%AF%BB%E5%8F%96%E8%87%AA%E5%AE%9A%E4%B9%89%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/" class="post-title-link" itemprop="url">自定义资源文件</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-02-22 17:56:02" itemprop="dateModified" datetime="2022-02-22T17:56:02+08:00">2022-02-22</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/08/spring/%E9%85%8D%E7%BD%AE/%E8%AF%BB%E5%8F%96%E8%87%AA%E5%AE%9A%E4%B9%89%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/spring/%E9%85%8D%E7%BD%AE/%E8%AF%BB%E5%8F%96%E8%87%AA%E5%AE%9A%E4%B9%89%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/" class="cy_cmt_count" data-xid="2022/03/08/spring/配置/读取自定义配置文件/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>131</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">BufferedReader beforeBr = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> InputStreamReader(getResources(<span class="string">&quot;config/htmlBefore.txt&quot;</span>), <span class="string">&quot;UTF-8&quot;</span>));</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/utils/bat/bat%E5%91%BD%E4%BB%A41/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/08/utils/bat/bat%E5%91%BD%E4%BB%A41/" class="post-title-link" itemprop="url">bat</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-11-03 01:20:49" itemprop="dateModified" datetime="2021-11-03T01:20:49+08:00">2021-11-03</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/utils/" itemprop="url" rel="index"><span itemprop="name">utils</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/utils/bat/" itemprop="url" rel="index"><span itemprop="name">bat</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/08/utils/bat/bat%E5%91%BD%E4%BB%A41/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/utils/bat/bat%E5%91%BD%E4%BB%A41/" class="cy_cmt_count" data-xid="2022/03/08/utils/bat/bat命令1/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>732</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="bat常见命令"><a href="#bat常见命令" class="headerlink" title="bat常见命令"></a>bat常见命令</h3><ol>
+<li><p>REM 和 :: 注释</p>
+</li>
+<li><p>ECHO 和 @</p>
+<ol>
+<li><p>@字符放在命令前将关闭该命令回显，无论此时echo是否为打开状态。</p>
+</li>
+<li><p>@ echo off 关闭off 并将这句话不会回显</p>
+</li>
+<li><p>打印空行 echo.</p>
+</li>
+<li><p>echo | 管道传参(将echo的输出当作|后面的输入)</p>
+</li>
+<li><p>新建文件 echo aaa &gt; a.txt</p>
+</li>
+<li><p>@echo off 关闭cmd的文件路径</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/03/08/utils/bat/bat%E5%91%BD%E4%BB%A41/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/utils/python/matplotlib/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/08/utils/python/matplotlib/" class="post-title-link" itemprop="url">matplotlib基本用法</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-12-30 16:47:56" itemprop="dateModified" datetime="2021-12-30T16:47:56+08:00">2021-12-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/08/utils/python/matplotlib/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/utils/python/matplotlib/" class="cy_cmt_count" data-xid="2022/03/08/utils/python/matplotlib/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="一、介绍"><a href="#一、介绍" class="headerlink" title="一、介绍"></a>一、介绍</h2><h3 id="1-1-简单使用"><a href="#1-1-简单使用" class="headerlink" title="1.1 简单使用"></a>1.1 简单使用</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line">x=[<span class="number">0</span>,<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>]</span><br><span class="line">y=[<span class="number">0</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">3</span>]</span><br><span class="line">plt.plot(x,y)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="二、API"><a href="#二、API" class="headerlink" title="二、API"></a>二、API</h2><h3 id="2-1-常见API"><a href="#2-1-常见API" class="headerlink" title="2.1 常见API"></a>2.1 常见API</h3><ol>
+<li><p>plt.plot 画图</p>
+</li>
+<li><p>plt.axis 修改坐标</p>
+</li>
+<li><p>plt.show 显示</p>
+</li>
+<li><p>plt.grid(True) 设置网格</p>
+</li>
+<li><p>添加说明：explain</p>
+<ol>
+<li><p>xy轴标注：plt.xlabel(“Money Earned”)  plt.ylabel(“Consume Level”)</p>
+</li>
+<li><p>标题：plt.title(“Figure.1”)</p>
+</li>
+<li><p>添加图内文字：plt.text(2,3,”text”)  ：在坐标(2,3)处显示”text”</p>
+</li>
+<li><p>添加箭头</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">plt.annotate(<span class="string">&#x27;箭头说明文字&#x27;</span>, xy=(<span class="number">20</span>, <span class="number">400</span>), xytext=(<span class="number">12.5</span>, <span class="number">400</span>),</span><br><span class="line">             arrowprops=<span class="built_in">dict</span>(facecolor=<span class="string">&#x27;black&#x27;</span>, shrink=<span class="number">0.05</span>),)</span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+</ol>
+<h3 id="2-2-plt-plot"><a href="#2-2-plt-plot" class="headerlink" title="2.2 plt.plot()"></a>2.2 plt.plot()</h3><blockquote>
+<p>plt.plot(x, y, format_string, **kwargs) ,返回Line2D 对象</p>
+</blockquote>
+<h4 id="2-2-1-format-string"><a href="#2-2-1-format-string" class="headerlink" title="2.2.1 format_string"></a>2.2.1 format_string</h4><blockquote>
+<p>控制颜色字符、风格字符、标记字</p>
+</blockquote>
+<ul>
+<li>颜色：’b’ 蓝色</li>
+<li>字符风格：默认’-‘折线段</li>
+<li>节点标记：默认没有 可选.^</li>
+</ul>
+<h4 id="2-2-2-kwargs"><a href="#2-2-2-kwargs" class="headerlink" title="2.2.2 kwargs:"></a>2.2.2 kwargs:</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">color : 控制颜色, color=<span class="string">&#x27;green&#x27;</span></span><br><span class="line">linestyle : 线条风格, linestyle=<span class="string">&#x27;dashed&#x27;</span></span><br><span class="line">marker : 标记风格, marker=<span class="string">&#x27;o&#x27;</span></span><br><span class="line">markerfacecolor: 标记颜色, markerfacecolor=<span class="string">&#x27;blue&#x27;</span></span><br><span class="line">markersize: 标记尺寸, markersize=<span class="number">20</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="2-2-3-plt-多线"><a href="#2-2-3-plt-多线" class="headerlink" title="2.2.3 plt.多线"></a>2.2.3 plt.多线</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">plt.plot(t1,<span class="string">&#x27;b--&#x27;</span>,t2,<span class="string">&#x27;r--&#x27;</span>)</span><br><span class="line"><span class="comment">#或</span></span><br><span class="line">x1=[<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>],y1=[<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>]</span><br><span class="line">x2=[<span class="number">2</span>,<span class="number">4</span>,<span class="number">6</span>,<span class="number">8</span>],y2=[<span class="number">4</span>,<span class="number">8</span>,<span class="number">12</span>,<span class="number">16</span>]</span><br><span class="line">plt.plot(x1,y1,<span class="string">&#x27;r-&#x27;</span>,x2,y2,<span class="string">&#x27;g--&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-2-4-函数表示y"><a href="#2-2-4-函数表示y" class="headerlink" title="2.2.4 函数表示y"></a>2.2.4 函数表示y</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">x = np.arange(<span class="number">0</span>, <span class="number">20</span>, <span class="number">0.01</span>)</span><br><span class="line">plt.plot(x, np.sin(x), <span class="string">&#x27;r-&#x27;</span>, x, np.cos(x), <span class="string">&#x27;b--&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="2-3-plt-axis"><a href="#2-3-plt-axis" class="headerlink" title="2.3 plt.axis"></a>2.3 plt.axis</h3><ol>
+<li><p>plt.axis([1, 2, 3, 4])</p>
+<p>设置x范围 1-2 y范围3-4</p>
+</li>
+<li><p>plt.axis(<code>option</code>=‘equal’) </p>
+<ol>
+<li>equal：x-y坐标等长</li>
+<li>off： 关闭</li>
+<li>auto：自动</li>
+<li>square：正方形</li>
+</ol>
+</li>
+</ol>
+<h3 id="2-4-plt-explain-说明文字参数"><a href="#2-4-plt-explain-说明文字参数" class="headerlink" title="2.4 plt.explain 说明文字参数"></a>2.4 plt.explain 说明文字参数</h3><ol>
+<li>color : 颜色</li>
+<li>size：大小</li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/xHibiki/article/details/84866887">其他</a>：字体系列，对其方式，行距，粗细，样式，字体名</li>
+</ol>
+<h3 id="2-5-plt-subplots-子图"><a href="#2-5-plt-subplots-子图" class="headerlink" title="2.5 plt.subplots 子图"></a>2.5 plt.subplots 子图</h3><blockquote>
+<p>返回一个包含figure和axes对象的元组</p>
+<p>figure: 拿到整张图</p>
+<p>ax： np.array[axe 对象]</p>
+</blockquote>
+<h4 id="subplots-和subplot-区别"><a href="#subplots-和subplot-区别" class="headerlink" title="subplots 和subplot 区别"></a>subplots 和subplot 区别</h4><ul>
+<li><p>subplots 一次性创建并返回所有的子图和其 axe 对象</p>
+</li>
+<li><p>subplot分开子图并拿到指定位置的子图plt.subplot(2, 1, 2) 分成2行1类并拿到第二个ax对象</p>
+</li>
+</ul>
+<h2 id="三、对象"><a href="#三、对象" class="headerlink" title="三、对象"></a>三、对象</h2><h3 id="3-2-AxesSubplot-子图对象"><a href="#3-2-AxesSubplot-子图对象" class="headerlink" title="3.2 AxesSubplot 子图对象"></a>3.2 AxesSubplot 子图对象</h3><h4 id="1-ax-plot"><a href="#1-ax-plot" class="headerlink" title="1 ax.plot()"></a>1 ax.plot()</h4><h4 id="2-ax-axis"><a href="#2-ax-axis" class="headerlink" title="2 ax.axis"></a>2 ax.axis</h4><h4 id="3-set-title"><a href="#3-set-title" class="headerlink" title="3 set_title"></a>3 set_title</h4><p>​    </p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/45/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/45/">45</a><span class="page-number current">46</span><a class="page-number" href="/page/47/">47</a><span class="space">&hellip;</span><a class="page-number" href="/page/57/">57</a><a class="extend next" rel="next" href="/page/47/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/45/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/45/">45</a><span class="page-number current">46</span><a class="page-number" href="/page/47/">47</a><span class="space">&hellip;</span><a class="page-number" href="/page/58/">58</a><a class="extend next" rel="next" href="/page/47/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -974,7 +900,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">285</span>
+          <span class="site-state-item-count">289</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1025,12 +951,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">308k</span>
+    <span title="站点总字数">321k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">4:40</span>
+    <span title="站点阅读时长">4:52</span>
 </div>
 
         

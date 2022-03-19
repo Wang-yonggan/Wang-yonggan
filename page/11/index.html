@@ -187,7 +187,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/shiro/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/RabbitMQ/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -201,7 +201,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/03/08/%E7%BB%84%E4%BB%B6/shiro/" class="post-title-link" itemprop="url">shiro</a>
+            <a href="/2022/03/08/%E7%BB%84%E4%BB%B6/RabbitMQ/" class="post-title-link" itemprop="url">未命名</a>
         </h2>
 
         <div class="post-meta">
@@ -218,17 +218,8 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-15 10:31:15" itemprop="dateModified" datetime="2022-03-15T10:31:15+08:00">2022-03-15</time>
+                <time title="修改时间：2021-12-04 13:55:07" itemprop="dateModified" datetime="2021-12-04T13:55:07+08:00">2021-12-04</time>
               </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E4%B8%AD%E9%97%B4%E4%BB%B6/" itemprop="url" rel="index"><span itemprop="name">中间件</span></a>
-                </span>
-            </span>
 
           
   
@@ -240,8 +231,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/03/08/%E7%BB%84%E4%BB%B6/shiro/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/shiro/" class="cy_cmt_count" data-xid="2022/03/08/组件/shiro/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/03/08/%E7%BB%84%E4%BB%B6/RabbitMQ/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/RabbitMQ/" class="cy_cmt_count" data-xid="2022/03/08/组件/RabbitMQ/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -252,476 +243,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>2.3k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>[toc]</p>
-<h2 id="一、功能"><a href="#一、功能" class="headerlink" title="一、功能"></a>一、功能</h2><ol>
-<li>认证</li>
-<li>授权</li>
-<li>方法加权</li>
-<li>自定义过滤</li>
-<li>会话管理：Session Manager  一次登录，所有信息保存在session中</li>
-<li>加密</li>
-</ol>
-<h3 id="1-1-Authentication-用户密码认证"><a href="#1-1-Authentication-用户密码认证" class="headerlink" title="1.1 Authentication 用户密码认证"></a>1.1 Authentication 用户密码认证</h3><h3 id="1-2-Authorization-验证是否有权限访问该方法"><a href="#1-2-Authorization-验证是否有权限访问该方法" class="headerlink" title="1.2 Authorization 验证是否有权限访问该方法"></a>1.2 Authorization 验证是否有权限访问该方法</h3><ol>
-<li><p>MyRealm extends AuthorizingRealm</p>
-<blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span><span class="comment">//授权</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> AuthorizationInfo <span class="title">doGetAuthorizationInfo</span><span class="params">(PrincipalCollection principalCollection)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//获得令牌/用户</span></span><br><span class="line">    User user=(User)principalCollection.asList().get(<span class="number">0</span>);</span><br><span class="line">    SimpleAuthorizationInfo authorizationInfo=<span class="keyword">new</span> SimpleAuthorizationInfo();</span><br><span class="line">    authorizationInfo.addRoles(user.getUserRoles());<span class="comment">//添加用户-授权</span></span><br><span class="line">    authorizationInfo.addStringPermissions(user.getUserPerms());<span class="comment">//添加权限-授权</span></span><br><span class="line">    <span class="keyword">return</span> authorizationInfo;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></blockquote>
-</li>
-</ol>
-<h3 id="1-3-其他功能"><a href="#1-3-其他功能" class="headerlink" title="1.3 其他功能"></a>1.3 其他功能</h3><h4 id="1-3-1-方法加权"><a href="#1-3-1-方法加权" class="headerlink" title="1.3.1 方法加权"></a>1.3.1 方法加权</h4><ol>
-<li><p>硬编码</p>
-<p>在每个方法体里面进行手动获取当前用户权限，然后和该方法的权限进行对比。</p>
-</li>
-<li><p>ShiroConfig添加路径</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">filterFactoryBean.setUnauthorizedUrl(<span class="string">&quot;/wq.html&quot;</span>);<span class="comment">//无权限跳到指定路径</span></span><br></pre></td></tr></table></figure></li>
-<li><p>注解</p>
-<ol>
-<li>RequiresAuthentication 需要登录</li>
-<li>RequiresUser 需要reamberMe</li>
-<li>RequiresPermissions 需要权限</li>
-</ol>
-<ul>
-<li>没权限会直接报500错误</li>
-<li>需要异常处理机制</li>
-</ul>
-</li>
-</ol>
-<h4 id="1-3-2-自定义过滤"><a href="#1-3-2-自定义过滤" class="headerlink" title="1.3.2 自定义过滤"></a>1.3.2 自定义过滤</h4><ol>
-<li><p>@Componet注册过滤器</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">F1</span> <span class="keyword">implements</span> <span class="title">Filter</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doFilter</span><span class="params">(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)</span> <span class="keyword">throws</span> IOException, ServletException </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;自定义过滤开始&quot;</span>);</span><br><span class="line">        filterChain.doFilter(servletRequest,servletResponse);</span><br><span class="line">        System.out.println(<span class="string">&quot;自定义过滤结束&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p>加入到请求过滤器</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">filters.put(<span class="string">&quot;oauth2&quot;</span>, <span class="keyword">new</span> F1());</span><br><span class="line">filterFactoryBean.setFilters(filters);</span><br></pre></td></tr></table></figure></li>
-<li></li>
-</ol>
-<h4 id="1-3-3-获取当前线程用户"><a href="#1-3-3-获取当前线程用户" class="headerlink" title="1.3.3 获取当前线程用户"></a>1.3.3 获取当前线程用户</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Subject subject = SecurityUtils.getSubject();</span><br></pre></td></tr></table></figure>
-
-<ol>
-<li><p>认证</p>
-<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">UsernamePasswordToken token = <span class="keyword">new</span> <span class="constructor">UsernamePasswordToken(<span class="params">user</span>.<span class="params">getUsername</span>()</span>, user.get<span class="constructor">Password()</span>);</span><br><span class="line">subject.login(token);</span><br></pre></td></tr></table></figure></li>
-<li><p>登录设置令牌</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">subject.getSession().setAttribute(<span class="string">&quot;currentUser&quot;</span>, subject.getPrincipal());</span><br></pre></td></tr></table></figure></li>
-<li><p>登出</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">subject.logout();<span class="comment">//或者在过滤器中配置   filterMap.put(&quot;/aaa&quot;,&quot;logout&quot;);</span></span><br></pre></td></tr></table></figure></li>
-</ol>
-<h2 id="二、组件"><a href="#二、组件" class="headerlink" title="二、组件"></a>二、组件</h2><h3 id="2-1-核心组件"><a href="#2-1-核心组件" class="headerlink" title="2.1 核心组件"></a>2.1 核心组件</h3><ol>
-<li>Subjetc： 当前进程obj</li>
-<li>Shiro SecurityManager</li>
-<li>Realm ：安全中心，提供认证授权服务</li>
-<li>ShiroFilterFactoryBean：请求过滤器<ol>
-<li>设置Map&lt;路径，权限&gt;的过滤器Map</li>
-<li>设置自定义过滤器</li>
-<li>设置无权路径</li>
-</ol>
-</li>
-</ol>
-<h3 id="2-2-注解模式"><a href="#2-2-注解模式" class="headerlink" title="2.2 注解模式"></a>2.2 注解模式</h3><blockquote>
-<p>对于Map&lt;路径，权限&gt;</p>
-</blockquote>
-<ol>
-<li>@RequiresAuthentication 需登录</li>
-<li>@RequiresPermissions(“b”)  需b权限</li>
-<li>@RequiresRoles(“admin”)  需admin角色</li>
-</ol>
-<h3 id="2-3-user"><a href="#2-3-user" class="headerlink" title="2.3 user"></a>2.3 user</h3><ol>
-<li>user<ol>
-<li>userName</li>
-<li>pasword</li>
-<li>List&lt;String&gt;roles</li>
-<li>List&lt;String&gt;perms</li>
-</ol>
-</li>
-</ol>
-<h2 id="三、原理"><a href="#三、原理" class="headerlink" title="三、原理"></a>三、原理</h2><h3 id="3-1-基于token"><a href="#3-1-基于token" class="headerlink" title="3.1 基于token"></a>3.1 基于token</h3><h3 id="3-2-安全中心-MyRealm"><a href="#3-2-安全中心-MyRealm" class="headerlink" title="3.2 安全中心 MyRealm"></a>3.2 安全中心 MyRealm</h3><ul>
-<li><p>认证中心  AuthenticationInfo(username,password)</p>
-<ul>
-<li>登录的时候会用有一次</li>
-<li>传入账号信息，通过数据库获得用户信息，返回token(user，passwod，Nmae)</li>
-</ul>
-</li>
-<li><p>权限中心  AuthorizationInfo(user)</p>
-<ul>
-<li><p>每次访问需要权限的地方会用到</p>
-</li>
-<li><p>格式化user的权限</p>
-</li>
-<li><p>然后根据user权限对比[需要访问的方法]的权限，如果有权限，就退回到对应界面</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">filterFactoryBean.setLoginUrl(<span class="string">&quot;/login.html&quot;</span>);<span class="comment">//登录页面</span></span><br><span class="line">filterFactoryBean.setUnauthorizedUrl(<span class="string">&quot;/wq.html&quot;</span>);<span class="comment">//无权限</span></span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-</ul>
-<h2 id="四、集成-改进"><a href="#四、集成-改进" class="headerlink" title="四、集成-改进"></a>四、集成-改进</h2><h3 id="5-1-shiro-redis集成"><a href="#5-1-shiro-redis集成" class="headerlink" title="5.1 shiro+redis集成"></a>5.1 shiro+redis集成</h3><h2 id="五、其他"><a href="#五、其他" class="headerlink" title="五、其他"></a>五、其他</h2><ol>
-<li><p>过滤顺序问题</p>
-<blockquote>
-<p>过滤设置规则是从上到下，详细的规则配在前面，大范围的配在后面。</p>
-</blockquote>
-</li>
-</ol>
-<h2 id="六、RDBC模型-role-based-access-control"><a href="#六、RDBC模型-role-based-access-control" class="headerlink" title="六、RDBC模型 role based access control"></a>六、RDBC模型 role based access control</h2>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/web%E7%BB%84%E4%BB%B6/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/08/%E7%BB%84%E4%BB%B6/web%E7%BB%84%E4%BB%B6/" class="post-title-link" itemprop="url">web组件</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-08 00:33:40" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:40+08:00">2022-03-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-11-06 11:33:55" itemprop="dateModified" datetime="2021-11-06T11:33:55+08:00">2021-11-06</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%BB%84%E4%BB%B6/" itemprop="url" rel="index"><span itemprop="name">组件</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/08/%E7%BB%84%E4%BB%B6/web%E7%BB%84%E4%BB%B6/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/web%E7%BB%84%E4%BB%B6/" class="cy_cmt_count" data-xid="2022/03/08/组件/web组件/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>4.9k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>4 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>[toc]</p>
-<h3 id="thymeleaf"><a href="#thymeleaf" class="headerlink" title="thymeleaf"></a>thymeleaf</h3><ol>
-<li><p>步骤</p>
-<ol>
-<li><p>controller传入Model model</p>
-</li>
-<li><p>```java<br>model.addAttribute(“name”, “xxxxx”);</p>
-<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">3. html加入命名空间</span><br><span class="line"></span><br><span class="line">   ```html</span><br><span class="line">   &lt;html <span class="attribute">lang</span>=<span class="string">&quot;en&quot;</span>   xmlns:<span class="attribute">th</span>=<span class="string">&quot;http://www.thymeleaf.org&quot;</span>&gt;</span><br></pre></td></tr></table></figure></li>
-<li><p>html调用</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">p</span> <span class="attr">th:text</span>=<span class="string">&quot;&#x27;hello&#x27; +$&#123;name&#125;&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-</ol>
-</li>
-</ol>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/03/08/%E7%BB%84%E4%BB%B6/web%E7%BB%84%E4%BB%B6/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/08/%E7%BB%84%E4%BB%B6/%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95/" class="post-title-link" itemprop="url">单点登录</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-08 00:33:40" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:40+08:00">2022-03-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-12-06 22:17:42" itemprop="dateModified" datetime="2021-12-06T22:17:42+08:00">2021-12-06</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%BB%84%E4%BB%B6/" itemprop="url" rel="index"><span itemprop="name">组件</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/08/%E7%BB%84%E4%BB%B6/%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95/" class="cy_cmt_count" data-xid="2022/03/08/组件/单点登录/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>2.5k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>[toc]</p>
-<h2 id="一、授权登录"><a href="#一、授权登录" class="headerlink" title="一、授权登录"></a>一、授权登录</h2><ol>
-<li>单点登录，自系统登录，SSO， Singal Sign on</li>
-<li>只需要登陆一次就能无需登录访问其他模块</li>
-</ol>
-<h2 id="二、SSO三种方法"><a href="#二、SSO三种方法" class="headerlink" title="二、SSO三种方法"></a>二、SSO三种方法</h2><blockquote>
-<p> 在百度浏览器登录后，打开百度贴吧就自动登录了，不需要二次登录。这就是单点登录</p>
-</blockquote>
-<h3 id="2-1-session广播"><a href="#2-1-session广播" class="headerlink" title="2.1 session广播"></a>2.1 session广播</h3><ol>
-<li><p>把session复制到其他模块</p>
-</li>
-<li><p>缺点：复制太浪费资源（时间+内存）</p>
-</li>
-<li><p>cookie+redis</p>
-<ol>
-<li>redis  放置  k:生成随即唯一值（用户ip,id）,v:用户信息</li>
-<li>cookie  将k放入cookie中</li>
-<li>访问其他模块时，带着cookie，取出k,查询redis,如果查到并正确</li>
-<li>也就是只需要验证签名，就能放心的取出的信息安全有效</li>
-</ol>
-</li>
-<li><p>token(令牌)</p>
-<ol>
-<li><p>token是按照一定规则生成的并加密的字符串</p>
-</li>
-<li><p>用户登录–&gt;生成随机字符串–&gt;拼接用户信息</p>
-</li>
-<li><p>每次访问其他模块，带着这个字符串，其他模块会解码取出用户信息并验证</p>
-</li>
-<li><p>也就是没到一个模块都要通过User数据库验证token才能确保信息安全有效</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/03/08/%E7%BB%84%E4%BB%B6/%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/%E5%8F%82%E6%95%B0%E6%A0%A1%E9%AA%8C/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/08/%E7%BB%84%E4%BB%B6/%E5%8F%82%E6%95%B0%E6%A0%A1%E9%AA%8C/" class="post-title-link" itemprop="url">参数校验组件</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-08 00:33:40" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:40+08:00">2022-03-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-10-30 13:01:49" itemprop="dateModified" datetime="2021-10-30T13:01:49+08:00">2021-10-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%BB%84%E4%BB%B62/" itemprop="url" rel="index"><span itemprop="name">组件2</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/08/%E7%BB%84%E4%BB%B6/%E5%8F%82%E6%95%B0%E6%A0%A1%E9%AA%8C/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/%E5%8F%82%E6%95%B0%E6%A0%A1%E9%AA%8C/" class="cy_cmt_count" data-xid="2022/03/08/组件/参数校验/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>53</span>
+              <span>0</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -740,21 +262,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id=""><a href="#" class="headerlink" title=""></a></h3><ol>
-<li><p>所有</p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211009142246223.png" alt="image-20211009142246223"></p>
-</li>
-<li><p>总开关@valid</p>
-</li>
-<li><p>entity加入@null @size等</p>
-</li>
-<li><p>指定massage</p>
-</li>
-<li><p>参数校验异常TO global</p>
-</li>
-<li></li>
-</ol>
-
+          
       
     </div>
 
@@ -773,7 +281,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/%E5%9B%BE%E7%89%87%E9%97%AE%E9%A2%98/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/%E7%AE%97%E6%B3%95/%E7%AE%97%E6%B3%95/%E8%B4%AA%E5%BF%83/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -787,7 +295,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/03/08/%E7%BB%84%E4%BB%B6/%E5%9B%BE%E7%89%87%E9%97%AE%E9%A2%98/" class="post-title-link" itemprop="url">web图片上传与获取</a>
+            <a href="/2022/03/08/%E7%AE%97%E6%B3%95/%E7%AE%97%E6%B3%95/%E8%B4%AA%E5%BF%83/" class="post-title-link" itemprop="url">未命名</a>
         </h2>
 
         <div class="post-meta">
@@ -804,7 +312,101 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-11-06 11:34:34" itemprop="dateModified" datetime="2021-11-06T11:34:34+08:00">2021-11-06</time>
+                <time title="修改时间：2021-12-30 10:06:36" itemprop="dateModified" datetime="2021-12-30T10:06:36+08:00">2021-12-30</time>
+              </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/08/%E7%AE%97%E6%B3%95/%E7%AE%97%E6%B3%95/%E8%B4%AA%E5%BF%83/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/%E7%AE%97%E6%B3%95/%E7%AE%97%E6%B3%95/%E8%B4%AA%E5%BF%83/" class="cy_cmt_count" data-xid="2022/03/08/算法/算法/贪心/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>0</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/common-lang3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/08/%E7%BB%84%E4%BB%B6/common-lang3/" class="post-title-link" itemprop="url">common-lang3</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-08 00:33:40" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:40+08:00">2022-03-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-11-06 11:57:54" itemprop="dateModified" datetime="2021-11-06T11:57:54+08:00">2021-11-06</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -826,8 +428,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/03/08/%E7%BB%84%E4%BB%B6/%E5%9B%BE%E7%89%87%E9%97%AE%E9%A2%98/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/%E5%9B%BE%E7%89%87%E9%97%AE%E9%A2%98/" class="cy_cmt_count" data-xid="2022/03/08/组件/图片问题/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/03/08/%E7%BB%84%E4%BB%B6/common-lang3/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/common-lang3/" class="cy_cmt_count" data-xid="2022/03/08/组件/common-lang3/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -838,7 +440,128 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>2k</span>
+              <span>5.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>5 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="common-lang3-参考"><a href="#common-lang3-参考" class="headerlink" title="common-lang3 参考"></a><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/1886903ed14c">common-lang3 参考</a></h1><p>[toc]</p>
+<h3 id="ArrayUtils"><a href="#ArrayUtils" class="headerlink" title="ArrayUtils"></a>ArrayUtils</h3><p>集合工具类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//创建数组</span></span><br><span class="line">String[] array = ArrayUtils.toArray(<span class="string">&quot;1&quot;</span>, <span class="string">&quot;2&quot;</span>);</span><br><span class="line"><span class="comment">//判断两个数据是否相等，如果内容相同， 顺序相同 则返回 true</span></span><br><span class="line">ArrayUtils.isEquals(arr1,arr2);</span><br><span class="line"><span class="comment">//判断数组中是否包含某一对象</span></span><br><span class="line">ArrayUtils.contains(arr, <span class="string">&quot;33&quot;</span>);</span><br><span class="line"><span class="comment">//二维数组转换成MAP</span></span><br><span class="line">Map map = ArrayUtils.toMap(<span class="keyword">new</span> String[][] &#123; </span><br><span class="line">    &#123; <span class="string">&quot;RED&quot;</span>, <span class="string">&quot;#FF0000&quot;</span> &#125;, &#123; <span class="string">&quot;GREEN&quot;</span>, <span class="string">&quot;#00FF00&quot;</span> &#125;, &#123; <span class="string">&quot;BLUE&quot;</span>, <span class="string">&quot;#0000FF&quot;</span> &#125; &#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="DateUtils"><a href="#DateUtils" class="headerlink" title="DateUtils"></a>DateUtils</h3><p>日期工具类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//日期加n天</span></span><br><span class="line">DateUtils.addDays(<span class="keyword">new</span> Date(), n);</span><br><span class="line"><span class="comment">//判断是否同一天</span></span><br><span class="line">DateUtils.isSameDay(date1, date2);</span><br><span class="line"><span class="comment">//字符串时间转换为Date</span></span><br><span class="line">DateUtils.parseDate(str, parsePatterns);</span><br></pre></td></tr></table></figure>
+
+<h3 id="1、StringUtils"><a href="#1、StringUtils" class="headerlink" title="1、StringUtils"></a>1、StringUtils</h3><p>操作字符串的工具类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//首字母大小写转换</span></span><br><span class="line">StringUtils.capitalize(<span class="string">&quot;cat&quot;</span>);<span class="comment">//---&quot;Cat&quot;</span></span><br><span class="line">StringUtils.uncapitalize(<span class="string">&quot;Cat&quot;</span>);<span class="comment">//---&quot;cat&quot;</span></span><br><span class="line"><span class="comment">//去除字符串中的&quot;\n&quot;, &quot;\r&quot;, or &quot;\r\n&quot;</span></span><br><span class="line">StringUtils.chomp(<span class="string">&quot;abc\r\n&quot;</span>);<span class="comment">//---&quot;abc&quot;</span></span><br><span class="line"><span class="comment">//判断一字符串是否包含另一字符串</span></span><br><span class="line">StringUtils.contains(<span class="string">&quot;abc&quot;</span>, <span class="string">&quot;z&quot;</span>);<span class="comment">//---false</span></span><br><span class="line">StringUtils.containsIgnoreCase(<span class="string">&quot;abc&quot;</span>, <span class="string">&quot;A&quot;</span>);<span class="comment">//---true</span></span><br><span class="line"><span class="comment">//删除字符串中的梭有空格</span></span><br><span class="line">StringUtils.deleteWhitespace(<span class="string">&quot;   ab  c  &quot;</span>);<span class="comment">//---&quot;abc&quot;</span></span><br><span class="line"><span class="comment">//检查字符串结尾后缀是否匹配</span></span><br><span class="line">StringUtils.endsWith(<span class="string">&quot;abcdef&quot;</span>, <span class="string">&quot;def&quot;</span>);<span class="comment">//---true</span></span><br><span class="line">StringUtils.endsWithIgnoreCase(<span class="string">&quot;ABCDEF&quot;</span>, <span class="string">&quot;def&quot;</span>);<span class="comment">//---true</span></span><br><span class="line">StringUtils.endsWithAny(<span class="string">&quot;abcxyz&quot;</span>, <span class="keyword">new</span> String[] &#123;<span class="keyword">null</span>, <span class="string">&quot;xyz&quot;</span>, <span class="string">&quot;abc&quot;</span>&#125;);<span class="comment">//---true</span></span><br><span class="line"><span class="comment">//判断两字符串是否相同</span></span><br><span class="line">StringUtils.equalsIgnoreCase(<span class="string">&quot;abc&quot;</span>, <span class="string">&quot;ABC&quot;</span>);<span class="comment">//---true</span></span><br><span class="line"><span class="comment">//比较字符串数组内的所有元素的字符序列，起始一致则返回一致的字符串，若无则返回&quot;&quot;</span></span><br><span class="line">StringUtils.getCommonPrefix(<span class="keyword">new</span> String[] &#123;<span class="string">&quot;abcde&quot;</span>, <span class="string">&quot;abxyz&quot;</span>&#125;);<span class="comment">//---&quot;ab&quot;</span></span><br><span class="line"><span class="comment">//判断字符串大写、小写</span></span><br><span class="line">StringUtils.isAllUpperCase(<span class="string">&quot;ABC&quot;</span>);<span class="comment">//---true</span></span><br><span class="line"><span class="comment">//判断是否为空(注：isBlank与isEmpty 区别)</span></span><br><span class="line">StringUtils.isBlank(<span class="keyword">null</span>);StringUtils.isBlank(<span class="string">&quot;&quot;</span>);StringUtils.isBlank(<span class="string">&quot; &quot;</span>);<span class="comment">//---true</span></span><br><span class="line">StringUtils.isNoneBlank(<span class="string">&quot; &quot;</span>, <span class="string">&quot;bar&quot;</span>);<span class="comment">//---false</span></span><br><span class="line">StringUtils.isEmpty(<span class="keyword">null</span>);StringUtils.isEmpty(<span class="string">&quot;&quot;</span>);<span class="comment">//---true</span></span><br><span class="line">StringUtils.isEmpty(<span class="string">&quot; &quot;</span>);<span class="comment">//---false</span></span><br><span class="line">StringUtils.isNoneEmpty(<span class="string">&quot; &quot;</span>, <span class="string">&quot;bar&quot;</span>);<span class="comment">//---true</span></span><br><span class="line"><span class="comment">//判断字符串数字</span></span><br><span class="line">StringUtils.isNumeric(<span class="string">&quot;123&quot;</span>);<span class="comment">//---false</span></span><br><span class="line">StringUtils.isNumericSpace(<span class="string">&quot;12 3&quot;</span>);<span class="comment">//---true</span></span><br><span class="line"><span class="comment">//数组中加入分隔符号</span></span><br><span class="line"><span class="comment">//StringUtils.join([1, 2, 3], ‘;‘);//---&quot;1;2;PKJjkkaf&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//大小写转换</span></span><br><span class="line">StringUtils.upperCase(<span class="string">&quot;aBc&quot;</span>);<span class="comment">//---&quot;ABC&quot;</span></span><br><span class="line">StringUtils.lowerCase(<span class="string">&quot;aBc&quot;</span>);<span class="comment">//---&quot;abc&quot;</span></span><br><span class="line">StringUtils.swapCase(<span class="string">&quot;The dog has a BONE&quot;</span>);<span class="comment">//---&quot;tHE DOG HAS A bone&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//替换字符串内容……（replacePattern、replceOnce）</span></span><br><span class="line">StringUtils.replace(<span class="string">&quot;aba&quot;</span>, <span class="string">&quot;a&quot;</span>, <span class="string">&quot;z&quot;</span>);<span class="comment">//---&quot;zbz&quot;</span></span><br><span class="line">StringUtils.overlay(<span class="string">&quot;abcdef&quot;</span>, <span class="string">&quot;zz&quot;</span>, <span class="number">2</span>, <span class="number">4</span>);<span class="comment">//---&quot;abzzef&quot;(指定区域)</span></span><br><span class="line">StringUtils.replaceEach(<span class="string">&quot;abcde&quot;</span>, <span class="keyword">new</span> String[]&#123;<span class="string">&quot;ab&quot;</span>, <span class="string">&quot;d&quot;</span>&#125;,</span><br><span class="line">                        <span class="keyword">new</span> String[]&#123;<span class="string">&quot;w&quot;</span>, <span class="string">&quot;t&quot;</span>&#125;);<span class="comment">//---&quot;wcte&quot;(多组指定替换ab-&gt;w，d-&gt;t)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//重复字符</span></span><br><span class="line">StringUtils.repeat(‘e‘, <span class="number">3</span>);<span class="comment">//---&quot;eee&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//反转字符串</span></span><br><span class="line">StringUtils.reverse(<span class="string">&quot;bat&quot;</span>);<span class="comment">//---&quot;tab&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//删除某字符</span></span><br><span class="line">StringUtils.remove(<span class="string">&quot;queued&quot;</span>, ‘u‘);<span class="comment">//---&quot;qeed&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//分割字符串</span></span><br><span class="line">StringUtils.split(<span class="string">&quot;a..b.c&quot;</span>, ‘.‘);<span class="comment">//---[&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]</span></span><br><span class="line">StringUtils.split(<span class="string">&quot;ab:cd:ef&quot;</span>, <span class="string">&quot;:&quot;</span>, <span class="number">2</span>);<span class="comment">//---[&quot;ab&quot;, &quot;cd:ef&quot;]</span></span><br><span class="line">StringUtils.splitByWholeSeparator(<span class="string">&quot;ab-!-cd-!-ef&quot;</span>, <span class="string">&quot;-!-&quot;</span>, <span class="number">2</span>);<span class="comment">//---[&quot;ab&quot;, &quot;cd-!-ef&quot;]</span></span><br><span class="line">StringUtils.splitByWholeSeparatorPreserveAllTokens(<span class="string">&quot;ab::cd:ef&quot;</span>, <span class="string">&quot;:&quot;</span>);<span class="comment">//-[&quot;ab&quot;,&quot; &quot;,&quot;cd&quot;,&quot;ef&quot;]</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//去除首尾空格，类似trim……（stripStart、stripEnd、stripAll、stripAccents）</span></span><br><span class="line">StringUtils.strip(<span class="string">&quot; ab c &quot;</span>);<span class="comment">//---&quot;ab c&quot;</span></span><br><span class="line">StringUtils.stripToNull(<span class="keyword">null</span>);<span class="comment">//---null</span></span><br><span class="line">StringUtils.stripToEmpty(<span class="keyword">null</span>);<span class="comment">//---&quot;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//截取字符串</span></span><br><span class="line">StringUtils.substring(<span class="string">&quot;abcd&quot;</span>, <span class="number">2</span>);<span class="comment">//---&quot;cd&quot;</span></span><br><span class="line">StringUtils.substring(<span class="string">&quot;abcdef&quot;</span>, <span class="number">2</span>, <span class="number">4</span>);<span class="comment">//---&quot;cd&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//left、right从左(右)开始截取n位字符</span></span><br><span class="line">StringUtils.left(<span class="string">&quot;abc&quot;</span>, <span class="number">2</span>);<span class="comment">//---&quot;ab&quot;</span></span><br><span class="line">StringUtils.right(<span class="string">&quot;abc&quot;</span>, <span class="number">2</span>);<span class="comment">//---&quot;bc&quot;</span></span><br><span class="line"><span class="comment">//从第n位开始截取m位字符       n  m</span></span><br><span class="line">StringUtils.mid(<span class="string">&quot;abcdefg&quot;</span>, <span class="number">2</span>, <span class="number">4</span>);<span class="comment">//---&quot;cdef&quot;</span></span><br><span class="line"></span><br><span class="line">StringUtils.substringBefore(<span class="string">&quot;abcba&quot;</span>, <span class="string">&quot;b&quot;</span>);<span class="comment">//---&quot;a&quot;</span></span><br><span class="line">StringUtils.substringBeforeLast(<span class="string">&quot;abcba&quot;</span>, <span class="string">&quot;b&quot;</span>);<span class="comment">//---&quot;abc&quot;</span></span><br><span class="line">StringUtils.substringAfter(<span class="string">&quot;abcba&quot;</span>, <span class="string">&quot;b&quot;</span>);<span class="comment">//---&quot;cba&quot;</span></span><br><span class="line">StringUtils.substringAfterLast(<span class="string">&quot;abcba&quot;</span>, <span class="string">&quot;b&quot;</span>);<span class="comment">//---&quot;a&quot;</span></span><br><span class="line"></span><br><span class="line">StringUtils.substringBetween(<span class="string">&quot;tagabctag&quot;</span>, <span class="string">&quot;tag&quot;</span>);<span class="comment">//---&quot;abc&quot;</span></span><br><span class="line">StringUtils.substringBetween(<span class="string">&quot;yabczyabcz&quot;</span>, <span class="string">&quot;y&quot;</span>, <span class="string">&quot;z&quot;</span>);<span class="comment">//---&quot;abc&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2、RandomStringUtils"><a href="#2、RandomStringUtils" class="headerlink" title="2、RandomStringUtils"></a>2、RandomStringUtils</h3><p>随机数工具类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//随机生成n位数数字</span></span><br><span class="line">RandomStringUtils.randomNumeric(n);</span><br><span class="line"><span class="comment">//在指定字符串中生成长度为n的随机字符串</span></span><br><span class="line">RandomStringUtils.random(n, <span class="string">&quot;abcdefghijk&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="3、NumberUtils"><a href="#3、NumberUtils" class="headerlink" title="3、NumberUtils"></a>3、NumberUtils</h3><p>数字工具类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//从数组中选出最大值</span></span><br><span class="line">NumberUtils.max(<span class="keyword">new</span> <span class="keyword">int</span>[] &#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span> &#125;);<span class="comment">//---4</span></span><br><span class="line"><span class="comment">//判断字符串是否全是整数</span></span><br><span class="line">NumberUtils.isDigits(<span class="string">&quot;153.4&quot;</span>);<span class="comment">//--false</span></span><br><span class="line"><span class="comment">//判断字符串是否是有效数字</span></span><br><span class="line">NumberUtils.isNumber(<span class="string">&quot;0321.1&quot;</span>);<span class="comment">//---false    </span></span><br></pre></td></tr></table></figure>
+
+
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/easyExcel/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/08/%E7%BB%84%E4%BB%B6/easyExcel/" class="post-title-link" itemprop="url">spring-easyExcel</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-08 00:33:40" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:40+08:00">2022-03-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-11-27 11:18:26" itemprop="dateModified" datetime="2021-11-27T11:18:26+08:00">2021-11-27</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/08/%E7%BB%84%E4%BB%B6/easyExcel/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/easyExcel/" class="cy_cmt_count" data-xid="2022/03/08/组件/easyExcel/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.9k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -858,35 +581,111 @@
 
       
           <p>[toc]</p>
-<h3 id="配置资源路径"><a href="#配置资源路径" class="headerlink" title="配置资源路径"></a>配置资源路径</h3><ol>
-<li><p>配置类</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WebResourceConfig</span> <span class="keyword">implements</span> <span class="title">WebMvcConfigurer</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addResourceHandlers</span><span class="params">(ResourceHandlerRegistry registry)</span> </span>&#123;</span><br><span class="line">        registry.addResourceHandler(<span class="string">&quot;/img/**&quot;</span>).addResourceLocations(<span class="string">&quot;file:D:/data/java/img/&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p>上传mutifile到指定路径</p>
-</li>
-<li><p>html访问/img/</p>
-</li>
-</ol>
-<h3 id="properties配置文件"><a href="#properties配置文件" class="headerlink" title="properties配置文件"></a>properties配置文件</h3><ol>
-<li></li>
-</ol>
-<h3 id="nginx"><a href="#nginx" class="headerlink" title="nginx"></a>nginx</h3><ol>
-<li></li>
-</ol>
-<h3 id="阿里云OSS"><a href="#阿里云OSS" class="headerlink" title="阿里云OSS"></a>阿里云OSS</h3><ol>
+<h3 id="easyExcel"><a href="#easyExcel" class="headerlink" title="easyExcel"></a>easyExcel</h3><ol>
 <li><p>依赖</p>
-</li>
-<li><p>配置</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.aliyun.oss<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>aliyun-sdk-oss<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-<li><p>代码</p>
-<ol>
-<li><p>配置类</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ConstantPropertiesUtils</span> <span class="keyword">implements</span> <span class="title">InitializingBean</span> </span>&#123; <span class="meta">@Value(&quot;$&#123;aliyun.oss.file.endpoint&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String endpoint; <span class="meta">@Value(&quot;$&#123;aliyun.oss.file.keyid&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String keyId; <span class="meta">@Value(&quot;$&#123;aliyun.oss.file.keysecret&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String keySecret; <span class="meta">@Value(&quot;$&#123;aliyun.oss.file.bucketname&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String bucketName;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String END_POIND;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String ACCESS_KEY_ID;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String ACCESS_KEY_SECRET;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String BUCKET_NAME;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">afterPropertiesSet</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        END_POIND = endpoint;</span><br><span class="line">        ACCESS_KEY_ID = keyId;</span><br><span class="line">        ACCESS_KEY_SECRET = keySecret;</span><br><span class="line">        BUCKET_NAME = bucketName;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p>上传</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">uploadFileAvatar</span><span class="params">(MultipartFile file)</span> </span>&#123;</span><br><span class="line">       <span class="comment">// 工具类获取值</span></span><br><span class="line">       String endpoint = OssConfig.END_POIND;</span><br><span class="line">       String bucketName = OssConfig.BUCKET_NAME;</span><br><span class="line">       <span class="keyword">try</span> &#123;</span><br><span class="line">           <span class="comment">// 创建OSS实例。</span></span><br><span class="line">           OSS ossClient = <span class="keyword">new</span> OSSClientBuilder().build(endpoint,</span><br><span class="line">                   OssConfig.ACCESS_KEY_ID, OssConfig.ACCESS_KEY_SECRET);</span><br><span class="line">           <span class="comment">//获取文件名称</span></span><br><span class="line">           String fileName =getFileName(file.getOriginalFilename());</span><br><span class="line">           fileName=<span class="string">&quot;test.jpg&quot;</span>;</span><br><span class="line">           <span class="comment">//第一个参数  Bucket名称 文件路径  文件流</span></span><br><span class="line">           ossClient.putObject(bucketName, fileName, file.getInputStream());</span><br><span class="line">           ossClient.shutdown();  <span class="comment">// 关闭OSSClient。</span></span><br><span class="line">           <span class="comment">//把上传之后文件路径返回</span></span><br><span class="line">           <span class="comment">//需要把上传到阿里云oss路径手动拼接出来</span></span><br><span class="line">           String url = <span class="string">&quot;https://&quot;</span> + bucketName + <span class="string">&quot;.&quot;</span> + endpoint + <span class="string">&quot;/&quot;</span> + fileName;</span><br><span class="line">           System.out.println(url);<span class="comment">//https://job-wyg.oss-cn-beijing.aliyuncs.com/test.jpg</span></span><br><span class="line">           <span class="keyword">return</span> url;</span><br><span class="line">       &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">           e.printStackTrace();</span><br><span class="line">           <span class="keyword">return</span> <span class="keyword">null</span>;&#125;</span><br></pre></td></tr></table></figure></li>
-</ol>
-</li>
-</ol>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>easyexcel<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.1.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">     <span class="comment">&lt;!-- poi office --&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.poi<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>poi<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;poi.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/03/08/%E7%BB%84%E4%BB%B6/easyExcel/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
 
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/beat/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/08/%E7%BB%84%E4%BB%B6/beat/" class="post-title-link" itemprop="url">日志</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-08 00:33:40" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:40+08:00">2022-03-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-07 18:29:27" itemprop="dateModified" datetime="2022-03-07T18:29:27+08:00">2022-03-07</time>
+              </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/08/%E7%BB%84%E4%BB%B6/beat/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/beat/" class="cy_cmt_count" data-xid="2022/03/08/组件/beat/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>0</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          
       
     </div>
 
@@ -904,7 +703,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/10/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><span class="page-number current">11</span><a class="page-number" href="/page/12/">12</a><span class="space">&hellip;</span><a class="page-number" href="/page/57/">57</a><a class="extend next" rel="next" href="/page/12/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/10/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/10/">10</a><span class="page-number current">11</span><a class="page-number" href="/page/12/">12</a><span class="space">&hellip;</span><a class="page-number" href="/page/58/">58</a><a class="extend next" rel="next" href="/page/12/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -972,7 +771,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">285</span>
+          <span class="site-state-item-count">289</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1023,12 +822,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">308k</span>
+    <span title="站点总字数">321k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">4:40</span>
+    <span title="站点阅读时长">4:52</span>
 </div>
 
         

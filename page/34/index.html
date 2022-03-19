@@ -187,7 +187,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/java/java%E7%BB%84%E4%BB%B6/%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/java%E5%88%86%E6%9E%90/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -201,7 +201,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/03/08/java/java%E7%BB%84%E4%BB%B6/%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82/" class="post-title-link" itemprop="url">java网络请求</a>
+            <a href="/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/java%E5%88%86%E6%9E%90/" class="post-title-link" itemprop="url">java分析1</a>
         </h2>
 
         <div class="post-meta">
@@ -218,7 +218,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-12 21:25:11" itemprop="dateModified" datetime="2022-03-12T21:25:11+08:00">2022-03-12</time>
+                <time title="修改时间：2021-11-06 00:36:37" itemprop="dateModified" datetime="2021-11-06T00:36:37+08:00">2021-11-06</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -240,8 +240,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/03/08/java/java%E7%BB%84%E4%BB%B6/%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/java/java%E7%BB%84%E4%BB%B6/%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82/" class="cy_cmt_count" data-xid="2022/03/08/java/java组件/网络请求/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/java%E5%88%86%E6%9E%90/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/java%E5%88%86%E6%9E%90/" class="cy_cmt_count" data-xid="2022/03/08/java/java源码解读/java分析/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -252,114 +252,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>1.9k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="org-apache-httpcomponents"><a href="#org-apache-httpcomponents" class="headerlink" title="org.apache.httpcomponents"></a>org.apache.httpcomponents</h3><ol>
-<li><p>依赖</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;org.apache.httpcomponents&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;httpclient&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;<span class="number">4.5</span><span class="number">.13</span>&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure></li>
-<li><p>get请求</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title">sendGet</span><span class="params">(String url, Map&lt;String, String&gt; params)</span> </span>&#123;</span><br><span class="line">       CloseableHttpClient client = HttpClients.createDefault();</span><br><span class="line">       HttpGet httpGet = <span class="keyword">new</span> HttpGet(url);</span><br><span class="line">       CloseableHttpResponse response = client.execute(httpGet);</span><br><span class="line">       InputStream respInputStream = response.getEntity().getContent();</span><br><span class="line">       response.close();</span><br><span class="line">       <span class="keyword">return</span> respInputStream;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></li>
-<li><p>post请求</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/03/08/java/java%E7%BB%84%E4%BB%B6/%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/java/javaSE/Error%E5%92%8CException/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/08/java/javaSE/Error%E5%92%8CException/" class="post-title-link" itemprop="url">Error和Exception</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-01-24 21:07:36" itemprop="dateModified" datetime="2022-01-24T21:07:36+08:00">2022-01-24</time>
-              </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/08/java/javaSE/Error%E5%92%8CException/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/java/javaSE/Error%E5%92%8CException/" class="cy_cmt_count" data-xid="2022/03/08/java/javaSE/Error和Exception/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>330</span>
+              <span>899</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -378,23 +271,21 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="一、异常体系"><a href="#一、异常体系" class="headerlink" title="一、异常体系"></a>一、异常体系</h3><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220124210601006.png" alt="image-20220124210601006"></p>
-<h3 id="二、异常关键字"><a href="#二、异常关键字" class="headerlink" title="二、异常关键字"></a>二、异常关键字</h3><ol>
-<li>try、catch、finally都不能单独使用</li>
-<li>组合：try-catch、try-finally、try-catch-finally。</li>
-</ol>
-<h3 id="三、区分"><a href="#三、区分" class="headerlink" title="三、区分"></a>三、区分</h3><h4 id="3-1-Error和RuntimeException"><a href="#3-1-Error和RuntimeException" class="headerlink" title="3.1 Error和RuntimeException"></a>3.1 Error和RuntimeException</h4><ol>
-<li>两者很像，都可以选择性catch或者throw</li>
-<li>不catch都会导致线程直接结束</li>
-<li>Error是系统级别的错误，不建议catch，更不建议自己创建一个Error子类。一般都和JVM有关</li>
-<li>RE是代码层面，算是一个简单的Bug(某种情况没考虑到)，可以通过简单处理解决的。</li>
-</ol>
-<h3 id="3-2-强制性异常"><a href="#3-2-强制性异常" class="headerlink" title="3.2 强制性异常"></a>3.2 强制性异常</h3><p>Java的Exception除了RuntimeException外都是<strong>强制性异常</strong>，</p>
+          <h3 id="数组-列表的for-each"><a href="#数组-列表的for-each" class="headerlink" title="数组-列表的for-each"></a>数组-列表的for-each</h3><ol>
+<li><p>数组</p>
 <ol>
-<li>强制性异常：必须catch或throws</li>
-<li>非强制性异常：选择性catch、throws</li>
-</ol>
-
+<li><p>源代码1</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (Student student : students) &#123;student=students2[<span class="number">0</span>];&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>反编译1</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(var5 = <span class="number">0</span>; var5 &lt; var4; ++var5) &#123;</span><br><span class="line">            Student var10000 = var3[var5];</span><br><span class="line">            var6 = var2[<span class="number">0</span>];</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/java%E5%88%86%E6%9E%90/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -413,7 +304,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/java/javaSE/JavaNPE%E9%97%AE%E9%A2%98%20nopointExpection/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/hashcode%E7%9A%84%E5%88%86%E6%9E%90/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -427,7 +318,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/03/08/java/javaSE/JavaNPE%E9%97%AE%E9%A2%98%20nopointExpection/" class="post-title-link" itemprop="url">未命名</a>
+            <a href="/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/hashcode%E7%9A%84%E5%88%86%E6%9E%90/" class="post-title-link" itemprop="url">hashcode分析</a>
         </h2>
 
         <div class="post-meta">
@@ -444,346 +335,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-10-17 22:58:31" itemprop="dateModified" datetime="2021-10-17T22:58:31+08:00">2021-10-17</time>
-              </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/08/java/javaSE/JavaNPE%E9%97%AE%E9%A2%98%20nopointExpection/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/java/javaSE/JavaNPE%E9%97%AE%E9%A2%98%20nopointExpection/" class="cy_cmt_count" data-xid="2022/03/08/java/javaSE/JavaNPE问题 nopointExpection/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>46</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="NPE问题-nopointExpection"><a href="#NPE问题-nopointExpection" class="headerlink" title="NPE问题 nopointExpection"></a>NPE问题 nopointExpection</h3><ol>
-<li>Opthional java8</li>
-<li>属性用包装类型   阿里巴巴</li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/java/javaSE/NIO/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/08/java/javaSE/NIO/" class="post-title-link" itemprop="url">NIO</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-12-12 00:58:26" itemprop="dateModified" datetime="2021-12-12T00:58:26+08:00">2021-12-12</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java%E9%AB%98%E7%BA%A7/" itemprop="url" rel="index"><span itemprop="name">java高级</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/08/java/javaSE/NIO/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/java/javaSE/NIO/" class="cy_cmt_count" data-xid="2022/03/08/java/javaSE/NIO/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.9k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>[toc]</p>
-<h2 id="一、IO概述"><a href="#一、IO概述" class="headerlink" title="一、IO概述"></a>一、IO概述</h2><ol>
-<li>同步阻塞IO-面向流-BIO<ol>
-<li>一个请求连接一个线程，</li>
-<li>问题：需要创建很多的线程，所有的线程还是同步的</li>
-<li>解决：线程池，但是线程池数量有上限</li>
-<li>适合请求少的场景，程序简单</li>
-</ol>
-</li>
-<li>同步非阻塞IO-多路复用器-NIO<ol>
-<li>一个线程可以处理多个请求</li>
-<li>selector 选择器(复用器)</li>
-<li>适合请求多，请求时间短：聊天，弹幕</li>
-</ol>
-</li>
-<li>异步非阻塞IO–AIO(NIO2.0)<ol>
-<li>一个请求一个线程</li>
-<li>适合请求较多，且请求时间长场景</li>
-</ol>
-</li>
-</ol>
-<h2 id="二、BIO"><a href="#二、BIO" class="headerlink" title="二、BIO"></a>二、BIO</h2><ol>
-<li>java.io</li>
-</ol>
-<h3 id="2-1-一对一"><a href="#2-1-一对一" class="headerlink" title="2.1 一对一"></a>2.1 一对一</h3><blockquote>
-<p>服务端只有一个线程，只能处理唯一一个请求</p>
-</blockquote>
-<h4 id="2-1-1-服务端"><a href="#2-1-1-服务端" class="headerlink" title="2.1.1 服务端"></a>2.1.1 服务端</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">ServerSocket serverSocket=<span class="keyword">new</span> ServerSocket(<span class="number">8888</span>);</span><br><span class="line"><span class="comment">//开启监听</span></span><br><span class="line">Socket accept = serverSocket.accept();</span><br><span class="line"><span class="comment">//从socket获得流</span></span><br><span class="line">InputStream inputStream = accept.getInputStream();</span><br><span class="line"><span class="comment">//包装缓冲区</span></span><br><span class="line">String msg= FileUtil.readFile(inputStream);</span><br><span class="line">System.out.println(msg);</span><br></pre></td></tr></table></figure>
-
-<h4 id="2-1-2-客户端"><a href="#2-1-2-客户端" class="headerlink" title="2.1.2 客户端"></a>2.1.2 客户端</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">Socket socket=<span class="keyword">new</span> Socket(<span class="string">&quot;127.0.0.1&quot;</span>,<span class="number">8888</span>);</span><br><span class="line"><span class="comment">//获得输出流</span></span><br><span class="line">OutputStream outputStream = socket.getOutputStream();</span><br><span class="line">PrintWriter printWriter=<span class="keyword">new</span> PrintWriter(outputStream);</span><br><span class="line">Scanner scanner=<span class="keyword">new</span> Scanner(System.in);</span><br><span class="line"><span class="keyword">while</span> (<span class="keyword">true</span>)&#123;</span><br><span class="line">    System.out.print(<span class="string">&quot;发送:&quot;</span>);</span><br><span class="line">    String s = scanner.nextLine();</span><br><span class="line">    <span class="keyword">if</span>(s.equals(<span class="string">&quot;-1&quot;</span>))</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    printWriter.println(s);</span><br><span class="line">    printWriter.flush();</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-2-多对多"><a href="#2-2-多对多" class="headerlink" title="2.2 多对多"></a>2.2 多对多</h3><blockquote>
-<p>每个请求创建一个线程去处理请求</p>
-</blockquote>
-<h4 id="2-2-1-服务端"><a href="#2-2-1-服务端" class="headerlink" title="2.2.1 服务端"></a>2.2.1 服务端</h4><h4 id="2-2-2-客户端"><a href="#2-2-2-客户端" class="headerlink" title="2.2.2 客户端"></a>2.2.2 客户端</h4><h4 id="2-2-3-缺陷"><a href="#2-2-3-缺陷" class="headerlink" title="2.2.3 缺陷"></a>2.2.3 缺陷</h4><ol>
-<li>每个请求都创建线程，线程的切换、竞争会浪费资源</li>
-<li>线程本身也占用cpu资源</li>
-<li>并不是每个请求线程</li>
-</ol>
-<h3 id="2-3-伪异步"><a href="#2-3-伪异步" class="headerlink" title="2.3 伪异步"></a>2.3 伪异步</h3><ul>
-<li>优：创建线程池，能避免创建线程的资源消耗问题</li>
-<li>缺：底层还是阻塞的，如果请求处理较慢，那么新的请求就会长时间的再请求队列中，产生大量超时</li>
-<li>适应：小批量，请求处理快速的场景</li>
-</ul>
-<h3 id="BIO总结"><a href="#BIO总结" class="headerlink" title="BIO总结"></a>BIO总结</h3><ol>
-<li><p>发送</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dataOutputStream.flush();</span><br></pre></td></tr></table></figure></li>
-<li><p>发送结束声明</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socket.shutdownOutput();</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h2 id="三、NIO"><a href="#三、NIO" class="headerlink" title="三、NIO"></a>三、NIO</h2><h3 id="3-1-NIO概述"><a href="#3-1-NIO概述" class="headerlink" title="3.1 NIO概述"></a>3.1 NIO概述</h3><h4 id="3-1-1-基本概念"><a href="#3-1-1-基本概念" class="headerlink" title="3.1.1 基本概念"></a>3.1.1 基本概念</h4><ol>
-<li>since JDK1.4</li>
-<li>基于通道的非阻塞IO，IO复用</li>
-<li>支持面向缓冲区</li>
-</ol>
-<h4 id="3-1-2-三大核心组件"><a href="#3-1-2-三大核心组件" class="headerlink" title="3.1.2 三大核心组件"></a>3.1.2 三大核心组件</h4><ol>
-<li>Channel 通道</li>
-<li>Buffer 缓冲区</li>
-<li>Selector 选择器(多路复用器)<ol>
-<li>轮询每个通道</li>
-</ol>
-</li>
-</ol>
-<h4 id="3-1-3-非阻塞模式"><a href="#3-1-3-非阻塞模式" class="headerlink" title="3.1.3 非阻塞模式"></a>3.1.3 非阻塞模式</h4><p>一个线程可以同时处理很多请求，基于监听器</p>
-<h4 id="3-1-4-NIO模型图"><a href="#3-1-4-NIO模型图" class="headerlink" title="3.1.4 NIO模型图"></a>3.1.4 NIO模型图</h4><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211207225509511.png" alt="image-20211207225509511"></p>
-<h4 id="3-1-5-NIO-vs-BIO"><a href="#3-1-5-NIO-vs-BIO" class="headerlink" title="3.1.5 NIO  vs  BIO"></a>3.1.5 NIO  vs  BIO</h4><table>
-<thead>
-<tr>
-<th>BIO</th>
-<th>NIO</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>数据流(字节，字符)</td>
-<td>数据块(缓冲区，通道)</td>
-</tr>
-<tr>
-<td>流：单向</td>
-<td>通道：双向</td>
-</tr>
-<tr>
-<td>阻塞</td>
-<td>非阻塞</td>
-</tr>
-<tr>
-<td>一个请求需要一个线程</td>
-<td>一个线程处理处理多个请求(选择器监听)</td>
-</tr>
-</tbody></table>
-<h3 id="3-2-Buffer"><a href="#3-2-Buffer" class="headerlink" title="3.2 Buffer"></a>3.2 Buffer</h3><h4 id="3-2-2-Buffer属性"><a href="#3-2-2-Buffer属性" class="headerlink" title="3.2.2 Buffer属性"></a>3.2.2 Buffer属性</h4><ol>
-<li>容量：数组大小,不可更改<ol>
-<li>通过allocate分配</li>
-</ol>
-</li>
-<li>限制：可操作的最后位置<ol>
-<li>读：表示有数据的最后位置</li>
-<li>写：表示容量</li>
-</ol>
-</li>
-<li>位置：写入、读取的当前位置索引<ol>
-<li>标记：mark该位置</li>
-<li>重置：重置到mark位置</li>
-</ol>
-</li>
-</ol>
-<h4 id="3-2-3-Buffer-Api"><a href="#3-2-3-Buffer-Api" class="headerlink" title="3.2.3 Buffer Api"></a>3.2.3 Buffer Api</h4><ol>
-<li>clear 清空缓存区</li>
-<li>flip：转换成可读模式</li>
-<li>Remaining：获得缓冲区长度</li>
-<li>hasRemaining：是否有数据</li>
-<li>rewind：将位置置0清除mark</li>
-</ol>
-<h4 id="3-2-4-缓冲区分类"><a href="#3-2-4-缓冲区分类" class="headerlink" title="3.2.4 缓冲区分类"></a>3.2.4 缓冲区分类</h4><h5 id="3-2-4-1-直接缓冲区"><a href="#3-2-4-1-直接缓冲区" class="headerlink" title="3.2.4.1 直接缓冲区"></a>3.2.4.1 直接缓冲区</h5><blockquote>
-<p>写入到直接内存，高并发场景</p>
-</blockquote>
-<h5 id="3-2-4-2-非直接缓冲区"><a href="#3-2-4-2-非直接缓冲区" class="headerlink" title="3.2.4.2 非直接缓冲区"></a>3.2.4.2 非直接缓冲区</h5><blockquote>
-<p>写入堆内存</p>
-</blockquote>
-<h3 id="3-3-Channel"><a href="#3-3-Channel" class="headerlink" title="3.3 Channel"></a>3.3 Channel</h3><h4 id="3-3-1-特点"><a href="#3-3-1-特点" class="headerlink" title="3.3.1 特点"></a>3.3.1 特点</h4><ol>
-<li>双向的</li>
-<li>不能直接数据交互，需借助buffer</li>
-<li>异步读写</li>
-</ol>
-<h4 id="3-3-2-Channel实现"><a href="#3-3-2-Channel实现" class="headerlink" title="3.3.2 Channel实现"></a>3.3.2 Channel实现</h4><ol>
-<li>FileChannel 文件</li>
-<li>DatagramChannel  UDP</li>
-<li>SocketChannel  TCP</li>
-<li>ServerSockeChannel  监听Web的TCP连接，每一个连接创建一个Channel</li>
-</ol>
-<h3 id="3-4-Selector"><a href="#3-4-Selector" class="headerlink" title="3.4 Selector"></a>3.4 Selector</h3><h4 id="3-4-1-工作方式"><a href="#3-4-1-工作方式" class="headerlink" title="3.4.1 工作方式"></a>3.4.1 工作方式</h4><blockquote>
-<p>多个 Channel 以事件的方式可以注册到同一个Selector，如果有事件发生，便获取事件然后针对每个事件进行相应的处理。这样就可以只用一个单线程去管理多个通道，也就是管理多个连接和请求。避免了多线程之间的上下文切换导致的开销</p>
-</blockquote>
-<h4 id="3-4-2-选择器作用"><a href="#3-4-2-选择器作用" class="headerlink" title="3.4.2 选择器作用"></a>3.4.2 选择器作用</h4><ol>
-<li>轮询Channel选出可用的Channel</li>
-</ol>
-<h3 id="3-5-Reactor模式"><a href="#3-5-Reactor模式" class="headerlink" title="3.5 Reactor模式"></a>3.5 Reactor模式</h3><ol>
-<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/93612337">参考</a></li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/java/javaSE/java2/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/08/java/javaSE/java2/" class="post-title-link" itemprop="url">java2</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-13 01:54:49" itemprop="dateModified" datetime="2022-03-13T01:54:49+08:00">2022-03-13</time>
+                <time title="修改时间：2021-12-21 18:21:54" itemprop="dateModified" datetime="2021-12-21T18:21:54+08:00">2021-12-21</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -805,8 +357,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/03/08/java/javaSE/java2/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/java/javaSE/java2/" class="cy_cmt_count" data-xid="2022/03/08/java/javaSE/java2/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/hashcode%E7%9A%84%E5%88%86%E6%9E%90/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/hashcode%E7%9A%84%E5%88%86%E6%9E%90/" class="cy_cmt_count" data-xid="2022/03/08/java/java源码解读/hashcode的分析/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -817,7 +369,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>59</span>
+              <span>656</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -836,22 +388,378 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>[toc]</p>
-<h3 id="接口"><a href="#接口" class="headerlink" title="接口"></a>接口</h3><ol>
-<li>接口基础<ol>
-<li><p>接口继承接口，方法重复只需要重写一个就ok</p>
+          <h3 id="hashcode的由来"><a href="#hashcode的由来" class="headerlink" title="hashcode的由来"></a>hashcode的由来</h3><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/zhangyuan19880606/article/details/51240372">参考1</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/be943b4958f4">参考2-Java Object.hashCode()返回的是对象内存地址？</a></p>
+<ol>
+<li><p>object直接输出类名+hashcode的16进制</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span>:</span></span><br><span class="line"><span class="function">	return <span class="title">getClass</span><span class="params">()</span>.<span class="title">getName</span><span class="params">()</span> + &quot;@&quot; + Integer.<span class="title">toHexString</span><span class="params">(hashCode()</span>)</span>;</span><br></pre></td></tr></table></figure></li>
+<li><p>jvm生成hashcode的算法是不稳定算法</p>
+<blockquote>
+<p>分为五种策略,默认五种</p>
+</blockquote>
+<ol>
+<li><p>第一种策略</p>
+<ol>
+<li><p>获取内存地址，然后根据地址进行一定计算</p>
+<figure class="highlight nim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">addr</span>=intptr&gt;&gt;<span class="number">3</span></span><br><span class="line"><span class="keyword">return</span> <span class="keyword">addr</span>^(<span class="keyword">addr</span>&gt;&gt;<span class="number">5</span>)^<span class="type">RandomInt</span></span><br></pre></td></tr></table></figure></li>
+</ol>
 </li>
-<li><p>接口可以有default方法</p>
+<li><p>策略2</p>
+<blockquote>
+<p>固定返回1，用于测试</p>
+</blockquote>
 </li>
-<li><p>接口可以有static方法</p>
+<li><p>策略3</p>
+<blockquote>
+<p>自增</p>
+</blockquote>
+</li>
+<li><p>策略4</p>
+<blockquote>
+<p>直接指针地址</p>
+</blockquote>
+</li>
+<li><p>策略5</p>
+</li>
+</ol>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/zjq_1314520/article/details/78955104">其他情况</a></p>
+<ol>
+<li><p>int  的hashcode就是他们的</p>
+</li>
+<li><p>string的hashcode</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> h = hash;<span class="comment">//默认为0</span></span><br><span class="line">        <span class="keyword">if</span> (h == <span class="number">0</span> &amp;&amp; value.length &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">char</span> val[] = value;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; value.length; i++) &#123;</span><br><span class="line">                h = <span class="number">31</span> * h + val[i];&#125;</span><br><span class="line">            hash = h;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> h;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>‘1’ -&gt; 49</p>
+<p>‘0’ -&gt; 48</p>
+<p>h=31*0+49=49 *</p>
+<p><em>h=31</em>49+48=1567</p>
+</blockquote>
+</li>
+<li><p>long</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">return</span> (<span class="keyword">int</span>)(value ^ (value &gt;&gt;&gt; <span class="number">32</span>));</span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+</ol>
+<h3 id="hashcode是否会相等"><a href="#hashcode是否会相等" class="headerlink" title="hashcode是否会相等"></a>hashcode是否会相等</h3>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/" class="post-title-link" itemprop="url">java常用工具类源码</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-13 03:52:56" itemprop="dateModified" datetime="2022-03-13T03:52:56+08:00">2022-03-13</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/javay/" itemprop="url" rel="index"><span itemprop="name">javay</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/" class="cy_cmt_count" data-xid="2022/03/08/java/java源码解读/java源码解读/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.6k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="比较器Comparator"><a href="#比较器Comparator" class="headerlink" title="比较器Comparator"></a>比较器Comparator</h3><h3 id="一、比较器Comparator"><a href="#一、比较器Comparator" class="headerlink" title="一、比较器Comparator"></a>一、比较器Comparator</h3><ol>
+<li><p>Arrays.sort(users,new Comparator)</p>
+<p>-&gt;TimSort.sort(user,0,length,comparator)</p>
+<p>-&gt;if(len&lt;32)</p>
+<p>​    –&gt;i++找到合适开始index</p>
+<p>​    –&gt;2进制插入排序binarySort(a,index,length,c)</p>
+<p>​    –&gt;这是对少量元素进行排序的最佳方法，它需</p>
+</li>
+</ol>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2022/03/08/java/javaSE/java2/#more" rel="contents">
+              <a class="btn" href="/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
           <!--/noindex-->
         
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB2/" class="post-title-link" itemprop="url">java源码解读2</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-13 03:55:27" itemprop="dateModified" datetime="2022-03-13T03:55:27+08:00">2022-03-13</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB2/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB2/" class="cy_cmt_count" data-xid="2022/03/08/java/java源码解读/java源码解读2/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>1. </p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/readme/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/readme/" class="post-title-link" itemprop="url">Java源码</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-12-24 13:04:20" itemprop="dateModified" datetime="2021-12-24T13:04:20+08:00">2021-12-24</time>
+              </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/readme/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/readme/" class="cy_cmt_count" data-xid="2022/03/08/java/java源码解读/readme/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>30</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="一、介绍"><a href="#一、介绍" class="headerlink" title="一、介绍"></a>一、介绍</h2><h3 id="1-1-作用"><a href="#1-1-作用" class="headerlink" title="1.1 作用"></a>1.1 作用</h3><h3 id="1-2-原理"><a href="#1-2-原理" class="headerlink" title="1.2 原理"></a>1.2 原理</h3><h3 id="1-3-父"><a href="#1-3-父" class="headerlink" title="1.3 父"></a>1.3 父</h3><h2 id="二、属性"><a href="#二、属性" class="headerlink" title="二、属性"></a>二、属性</h2><h2 id="三、方法"><a href="#三、方法" class="headerlink" title="三、方法"></a>三、方法</h2><h2 id="四、细节"><a href="#四、细节" class="headerlink" title="四、细节"></a>四、细节</h2>
       
     </div>
 
@@ -869,7 +777,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/33/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/33/">33</a><span class="page-number current">34</span><a class="page-number" href="/page/35/">35</a><span class="space">&hellip;</span><a class="page-number" href="/page/57/">57</a><a class="extend next" rel="next" href="/page/35/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/33/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/33/">33</a><span class="page-number current">34</span><a class="page-number" href="/page/35/">35</a><span class="space">&hellip;</span><a class="page-number" href="/page/58/">58</a><a class="extend next" rel="next" href="/page/35/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -937,7 +845,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">285</span>
+          <span class="site-state-item-count">289</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -988,12 +896,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">308k</span>
+    <span title="站点总字数">321k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">4:40</span>
+    <span title="站点阅读时长">4:52</span>
 </div>
 
         
