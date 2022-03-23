@@ -187,6 +187,809 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/12/java/javaSE/jvm/Java%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/12/java/javaSE/jvm/Java%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84/" class="post-title-link" itemprop="url">JVM内存模型</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-12 16:50:27" itemprop="dateCreated datePublished" datetime="2022-03-12T16:50:27+08:00">2022-03-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-22 20:20:45" itemprop="dateModified" datetime="2022-03-22T20:20:45+08:00">2022-03-22</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/JVM/" itemprop="url" rel="index"><span itemprop="name">JVM</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/12/java/javaSE/jvm/Java%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/12/java/javaSE/jvm/Java%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84/" class="cy_cmt_count" data-xid="2022/03/12/java/javaSE/jvm/Java内存结构/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>4.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>[toc]</p>
+<h2 id="一、JVM内存结构"><a href="#一、JVM内存结构" class="headerlink" title="一、JVM内存结构"></a>一、JVM内存结构</h2><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211214035039329.png" alt="image-20211214035039329"></p>
+<blockquote>
+<p>包括：栈、堆、程序计数器、本地方法栈、方法区</p>
+</blockquote>
+<h3 id="1-1-JVM栈"><a href="#1-1-JVM栈" class="headerlink" title="1.1 JVM栈 "></a>1.1 <a target="_blank" rel="noopener" href="https://blog.csdn.net/heart_mine/article/details/79495032">JVM栈 </a></h3><blockquote>
+<p>每个线程对应一个栈</p>
+<p>栈：方法栈</p>
+<p>栈帧：某个方法所需的内存 ：参数，局部变量，返回值(返回地址)</p>
+</blockquote>
+<blockquote>
+<p>默认1024KB，影响递归的深度</p>
+</blockquote>
+<ul>
+<li>每深入一个方法，以栈帧为单位的压栈或者出栈</li>
+<li>每退出一个方法，退栈</li>
+</ul>
+<h4 id="1-1-1-存储内容"><a href="#1-1-1-存储内容" class="headerlink" title="1.1.1 存储内容"></a>1.1.1 存储内容</h4><p>​    栈中只保存基础数据类型的对象和自定义对象的引用(不是整个对象)，对象都存放在堆区中 每个栈中的数据(原始类型和对象引用)都是私有的，其他栈不能访问。</p>
+<p>​     栈分为3个部分：基本类型变量区、执行环境上下文、操作指令区(存放操作指令)。</p>
+<h4 id="1-1-2-特殊"><a href="#1-1-2-特殊" class="headerlink" title="1.1.2 特殊"></a>1.1.2 特殊</h4><ol>
+<li><p>Java方法本身没有线程安不安全，全都依赖它的变量的作用范围</p>
+</li>
+<li><p>synchronized修饰方法，意思是锁住调用者</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">changeStudent</span><span class="params">(Student s)</span></span>&#123;</span><br><span class="line">	s.setName(<span class="string">&quot;小明&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>当普通方法</p>
+</li>
+</ol>
+<h3 id="1-2-堆内存"><a href="#1-2-堆内存" class="headerlink" title="1.2 堆内存"></a>1.2 堆内存</h3><h4 id="1-2-1-存储内容"><a href="#1-2-1-存储内容" class="headerlink" title="1.2.1 存储内容"></a>1.2.1 存储内容</h4><ol>
+<li><p>全部是对象，每个对象包含一个与之对应的class信息–class的目的是得到操作指令。</p>
+</li>
+<li><p>JDK7之后存储静态变量、字符常量池，JDK7之前存在方法区</p>
+</li>
+</ol>
+<h4 id="1-2-2-堆内存特点"><a href="#1-2-2-堆内存特点" class="headerlink" title="1.2.2 堆内存特点"></a>1.2.2 堆内存特点</h4><p>jvm只有一个堆区（heap）被所有线程共享，堆区中不存放基本类型和对象引用，只存放对象本身。  </p>
+<ul>
+<li>堆的优势是可以动态地分配内存大小，生存期也不必事先告诉编译器，因为它是在运行时动态分配内存的，Java的垃圾收集器会自动收走这些不再使用的数据。 </li>
+<li>缺点是，由于要在运行时动态分配内存，存取速度较慢。</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/shamo89/p/9775122.html">Java堆完全是自动化管理</a>，通过垃圾收集机制，垃圾对象会自动清理，不需自己去释放</p>
+<p>Java堆分为新生代(Young Gen)和老年代(Tenured Gen)</p>
+<h3 id="1-3-方法区"><a href="#1-3-方法区" class="headerlink" title="1.3 方法区"></a>1.3 方法区</h3><blockquote>
+<p>方法区看作是一块独立于Java堆的内存空间，属于共享内存</p>
+</blockquote>
+<h4 id="1-3-1-存储内容"><a href="#1-3-1-存储内容" class="headerlink" title="1.3.1 存储内容"></a>1.3.1 存储内容</h4><ol>
+<li>类头信息<ol>
+<li>名称</li>
+<li>父类</li>
+<li>修饰符</li>
+<li>接口</li>
+</ol>
+</li>
+<li>类域信息：字段信息</li>
+<li>类方法信息<ol>
+<li>名称</li>
+<li>参数数量、类型</li>
+<li>修饰符</li>
+<li>方法字节码(操作+局部变量)</li>
+<li>异常表</li>
+</ol>
+</li>
+<li>运行时常量，它是每一个类或接口的常量池的运行时表示形式，在类和接口被加载到JVM后，对应的运行时常量池就被创建出来。在运行期间也可将新的常量放入运行时常量池中，比如String的intern方法。虽然JVM规范把方法区描述为堆的一个逻辑部分， 但它却有个别名non-heap（非堆）。<strong>方法区的大小决定了系统可以加载多少个类</strong>， 如果系统定义的类太多，可能会产生OOM</li>
+</ol>
+<h4 id="1-3-2-常量池"><a href="#1-3-2-常量池" class="headerlink" title="1.3.2 常量池"></a>1.3.2 常量池</h4><p> 运行时常量池与常量池的区别</p>
+<ol>
+<li>存放内容：存放编译期间生成的<ol>
+<li>各种字面量（字符串和final常量）</li>
+<li>字段表、方法表、属性表</li>
+<li>符号引用（类和接口的全限定名、字段的名称和描述符、方法句柄和方法类型、方法的名称和描述符 ）</li>
+</ol>
+</li>
+<li>区别<ul>
+<li>常量池：存放在.class文件中</li>
+<li>运行时常量池：内存中</li>
+</ul>
+</li>
+<li>运行时常量池是常量池表在运行时的表现形式，通过ClassLoader将字节码文件的常量池中的信息加载到内存中，存储在了方法区的运行时常量池中。</li>
+</ol>
+<h4 id="1-3-3-方法区的演进"><a href="#1-3-3-方法区的演进" class="headerlink" title="1.3.3 方法区的演进"></a>1.3.3 方法区的演进</h4><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211214042049855.png" alt="image-20211214042049855"></p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211214042305858.png" alt="image-20211214042305858"></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_43232955/article/details/107411378">图片来源</a></p>
+<h4 id="1-3-4-元空间与永久代"><a href="#1-3-4-元空间与永久代" class="headerlink" title="1.3.4 元空间与永久代"></a>1.3.4 元空间与永久代</h4><p>​    元空间不在虚拟机设置的内存中，而是使用本地内存，相对于虚拟机的内存，本地内存空间更大,元空间的大小仅受本地内存限制，更不容易出现OOM</p>
+<h4 id="1-3-5-新生代与老年代"><a href="#1-3-5-新生代与老年代" class="headerlink" title="1.3.5 新生代与老年代"></a>1.3.5 <a target="_blank" rel="noopener" href="https://www.cnblogs.com/shamo89/p/9775122.html">新生代与老年代</a></h4><blockquote>
+<p>新生代存放新生的对象或者年龄不大的对象，老年代则存放老年对象。</p>
+</blockquote>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211214110956494.png" alt="image-20211214110956494"></p>
+<ol>
+<li><p>新生代分为edn区，s0区，s1区</p>
+<p>s0和s1也被称为from和to区域，他们是两块大小相等，并且可以互相转换的空间。</p>
+</li>
+<li><p>绝大多数情况下，对象首先分配在edn区，在新生代回收后，如果对象还存活，则进入s0或s1区，之后每经过一次新生代回收，如果对象存活则他的年龄就加1，对象达到一定的年龄后，则进入老年代。</p>
+</li>
+</ol>
+<p>举例：A a=new A()；首先把对象存放到堆内存当中，发现这个A只用了一次，首先会进入新生代里边去，存放到edn区域里面，因为Java堆自动化管理，垃圾收集机制，发现这个a只用了一次，如果a又被一段代码引用，垃圾回收机制有算法，每引用一次记录一次，就会马上进入到s0或者是s1区域，一旦a这个对象引用次数非常多了，就会存放到老年代里去。</p>
+<h3 id="1-4-本地方法栈"><a href="#1-4-本地方法栈" class="headerlink" title="1.4 本地方法栈"></a>1.4 本地方法栈</h3><p>和java栈的作用差不多，只不过是为JVM使用到的native方法服务的。</p>
+<p>Java官方对于本地方法的定义为methods written in a language other than the Java programming language，就是使用非Java语言实现的方法，但是通常我们指的一般为C或者C++，因此这个栈也有着C栈这一称号。一个不支持本地方法执行的JVM没有必要实现这个数据区域。本地方法栈基本和JVM栈一样，其大小也是可以设置为固定值或者动态增加，因此也会对应抛出StackOverflowError和OutOfMemoryError错误。 </p>
+<p>在HotSopt虚拟机中直接就把本地方法栈和Java栈合二为一。</p>
+<h3 id="1-5-程序计数器"><a href="#1-5-程序计数器" class="headerlink" title="1.5 程序计数器"></a>1.5 程序计数器</h3><blockquote>
+<p>用于保存下一条指令的内存地址。</p>
+</blockquote>
+<p>​    由于JVM程序是多线程执行的（线程轮流切换），所以为了保证线程切换回来后，还能恢复到原先状态，就需要一个独立的计数器，记录之前中断的地方，可见程序计数器也是线程私有的。</p>
+<p><strong>注意这个区域是唯一一个不抛出OutOfMemoryError的运行时数据区。</strong></p>
+<h2 id="二、Java内存模型"><a href="#二、Java内存模型" class="headerlink" title="二、Java内存模型"></a>二、Java内存模型</h2><blockquote>
+<p>JMM，只是一个抽象的概念，是和多线程相关的，他描述了一组规则或规范，这个规范定义了一个线程对共享变量的写入时对另一个线程是可见的。</p>
+</blockquote>
+<p>Java堆和方法区的区域是多个线程共享的数据区域，多个线程可能可以操作保存在堆或者方法区中的同一个数据。这也就是我们常说的“Java的线程间通过共享内存进行通信”。<br>在通信过程中会存在一系列如可见性、原子性、顺序性等问题，而JMM就是围绕着多线程通信以及与其相关的一系列特性而建立的模型，JMM定义了一些语法集，这些语法集映射到Java语言中就是volatile、synchronized等关键字。</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211214040257190.png" alt="image-20211214040257190"></p>
+<h2 id="三、Java对象模型"><a href="#三、Java对象模型" class="headerlink" title="三、Java对象模型"></a>三、Java对象模型</h2><ol>
+<li>每一个Java类在被JVM加载的时候，JVM会给这个类创建一个<code>instanceKlass</code>，保存在方法区</li>
+<li>new一个对象的时候，JVM会创建一个<code>instanceOopDesc</code>对象，这个对象中包含了对象头以及实例数据。报保存在堆内</li>
+</ol>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211214040801845.png" alt="image-20211214040801845"></p>
+<p><a target="_blank" rel="noopener" href="https://www.hollischuang.com/archives/2509">图片来源</a></p>
+<h2 id="四、疑惑"><a href="#四、疑惑" class="headerlink" title="四、疑惑"></a>四、疑惑</h2><h3 id="4-1-为什么分栈、堆、方法区的区别"><a href="#4-1-为什么分栈、堆、方法区的区别" class="headerlink" title="4.1 为什么分栈、堆、方法区的区别"></a>4.1 <a target="_blank" rel="noopener" href="https://blog.csdn.net/JustKian/article/details/104559654?utm_medium=distribute.pc_aggpage_search_result.none-task-blog-2~aggregatepage~first_rank_ecpm_v1~rank_v31_ecpm-1-104559654.pc_agg_new_rank&utm_term=jvm%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E7%94%A8%E6%A0%88&spm=1000.2123.3001.4430">为什么分栈、堆、方法区的区别</a></h3><blockquote>
+<p>堆，栈，方法区等都有自己特有的内存管理方式，都有自己合适存储的内容，方便jvm去调用和进行内存管理</p>
+</blockquote>
+<p>​    人们发现 变量主要是两种形式</p>
+<ul>
+<li><p>一种内容短小（比如一个int整数），需要频繁访问，但是生命周期很短，通常只在一个方法内存活</p>
+</li>
+<li><p>而另一种内容可能很多（比如很长一个字符串），可能不需要太频繁的访问，但生命周期较长，通常很多个方法中可能都要用到</p>
+<p>那么自然将这两类变量分开就显得比较理性，一类存储在栈区，通常是局部变量、操作符栈、函数参数传递和返回值，另一类存储在堆区，通常是较大的结构体（或者OOP中的对象）、需要反复访问的全局变量。堆区就是各种慢，申请内存慢，访问慢，修改慢，释放慢，整理慢（或者说GC垃圾回收），但优点也不言而喻，访问随机灵活，空间超大，在不超可用内存的情况下你要多大就给多大</p>
+</li>
+</ul>
+<h3 id="4-2-栈内存"><a href="#4-2-栈内存" class="headerlink" title="4.2 栈内存"></a>4.2 栈内存</h3><blockquote>
+<p>栈内存实际上就是满足先进后出的性质的数学或数据结构。</p>
+</blockquote>
+<h4 id="4-2-1-存储内容"><a href="#4-2-1-存储内容" class="headerlink" title="4.2.1 存储内容"></a>4.2.1 存储内容</h4><p>​    栈内存在函数中定义的一些基本类型的变量和对象的引用变量都在函数的栈内存中分配。当在一段代码块定义一个变量时，Java就在栈中为这个变量分配内存空间，当超过变量的作用域后，Java会自动释放掉为该变量所分配的内存空间，该内存空间可以立即被另作他用。栈中主要存放一些基本类型的变量（,int, short, long, byte, float, double, boolean, char）和对象句柄。栈有一个很重要的特殊性，就是存在栈中的数据可以共享。</p>
+<h4 id="4-2-2-特点"><a href="#4-2-2-特点" class="headerlink" title="4.2.2 特点"></a>4.2.2 特点</h4><ul>
+<li><p>优点</p>
+<p>存取速度比堆要快，仅次于寄存器，栈数据可以共享。</p>
+</li>
+<li><p>缺点</p>
+<p>存在栈中的数据大小与生存期必须是确定的，缺乏灵活性。</p>
+</li>
+</ul>
+<h3 id="4-3-堆内存"><a href="#4-3-堆内存" class="headerlink" title="4.3 堆内存"></a>4.3 堆内存</h3><h4 id="4-3-1-存储内容"><a href="#4-3-1-存储内容" class="headerlink" title="4.3.1 存储内容"></a>4.3.1 存储内容</h4><ol>
+<li>方法区</li>
+<li>运行时常量池</li>
+<li>类实例</li>
+</ol>
+<h4 id="4-3-2-特点"><a href="#4-3-2-特点" class="headerlink" title="4.3.2 特点"></a>4.3.2 特点</h4><p>允许程序在运行时动态地申请某个大小的内存空间</p>
+<h2 id="五、JVM内存"><a href="#五、JVM内存" class="headerlink" title="五、JVM内存"></a>五、JVM内存</h2><h3 id="5-1-变量"><a href="#5-1-变量" class="headerlink" title="5.1 变量"></a>5.1 变量</h3><p>java有三种变量</p>
+<ul>
+<li>类变量–static—方法区</li>
+<li>成员变量–private int age– 堆内存</li>
+<li>局部变量—栈</li>
+</ul>
+<h3 id="5-2-运行时常量池"><a href="#5-2-运行时常量池" class="headerlink" title="5.2 运行时常量池"></a>5.2 运行时常量池</h3><ol>
+<li><p>二进制字节码：</p>
+<ol>
+<li><p>类基本信息：修改实践，版本，创建时间，父类，访问权限</p>
+</li>
+<li><p>常量池(常量表)</p>
+<blockquote>
+<p>方法，Class，Field，f</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#<span class="number">1</span> = Methodref #<span class="number">6.</span>#<span class="number">20</span></span><br><span class="line">#<span class="number">2</span> = Fieldref #<span class="number">3.</span>#<span class="number">4</span> <span class="comment">//java.lang.System.out</span></span><br><span class="line">#<span class="number">3</span> = Class #<span class="number">28</span> <span class="comment">//java.lang.System</span></span><br><span class="line">#<span class="number">4</span> = Utf8 out</span><br></pre></td></tr></table></figure></li>
+<li><p><strong>类方法信息</strong></p>
+<ol>
+<li>方法信息：描述-&gt;返回值.参数.地址</li>
+<li>虚拟机指令</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="5-3-StringTable"><a href="#5-3-StringTable" class="headerlink" title="5.3 StringTable"></a>5.3 StringTable</h3><blockquote>
+<p>属于运行时常量池，存的时<code>符号</code>，而不是String对象。</p>
+<p>字符串常量池：StringTable(HashTable[String,Index])</p>
+</blockquote>
+<h4 id="5-3-0注意"><a href="#5-3-0注意" class="headerlink" title="5.3.0注意"></a>5.3.0注意</h4><ol>
+<li>jdk1.7开始，ST被放在堆中</li>
+</ol>
+<h4 id="5-3-1-字符串拼接"><a href="#5-3-1-字符串拼接" class="headerlink" title="5.3.1 字符串拼接"></a>5.3.1 字符串拼接</h4><p>单一原则：”a”+”b”—&gt;字符串对象”ab”—&gt;存到StringTable(如果ST已经有了,那么会直接用)</p>
+<ul>
+<li><p>常量拼接</p>
+<p>“ab”==”a”+”b”  常量字符串拼接的javac优化，”a”与”b”都不会变了，javac直接判为”ab”</p>
+</li>
+<li><p>变量拼接</p>
+<p>“ab”!=a+b  因为后者通过StringBuffer的  toString():return new String()</p>
+</li>
+</ul>
+<h4 id="5-3-2-intern"><a href="#5-3-2-intern" class="headerlink" title="5.3.2 intern"></a>5.3.2 intern</h4><blockquote>
+<p>将String变量ab的符号放入ST中,但不会改变ab的地址</p>
+</blockquote>
+<ul>
+<li>如果ST中已有，那么就返回这个地址，ab地址不变，即ab!=”ab”</li>
+<li>如果ST中没有，那么就把ab的地址直接放入ST中，以后就会有ab==”ab”</li>
+</ul>
+<ol>
+<li><p>new的String在堆中，不在StringTable中</p>
+<p>比如String s=new String(“ab”) 那么StringTable中没有”ab”</p>
+</li>
+<li><p>将s放入ST的方法时intern</p>
+<p>String s2=s.intern()</p>
+</li>
+</ol>
+<h4 id="5-3-3-StringTable调优"><a href="#5-3-3-StringTable调优" class="headerlink" title="5.3.3 StringTable调优"></a>5.3.3 StringTable调优</h4><ol>
+<li>会存在垃圾回收</li>
+<li>建议常用intern()</li>
+</ol>
+<h4 id="5-4-直接内存"><a href="#5-4-直接内存" class="headerlink" title="5.4 直接内存"></a>5.4 直接内存</h4><ol>
+<li>常用于NIO操作(属于操作系统内存，而非JVM内存)</li>
+<li>分配回收消耗大</li>
+<li>读写性能高</li>
+<li>不受JVM内存管理</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/12/java/socket%E7%BC%96%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/12/java/socket%E7%BC%96%E7%A8%8B/" class="post-title-link" itemprop="url">socket编程</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-03-12 14:11:08 / 修改时间：15:12:08" itemprop="dateCreated datePublished" datetime="2022-03-12T14:11:08+08:00">2022-03-12</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/12/java/socket%E7%BC%96%E7%A8%8B/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/12/java/socket%E7%BC%96%E7%A8%8B/" class="cy_cmt_count" data-xid="2022/03/12/java/socket编程/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>714</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="TCP-UDP"><a href="#TCP-UDP" class="headerlink" title="TCP UDP"></a>TCP UDP</h3><ul>
+<li><strong>TCP</strong>：传输控制协议，是一种面向连接的、可靠的、基于字节流的传输层通信协议，TCP 层是位于 IP 层之上，应用层之下的中间层。TCP 保障了两个应用程序之间的可靠通信。通常用于互联网协议，被称 TCP / IP。</li>
+<li><strong>UDP</strong>：用户数据报协议，位于 OSI 模型的传输层。一个无连接的协议。提供了应用程序之间要发送数据的数据报。由于UDP缺乏可靠性且属于无连接协议，所以应用程序通常必须容许一些丢失、错误或重复的数据包</li>
+</ul>
+<h3 id="socket"><a href="#socket" class="headerlink" title="socket"></a>socket</h3><ol>
+<li><p>在计算机网络中，叫套接字socket (ip:port)</p>
+<p>top连接={socket1,socket2}</p>
+</li>
+<li><p>在程序通信中，叫socket Api，网络通信接口，这是对TCP、IP的封装</p>
+</li>
+</ol>
+<h3 id="socket编程"><a href="#socket编程" class="headerlink" title="socket编程"></a>socket编程</h3><blockquote>
+<p>当连接建立时，服务器会创建一个 Socket 对象。客户端和服务器现在可以通过对 Socket 对象的写入和读取来进行通信。</p>
+</blockquote>
+<h2 id="二、类"><a href="#二、类" class="headerlink" title="二、类"></a>二、类</h2><h3 id="2-1-ServerSocket"><a href="#2-1-ServerSocket" class="headerlink" title="2.1 ServerSocket"></a>2.1 ServerSocket</h3><table>
+<thead>
+<tr>
+<th>序号</th>
+<th>方法名</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>ServerSocket(int port)</td>
+<td>构造函数</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>getLocalPort</strong></td>
+<td>获得端口</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>accept</strong></td>
+<td>监听</td>
+</tr>
+<tr>
+<td>4</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>5</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>6</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>7</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>8</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>9</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id="2-2-Socket"><a href="#2-2-Socket" class="headerlink" title="2.2 Socket"></a>2.2 Socket</h3><table>
+<thead>
+<tr>
+<th>序号</th>
+<th>方法名</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>Socket(String host, int port)</td>
+<td>构造函数</td>
+</tr>
+<tr>
+<td>2</td>
+<td>**connect(**SocketAddress host, int timeout)</td>
+<td>连接</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>getInetAddress</strong></td>
+<td>获得地址</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>getPort</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>getInputStream</strong></td>
+<td>获得输入流</td>
+</tr>
+<tr>
+<td>6</td>
+<td>OutputStream</td>
+<td>获得输出流</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>close</strong></td>
+<td>关闭</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id="2-3-InetAddress"><a href="#2-3-InetAddress" class="headerlink" title="2.3 InetAddress"></a>2.3 InetAddress</h3><table>
+<thead>
+<tr>
+<th>序号</th>
+<th>方法名</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><h4 id="阻塞IO"><a href="#阻塞IO" class="headerlink" title="阻塞IO"></a>阻塞IO</h4><p>进程进行IO操作的适合被挂起，防止被运行，指导IO操作完成。</p>
+<h4 id="非阻塞IO"><a href="#非阻塞IO" class="headerlink" title="非阻塞IO"></a>非阻塞IO</h4><p>IO操作立即返回，返回值为读取到的数据大小。等到总线发送了中断信号，就表示IO操作完成。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/12/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%B4%A2%E5%BC%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/12/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%B4%A2%E5%BC%95/" class="post-title-link" itemprop="url">mysql索引</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-12 03:01:52" itemprop="dateCreated datePublished" datetime="2022-03-12T03:01:52+08:00">2022-03-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-20 22:17:00" itemprop="dateModified" datetime="2022-03-20T22:17:00+08:00">2022-03-20</time>
+              </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/12/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%B4%A2%E5%BC%95/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/12/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%B4%A2%E5%BC%95/" class="cy_cmt_count" data-xid="2022/03/12/数据库/mysql索引/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.7k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>​    </p>
+<h2 id="一、索引原理"><a href="#一、索引原理" class="headerlink" title="一、索引原理"></a>一、索引原理</h2><blockquote>
+<p>索引原理：</p>
+<p>索引是一种利用某种规则的数据结构与实际数据的关系加快数据查找的功能；索引数据节点中有着实际文件的位置，因为索引是根据特定的规则和算法构建的,在查找的时候遵循索引的规则可以快速查找到对应数据的节点，从而达到快速查找数据的效果；其实宏观来说索引其实是一种概念而不是具体的某项技术，只是我们在某个技术中运用得比较广泛和鲜明（比如说数据库）渐渐的有了特定领域的标签，其实在生活中索引的使用无处不在，比如说：书本里的目录；读书时的座位号，考试编号都有类似索引的功能;</p>
+<p>总结来所有通过某规则数据结构和实际目标关联，根据特定规则算法快速寻址的功能都可以称之为索引；</p>
+</blockquote>
+<h3 id="术语"><a href="#术语" class="headerlink" title="术语"></a>术语</h3><h4 id="索引覆盖"><a href="#索引覆盖" class="headerlink" title="索引覆盖"></a>索引覆盖</h4><blockquote>
+<p>正好命中索引，不需要回表</p>
+<p>select id,name from user  索引覆盖的前提是name有索引，因为name的索引表中存储的是（name,id），一个表就存储了name和id</p>
+</blockquote>
+<h2 id="二、索引结构"><a href="#二、索引结构" class="headerlink" title="二、索引结构"></a>二、索引结构</h2><h3 id="1-1-为什么是b-树"><a href="#1-1-为什么是b-树" class="headerlink" title="1.1 为什么是b+树"></a>1.1 为什么是b+树</h3><ol>
+<li>索引的表象是一个目录</li>
+<li>底层原理   [字段值,地址] 某种数据结构的映射</li>
+</ol>
+<h3 id="1-2-排序的结构"><a href="#1-2-排序的结构" class="headerlink" title="1.2 排序的结构"></a>1.2 排序的结构</h3><ol>
+<li>二叉树   —&gt; 递增有序的情况    <strong>树高度==n</strong></li>
+<li>AVL 平衡二叉树   旋转次数多</li>
+<li>红黑树 弱平衡二叉树         弊端: 高度高</li>
+<li>B树   m叉树+平衡查找树     扩大横分叉，高度可控</li>
+<li>B+树  每个节点从左到右一次递增<ol>
+<li>非叶子节点不存数据，只存冗余索引</li>
+<li>叶子节点从大到小相互连接</li>
+<li>每个页16KB<ol>
+<li>如果满了  节点分裂  高度增加</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<h4 id="B-树相对于B树优点"><a href="#B-树相对于B树优点" class="headerlink" title="B+树相对于B树优点"></a>B+树相对于B树优点</h4><ol>
+<li>非叶子节点都存有冗余，这样的目的是为了让叶子节点存有所有的数据</li>
+<li>非叶子节点不带有指向记录的指针，则一个块可以存储更多的索引项，如此可以降低树的高度。</li>
+<li>叶子节点之间有指针连接，则在范围扫描时避免了在内部节点来回移动。</li>
+</ol>
+<h4 id="B-树搜索过程"><a href="#B-树搜索过程" class="headerlink" title="B+树搜索过程"></a>B+树搜索过程</h4><ol>
+<li>根据冗余索引找到data叶子节点</li>
+<li>把data加载到内存 然后二分查找</li>
+</ol>
+<h4 id="特别的"><a href="#特别的" class="headerlink" title="特别的"></a>特别的</h4><ol>
+<li>如果只有一层  那么就相当于二分查找 ，但是，但是这意味着把所有的数据加载到内存，内存吃不消。 </li>
+<li>hash表<ol>
+<li>数组+链表</li>
+<li>hash运算—&gt;存到链表(hash冲突直接加在链表尾部)</li>
+<li><strong>不支持范围查找</strong></li>
+<li>不支持模糊查询</li>
+<li>大量重复数据，会严重影响查询性能</li>
+</ol>
+</li>
+<li>mysql的memory支持hash索引，一般hash索引用于名字，而不用于数字</li>
+<li>innodb不支持hash索引，</li>
+</ol>
+<h2 id="三、索引分类"><a href="#三、索引分类" class="headerlink" title="三、索引分类"></a>三、索引分类</h2><blockquote>
+<p>索引分类 innodb才有   mylsam没有分类</p>
+</blockquote>
+<h3 id="3-1-聚集索引："><a href="#3-1-聚集索引：" class="headerlink" title="3.1 聚集索引："></a>3.1 聚集索引：</h3><blockquote>
+<p> InnoDB必须要有，且只有一个聚集索引</p>
+<ol>
+<li>如果表定义了PK，则PK就是聚集索引；</li>
+<li>如果表没有定义PK，则第一个not NULL unique列是聚集索引；</li>
+<li>否则，InnoDB会创建一个隐藏的row-id作为聚集索引；</li>
+</ol>
+</blockquote>
+<blockquote>
+<p>存(id,data)    </p>
+<p>数据按照索引的顺序来存储的，索引的顺序与表中记录的物理顺序一致。对于聚集索引，叶子结点即存储了真实的数据行，不再有另外单独的数据页。 在一张表上最多只能创建一个聚集索引，因为真实数据的物理顺序只能有一种</p>
+</blockquote>
+<ol>
+<li><p>索引和数据一起存储 ，找到了索引就是找到了数据</p>
+</li>
+<li><p>一个文件 idb</p>
+</li>
+<li><p><strong>优势</strong>：</p>
+<ol>
+<li>直接拿到数据，不需要二次查询。</li>
+<li>范围查询好</li>
+<li>是否排序的场合</li>
+</ol>
+</li>
+<li><p>劣势</p>
+<ol>
+<li><p>维护差，需要大量操作</p>
+</li>
+<li><p>使用uuid做主键，插入就会变得随机性，</p>
+</li>
+<li><p>id很大的化，辅助索引也会占用很大的空间</p>
+<blockquote>
+<p>辅助索引就是存(age,id)</p>
+</blockquote>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="3-2-非聚集-稀疏，二级索引-索引："><a href="#3-2-非聚集-稀疏，二级索引-索引：" class="headerlink" title="3.2 非聚集(稀疏，二级索引)索引："></a>3.2 非聚集(稀疏，二级索引)索引：</h3><blockquote>
+<p>存储(key,主键)</p>
+</blockquote>
+<ol>
+<li><p>查完得到主键</p>
+</li>
+<li><p>再回表去主键索引查询位置</p>
+</li>
+</ol>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220320213638194.png" alt="image-20220320213638194"></p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220320213755722.png" alt="image-20220320213755722"></p>
+<h3 id="3-4-联合索引"><a href="#3-4-联合索引" class="headerlink" title="3.4 联合索引"></a>3.4 联合索引</h3><ol>
+<li><p>底层</p>
+</li>
+<li><p>最左前缀原则(a,b,c)</p>
+<ol>
+<li><p>为什么最左前缀</p>
+<p>在相同的a下才会排序b</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211014212733501.png" alt="image-20211014212733501"></p>
+</li>
+<li></li>
+</ol>
+</li>
+</ol>
+<h2 id="三、索引选择"><a href="#三、索引选择" class="headerlink" title="三、索引选择"></a>三、索引选择</h2><h3 id="3-1-B-树索引"><a href="#3-1-B-树索引" class="headerlink" title="3.1 B+树索引"></a>3.1 B+树索引</h3><h4 id="优势"><a href="#优势" class="headerlink" title="优势"></a>优势</h4><ol>
+<li>完全匹配</li>
+<li>范围匹配</li>
+<li>前缀匹配（左模糊）</li>
+</ol>
+<h4 id="限制"><a href="#限制" class="headerlink" title="限制"></a>限制</h4><ol>
+<li>对于index(a,b,c)，有最左原则，也就是只有选了a才能用索引</li>
+</ol>
+<h3 id="3-2-hash索引"><a href="#3-2-hash索引" class="headerlink" title="3.2 hash索引"></a>3.2 hash索引</h3><h4 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h4><ol>
+<li>简单</li>
+<li>快</li>
+</ol>
+<h4 id="限制-1"><a href="#限制-1" class="headerlink" title="限制"></a>限制</h4><ol>
+<li>不能范围</li>
+<li>不能排序</li>
+<li>不能模糊查询</li>
+<li>考虑hash冲突</li>
+</ol>
+<h2 id="四、索引创建原则"><a href="#四、索引创建原则" class="headerlink" title="四、索引创建原则"></a>四、索引创建原则</h2><h3 id="需要建立索引"><a href="#需要建立索引" class="headerlink" title="需要建立索引"></a>需要建立索引</h3><ol>
+<li>该字段经常select+where, update+where delete where</li>
+<li>需要分组、排序的字段</li>
+<li>唯一的字段</li>
+</ol>
+<h3 id="不需要建立索引"><a href="#不需要建立索引" class="headerlink" title="不需要建立索引"></a>不需要建立索引</h3><ol>
+<li><p>数据量小不建立</p>
+</li>
+<li><p>经常update,delete,insert</p>
+</li>
+<li><p>不经常where</p>
+</li>
+<li><p>数据重复严重 </p>
+<blockquote>
+<p>索引的目的是为了加速，比如把sex建立索引，加速太小，反而还需要维护索引，不如全表扫描</p>
+</blockquote>
+</li>
+<li><p>字段长度太大</p>
+</li>
+</ol>
+<h2 id="五、索引失效"><a href="#五、索引失效" class="headerlink" title="五、索引失效"></a>五、索引失效</h2><blockquote>
+<p>模：代表模糊查询。</p>
+<p>型：代表数据类型。</p>
+<p>数：代表函数。</p>
+<p>空：是Null的意思。</p>
+<p>运：代表运算。</p>
+<p>最：代表最左原则。</p>
+<p>快：全表扫描更快的意思</p>
+</blockquote>
+<h2 id="六、索引调优"><a href="#六、索引调优" class="headerlink" title="六、索引调优"></a>六、索引调优</h2><h3 id="6-1-长字段索引"><a href="#6-1-长字段索引" class="headerlink" title="6.1 长字段索引"></a>6.1 长字段索引</h3><p>字符串长度太大不适合索引</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/11/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/elasticsearch%E8%AF%AD%E6%B3%95/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -445,651 +1248,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/easyExcel/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/08/%E7%BB%84%E4%BB%B6/easyExcel/" class="post-title-link" itemprop="url">spring-easyExcel</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-08 00:33:40" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:40+08:00">2022-03-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-11-27 11:18:26" itemprop="dateModified" datetime="2021-11-27T11:18:26+08:00">2021-11-27</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/08/%E7%BB%84%E4%BB%B6/easyExcel/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/easyExcel/" class="cy_cmt_count" data-xid="2022/03/08/组件/easyExcel/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.9k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>[toc]</p>
-<h3 id="easyExcel"><a href="#easyExcel" class="headerlink" title="easyExcel"></a>easyExcel</h3><ol>
-<li><p>依赖</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>easyexcel<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.1.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">     <span class="comment">&lt;!-- poi office --&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.poi<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>poi<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;poi.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/03/08/%E7%BB%84%E4%BB%B6/easyExcel/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/nginx/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/08/%E7%BB%84%E4%BB%B6/nginx/" class="post-title-link" itemprop="url">nginx</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-08 00:33:40" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:40+08:00">2022-03-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-22 02:54:46" itemprop="dateModified" datetime="2022-03-22T02:54:46+08:00">2022-03-22</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%BB%84%E4%BB%B6/" itemprop="url" rel="index"><span itemprop="name">组件</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/08/%E7%BB%84%E4%BB%B6/nginx/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/nginx/" class="cy_cmt_count" data-xid="2022/03/08/组件/nginx/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>8.7k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>8 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>[toc]</p>
-<h2 id="一、概述"><a href="#一、概述" class="headerlink" title="一、概述"></a>一、概述</h2><ol>
-<li><p>nginxweb反向代理服务器</p>
-<ul>
-<li>开源</li>
-<li>高性能</li>
-<li>支持热部署</li>
-<li>24小数无间断</li>
-<li>支持高并发(5w)</li>
-</ul>
-</li>
-<li><p>用途</p>
-<ol>
-<li>静态资源服务器</li>
-<li>反向代理服务器</li>
-<li>正向代理服务器</li>
-<li>动静分离</li>
-<li>负载均衡</li>
-</ol>
-</li>
-<li><p>代理</p>
-<ol>
-<li><p>正向代理</p>
-<ol>
-<li><p>代理服务器：：访问国外网站，使用中间人服务器，</p>
-<p>中间人可以访问外国网站</p>
-<p>我可以访问中间人网站</p>
-</li>
-</ol>
-</li>
-<li><p>反向代理</p>
-<p>1. </p>
-</li>
-<li></li>
-</ol>
-</li>
-</ol>
-<h2 id="二、安装"><a href="#二、安装" class="headerlink" title="二、安装"></a>二、安装</h2><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">yum <span class="keyword">install</span> gcc-c++</span><br><span class="line">yum <span class="keyword">install</span> -y pcre pcre-devel</span><br><span class="line">yum <span class="keyword">install</span> -y zlib zlib-devel</span><br><span class="line">yum <span class="keyword">install</span> -y openssl openssl-devel</span><br></pre></td></tr></table></figure>
-
-<p><a target="_blank" rel="noopener" href="https://nginx.org/en/download.html">下载官网</a></p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220308211818104.png" alt="image-20220308211818104"></p>
-<p>复制链接  <a target="_blank" rel="noopener" href="https://nginx.org/download/nginx-1.6.3.tar.gz">https://nginx.org/download/nginx-1.6.3.tar.gz</a></p>
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">方式一 wget自己安装</span><br><span class="line">wget https:<span class="regexp">//</span>nginx.org<span class="regexp">/download/</span>nginx-<span class="number">1.6</span>.<span class="number">3</span>.tar.gz</span><br><span class="line">tar -zxvf nginx-<span class="number">1.6</span>.<span class="number">3</span>.tar.gz</span><br><span class="line">方式二 yum 一步安装</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cd</span> nginx-<span class="number">1.6</span>.<span class="number">3</span>.tar.gz</span><br><span class="line">./configure  编译配置环境</span><br><span class="line"><span class="keyword">make</span></span><br><span class="line"><span class="keyword">make</span> install</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">whereis</span> nginx 找到nginx执行文件</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-1-nginx文件结构"><a href="#2-1-nginx文件结构" class="headerlink" title="2.1 nginx文件结构"></a>2.1 nginx文件结构</h3><ol>
-<li>配置文件：/usr/local/nginx/conf/nginx.conf</li>
-<li>启动脚本 ：/usr/local/nginx/sbin/nginx</li>
-<li>log文件：/usr/local/nginx/logs/*.log</li>
-<li>pid文件: /usr/local/nginx/logs/nginx.pid</li>
-</ol>
-<h3 id="2-2-常用命令"><a href="#2-2-常用命令" class="headerlink" title="2.2 常用命令"></a>2.2 常用命令</h3><ol>
-<li><p>指定配置文件</p>
-<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">nginx -h</span><br><span class="line">nginx -c <span class="keyword">a</span>.conf 指定配置文件</span><br><span class="line"><span class="built_in">kill</span> -quid pid  平和的结束，信号量机制</span><br><span class="line"><span class="built_in">kill</span> -term pid 立即停止</span><br><span class="line"><span class="built_in">kill</span> <span class="number">-9</span> pid 强制结束，子进程可能不会被<span class="built_in">kill</span>掉</span><br></pre></td></tr></table></figure></li>
-<li><p>启动、暂停，重新加载</p>
-<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cd</span> <span class="string">/usr/local/nginx/sbin/</span></span><br><span class="line"><span class="string">./nginx</span> </span><br><span class="line"><span class="string">./nginx</span> -s stop</span><br><span class="line"><span class="string">./nginx</span> -s <span class="keyword">quit</span></span><br><span class="line"><span class="string">./nginx</span> -s <span class="keyword">reload</span></span><br><span class="line">-s 表示signal 发送一个信号</span><br></pre></td></tr></table></figure></li>
-<li><p>windows下杀死</p>
-<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">taskkill <span class="string">/fi</span> <span class="string">&quot;imagename eq nginx.EXE&quot;</span> <span class="string">/f</span></span><br></pre></td></tr></table></figure></li>
-</ol>
-<h2 id="三、nginx配置文件"><a href="#三、nginx配置文件" class="headerlink" title="三、nginx配置文件"></a>三、nginx配置文件</h2><h3 id="3-1-原始配置"><a href="#3-1-原始配置" class="headerlink" title="3.1 原始配置"></a>3.1 原始配置</h3><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#user  nobody;</span></span><br><span class="line"><span class="attribute">worker_processes</span>  <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">#error_log  logs/error.log;</span></span><br><span class="line"><span class="comment">#error_log  logs/error.log  notice;</span></span><br><span class="line"><span class="comment">#error_log  logs/error.log  info;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#pid        logs/nginx.pid;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="section">events</span> &#123;</span><br><span class="line">    <span class="attribute">worker_connections</span>  <span class="number">1024</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="section">http</span> &#123;</span><br><span class="line">    <span class="attribute">include</span>       mime.types;</span><br><span class="line">    <span class="attribute">default_type</span>  application/octet-stream;</span><br><span class="line"></span><br><span class="line">    <span class="comment">#log_format  main  &#x27;$remote_addr - $remote_user [$time_local] &quot;$request&quot; &#x27;</span></span><br><span class="line">    <span class="comment">#                  &#x27;$status $body_bytes_sent &quot;$http_referer&quot; &#x27;</span></span><br><span class="line">    <span class="comment">#                  &#x27;&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;&#x27;;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#access_log  logs/access.log  main;</span></span><br><span class="line"></span><br><span class="line">    <span class="attribute">sendfile</span>        <span class="literal">on</span>;</span><br><span class="line">    <span class="comment">#tcp_nopush     on;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#keepalive_timeout  0;</span></span><br><span class="line">    <span class="attribute">keepalive_timeout</span>  <span class="number">65</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">#gzip  on;</span></span><br><span class="line"></span><br><span class="line">    <span class="section">server</span> &#123;</span><br><span class="line">        <span class="attribute">listen</span>       <span class="number">80</span>;</span><br><span class="line">        <span class="attribute">server_name</span>  localhost;</span><br><span class="line"></span><br><span class="line">        <span class="comment">#charset koi8-r;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">#access_log  logs/host.access.log  main;</span></span><br><span class="line"></span><br><span class="line">        <span class="attribute">location</span> / &#123;</span><br><span class="line">            <span class="attribute">root</span>   html;</span><br><span class="line">            <span class="attribute">index</span>  index.html index.htm;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">#error_page  404              /404.html;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># redirect server error pages to the static page /50x.html</span></span><br><span class="line">        <span class="comment">#</span></span><br><span class="line">        <span class="attribute">error_page</span>   <span class="number">500</span> <span class="number">502</span> <span class="number">503</span> <span class="number">504</span>  /50x.html;</span><br><span class="line">        <span class="attribute">location</span> = /50x.html &#123;</span><br><span class="line">            <span class="attribute">root</span>   html;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment"># proxy the PHP scripts to Apache listening on 127.0.0.1:80</span></span><br><span class="line">        <span class="comment">#</span></span><br><span class="line">        <span class="comment">#location ~ \.php$ &#123;</span></span><br><span class="line">        <span class="comment">#    proxy_pass   http://127.0.0.1;</span></span><br><span class="line">        <span class="comment">#&#125;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000</span></span><br><span class="line">        <span class="comment">#</span></span><br><span class="line">        <span class="comment">#location ~ \.php$ &#123;</span></span><br><span class="line">        <span class="comment">#    root           html;</span></span><br><span class="line">        <span class="comment">#    fastcgi_pass   127.0.0.1:9000;</span></span><br><span class="line">        <span class="comment">#    fastcgi_index  index.php;</span></span><br><span class="line">        <span class="comment">#    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;</span></span><br><span class="line">        <span class="comment">#    include        fastcgi_params;</span></span><br><span class="line">        <span class="comment">#&#125;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># deny access to .htaccess files, if Apache&#x27;s document root</span></span><br><span class="line">        <span class="comment"># concurs with nginx&#x27;s one</span></span><br><span class="line">        <span class="comment">#</span></span><br><span class="line">        <span class="comment">#location ~ /\.ht &#123;</span></span><br><span class="line">        <span class="comment">#    deny  all;</span></span><br><span class="line">        <span class="comment">#&#125;</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment"># another virtual host using mix of IP-, name-, and port-based configuration</span></span><br><span class="line">    <span class="comment">#</span></span><br><span class="line">    <span class="comment">#server &#123;</span></span><br><span class="line">    <span class="comment">#    listen       8000;</span></span><br><span class="line">    <span class="comment">#    listen       somename:8080;</span></span><br><span class="line">    <span class="comment">#    server_name  somename  alias  another.alias;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#    location / &#123;</span></span><br><span class="line">    <span class="comment">#        root   html;</span></span><br><span class="line">    <span class="comment">#        index  index.html index.htm;</span></span><br><span class="line">    <span class="comment">#    &#125;</span></span><br><span class="line">    <span class="comment">#&#125;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment"># HTTPS server</span></span><br><span class="line">    <span class="comment">#</span></span><br><span class="line">    <span class="comment">#server &#123;</span></span><br><span class="line">    <span class="comment">#    listen       443 ssl;</span></span><br><span class="line">    <span class="comment">#    server_name  localhost;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#    ssl_certificate      cert.pem;</span></span><br><span class="line">    <span class="comment">#    ssl_certificate_key  cert.key;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#    ssl_session_cache    shared:SSL:1m;</span></span><br><span class="line">    <span class="comment">#    ssl_session_timeout  5m;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#    ssl_ciphers  HIGH:!aNULL:!MD5;</span></span><br><span class="line">    <span class="comment">#    ssl_prefer_server_ciphers  on;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#    location / &#123;</span></span><br><span class="line">    <span class="comment">#        root   html;</span></span><br><span class="line">    <span class="comment">#        index  index.html index.htm;</span></span><br><span class="line">    <span class="comment">#    &#125;</span></span><br><span class="line">    <span class="comment">#&#125;</span></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="3-2-文件结构"><a href="#3-2-文件结构" class="headerlink" title="3.2 文件结构"></a>3.2 文件结构</h3><figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">...</span>              <span class="comment">#1.全局块</span></span><br><span class="line"></span><br><span class="line">events &#123;         <span class="comment">#events块</span></span><br><span class="line">   <span class="string">...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">http      <span class="comment">#2.http块</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">...</span>   <span class="comment">#http全局块 </span></span><br><span class="line">    server        <span class="comment">#server块</span></span><br><span class="line">    &#123; </span><br><span class="line">        <span class="string">...</span>       <span class="comment">#server全局块</span></span><br><span class="line">        location [PATTERN]   <span class="comment">#location块</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="string">...</span></span><br><span class="line">        &#125;</span><br><span class="line">        location [PATTERN] </span><br><span class="line">        &#123;</span><br><span class="line">            <span class="string">...</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    server</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="string">...</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="string">...</span>     <span class="comment">#http全局块</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="3-3-结构说明"><a href="#3-3-结构说明" class="headerlink" title="3.3 结构说明"></a>3.3 结构说明</h3><ol>
-<li>全局块：配置影响nginx全局的指令<ol>
-<li>运行nginx服务器的用户组</li>
-<li>nginx进程pid存放路径</li>
-<li>日志存放路径</li>
-<li>配置文件引入</li>
-<li>允许生成worker process数等。</li>
-</ol>
-</li>
-<li>events块：配置影响nginx服务器或与用户的网络连接。<ol>
-<li>每个进程的最大连接数</li>
-<li>选取哪种事件驱动模型处理连接请求</li>
-<li>是否允许同时接受多个网路连接</li>
-<li>开启多个网络连接序列化等。</li>
-</ol>
-</li>
-<li>http块：可以嵌套多个server，配置代理，缓存，日志定义等绝大多数功能和第三方模块的配置。如文件引入，mime-type定义，日志自定义，是否使用sendfile传输文件，连接超时时间，单连接请求数等。</li>
-<li>server块：配置虚拟主机的相关参数，一个http中可以有多个server。</li>
-<li>location块：配置请求的路由，以及各种页面的处理情况。</li>
-<li>upstream块：配置集群，内网服务</li>
-</ol>
-<h3 id="3-4-配置参考"><a href="#3-4-配置参考" class="headerlink" title="3.4 配置参考"></a>3.4 配置参考</h3><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">########### 每个指令必须有分号结束。#################</span></span><br><span class="line"><span class="comment">#user administrator administrators;  #设置worker进程的用户,默认为nobody nobody。</span></span><br><span class="line"><span class="comment">#worker_processes 2;  #指定woker进程的数量，默认为1，一般=核数*cpu个数</span></span><br><span class="line"><span class="comment">#pid /nginx/pid/nginx.pid;   #指定nginx进程id文件运行文件存放地址</span></span><br><span class="line"><span class="attribute">error_log</span> log/error.log <span class="literal">debug</span>;  <span class="comment">#制定日志路径，级别。这个设置可以放入全局块，http块，server块，级别以此为：debug|info|notice|warn|error|crit|alert|emerg</span></span><br><span class="line"><span class="section">events</span> &#123;</span><br><span class="line">    <span class="attribute">accept_mutex</span> <span class="literal">on</span>;   <span class="comment">#设置网路连接序列化，防止惊群现象发生，默认为on</span></span><br><span class="line">    <span class="attribute">multi_accept</span> <span class="literal">on</span>;  <span class="comment">#设置一个进程是否同时接受多个网络连接，默认为off</span></span><br><span class="line">    <span class="comment">#use epoll;      #事件驱动模型，select|poll|kqueue|epoll|resig|/dev/poll|eventport</span></span><br><span class="line">    <span class="attribute">worker_connections</span>  <span class="number">1024</span>;    <span class="comment">#单个进程的最大连接数，默认为512</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="section">http</span> &#123;</span><br><span class="line">    <span class="attribute">include</span>       mime.types;   <span class="comment">#文件扩展名与文件类型映射表</span></span><br><span class="line">    <span class="attribute">default_type</span>  application/octet-stream; <span class="comment">#默认文件类型，默认为text/plain</span></span><br><span class="line">    <span class="comment">#access_log off; #取消服务日志    </span></span><br><span class="line">    <span class="attribute">log_format</span> myFormat <span class="string">&#x27;$remote_addr–$remote_user [$time_local] $request $status $body_bytes_sent $http_referer $http_user_agent $http_x_forwarded_for&#x27;</span>; <span class="comment">#自定义格式</span></span><br><span class="line">    <span class="attribute">access_log</span> log/access.log myFormat;  <span class="comment">#combined为日志格式的默认值</span></span><br><span class="line">    <span class="attribute">sendfile</span> <span class="literal">on</span>;   <span class="comment">#允许sendfile方式传输文件，默认为off，可以在http块，server块，location块。</span></span><br><span class="line">    <span class="attribute">sendfile_max_chunk</span> <span class="number">100k</span>;  <span class="comment">#每个进程每次调用传输数量不能大于设定的值，默认为0，即不设上限。</span></span><br><span class="line">    <span class="attribute">keepalive_timeout</span> <span class="number">65</span>;  <span class="comment">#连接超时时间，默认为75s，可以在http，server，location块。</span></span><br><span class="line"></span><br><span class="line">    <span class="attribute">upstream</span> mysvr &#123;   </span><br><span class="line">      <span class="attribute">server</span> <span class="number">127.0.0.1:7878</span>;</span><br><span class="line">      <span class="attribute">server</span> <span class="number">192.168.10.121:3333</span> backup;  <span class="comment">#热备</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="attribute">error_page</span> <span class="number">404</span> https://www.baidu.com; <span class="comment">#错误页</span></span><br><span class="line">    <span class="section">server</span> &#123; <span class="comment">#一个server就是一个服务</span></span><br><span class="line">        <span class="attribute">keepalive_requests</span> <span class="number">120</span>; <span class="comment">#单连接请求上限次数。</span></span><br><span class="line">        <span class="attribute">listen</span>       <span class="number">4545</span>;   <span class="comment">#监听端口</span></span><br><span class="line">        <span class="attribute">server_name</span>  <span class="number">127.0.0.1</span>;   <span class="comment">#服务名称，监听地址，域名 server_name:listen/root/uri       </span></span><br><span class="line">        <span class="attribute">location</span>  ~*^.+$ &#123;       <span class="comment">#请求的url过滤，正则匹配，~为区分大小写，~*为不区分大小写。</span></span><br><span class="line">           <span class="comment">#root path;  #资源目录</span></span><br><span class="line">           <span class="comment">#index index.html;  #设置默认页</span></span><br><span class="line">           <span class="attribute">proxy_pass</span>  http://mysvr;  <span class="comment">#请求转向mysvr 定义的服务器列表</span></span><br><span class="line">           <span class="attribute">deny</span> <span class="number">127.0.0.1</span>;  <span class="comment">#拒绝的ip</span></span><br><span class="line">           <span class="attribute">allow</span> <span class="number">172.18.5.54</span>; <span class="comment">#允许的ip           </span></span><br><span class="line">        &#125; </span><br><span class="line">        <span class="comment">#error_page 404		/404.html;</span></span><br><span class="line">        <span class="comment">#error_page 500 502 503  /50.html</span></span><br><span class="line">     &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="3-4-简易配置"><a href="#3-4-简易配置" class="headerlink" title="3.4_简易配置"></a>3.4_简易配置</h3><figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">worker_processes auto<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">events &#123;</span><br><span class="line">    worker_connections <span class="number">1024</span><span class="comment">;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">http &#123;</span><br><span class="line">    sendfile            on<span class="comment">;</span></span><br><span class="line">    tcp_nopush          on<span class="comment">;</span></span><br><span class="line">    tcp_nodelay         on<span class="comment">;</span></span><br><span class="line">    keepalive_timeout   <span class="number">65</span><span class="comment">;</span></span><br><span class="line">    types_hash_max_size <span class="number">2048</span><span class="comment">;</span></span><br><span class="line">    server&#123;</span><br><span class="line">        listen <span class="number">80</span><span class="comment">;</span></span><br><span class="line">        location / &#123;</span><br><span class="line">            root html<span class="comment">;</span></span><br><span class="line">            index index.html index.htm<span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-<h3 id="3-5-结构参数"><a href="#3-5-结构参数" class="headerlink" title="3.5 结构参数"></a>3.5 结构参数</h3><h4 id="3-5-0-main块"><a href="#3-5-0-main块" class="headerlink" title="3.5.0 main块"></a>3.5.0 main块</h4><h4 id="3-5-1-event块"><a href="#3-5-1-event块" class="headerlink" title="3.5.1 event块"></a>3.5.1 event块</h4><h4 id="3-5-2-http块"><a href="#3-5-2-http块" class="headerlink" title="3.5.2 http块"></a>3.5.2 http块</h4><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sendfile on; 开启静态资源快速传输，传送过程 磁盘-&gt;核心内存-&gt;用户内存-&gt;核心内存-&gt;tcp，省略了<span class="number">3</span>,<span class="number">4</span>步</span><br><span class="line">keepalive_timeout; 处理长连接，一般tcp连接经过三次挥手，浪费极大，而开启长连接就能复用上一次的连接</span><br><span class="line">keepalive_requests <span class="number">20</span>; 长连接次数  <span class="number">20</span>次连接后，就需要重新建立连接 </span><br><span class="line">listen <span class="number">80</span> <span class="selector-attr">[defalut_server]</span>; 监听的端口</span><br><span class="line">server_name localhost;虚拟主机的名称,值：localhost,ip,域名，正则，通配符星号</span><br></pre></td></tr></table></figure>
-
-<h5 id="3-5-2-1-defalut-server"><a href="#3-5-2-1-defalut-server" class="headerlink" title="3.5.2.1 defalut_server"></a>3.5.2.1 defalut_server</h5><figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">server</span>&#123;</span><br><span class="line">	<span class="keyword">listen</span> <span class="number">888</span>;</span><br><span class="line">	server_name abc.com;</span><br><span class="line">	<span class="keyword">location</span>&#123;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">server</span>&#123;</span><br><span class="line">	<span class="keyword">listen</span> <span class="number">888</span>;</span><br><span class="line">	server_name xxxx.com;</span><br><span class="line">	<span class="keyword">location</span>&#123;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">第一个<span class="keyword">server</span>:abc.com就是默认<span class="keyword">server</span>,对于访问<span class="number">888</span>端口如果没有匹配到，就是转到abc.c</span><br></pre></td></tr></table></figure>
-
-<h5 id="3-5-2-2-server-name"><a href="#3-5-2-2-server-name" class="headerlink" title="3.5.2.2 server_name"></a>3.5.2.2 server_name</h5><ol>
-<li>通配符：*.wyg.com  *只能在首尾 *</li>
-<li>正则：server_name ~^www.\w+.com     <code>www.*.com</code>  其中.是防转义字符</li>
-<li>server_name匹配顺序<ol>
-<li>精确匹配</li>
-<li>通配符在首部的   <code>*.abc.com</code></li>
-<li>通配符*在结尾的  <code>www.wyg.*</code></li>
-<li>正则匹配</li>
-<li>default_server</li>
-</ol>
-</li>
-</ol>
-<h4 id="3-5-3-server块"><a href="#3-5-3-server块" class="headerlink" title="3.5.3 server块"></a>3.5.3 server块</h4><h4 id="3-5-4-location块"><a href="#3-5-4-location块" class="headerlink" title="3.5.4 location块"></a>3.5.4 location块</h4><ol>
-<li>支持多种</li>
-</ol>
-<h3 id="3-6-特殊"><a href="#3-6-特殊" class="headerlink" title="3.6 特殊"></a>3.6 特殊</h3><h4 id="3-6-1-多种块都存在的参数"><a href="#3-6-1-多种块都存在的参数" class="headerlink" title="3.6.1 多种块都存在的参数"></a>3.6.1 多种块都存在的参数</h4><p>例如: access.log</p>
-<p><strong>就近原则</strong></p>
-<ol>
-<li><p>在http中</p>
-</li>
-<li><p>在server中</p>
-</li>
-<li><p>在location中</p>
-</li>
-</ol>
-<h2 id="二、使用"><a href="#二、使用" class="headerlink" title="二、使用"></a>二、使用</h2><h3 id="4-1-nginx虚拟主机配置"><a href="#4-1-nginx虚拟主机配置" class="headerlink" title="4.1 nginx虚拟主机配置"></a>4.1 nginx虚拟主机配置</h3><h4 id="4-1-1-步骤"><a href="#4-1-1-步骤" class="headerlink" title="4.1.1 步骤"></a>4.1.1 步骤</h4><ol>
-<li><p>创建三个文件夹</p>
-<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">mkdir</span> aa bb <span class="keyword">cc</span></span><br></pre></td></tr></table></figure></li>
-<li><p>将index.html放进aa bb cc</p>
-<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">vim</span> <span class="built_in">index</span>.html</span><br><span class="line"><span class="keyword">cp</span> <span class="built_in">index</span>.html aa</span><br><span class="line"><span class="keyword">cp</span> <span class="built_in">index</span>.html bb</span><br><span class="line"><span class="keyword">cp</span> <span class="built_in">index</span>.html <span class="keyword">cc</span></span><br></pre></td></tr></table></figure></li>
-<li><p>修改nginx.conf</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">   </span><br></pre></td></tr></table></figure></li>
-<li><p>更改hosts文件或者购买域名</p>
-<figure class="highlight accesslog"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">114.55.253.244</span> aa bb cc</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h3 id="4-2-反向代理"><a href="#4-2-反向代理" class="headerlink" title="4.2 反向代理"></a>4.2 反向代理</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">server &#123; #一个server就是一个服务</span><br><span class="line">    keepalive_requests <span class="number">120</span>; #单连接请求上限次数。</span><br><span class="line">    listen       <span class="number">80</span>;   #监听端口</span><br><span class="line">    server_name  wyg.aa.com;   #监听地址</span><br><span class="line">    root /usr/local/nginx/test/aa;  #资源目录</span><br><span class="line">    location  / &#123;       #请求的url过滤，正则匹配，~为区分大小写，~*为不区分大小写。</span><br><span class="line">        proxy_pass http:<span class="comment">//127.0.0.1:8003;d</span></span><br><span class="line">        index index.html;  #设置默认页</span><br><span class="line">    &#125;</span><br><span class="line">    #error_page <span class="number">404</span>         /<span class="number">404.</span>html;</span><br><span class="line">    #error_page <span class="number">500</span> <span class="number">502</span> <span class="number">503</span>  /<span class="number">50.</span>html</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="4-3-静态资源"><a href="#4-3-静态资源" class="headerlink" title="4.3 静态资源"></a>4.3 静态资源</h3><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">location /uri &#123;  </span><br><span class="line">    root <span class="regexp">/data/</span>w3;</span><br><span class="line">&#125;</span><br><span class="line">访问   server:port<span class="regexp">/uri/</span>a.png</span><br><span class="line">真实路径  root+uri+a.png</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">location /uri &#123;  </span><br><span class="line">    alias <span class="regexp">/data/</span>w3;</span><br><span class="line">&#125;</span><br><span class="line">访问   server:port<span class="regexp">/uri/</span>a.png</span><br><span class="line">真实路径  alias+uri</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">location</span>  /&#123;<span class="attribute">undefined</span></span><br><span class="line">            alias /usr/local/download/;</span><br><span class="line">            <span class="comment">#Nginx日志目录</span></span><br><span class="line">            <span class="attribute">autoindex</span> <span class="literal">on</span>;<span class="comment">#注意。不能有Index，如果有，请加入一句话 index abc123.html</span></span><br><span class="line">            <span class="comment">#打开目录浏览功能</span></span><br><span class="line">            <span class="attribute">autoindex_exact_size</span> <span class="literal">off</span>;</span><br><span class="line">            <span class="comment">#默认为on，显示出文件的确切大小，单位是bytes</span></span><br><span class="line">            <span class="comment">#显示出文件的大概大小，单位是kB或者MB或者GB</span></span><br><span class="line">            <span class="attribute">autoindex_localtime</span> <span class="literal">on</span>;</span><br><span class="line">            <span class="comment">#默认为off，显示的文件时间为GMT时间。</span></span><br><span class="line">            <span class="comment">#改为on后，显示的文件时间为文件的服务器时间</span></span><br><span class="line">            <span class="attribute">add_header</span> Cache-Control <span class="literal">no</span>-store;</span><br><span class="line">           &#125;</span><br></pre></td></tr></table></figure>
-
-<p>关键字：</p>
-<ol>
-<li>location </li>
-<li>root  有点像根前缀</li>
-<li>alias  前缀+中缀</li>
-<li>uri  有点像中缀</li>
-<li>path</li>
-<li>img.png  是真是资源后缀</li>
-<li>autoindex 打开目录</li>
-</ol>
-<h3 id="4-4-负载均衡"><a href="#4-4-负载均衡" class="headerlink" title="4.4 负载均衡"></a>4.4 负载均衡</h3><figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">upstream test &#123;</span><br><span class="line">    ip_hash<span class="comment">;</span></span><br><span class="line">    server <span class="number">192.168</span>.<span class="number">0.1</span><span class="comment">;</span></span><br><span class="line">    server <span class="number">192.168</span>.<span class="number">0.2</span><span class="comment">;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h4 id="系统扩展的方式"><a href="#系统扩展的方式" class="headerlink" title="系统扩展的方式"></a>系统扩展的方式</h4><ul>
-<li>横向扩展：增加机器数量，负载均衡</li>
-<li>纵向扩展：提高硬件性能</li>
-</ul>
-<h4 id="负载均衡算法"><a href="#负载均衡算法" class="headerlink" title="负载均衡算法"></a>负载均衡算法</h4><h4 id="负载均衡作用"><a href="#负载均衡作用" class="headerlink" title="负载均衡作用"></a>负载均衡作用</h4><ol>
-<li>提高高并发能力</li>
-<li>在负载均衡上过滤，提高系统安全性</li>
-<li>故障转移，实现高可用</li>
-</ol>
-<h4 id="负载均衡方式"><a href="#负载均衡方式" class="headerlink" title="负载均衡方式"></a>负载均衡方式</h4><ul>
-<li><p>用户手动下载</p>
-<p>比如：联通下载，电信下载</p>
-</li>
-<li><p>DNS轮询：DNS服务商可以让一个域名对应不同的ip</p>
-</li>
-<li><p>四层、七层负载均衡</p>
-</li>
-</ul>
-<h3 id="4-5-跨域"><a href="#4-5-跨域" class="headerlink" title="4.5 跨域"></a>4.5 跨域</h3><h4 id="nginx-conf"><a href="#nginx-conf" class="headerlink" title="nginx.conf"></a>nginx.conf</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">server &#123; <span class="comment">#一个server就是一个服务</span></span><br><span class="line">      keepalive_requests 120; <span class="comment">#单连接请求上限次数。</span></span><br><span class="line">      listen       80;   <span class="comment">#监听端口</span></span><br><span class="line">      server_name  localhost;   <span class="comment">#监听地址</span></span><br><span class="line">      location  / &#123;        <span class="comment">#请求的url过滤，正则匹配，~为区分大小写，~*为不区分大小写。</span></span><br><span class="line">         proxy_pass http://127.0.0.1:8080;</span><br><span class="line">       <span class="comment">#  root     /home/admin/html;  #资源目录</span></span><br><span class="line">        <span class="comment"># index a.html;  #设置默认页</span></span><br><span class="line">      &#125;</span><br><span class="line">      location /api &#123;</span><br><span class="line">              proxy_pass http://localhost:8001;</span><br><span class="line">              rewrite ^/api/(.*)$ /<span class="variable">$1</span> <span class="built_in">break</span>;</span><br><span class="line"></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-
-<h4 id="前端"><a href="#前端" class="headerlink" title="前端"></a>前端</h4><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">bp=<span class="string">&quot;/api/&quot;</span></span><br><span class="line"><span class="function"><span class="title">login</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    that=<span class="built_in">this</span></span><br><span class="line">    axios.post(bp+<span class="string">&quot;user/login&quot;</span>, <span class="built_in">this</span>.user).then(<span class="function"><span class="params">res</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(res);</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
-
-
-
-<h4 id="rewrite"><a href="#rewrite" class="headerlink" title="rewrite"></a>rewrite</h4><blockquote>
-<p>重定向，支持正则表达式</p>
-</blockquote>
-<p>rewrite regex to</p>
-<h2 id="五、其他"><a href="#五、其他" class="headerlink" title="五、其他"></a>五、其他</h2><h3 id="5-0-nginx正则匹配"><a href="#5-0-nginx正则匹配" class="headerlink" title="5.0 nginx正则匹配"></a>5.0 nginx正则匹配</h3><h3 id="5-1-注意"><a href="#5-1-注意" class="headerlink" title="5.1 注意"></a>5.1 注意</h3><ol>
-<li><p>尽量不写结尾的”/“符号，不然很难匹配</p>
-<p>​    有以下规则</p>
-<ol>
-<li>如果在配置路径写了结尾”/“，那么在浏览器也必须写结尾的”/“</li>
-<li>如果配置路径没写结尾”/“，那么在浏览器可写可不写”/ “</li>
-<li>所以，**配置里面不要写结尾的/  **</li>
-</ol>
-</li>
-<li><p>更新资源不需要reload，更新配置文件才需要reload</p>
-</li>
-</ol>
-<h4 id="5-1-2-目录权限问题-403错误"><a href="#5-1-2-目录权限问题-403错误" class="headerlink" title="5.1.2 目录权限问题 403错误"></a>5.1.2 目录权限问题 403错误</h4><ol>
-<li><p>如果是root的启动，那么nginx不能代理其他用户权限的文件夹，获取权限方式</p>
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chown -R wyg <span class="regexp">/home/</span>testUser</span><br></pre></td></tr></table></figure></li>
-<li><p>不能访问 /root下的文件问题</p>
-<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">配置文件第一行指定用户</span><br><span class="line"><span class="keyword">user</span> <span class="title">root</span>;</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h2 id="六、linux相关"><a href="#六、linux相关" class="headerlink" title="六、linux相关"></a>六、linux相关</h2><h3 id="6-1-做成操作系统服务"><a href="#6-1-做成操作系统服务" class="headerlink" title="6.1 做成操作系统服务"></a>6.1 做成操作系统服务</h3><ol>
-<li><p>linux服务默认位置：/usr/lib/systemd/system</p>
-</li>
-<li><p>在该文件夹下创建nginx.service</p>
-</li>
-<li><p>添加内容</p>
-<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">....</span>百度查询nginx.servie</span><br></pre></td></tr></table></figure></li>
-<li><p>修改权限</p>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">chmod</span> <span class="number">755</span> nginx.service</span><br></pre></td></tr></table></figure></li>
-<li><p>启动</p>
-<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl <span class="literal">start</span> nginx</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h2 id="六、原理-暂无"><a href="#六、原理-暂无" class="headerlink" title="六、原理-暂无"></a>六、原理-暂无</h2><p>下载tomcat</p>
-<p>wget <a target="_blank" rel="noopener" href="https://archive.apache.org/dist/tomcat/tomcat-8/v8.0.23/bin/apache-tomcat-8.0.23.tar.gz">https://archive.apache.org/dist/tomcat/tomcat-8/v8.0.23/bin/apache-tomcat-8.0.23.tar.gz</a></p>
-<p>tar -zxvf …</p>
-<p>./tomcat/bin/startup.sh</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/shiro/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/08/%E7%BB%84%E4%BB%B6/shiro/" class="post-title-link" itemprop="url">shiro</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-08 00:33:40" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:40+08:00">2022-03-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-15 10:31:15" itemprop="dateModified" datetime="2022-03-15T10:31:15+08:00">2022-03-15</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E4%B8%AD%E9%97%B4%E4%BB%B6/" itemprop="url" rel="index"><span itemprop="name">中间件</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/08/%E7%BB%84%E4%BB%B6/shiro/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/shiro/" class="cy_cmt_count" data-xid="2022/03/08/组件/shiro/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>2.3k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>[toc]</p>
-<h2 id="一、功能"><a href="#一、功能" class="headerlink" title="一、功能"></a>一、功能</h2><ol>
-<li>认证</li>
-<li>授权</li>
-<li>方法加权</li>
-<li>自定义过滤</li>
-<li>会话管理：Session Manager  一次登录，所有信息保存在session中</li>
-<li>加密</li>
-</ol>
-<h3 id="1-1-Authentication-用户密码认证"><a href="#1-1-Authentication-用户密码认证" class="headerlink" title="1.1 Authentication 用户密码认证"></a>1.1 Authentication 用户密码认证</h3><h3 id="1-2-Authorization-验证是否有权限访问该方法"><a href="#1-2-Authorization-验证是否有权限访问该方法" class="headerlink" title="1.2 Authorization 验证是否有权限访问该方法"></a>1.2 Authorization 验证是否有权限访问该方法</h3><ol>
-<li><p>MyRealm extends AuthorizingRealm</p>
-<blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span><span class="comment">//授权</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> AuthorizationInfo <span class="title">doGetAuthorizationInfo</span><span class="params">(PrincipalCollection principalCollection)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//获得令牌/用户</span></span><br><span class="line">    User user=(User)principalCollection.asList().get(<span class="number">0</span>);</span><br><span class="line">    SimpleAuthorizationInfo authorizationInfo=<span class="keyword">new</span> SimpleAuthorizationInfo();</span><br><span class="line">    authorizationInfo.addRoles(user.getUserRoles());<span class="comment">//添加用户-授权</span></span><br><span class="line">    authorizationInfo.addStringPermissions(user.getUserPerms());<span class="comment">//添加权限-授权</span></span><br><span class="line">    <span class="keyword">return</span> authorizationInfo;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></blockquote>
-</li>
-</ol>
-<h3 id="1-3-其他功能"><a href="#1-3-其他功能" class="headerlink" title="1.3 其他功能"></a>1.3 其他功能</h3><h4 id="1-3-1-方法加权"><a href="#1-3-1-方法加权" class="headerlink" title="1.3.1 方法加权"></a>1.3.1 方法加权</h4><ol>
-<li><p>硬编码</p>
-<p>在每个方法体里面进行手动获取当前用户权限，然后和该方法的权限进行对比。</p>
-</li>
-<li><p>ShiroConfig添加路径</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">filterFactoryBean.setUnauthorizedUrl(<span class="string">&quot;/wq.html&quot;</span>);<span class="comment">//无权限跳到指定路径</span></span><br></pre></td></tr></table></figure></li>
-<li><p>注解</p>
-<ol>
-<li>RequiresAuthentication 需要登录</li>
-<li>RequiresUser 需要reamberMe</li>
-<li>RequiresPermissions 需要权限</li>
-</ol>
-<ul>
-<li>没权限会直接报500错误</li>
-<li>需要异常处理机制</li>
-</ul>
-</li>
-</ol>
-<h4 id="1-3-2-自定义过滤"><a href="#1-3-2-自定义过滤" class="headerlink" title="1.3.2 自定义过滤"></a>1.3.2 自定义过滤</h4><ol>
-<li><p>@Componet注册过滤器</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">F1</span> <span class="keyword">implements</span> <span class="title">Filter</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doFilter</span><span class="params">(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)</span> <span class="keyword">throws</span> IOException, ServletException </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;自定义过滤开始&quot;</span>);</span><br><span class="line">        filterChain.doFilter(servletRequest,servletResponse);</span><br><span class="line">        System.out.println(<span class="string">&quot;自定义过滤结束&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p>加入到请求过滤器</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">filters.put(<span class="string">&quot;oauth2&quot;</span>, <span class="keyword">new</span> F1());</span><br><span class="line">filterFactoryBean.setFilters(filters);</span><br></pre></td></tr></table></figure></li>
-<li></li>
-</ol>
-<h4 id="1-3-3-获取当前线程用户"><a href="#1-3-3-获取当前线程用户" class="headerlink" title="1.3.3 获取当前线程用户"></a>1.3.3 获取当前线程用户</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Subject subject = SecurityUtils.getSubject();</span><br></pre></td></tr></table></figure>
-
-<ol>
-<li><p>认证</p>
-<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">UsernamePasswordToken token = <span class="keyword">new</span> <span class="constructor">UsernamePasswordToken(<span class="params">user</span>.<span class="params">getUsername</span>()</span>, user.get<span class="constructor">Password()</span>);</span><br><span class="line">subject.login(token);</span><br></pre></td></tr></table></figure></li>
-<li><p>登录设置令牌</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">subject.getSession().setAttribute(<span class="string">&quot;currentUser&quot;</span>, subject.getPrincipal());</span><br></pre></td></tr></table></figure></li>
-<li><p>登出</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">subject.logout();<span class="comment">//或者在过滤器中配置   filterMap.put(&quot;/aaa&quot;,&quot;logout&quot;);</span></span><br></pre></td></tr></table></figure></li>
-</ol>
-<h2 id="二、组件"><a href="#二、组件" class="headerlink" title="二、组件"></a>二、组件</h2><h3 id="2-1-核心组件"><a href="#2-1-核心组件" class="headerlink" title="2.1 核心组件"></a>2.1 核心组件</h3><ol>
-<li>Subjetc： 当前进程obj</li>
-<li>Shiro SecurityManager</li>
-<li>Realm ：安全中心，提供认证授权服务</li>
-<li>ShiroFilterFactoryBean：请求过滤器<ol>
-<li>设置Map&lt;路径，权限&gt;的过滤器Map</li>
-<li>设置自定义过滤器</li>
-<li>设置无权路径</li>
-</ol>
-</li>
-</ol>
-<h3 id="2-2-注解模式"><a href="#2-2-注解模式" class="headerlink" title="2.2 注解模式"></a>2.2 注解模式</h3><blockquote>
-<p>对于Map&lt;路径，权限&gt;</p>
-</blockquote>
-<ol>
-<li>@RequiresAuthentication 需登录</li>
-<li>@RequiresPermissions(“b”)  需b权限</li>
-<li>@RequiresRoles(“admin”)  需admin角色</li>
-</ol>
-<h3 id="2-3-user"><a href="#2-3-user" class="headerlink" title="2.3 user"></a>2.3 user</h3><ol>
-<li>user<ol>
-<li>userName</li>
-<li>pasword</li>
-<li>List&lt;String&gt;roles</li>
-<li>List&lt;String&gt;perms</li>
-</ol>
-</li>
-</ol>
-<h2 id="三、原理"><a href="#三、原理" class="headerlink" title="三、原理"></a>三、原理</h2><h3 id="3-1-基于token"><a href="#3-1-基于token" class="headerlink" title="3.1 基于token"></a>3.1 基于token</h3><h3 id="3-2-安全中心-MyRealm"><a href="#3-2-安全中心-MyRealm" class="headerlink" title="3.2 安全中心 MyRealm"></a>3.2 安全中心 MyRealm</h3><ul>
-<li><p>认证中心  AuthenticationInfo(username,password)</p>
-<ul>
-<li>登录的时候会用有一次</li>
-<li>传入账号信息，通过数据库获得用户信息，返回token(user，passwod，Nmae)</li>
-</ul>
-</li>
-<li><p>权限中心  AuthorizationInfo(user)</p>
-<ul>
-<li><p>每次访问需要权限的地方会用到</p>
-</li>
-<li><p>格式化user的权限</p>
-</li>
-<li><p>然后根据user权限对比[需要访问的方法]的权限，如果有权限，就退回到对应界面</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">filterFactoryBean.setLoginUrl(<span class="string">&quot;/login.html&quot;</span>);<span class="comment">//登录页面</span></span><br><span class="line">filterFactoryBean.setUnauthorizedUrl(<span class="string">&quot;/wq.html&quot;</span>);<span class="comment">//无权限</span></span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-</ul>
-<h2 id="四、集成-改进"><a href="#四、集成-改进" class="headerlink" title="四、集成-改进"></a>四、集成-改进</h2><h3 id="5-1-shiro-redis集成"><a href="#5-1-shiro-redis集成" class="headerlink" title="5.1 shiro+redis集成"></a>5.1 shiro+redis集成</h3><h2 id="五、其他"><a href="#五、其他" class="headerlink" title="五、其他"></a>五、其他</h2><ol>
-<li><p>过滤顺序问题</p>
-<blockquote>
-<p>过滤设置规则是从上到下，详细的规则配在前面，大范围的配在后面。</p>
-</blockquote>
-</li>
-</ol>
-<h2 id="六、RDBC模型-role-based-access-control"><a href="#六、RDBC模型-role-based-access-control" class="headerlink" title="六、RDBC模型 role based access control"></a>六、RDBC模型 role based access control</h2>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/3/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/19/">19</a><a class="extend next" rel="next" href="/page/5/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/3/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/20/">20</a><a class="extend next" rel="next" href="/page/5/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1157,7 +1319,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">95</span>
+          <span class="site-state-item-count">98</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1208,12 +1370,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">263k</span>
+    <span title="站点总字数">267k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">3:59</span>
+    <span title="站点阅读时长">4:03</span>
 </div>
 
         
