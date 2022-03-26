@@ -187,6 +187,582 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/java/javaSE/jvm/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/08/java/javaSE/jvm/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B/" class="post-title-link" itemprop="url">类加载</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-22 18:04:19" itemprop="dateModified" datetime="2022-03-22T18:04:19+08:00">2022-03-22</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/JVM/" itemprop="url" rel="index"><span itemprop="name">JVM</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/08/java/javaSE/jvm/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/java/javaSE/jvm/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B/" class="cy_cmt_count" data-xid="2022/03/08/java/javaSE/jvm/类加载过程/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>[toc]</p>
+<h2 id="一、生命周期"><a href="#一、生命周期" class="headerlink" title="一、生命周期"></a>一、生命周期</h2><blockquote>
+<p>  JVM把class文件加载的内存，并对数据进行校验、转换解析和初始化，最终形成JVM可以直接使用的Java类型的过程就是加载机制。</p>
+</blockquote>
+<h3 id="1-1-加载-参考"><a href="#1-1-加载-参考" class="headerlink" title="1.1 加载-参考"></a>1.1 <a target="_blank" rel="noopener" href="https://my.oschina.net/winHerson/blog/114180?p=%7B%7BtotalPage%7D%7D">加载-参考</a></h3><ol>
+<li>通过一个类的权限定名从文件(.class、.jar、网络)中来获取定义此类的二进制字节流</li>
+<li>将这个字节流所代表的静态存储结构转化为方法去的运行时数据结构</li>
+<li>在java堆中生成一个代表这个类的java.lang.Class对象，作为方法去这些数据的访问入口。</li>
+</ol>
+<h3 id="1-2-连接"><a href="#1-2-连接" class="headerlink" title="1.2 连接"></a>1.2 连接</h3><h4 id="1-2-1-验证"><a href="#1-2-1-验证" class="headerlink" title="1.2.1 验证"></a>1.2.1 验证</h4><ol>
+<li><p>文件格式验证</p>
+<p>验证class文件格式规范，例如： class文件是否已魔术0xCAFEBABE开头 ， 主、次版本号是否在当前虚拟机处理范围之内等</p>
+</li>
+<li><p>元数据验证</p>
+<p>这个阶段是对字节码描述的信息进行语义分析，以保证起描述的信息符合java语言规范要求。验证点可能包括：这个类是否有父类(除了java.lang.Object之外，所有的类都应当有父类)、这个类是否继承了不允许被继承的类(被final修饰的)、如果这个类的父类是抽象类，是否实现了起父类或接口中要求实现的所有方法。</p>
+</li>
+<li><p>字节码验证</p>
+<p>进行数据流和控制流分析，这个阶段对类的方法体进行校验分析，这个阶段的任务是保证被校验类的方法在运行时不会做出危害虚拟机安全的行为.如：保证访法体中的类型转换有效，例如可以把一个子类对象赋值给父类数据类型，这是安全的，但不能把一个父类对象赋值给子类数据类型、保证跳转命令不会跳转到方法体以外的字节码命令上。</p>
+</li>
+<li><p>符号引用验证</p>
+<p>符号引用中通过字符串描述的全限定名是否能找到对应的类、符号引用类中的类，字段和方法的访问性(private、protected、public、default)是否可被当前类访问。</p>
+</li>
+</ol>
+<h4 id="1-2-1-准备"><a href="#1-2-1-准备" class="headerlink" title="1.2.1 准备"></a>1.2.1 准备</h4><blockquote>
+<p>为类变量分配内存并设置变量初始值(零值)的阶段，这些内存都将在方法去中进行分配。</p>
+</blockquote>
+<ol>
+<li><p>进行内存分配的仅包括类变量（被static修饰的变量），而不包括实例变量，实例变量将会在对象实例化时随着对象一起分配在java堆中</p>
+</li>
+<li><p>初始值是指数据类型为零值，主要是为了初始化内存，并不做逻辑代码</p>
+<ul>
+<li><p>public static int value = 123</p>
+<p>那么变量value在准备阶段过后的值是0，而不是123，因为这时候尚未开始执行任何java方法。</p>
+</li>
+<li><p>public static final int value = 123</p>
+<p>final修饰的字段，子啊准备阶段虚拟机就会根据赋值，value的值为123.</p>
+</li>
+</ul>
+</li>
+</ol>
+<h4 id="1-2-3-解析"><a href="#1-2-3-解析" class="headerlink" title="1.2.3 解析"></a>1.2.3 解析</h4><blockquote>
+<p> 虚拟机将常量池内的符号引用替换为直接引用的过程</p>
+</blockquote>
+<h5 id="1-2-3-1-符号、直接引用"><a href="#1-2-3-1-符号、直接引用" class="headerlink" title="1.2.3.1 符号、直接引用"></a>1.2.3.1 符号、直接引用</h5><ul>
+<li>符号引用：描述所引用的目标对象的符号，可以是任何形式的字面量，只要使用时能无歧义地定位到目标即可。引用的目标对象并不一定已经加载到内存中。</li>
+<li>直接引用：指向目标对象的指针、相对偏移量、一个能间接定位到目标的句柄。直接引用的目标必定已经在内存中存在。</li>
+<li>例如 String a=”str”; 这个a在解析阶段之前就是符号引用，解析之后就是直接引用</li>
+</ul>
+<h5 id="1-2-3-2-解析内容"><a href="#1-2-3-2-解析内容" class="headerlink" title="1.2.3.2 解析内容"></a>1.2.3.2 解析内容</h5><ol>
+<li><p>类或接口的解析</p>
+</li>
+<li><p>字段解析：解析出类的方法表的class_index项中索引的字段所属的类或接口的符号引用</p>
+</li>
+<li><p>类方法解析：首先解析出类的方法表的class_index项中索引的方法所属的类或接口的符号引用</p>
+</li>
+<li><p>接口方法解析：首先解析出类的方法表的class_index项中索引的方法所属的类或接口的符号引用。</p>
+</li>
+</ol>
+<h3 id="1-3-初始化"><a href="#1-3-初始化" class="headerlink" title="1.3 初始化"></a>1.3 初始化</h3><blockquote>
+<p>执行类中定义的java程序逻辑代码</p>
+</blockquote>
+<h4 id="1-3-1-触发条件"><a href="#1-3-1-触发条件" class="headerlink" title="1.3.1 触发条件"></a>1.3.1 触发条件</h4><p>以下四种情况触发执行类构造器clinit()方法</p>
+<ol>
+<li>new关键字实例化对象</li>
+<li>访问一个类的静态字段(被final修饰、已在编译器把结果放入常量池的静态字段除外)</li>
+<li>调用类的静态方法</li>
+<li>使用java.lang.reflect包的方法对类进行反射调用的时候</li>
+<li>jvm启动时，用户指定一个执行的主类(包含main方法的那个类)，虚拟机会先初始化这个类</li>
+<li>当初始化一个类的时候，如果发现其父类还没有进行过初始化、则需要先出发其父类的初始化</li>
+</ol>
+<h3 id="1-4-使用"><a href="#1-4-使用" class="headerlink" title="1.4 使用"></a>1.4 使用</h3><h3 id="1-5-卸载"><a href="#1-5-卸载" class="headerlink" title="1.5 卸载"></a>1.5 卸载</h3><h2 id="二、其他"><a href="#二、其他" class="headerlink" title="二、其他"></a>二、其他</h2><h3 id="2-1-双亲委派机制"><a href="#2-1-双亲委派机制" class="headerlink" title="2.1 双亲委派机制"></a>2.1 双亲委派机制</h3><h3 id="2-2-实例化对象的方式"><a href="#2-2-实例化对象的方式" class="headerlink" title="2.2 实例化对象的方式"></a>2.2 实例化对象的方式</h3><ol>
+<li>创建<ol>
+<li>new</li>
+<li>newInstance(要求有无参构造)</li>
+<li>clone</li>
+</ol>
+</li>
+<li>序列化<ol>
+<li>加载文件</li>
+<li>反序列化</li>
+<li>网络请求</li>
+</ol>
+</li>
+</ol>
+<h3 id="2-3-newInstance与new"><a href="#2-3-newInstance与new" class="headerlink" title="2.3 newInstance与new"></a>2.3 <a target="_blank" rel="noopener" href="https://www.cnblogs.com/zouxiangzhongyan/p/10722118.html">newInstance与new</a></h3><blockquote>
+<p>spring中有很多的newInstance</p>
+</blockquote>
+<ol>
+<li>newInstance要求<ol>
+<li>这个类已经加载</li>
+<li>这个类已经连接了</li>
+<li>这两步可用Class.forname完成</li>
+</ol>
+</li>
+<li>newInstance是通过反射创建对象的，在创建一个类的对象的时候，你可以对该类一无所知，一些开源框架比如Spring内部大都是通过反射来创建实例的，当然这种方法创建对象的时候必须拥有该类的句柄，甚至必要的时候还要有相关的权限设置（比如无参构造函数是私有的），而句柄是可以动态载入的，实际上JVM内部也是这样加载类的。该方法创建对象的时候，只会调用该类的无参数构造函数，不会调用其他的有参构造函数。</li>
+<li>new  后面接类名参数，是最常见的创建实例的方式。这是必须要知道一个明确的类才能使用</li>
+</ol>
+<h4 id="2-3-2-解耦"><a href="#2-3-2-解耦" class="headerlink" title="2.3.2 解耦"></a>2.3.2 解耦</h4><blockquote>
+<p>newInstance实际上是把new方式分解为两步</p>
+</blockquote>
+<ol>
+<li>首先调用Class加载方法加载某个类</li>
+<li>然后实例化。</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"> Class a1 = Class.forName(<span class="string">&quot;A&quot;</span>);</span><br><span class="line">BeanFactory a2 =  (BeanFactory) a1.newInstance();</span><br><span class="line">System.out.println(a2);</span><br><span class="line">Class b1 = Class.forName(<span class="string">&quot;B&quot;</span>);</span><br><span class="line">BeanFactory b2 =  (BeanFactory) b1.newInstance();</span><br><span class="line">System.out.println(b2); <span class="comment">//两个l</span></span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">String className = readfromXMlConfig;<span class="comment">//从xml 配置文件中获需要加载的类</span></span><br><span class="line">Class c = Class.forName（className）；</span><br><span class="line">factory = （AInterface）c.newInstance（）；<span class="comment">//这样，在不知道是实现类的类名的情况下创建到了实现类</span></span><br></pre></td></tr></table></figure>
+
+<p>可以在调用class.forName时获得更好的灵活性（获得更宽泛的类名），提供给了一种降耦(降低耦合度)的手段。</p>
+<h4 id="2-3-3-区别总结"><a href="#2-3-3-区别总结" class="headerlink" title="2.3.3  区别总结"></a>2.3.3  区别总结</h4><ul>
+<li>newInstance: 方法级别，弱类型。低效率。只能调用无参构造。</li>
+<li>new: 关键字级别，强类型。相对高效。能调用任何public构造。</li>
+</ul>
+<h4 id="2-3-4-newInstance用途"><a href="#2-3-4-newInstance用途" class="headerlink" title="2.3.4 newInstance用途"></a>2.3.4 newInstance用途</h4><p>是实现IOC、反射、依赖倒置 等技术方法的必然选择，new 只能实现具体类的实例化，不适合于接口编程。类里面就是经过这个类的默认构造函数构建了一个对象，若是没有默认构造函数就抛出InstantiationException, 若是没有访问默认构造函数的权限就抛出IllegalAccessException xml</p>
+<h2 id="三、类加载器"><a href="#三、类加载器" class="headerlink" title="三、类加载器"></a>三、类加载器</h2><h3 id="3-1-三级"><a href="#3-1-三级" class="headerlink" title="3.1 三级"></a>3.1 三级</h3><h4 id="3-1-1-Bootstrap类加载器"><a href="#3-1-1-Bootstrap类加载器" class="headerlink" title="3.1.1 Bootstrap类加载器"></a>3.1.1 Bootstrap类加载器</h4><ul>
+<li>作用：加载java.lib下面的核心类库<ul>
+<li>rt.jar</li>
+<li>resources.jar</li>
+</ul>
+</li>
+<li>获取：System.getProperty(“sun.boot.class.path”)</li>
+</ul>
+<h4 id="3-1-2-Extension类加载器"><a href="#3-1-2-Extension类加载器" class="headerlink" title="3.1.2 Extension类加载器"></a>3.1.2 Extension类加载器</h4><ul>
+<li>作用：加载java.lib.ext下的类</li>
+<li>System.getProperty(“java.ext.dirs”)</li>
+</ul>
+<h4 id="3-1-3-System类加载器"><a href="#3-1-3-System类加载器" class="headerlink" title="3.1.3 System类加载器"></a>3.1.3 System类加载器</h4><ul>
+<li>作用：加载javaclasspath下的类</li>
+</ul>
+<h3 id="3-2-双亲委派机制"><a href="#3-2-双亲委派机制" class="headerlink" title="3.2 双亲委派机制"></a>3.2 双亲委派机制</h3>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JUtil/Objects/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JUtil/Objects/" class="post-title-link" itemprop="url">Objects</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-12-20 00:20:42" itemprop="dateModified" datetime="2021-12-20T00:20:42+08:00">2021-12-20</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JUtil/Objects/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JUtil/Objects/" class="cy_cmt_count" data-xid="2022/03/08/java/java源码解读/JUtil/Objects/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.6k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>[toc]</p>
+<h2 id="一、属性"><a href="#一、属性" class="headerlink" title="一、属性"></a>一、属性</h2><p>1</p>
+<h2 id="二、方法"><a href="#二、方法" class="headerlink" title="二、方法"></a>二、方法</h2><blockquote>
+<p>私有构造，工具方法类</p>
+</blockquote>
+<h3 id="2-1-equals"><a href="#2-1-equals" class="headerlink" title="2.1 equals"></a>2.1 equals</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object a, Object b)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> (a == b) || (a != <span class="keyword">null</span> &amp;&amp; a.equals(b));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-deepEquals"><a href="#2-2-deepEquals" class="headerlink" title="2.2 deepEquals"></a>2.2 deepEquals</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">deepEquals</span><span class="params">(Object a, Object b)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (a == b)</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (a == <span class="keyword">null</span> || b == <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            <span class="keyword">return</span> Arrays.deepEquals0(a, b);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-3-hashCode"><a href="#2-3-hashCode" class="headerlink" title="2.3 hashCode"></a>2.3 hashCode</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">(Object o)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> o != <span class="keyword">null</span> ? o.hashCode() : <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-4-hash"><a href="#2-4-hash" class="headerlink" title="2.4 hash"></a>2.4 hash</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">hash</span><span class="params">(Object... values)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> Arrays.hashCode(values);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">package</span> java.util;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.function.Supplier;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">Objects</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">Objects</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> AssertionError(<span class="string">&quot;No java.util.Objects instances for you!&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"> </span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">toString</span><span class="params">(Object o)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> String.valueOf(o);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">toString</span><span class="params">(Object o, String nullDefault)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> (o != <span class="keyword">null</span>) ? o.toString() : nullDefault;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function"><span class="keyword">int</span> <span class="title">compare</span><span class="params">(T a, T b, Comparator&lt;? <span class="keyword">super</span> T&gt; c)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> (a == b) ? <span class="number">0</span> :  c.compare(a, b);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"> </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">T <span class="title">requireNonNull</span><span class="params">(T obj)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (obj == <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException();</span><br><span class="line">        <span class="keyword">return</span> obj;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">T <span class="title">requireNonNull</span><span class="params">(T obj, String message)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (obj == <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException(message);</span><br><span class="line">        <span class="keyword">return</span> obj;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">isNull</span><span class="params">(Object obj)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> obj == <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">nonNull</span><span class="params">(Object obj)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> obj != <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">   </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">T <span class="title">requireNonNull</span><span class="params">(T obj, Supplier&lt;String&gt; messageSupplier)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (obj == <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException(messageSupplier.get());</span><br><span class="line">        <span class="keyword">return</span> obj;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/spring/spring%E6%A0%B8%E5%BF%83/aop/springAOP/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/08/spring/spring%E6%A0%B8%E5%BF%83/aop/springAOP/" class="post-title-link" itemprop="url">springAOP</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-18 16:28:19" itemprop="dateModified" datetime="2022-03-18T16:28:19+08:00">2022-03-18</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/08/spring/spring%E6%A0%B8%E5%BF%83/aop/springAOP/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/spring/spring%E6%A0%B8%E5%BF%83/aop/springAOP/" class="cy_cmt_count" data-xid="2022/03/08/spring/spring核心/aop/springAOP/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>[toc]</p>
+<h2 id="一、AOP术语"><a href="#一、AOP术语" class="headerlink" title="一、AOP术语"></a>一、AOP术语</h2><p><a target="_blank" rel="noopener" href="https://mrbird.cc/AOP%E6%9C%AF%E8%AF%AD.html">参考</a></p>
+<h3 id="1-通知"><a href="#1-通知" class="headerlink" title="1. 通知"></a>1. 通知</h3><ol>
+<li><code>Before</code> —— 在方法被调用之前调用通知。</li>
+<li><code>After</code> —— 在方法完成之后调用通知，无论方法是否执行成功。</li>
+<li><code>After-returning</code> —— 在方法成功执行之后调用通知。</li>
+<li><code>After-throwing</code> —— 在方法抛出异常以后调用通知。</li>
+<li><code>Around</code> —— 通知包裹了被通知的方法，在被通知的方法调用之前和调用之后执行自定义的行为。</li>
+</ol>
+<h3 id="2-连接点-Joinpoint"><a href="#2-连接点-Joinpoint" class="headerlink" title="2. 连接点(Joinpoint)"></a>2. 连接点(Joinpoint)</h3><blockquote>
+<p>​    连接点是在应用执行过程中能够插入切面的一个点。这个点可以是调用方法时，抛出异常时，甚至是修改一个字段时。切面代码可以利用这些点插入到应用的正常流程之中，并添加新的行为。</p>
+</blockquote>
+<h3 id="3-切点-Pointcut"><a href="#3-切点-Pointcut" class="headerlink" title="3. 切点(Pointcut)"></a>3. 切点(Pointcut)</h3><blockquote>
+<p>​    切点的定义会匹配通知所要织入的一个或多个连接点。我们通常使用明确的类和方法名称来指定这些切点，或是利用正则表达式定义匹配的类和方法名称模式来指定这些切点。</p>
+</blockquote>
+<h3 id="4-切面-Aspect"><a href="#4-切面-Aspect" class="headerlink" title="4. 切面(Aspect)"></a>4. 切面(Aspect)</h3><blockquote>
+<p>​    切面是通知和切点的结合。通知和切点共同定义了关于切面的全部内容 —— 它是什么，在何时和何处完成其功能。</p>
+</blockquote>
+<h3 id="5-引入-Introduction"><a href="#5-引入-Introduction" class="headerlink" title="5. 引入(Introduction)"></a>5. 引入(Introduction)</h3><blockquote>
+<p>​    引入允许我们向现有的类添加新的方法和属性。</p>
+</blockquote>
+<h3 id="6-织入-Weaving"><a href="#6-织入-Weaving" class="headerlink" title="6. 织入(Weaving)"></a>6. 织入(Weaving)</h3><blockquote>
+<p>​    织入是将切面应用到目标对象来创建新的代理对象的过程。切面在指定的连接点被织入到目标对象中。在目标对象的生命周期里有多个点可以进行织入：</p>
+</blockquote>
+<ul>
+<li>编译器 —— 切面在目标类编译时被织入。</li>
+<li>类加载期 —— 切面在目标类加载到JVM时被织入。</li>
+<li>运行期 —— 切面在应用运行的某个时候被织入。Spring AOP就是以这种方式织入切面的。</li>
+</ul>
+<h2 id="二、springAop关键对象"><a href="#二、springAop关键对象" class="headerlink" title="二、springAop关键对象"></a>二、springAop关键对象</h2><table>
+<thead>
+<tr>
+<th align="left">Aspect</th>
+<th>一个模块具有一组提供横切需求的 APIs。例如，一个日志模块为了记录日志将被 AOP 方面调用。应用程序可以拥有任意数量的方面，这取决于需求。</th>
+<th>切面</th>
+<th>@Aspect</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Join point</td>
+<td>在你的应用程序中它代表一个点，你可以在插件 AOP 方面。你也能说，它是在实际的应用程序中，其中一个操作将使用 Spring AOP 框架。</td>
+<td>连接点</td>
+<td>ProceedingJoinPoint</td>
+</tr>
+<tr>
+<td align="left">Advice</td>
+<td>这是实际行动之前或之后执行的方法。这是在程序执行期间通过 Spring AOP 框架实际被调用的代码。</td>
+<td>通知</td>
+<td>@before,after</td>
+</tr>
+<tr>
+<td align="left">Pointcut</td>
+<td>这是一组一个或多个连接点，通知应该被执行。你可以使用表达式或模式指定切入点正如我们将在 AOP 的例子中看到的。</td>
+<td>切点</td>
+<td>@Pointcut</td>
+</tr>
+<tr>
+<td align="left">Introduction</td>
+<td>引用允许你添加新方法或属性到现有的类中。</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="left">Target object</td>
+<td>被一个或者多个方面所通知的对象，这个对象永远是一个被代理对象。也称为被通知对象。</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td align="left">Weaving</td>
+<td>Weaving 把方面连接到其它的应用程序类型或者对象上，并创建一个被通知的对象。这些可以在编译时，类加载时和运行时完成。</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id="切入点表达式"><a href="#切入点表达式" class="headerlink" title="切入点表达式"></a>切入点表达式</h2><h3 id="execution-标准式"><a href="#execution-标准式" class="headerlink" title="@execution 标准式"></a>@execution 标准式</h3><h3 id="within-包、类的所有方法"><a href="#within-包、类的所有方法" class="headerlink" title="within 包、类的所有方法"></a>within 包、类的所有方法</h3><h3 id="annotation-注解"><a href="#annotation-注解" class="headerlink" title="@annotation 注解"></a>@annotation 注解</h3><h2 id="三、AOP使用"><a href="#三、AOP使用" class="headerlink" title="三、AOP使用"></a>三、AOP使用</h2><h3 id="3-1-日志"><a href="#3-1-日志" class="headerlink" title="3.1 日志"></a>3.1 日志</h3><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">``</span><span class="string">`</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">#### 2.1.1 基于注解</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">1. 设置注解</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">   `</span><span class="string">``</span>java</span><br><span class="line">   <span class="keyword">public</span> <span class="meta">@interface</span> Log &#123;</span><br><span class="line">   	<span class="built_in">String</span> value() <span class="keyword">default</span> <span class="string">&quot;&quot;</span>;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li><p>加入切入点</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Pointcut(&quot;@annotation(com.wyg.myAnnotation.Log)&quot;)</span><span class="comment">//任意有这个注解的切入</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">pointcut</span><span class="params">()</span> </span>&#123;&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>加入环绕方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Around(&quot;pointcut()&quot;)</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">around</span><span class="params">(ProceedingJoinPoint point)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">long</span> beginTime = System.currentTimeMillis();</span><br><span class="line">    point.proceed();			<span class="comment">// 执行方法</span></span><br><span class="line">    <span class="comment">// 执行时长(毫秒)</span></span><br><span class="line">    <span class="keyword">long</span> time = System.currentTimeMillis() - beginTime;</span><br><span class="line">    <span class="comment">// 保存日志</span></span><br><span class="line">    saveLog(point, time);</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h4 id="2-1-2-基于方法名称"><a href="#2-1-2-基于方法名称" class="headerlink" title="2.1.2 基于方法名称"></a>2.1.2 基于方法名称</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Pointcut(&quot;@execution(com.springboot.controller.TestController.methodTwo)&quot;)</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">pointcut</span><span class="params">()</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、execution语法"><a href="#三、execution语法" class="headerlink" title="三、execution语法"></a>三、execution语法</h2><h3 id="3-1-基本格式"><a href="#3-1-基本格式" class="headerlink" title="3.1 基本格式"></a>3.1 基本格式</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">execution(A com.<span class="keyword">package</span>..B.C(..))</span><br></pre></td></tr></table></figure>
+
+<p>A 返回类型</p>
+<p>B 类名</p>
+<p>C 方法名</p>
+<p>第一个 .. 当前包和子包，还可以写. 表示当前包</p>
+<p>第二个.. 表示任意参数 </p>
+<h2 id="四、JointPoint-获取连接点信息"><a href="#四、JointPoint-获取连接点信息" class="headerlink" title="四、JointPoint  获取连接点信息"></a>四、JointPoint  获取连接点信息</h2><p><strong>ProceedingJoinPoint只支持around</strong></p>
+<table>
+<thead>
+<tr>
+<th>方法名</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Signature getSignature();</td>
+<td>获取封装了署名信息的对象,在该对象中可以获取到目标方法名,所属类的Class等信息</td>
+</tr>
+<tr>
+<td>Object[] getArgs();</td>
+<td>获取传入目标方法的参数对象</td>
+</tr>
+<tr>
+<td>Object getTarget();</td>
+<td>获取被代理的对象</td>
+</tr>
+<tr>
+<td>Object getThis();</td>
+<td>获取代理对象</td>
+</tr>
+</tbody></table>
+<h2 id="五、ProceedingJoinPoint"><a href="#五、ProceedingJoinPoint" class="headerlink" title="五、ProceedingJoinPoint"></a>五、ProceedingJoinPoint</h2>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/spring/%E9%85%8D%E7%BD%AE/pom/pom%E5%B8%B8%E7%94%A8%E4%BE%9D%E8%B5%96/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -327,131 +903,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/spring/%E9%85%8D%E7%BD%AE/pom/pom%E7%9F%A5%E8%AF%86/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/08/spring/%E9%85%8D%E7%BD%AE/pom/pom%E7%9F%A5%E8%AF%86/" class="post-title-link" itemprop="url">pom配置文件</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-12-11 16:59:50" itemprop="dateModified" datetime="2021-12-11T16:59:50+08:00">2021-12-11</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/spring/%E9%85%8D%E7%BD%AE/" itemprop="url" rel="index"><span itemprop="name">配置</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/08/spring/%E9%85%8D%E7%BD%AE/pom/pom%E7%9F%A5%E8%AF%86/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/spring/%E9%85%8D%E7%BD%AE/pom/pom%E7%9F%A5%E8%AF%86/" class="cy_cmt_count" data-xid="2022/03/08/spring/配置/pom/pom知识/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>2.4k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>[toc]</p>
-<h2 id="一、POM"><a href="#一、POM" class="headerlink" title="一、POM"></a>一、POM</h2><h3 id="1-1-转载-pom节点说明1"><a href="#1-1-转载-pom节点说明1" class="headerlink" title="1.1 转载-pom节点说明1"></a>1.1 <a target="_blank" rel="noopener" href="https://blog.csdn.net/jiangyu1013/article/details/52424726">转载-pom节点说明1</a></h3><ol>
-<li><p>modelVersion：声明项目描述符遵循哪一个POM模型版本。<br>模型本身的版本很少改变，虽然如此，但它仍然是必不可少的.<br>这是为了当Maven引入了新的特性或者其他模型变更的时候，确保稳定性。</p>
-</li>
-<li><p>parent：引入父级pom文件。</p>
-</li>
-<li><p>groupId：公司名称、组织名称、项目开发者，配置时生成路径也是由此生成（包名，如com.XXX）。</p>
-</li>
-<li><p>artifactId：项目通用名称。</p>
-</li>
-<li><p>version：对应项目版本号。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/03/08/spring/%E9%85%8D%E7%BD%AE/pom/pom%E7%9F%A5%E8%AF%86/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/spring/%E9%85%8D%E7%BD%AE/pom/pom%E6%A0%BC%E5%BC%8F/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -560,238 +1011,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JUtil/%E9%9B%86%E5%90%88/HashMap/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JUtil/%E9%9B%86%E5%90%88/HashMap/" class="post-title-link" itemprop="url">hashmap</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-12-24 12:50:40" itemprop="dateModified" datetime="2021-12-24T12:50:40+08:00">2021-12-24</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JUtil/%E9%9B%86%E5%90%88/HashMap/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JUtil/%E9%9B%86%E5%90%88/HashMap/" class="cy_cmt_count" data-xid="2022/03/08/java/java源码解读/JUtil/集合/HashMap/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>4.6k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>4 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="一、原理"><a href="#一、原理" class="headerlink" title="一、原理"></a>一、原理</h2><p>基于哈希表的实现的<code>Map</code>接口。此实现提供了所有可选的map操作，并允许<code>null的</code>值和<code>null</code>键。（  <code>HashMap</code>类大致相当于<code>Hashtable</code> ，除了它是不同步的，并允许null）。这个类不能保证map的。</p>
-<p>假设哈希函数在这些存储桶之间正确分散元素，这个实现为基本操作（ <code>get</code>和<code>put</code>  ）提供了恒定的时间性能。 收集视图的迭代需要与<code>HashMap</code>实例（桶数）加上其大小（键值映射数）的“容量”  <code>成正比</code> 。 因此，如果迭代性能很重要，不要将初始容量设置得太高（或负载因子太低）是非常重要的。 </p>
-<p><code>HashMap的</code>一个实例有两个影响其性能的参数： <em>初始容量</em>和<em>负载因子</em> 。  <em>容量</em>是哈希表中的桶数，初始容量只是创建哈希表时的容量。  <em>负载因子</em>是在容量自动增加之前允许哈希表得到满足的度量。  当在散列表中的条目的数量超过了负载因数和电流容量的乘积，哈希表被<em>重新散列</em>  （即，内部数据结构被重建），使得哈希表具有桶的大约两倍。 </p>
-<p>作为一般规则，默认负载因子（.75）提供了时间和空间成本之间的良好折中。  更高的值会降低空间开销，但会增加查找成本（反映在<code>HashMap</code>类的大部分操作中，包括<code>get</code>和<code>put</code>  ）。 在设置其初始容量时，应考虑map中预期的条目数及其负载因子，以便最小化重新组播操作的数量。  如果初始容量大于最大条目数除以负载因子，则不会发生重新排列操作。 </p>
-<p>如果许多映射要存储在<code>HashMap</code>实例中，则以足够大的容量创建映射将允许映射的存储效率高于使其根据需要执行自动重新排序以增长表。  请注意，使用同一个<code>hashCode()</code>多个密钥是降低任何哈希表的<code>hashCode()</code>的一种方法。  为了改善影响，当按键是<a href="../../java/lang/Comparable.html"><code>Comparable</code></a>时，这个类可以使用键之间的比较顺序来帮助打破关系。 </p>
-<p>当链表大于 8 并且容量大于 64 时，链表结构会转换成红黑树结构，大体结构如下图：</p>
-<ol>
-<li>基于equals</li>
-</ol>
-<h2 id="二、属性"><a href="#二、属性" class="headerlink" title="二、属性"></a>二、属性</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> DEFAULT_INITIAL_CAPACITY = <span class="number">1</span> &lt;&lt; <span class="number">4</span>; <span class="comment">// 默认容量 16</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> MAXIMUM_CAPACITY = <span class="number">1</span> &lt;&lt; <span class="number">30</span>; <span class="comment">//最大容量</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">float</span> DEFAULT_LOAD_FACTOR = <span class="number">0.75f</span>;<span class="comment">//默认负载因子</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> TREEIFY_THRESHOLD = <span class="number">8</span>;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> UNTREEIFY_THRESHOLD = <span class="number">6</span>;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> MIN_TREEIFY_CAPACITY = <span class="number">64</span>;</span><br><span class="line"><span class="keyword">transient</span> Node&lt;K,V&gt;[] table;<span class="comment">//表.分配时，长度始终为2的幂。</span></span><br><span class="line"><span class="keyword">transient</span> Set&lt;Map.Entry&lt;K,V&gt;&gt; entrySet;<span class="comment">//保存缓存的entrySet</span></span><br><span class="line"><span class="keyword">transient</span> <span class="keyword">int</span> size;<span class="comment">//现在容量</span></span><br><span class="line"><span class="keyword">transient</span> <span class="keyword">int</span> modCount;<span class="comment">//Fail-Fast机制</span></span><br><span class="line"><span class="keyword">int</span> threshold; <span class="comment">//要调整大小的下一个大小值（容量*负载系数）。</span></span><br><span class="line"><span class="keyword">final</span> <span class="keyword">float</span> loadFactor;<span class="comment">//f</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="三、-方法"><a href="#三、-方法" class="headerlink" title="三、 方法"></a>三、 方法</h2><h3 id="2-1-hash-key"><a href="#2-1-hash-key" class="headerlink" title="2.1 hash(key)"></a>2.1 hash(key)</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">hash</span><span class="params">(Object key)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">int</span> h;</span><br><span class="line">       <span class="keyword">return</span> (key == <span class="keyword">null</span>) ? <span class="number">0</span> : (h = key.hashCode()) ^ (h &gt;&gt;&gt; <span class="number">16</span>);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-2-put"><a href="#2-2-put" class="headerlink" title="2.2 put"></a>2.2 put</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> V <span class="title">put</span><span class="params">(K key, V value)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> putVal(hash(key), key, value, <span class="keyword">false</span>, <span class="keyword">true</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">final</span> V <span class="title">putVal</span><span class="params">(<span class="keyword">int</span> hash, K key, V value, <span class="keyword">boolean</span> onlyIfAbsent,</span></span></span><br><span class="line"><span class="params"><span class="function">               <span class="keyword">boolean</span> evict)</span> </span>&#123;</span><br><span class="line">    Node&lt;K,V&gt;[] tab; Node&lt;K,V&gt; p; <span class="keyword">int</span> n, i;</span><br><span class="line">    <span class="keyword">if</span> ((tab = table) == <span class="keyword">null</span> || (n = tab.length) == <span class="number">0</span>)</span><br><span class="line">        n = (tab = resize()).length;</span><br><span class="line">    <span class="keyword">if</span> ((p = tab[i = (n - <span class="number">1</span>) &amp; hash]) == <span class="keyword">null</span>)</span><br><span class="line">        tab[i] = newNode(hash, key, value, <span class="keyword">null</span>);</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        Node&lt;K,V&gt; e; K k;</span><br><span class="line">        <span class="keyword">if</span> (p.hash == hash &amp;&amp;</span><br><span class="line">            ((k = p.key) == key || (key != <span class="keyword">null</span> &amp;&amp; key.equals(k))))</span><br><span class="line">            e = p;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (p <span class="keyword">instanceof</span> TreeNode)</span><br><span class="line">            e = ((TreeNode&lt;K,V&gt;)p).putTreeVal(<span class="keyword">this</span>, tab, hash, key, value);</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> binCount = <span class="number">0</span>; ; ++binCount) &#123;</span><br><span class="line">                <span class="keyword">if</span> ((e = p.next) == <span class="keyword">null</span>) &#123;</span><br><span class="line">                    p.next = newNode(hash, key, value, <span class="keyword">null</span>);</span><br><span class="line">                    <span class="keyword">if</span> (binCount &gt;= TREEIFY_THRESHOLD - <span class="number">1</span>) <span class="comment">// -1 for 1st</span></span><br><span class="line">                        treeifyBin(tab, hash);</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (e.hash == hash &amp;&amp;</span><br><span class="line">                    ((k = e.key) == key || (key != <span class="keyword">null</span> &amp;&amp; key.equals(k))))</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                p = e;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (e != <span class="keyword">null</span>) &#123; <span class="comment">// existing mapping for key</span></span><br><span class="line">            V oldValue = e.value;</span><br><span class="line">            <span class="keyword">if</span> (!onlyIfAbsent || oldValue == <span class="keyword">null</span>)</span><br><span class="line">                e.value = value;</span><br><span class="line">            afterNodeAccess(e);</span><br><span class="line">            <span class="keyword">return</span> oldValue;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    ++modCount;</span><br><span class="line">    <span class="keyword">if</span> (++size &gt; threshold)</span><br><span class="line">        resize();</span><br><span class="line">    afterNodeInsertion(evict);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/b7b55fbaeb2948b5a50496d7a2f67c88.png" alt="b7b55fbaeb2948b5a50496d7a2f67c88"></p>
-<h3 id="2-3-resize"><a href="#2-3-resize" class="headerlink" title="2.3 resize"></a>2.3 resize</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> Node&lt;K,V&gt;[] resize() &#123;</span><br><span class="line">    Node&lt;K,V&gt;[] oldTab = table;</span><br><span class="line">    <span class="keyword">int</span> oldCap = (oldTab == <span class="keyword">null</span>) ? <span class="number">0</span> : oldTab.length;</span><br><span class="line">    <span class="keyword">int</span> oldThr = threshold;</span><br><span class="line">    <span class="keyword">int</span> newCap, newThr = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">if</span> (oldCap &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (oldCap &gt;= MAXIMUM_CAPACITY) &#123;</span><br><span class="line">            threshold = Integer.MAX_VALUE;</span><br><span class="line">            <span class="keyword">return</span> oldTab;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> ((newCap = oldCap &lt;&lt; <span class="number">1</span>) &lt; MAXIMUM_CAPACITY &amp;&amp;</span><br><span class="line">                 oldCap &gt;= DEFAULT_INITIAL_CAPACITY)</span><br><span class="line">            newThr = oldThr &lt;&lt; <span class="number">1</span>; <span class="comment">// double threshold</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (oldThr &gt; <span class="number">0</span>) <span class="comment">// initial capacity was placed in threshold</span></span><br><span class="line">        newCap = oldThr;</span><br><span class="line">    <span class="keyword">else</span> &#123;               <span class="comment">// zero initial threshold signifies using defaults</span></span><br><span class="line">        newCap = DEFAULT_INITIAL_CAPACITY;</span><br><span class="line">        newThr = (<span class="keyword">int</span>)(DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (newThr == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">float</span> ft = (<span class="keyword">float</span>)newCap * loadFactor;</span><br><span class="line">        newThr = (newCap &lt; MAXIMUM_CAPACITY &amp;&amp; ft &lt; (<span class="keyword">float</span>)MAXIMUM_CAPACITY ?</span><br><span class="line">                  (<span class="keyword">int</span>)ft : Integer.MAX_VALUE);</span><br><span class="line">    &#125;</span><br><span class="line">    threshold = newThr;</span><br><span class="line">    Node&lt;K,V&gt;[] newTab = (Node&lt;K,V&gt;[])<span class="keyword">new</span> Node[newCap];</span><br><span class="line">    table = newTab;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; oldCap; ++j) &#123;</span><br><span class="line">        Node&lt;K,V&gt; e;</span><br><span class="line">        <span class="keyword">if</span> ((e = oldTab[j]) != <span class="keyword">null</span>) &#123;</span><br><span class="line">            oldTab[j] = <span class="keyword">null</span>;</span><br><span class="line">            <span class="keyword">if</span> (e.next == <span class="keyword">null</span>)</span><br><span class="line">                newTab[e.hash &amp; (newCap - <span class="number">1</span>)] = e;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (e <span class="keyword">instanceof</span> TreeNode)</span><br><span class="line">                ((TreeNode&lt;K,V&gt;)e).split(<span class="keyword">this</span>, newTab, j, oldCap);</span><br><span class="line">            <span class="keyword">else</span> &#123; <span class="comment">// preserve order</span></span><br><span class="line">                Node&lt;K,V&gt; loHead = <span class="keyword">null</span>, loTail = <span class="keyword">null</span>;</span><br><span class="line">                Node&lt;K,V&gt; hiHead = <span class="keyword">null</span>, hiTail = <span class="keyword">null</span>;</span><br><span class="line">                Node&lt;K,V&gt; next;</span><br><span class="line">                <span class="keyword">do</span> &#123;</span><br><span class="line">                    next = e.next;</span><br><span class="line">                    <span class="keyword">if</span> ((e.hash &amp; oldCap) == <span class="number">0</span>) &#123;</span><br><span class="line">                        <span class="keyword">if</span> (loTail == <span class="keyword">null</span>)</span><br><span class="line">                            loHead = e;</span><br><span class="line">                        <span class="keyword">else</span></span><br><span class="line">                            loTail.next = e;</span><br><span class="line">                        loTail = e;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">else</span> &#123;</span><br><span class="line">                        <span class="keyword">if</span> (hiTail == <span class="keyword">null</span>)</span><br><span class="line">                            hiHead = e;</span><br><span class="line">                        <span class="keyword">else</span></span><br><span class="line">                            hiTail.next = e;</span><br><span class="line">                        hiTail = e;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; <span class="keyword">while</span> ((e = next) != <span class="keyword">null</span>);</span><br><span class="line">                <span class="keyword">if</span> (loTail != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    loTail.next = <span class="keyword">null</span>;</span><br><span class="line">                    newTab[j] = loHead;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (hiTail != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    hiTail.next = <span class="keyword">null</span>;</span><br><span class="line">                    newTab[j + oldCap] = hiHead;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> newTab;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="四、细节"><a href="#四、细节" class="headerlink" title="四、细节"></a>四、细节</h2><ol>
-<li>在散列表中的条目的数量超过了负载因数和电流容量的乘积，哈希表被<em>重新散列</em> （即，内部数据结构被重建），使得哈希表具有桶的大约两倍。</li>
-<li>如果许多映射要存储在<code>HashMap</code>实例中，则以足够大的容量创建映射将允许映射的存储效率高于使其根据需要执行自动重新排序以增长表。  请注意，使用同一个<code>hashCode()</code>多个密钥是降低任何哈希表的<code>hashCode()</code>的一种方法。  为了改善影响，当按键是<a href="../../java/lang/Comparable.html"><code>Comparable</code></a>时，这个类可以使用键之间的比较顺序来帮助打破关系</li>
-</ol>
-<h3 id="HashMap和HashTable区别"><a href="#HashMap和HashTable区别" class="headerlink" title="HashMap和HashTable区别"></a>HashMap和HashTable区别</h3><ol>
-<li>hashmap线程不安全</li>
-<li>hashmap的key可以为null</li>
-</ol>
-<h3 id="HashMap、LinkedHashMap、TreeMap-区别"><a href="#HashMap、LinkedHashMap、TreeMap-区别" class="headerlink" title="HashMap、LinkedHashMap、TreeMap 区别"></a>HashMap、LinkedHashMap、TreeMap 区别</h3><ol>
-<li>LinkedHashMap底层双向链表，有序</li>
-<li>TreeMap 可以用于排序</li>
-<li>HashMap</li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JUtil/%E9%9B%86%E5%90%88/Arrays/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JUtil/%E9%9B%86%E5%90%88/Arrays/" class="post-title-link" itemprop="url">Arrays</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-12-24 12:44:45" itemprop="dateModified" datetime="2021-12-24T12:44:45+08:00">2021-12-24</time>
-              </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JUtil/%E9%9B%86%E5%90%88/Arrays/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JUtil/%E9%9B%86%E5%90%88/Arrays/" class="cy_cmt_count" data-xid="2022/03/08/java/java源码解读/JUtil/集合/Arrays/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.8k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id=""><a href="#" class="headerlink" title=""></a></h2><h2 id="-1"><a href="#-1" class="headerlink" title=""></a></h2><h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><h3 id="内置对象ArrayList"><a href="#内置对象ArrayList" class="headerlink" title="内置对象ArrayList"></a>内置对象ArrayList</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ArrayList</span>&lt;<span class="title">E</span>&gt; <span class="keyword">extends</span> <span class="title">AbstractList</span>&lt;<span class="title">E</span>&gt;</span></span><br><span class="line"><span class="class">        <span class="keyword">implements</span> <span class="title">RandomAccess</span>, <span class="title">java</span>.<span class="title">io</span>.<span class="title">Serializable</span></span></span><br><span class="line"><span class="class">    </span>&#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = -<span class="number">2764017481108945198L</span>;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">final</span> E[] a;</span><br><span class="line"></span><br><span class="line">        ArrayList(E[] array) &#123;</span><br><span class="line">            a = Objects.requireNonNull(array);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">size</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> a.length;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> Object[] toArray() &#123;</span><br><span class="line">            <span class="keyword">return</span> a.clone();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="meta">@SuppressWarnings(&quot;unchecked&quot;)</span></span><br><span class="line">        <span class="keyword">public</span> &lt;T&gt; T[] toArray(T[] a) &#123;</span><br><span class="line">            <span class="keyword">int</span> size = size();</span><br><span class="line">            <span class="keyword">if</span> (a.length &lt; size)</span><br><span class="line">                <span class="keyword">return</span> Arrays.copyOf(<span class="keyword">this</span>.a, size,</span><br><span class="line">                                     (Class&lt;? extends T[]&gt;) a.getClass());</span><br><span class="line">            System.arraycopy(<span class="keyword">this</span>.a, <span class="number">0</span>, a, <span class="number">0</span>, size);</span><br><span class="line">            <span class="keyword">if</span> (a.length &gt; size)</span><br><span class="line">                a[size] = <span class="keyword">null</span>;</span><br><span class="line">            <span class="keyword">return</span> a;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> E <span class="title">get</span><span class="params">(<span class="keyword">int</span> index)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> a[index];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> E <span class="title">set</span><span class="params">(<span class="keyword">int</span> index, E element)</span> </span>&#123;</span><br><span class="line">            E oldValue = a[index];</span><br><span class="line">            a[index] = element;</span><br><span class="line">            <span class="keyword">return</span> oldValue;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">indexOf</span><span class="params">(Object o)</span> </span>&#123;</span><br><span class="line">            E[] a = <span class="keyword">this</span>.a;</span><br><span class="line">            <span class="keyword">if</span> (o == <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; a.length; i++)</span><br><span class="line">                    <span class="keyword">if</span> (a[i] == <span class="keyword">null</span>)</span><br><span class="line">                        <span class="keyword">return</span> i;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; a.length; i++)</span><br><span class="line">                    <span class="keyword">if</span> (o.equals(a[i]))</span><br><span class="line">                        <span class="keyword">return</span> i;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">contains</span><span class="params">(Object o)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> indexOf(o) != -<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> Spliterator&lt;E&gt; <span class="title">spliterator</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> Spliterators.spliterator(a, Spliterator.ORDERED);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">forEach</span><span class="params">(Consumer&lt;? <span class="keyword">super</span> E&gt; action)</span> </span>&#123;</span><br><span class="line">            Objects.requireNonNull(action);</span><br><span class="line">            <span class="keyword">for</span> (E e : a) &#123;</span><br><span class="line">                action.accept(e);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">replaceAll</span><span class="params">(UnaryOperator&lt;E&gt; operator)</span> </span>&#123;</span><br><span class="line">            Objects.requireNonNull(operator);</span><br><span class="line">            E[] a = <span class="keyword">this</span>.a;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; a.length; i++) &#123;</span><br><span class="line">                a[i] = operator.apply(a[i]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sort</span><span class="params">(Comparator&lt;? <span class="keyword">super</span> E&gt; c)</span> </span>&#123;</span><br><span class="line">            Arrays.sort(a, c);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-
-
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -863,14 +1082,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">98</span>
+          <span class="site-state-item-count">100</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-count">24</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>
@@ -914,12 +1133,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">267k</span>
+    <span title="站点总字数">271k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">4:03</span>
+    <span title="站点阅读时长">4:07</span>
 </div>
 
         

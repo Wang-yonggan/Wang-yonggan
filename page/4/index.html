@@ -187,6 +187,169 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/12/java/javaSE/jvm/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/12/java/javaSE/jvm/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8/" class="post-title-link" itemprop="url">classLoader</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-12 16:50:53" itemprop="dateCreated datePublished" datetime="2022-03-12T16:50:53+08:00">2022-03-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-13 03:50:05" itemprop="dateModified" datetime="2022-03-13T03:50:05+08:00">2022-03-13</time>
+              </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/12/java/javaSE/jvm/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/12/java/javaSE/jvm/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8/" class="cy_cmt_count" data-xid="2022/03/12/java/javaSE/jvm/类加载器/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.8k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>[toc]</p>
+<h2 id="一、类加载器"><a href="#一、类加载器" class="headerlink" title="一、类加载器"></a>一、类加载器</h2><h3 id="1-1-BootStrapClassLoader"><a href="#1-1-BootStrapClassLoader" class="headerlink" title="1.1 BootStrapClassLoader"></a>1.1 BootStrapClassLoader</h3><ol>
+<li><p>这是一个c++写的类加载器，在java中显示为null</p>
+</li>
+<li><p>负责加载JRE_HOME下的lib目录和其他c++写的jar</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>rt.jar</td>
+<td>运行环境包，rt即runtime，J2SE 的类定义都在这个包内</td>
+</tr>
+<tr>
+<td>charsets.jar</td>
+<td>字符集支持包</td>
+</tr>
+<tr>
+<td>jce.jar</td>
+<td>是一组包，它们提供用于加密、密钥生成和协商以及 Message Authentication Code（MAC）算法的框架和实现</td>
+</tr>
+<tr>
+<td>jsse.jar</td>
+<td>安全套接字拓展包Java(TM) Secure Socket Extension</td>
+</tr>
+<tr>
+<td>classlist</td>
+<td>该文件内表示是引导类加载器应该加载的类的清单</td>
+</tr>
+<tr>
+<td>net.properties</td>
+<td>JVM网络配置信息</td>
+</tr>
+</tbody></table>
+</li>
+</ol>
+<h3 id="1-2-URLClassLoader"><a href="#1-2-URLClassLoader" class="headerlink" title="1.2 URLClassLoader"></a>1.2 URLClassLoader</h3><h2 id="二、类加载机制"><a href="#二、类加载机制" class="headerlink" title="二、类加载机制"></a>二、类加载机制</h2><h3 id="2-1-获得类加载器"><a href="#2-1-获得类加载器" class="headerlink" title="2.1 获得类加载器"></a>2.1 获得类加载器</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Thread.currentThread().getContextClassLoader();<span class="comment">//当前线程的，一般为appClassLoader</span></span><br><span class="line">Student.class.getClassLoader();<span class="comment">//appClassLoader</span></span><br><span class="line">appClassLoader.getParent();<span class="comment">//extClassLoader</span></span><br><span class="line">extClassLoader.getParent();<span class="comment">//null</span></span><br><span class="line">ClassLoader.getSystemClassLoader();<span class="comment">//appClassLoader</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-类加载的双亲委派"><a href="#2-2-类加载的双亲委派" class="headerlink" title="2.2 类加载的双亲委派"></a>2.2 类加载的双亲委派</h3><h4 id="2-2-1-步骤"><a href="#2-2-1-步骤" class="headerlink" title="2.2.1 步骤"></a>2.2.1 步骤</h4><ol>
+<li>MyClassLoader要加载Student.class</li>
+<li>委派给parent.parent.parent</li>
+<li>parentClassLoader从缓存中找，没有，再去自己的Floder找还没有</li>
+<li>委派给child</li>
+</ol>
+<h4 id="2-2-2-优点"><a href="#2-2-2-优点" class="headerlink" title="2.2.2 优点"></a>2.2.2 优点</h4><ol>
+<li><p>能保证类的唯一性</p>
+<p>但是这只是Java官方使用并建议的方式，用户自定义加载器可能会创建出多个名字相同的类，所以还需要判断他们的类加载器是否一样。</p>
+</li>
+</ol>
+<h2 id="三、常见类"><a href="#三、常见类" class="headerlink" title="三、常见类"></a>三、常见类</h2><h3 id="3-1-Launcher"><a href="#3-1-Launcher" class="headerlink" title="3.1 Launcher"></a>3.1 Launcher</h3><blockquote>
+<p>java入口类，由jvm创建，用来初始化Ext和AppClassLoader，放进主线程的ContextClassLoader中，也就是单例</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Launcher</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Launcher launcher = <span class="keyword">new</span> Launcher();</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> String bootClassPath =</span><br><span class="line">        System.getProperty(<span class="string">&quot;sun.boot.class.path&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Launcher <span class="title">getLauncher</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> launcher;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> ClassLoader loader;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Launcher</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// Create the extension class loader</span></span><br><span class="line">        ClassLoader extcl;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            extcl = ExtClassLoader.getExtClassLoader();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> InternalError(</span><br><span class="line">                <span class="string">&quot;Could not create extension class loader&quot;</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Now create the class loader to use to launch the application</span></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            loader = AppClassLoader.getAppClassLoader(extcl);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> InternalError(</span><br><span class="line">                <span class="string">&quot;Could not create application class loader&quot;</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//设置AppClassLoader为线程上下文类加载器，这个文章后面部分讲解</span></span><br><span class="line">        Thread.currentThread().setContextClassLoader(loader);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * Returns the class loader used to launch the main application.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ClassLoader <span class="title">getClassLoader</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> loader;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * The class loader used for loading installed extensions.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ExtClassLoader</span> <span class="keyword">extends</span> <span class="title">URLClassLoader</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * The class loader used for loading from java.class.path.</span></span><br><span class="line"><span class="comment">     * runs in a restricted security context.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">AppClassLoader</span> <span class="keyword">extends</span> <span class="title">URLClassLoader</span> </span>&#123;&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="3-2-ClassLoader"><a href="#3-2-ClassLoader" class="headerlink" title="3.2 ClassLoader"></a>3.2 ClassLoader</h3><h4 id="loadClass"><a href="#loadClass" class="headerlink" title="loadClass"></a>loadClass</h4><p>此方法负责加载指定名字的类，ClassLoader的实现方法为先从已经加载的类中寻找，如没有则继续从parent ClassLoader中寻找，如仍然没找到，则从System ClassLoader中寻找，最后再调用findClass方法来寻找，如要改变类的加载顺序，则可覆盖此方法</p>
+<h4 id="findLoadedClass"><a href="#findLoadedClass" class="headerlink" title="findLoadedClass"></a>findLoadedClass</h4><p>此方法负责从当前ClassLoader实例对象的缓存中寻找已加载的类，调用的为native的方法。</p>
+<h4 id="findClass"><a href="#findClass" class="headerlink" title="findClass"></a>findClass</h4><p>此方法直接抛出ClassNotFoundException，因此需要通过覆盖loadClass或此方法来以自定义的方式加载相应的类。</p>
+<h4 id="findSystemClass"><a href="#findSystemClass" class="headerlink" title="findSystemClass"></a>findSystemClass</h4><p>此方法负责从System ClassLoader中寻找类，如未找到，则继续从Bootstrap ClassLoader中寻找，如仍然未找到，则返回null。</p>
+<h4 id="defineClass"><a href="#defineClass" class="headerlink" title="defineClass"></a>defineClass</h4><p>此方法负责将二进制的字节码转换为Class对象</p>
+<h4 id="resolveClass"><a href="#resolveClass" class="headerlink" title="resolveClass"></a>resolveClass</h4><p>此方法负责完成Class对象的链接，如已链接过，则会直接返回。</p>
+<h4 id="getSystemResources"><a href="#getSystemResources" class="headerlink" title="getSystemResources"></a>getSystemResources</h4><p>获得classpath路径下的资源路径</p>
+<h4 id="getResources"><a href="#getResources" class="headerlink" title="getResources"></a>getResources</h4><p>获得该类下的资源路径</p>
+<h2 id="四、其他"><a href="#四、其他" class="headerlink" title="四、其他"></a>四、其他</h2><h3 id="4-1"><a href="#4-1" class="headerlink" title="4.1"></a>4.1</h3><h3 id="类加载的异常"><a href="#类加载的异常" class="headerlink" title="类加载的异常"></a>类加载的异常</h3><h4 id="ClassNotFoundException"><a href="#ClassNotFoundException" class="headerlink" title="ClassNotFoundException"></a>ClassNotFoundException</h4><ul>
+<li>Class.forName()</li>
+<li>ClassLoader.getSystemClassLoader().loadClass()</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/12/java/javaSE/jvm/Java%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -524,10 +687,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2022-03-12 14:11:08 / 修改时间：15:12:08" itemprop="dateCreated datePublished" datetime="2022-03-12T14:11:08+08:00">2022-03-12</time>
+              <time title="创建时间：2022-03-12 14:11:08" itemprop="dateCreated datePublished" datetime="2022-03-12T14:11:08+08:00">2022-03-12</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-26 22:44:10" itemprop="dateModified" datetime="2022-03-26T22:44:10+08:00">2022-03-26</time>
+              </span>
 
           
   
@@ -551,7 +720,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>714</span>
+              <span>934</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -570,9 +739,13 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="TCP-UDP"><a href="#TCP-UDP" class="headerlink" title="TCP UDP"></a>TCP UDP</h3><ul>
+          <p>`</p>
+<blockquote>
+<p>socket就是对UDP、TCP的封装</p>
+</blockquote>
+<h3 id="TCP-UDP"><a href="#TCP-UDP" class="headerlink" title="TCP UDP"></a>TCP UDP</h3><ul>
 <li><strong>TCP</strong>：传输控制协议，是一种面向连接的、可靠的、基于字节流的传输层通信协议，TCP 层是位于 IP 层之上，应用层之下的中间层。TCP 保障了两个应用程序之间的可靠通信。通常用于互联网协议，被称 TCP / IP。</li>
-<li><strong>UDP</strong>：用户数据报协议，位于 OSI 模型的传输层。一个无连接的协议。提供了应用程序之间要发送数据的数据报。由于UDP缺乏可靠性且属于无连接协议，所以应用程序通常必须容许一些丢失、错误或重复的数据包</li>
+<li><strong>UDP</strong>：用户数据报协议，位于 OSI 模型的传输层。一个无连接的协议。提供了应用程序之间要发送数据的数据报。由于UDP缺乏可靠性且属于无连接协议，所以应用程序通常必须容许一些丢失、错误或重复的数据包。不局限于端到端，可以广播</li>
 </ul>
 <h3 id="socket"><a href="#socket" class="headerlink" title="socket"></a>socket</h3><ol>
 <li><p>在计算机网络中，叫套接字socket (ip:port)</p>
@@ -713,6 +886,19 @@
 </tbody></table>
 <h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><h4 id="阻塞IO"><a href="#阻塞IO" class="headerlink" title="阻塞IO"></a>阻塞IO</h4><p>进程进行IO操作的适合被挂起，防止被运行，指导IO操作完成。</p>
 <h4 id="非阻塞IO"><a href="#非阻塞IO" class="headerlink" title="非阻塞IO"></a>非阻塞IO</h4><p>IO操作立即返回，返回值为读取到的数据大小。等到总线发送了中断信号，就表示IO操作完成。</p>
+<h2 id="三、步骤"><a href="#三、步骤" class="headerlink" title="三、步骤"></a>三、步骤</h2><ol>
+<li>创建一个ServerSocket，监听并绑定一个端口</li>
+<li>一系列客户端来请求这个端口</li>
+<li>服务器使用Accept，获得一个来自客户端的Socket连接对象 </li>
+<li>启动一个新线程处理连接 <ol>
+<li>读Socket，得到字节流</li>
+<li>解码协议，得到Http请求对象 </li>
+<li>处理Http请求，得到一个结果，封装成一个HttpResponse对象 </li>
+<li>编码协议，将结果序列化字节流 写Socket，将字节流发给客户端 </li>
+</ol>
+</li>
+<li>继续循环步骤3</li>
+</ol>
 
       
     </div>
@@ -763,7 +949,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-24 15:53:02" itemprop="dateModified" datetime="2022-03-24T15:53:02+08:00">2022-03-24</time>
+                <time title="修改时间：2022-03-24 15:57:29" itemprop="dateModified" datetime="2022-03-24T15:57:29+08:00">2022-03-24</time>
               </span>
 
           
@@ -788,7 +974,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>1.7k</span>
+              <span>1.8k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -860,6 +1046,11 @@
 </ol>
 <h2 id="三、索引分类"><a href="#三、索引分类" class="headerlink" title="三、索引分类"></a>三、索引分类</h2><blockquote>
 <p>索引分类 innodb才有   mylsam没有分类</p>
+<blockquote>
+<p>主键是不能为null的唯一索引</p>
+<p>唯一索引null可以出现多次,</p>
+<p>普通索引的所有值都能出现多次</p>
+</blockquote>
 </blockquote>
 <h3 id="3-1-聚集索引："><a href="#3-1-聚集索引：" class="headerlink" title="3.1 聚集索引："></a>3.1 聚集索引：</h3><blockquote>
 <p> InnoDB必须要有，且只有一个聚集索引</p>
@@ -923,7 +1114,10 @@
 </ol>
 </li>
 </ol>
-<h3 id="3-4-全文索引"><a href="#3-4-全文索引" class="headerlink" title="3.4 全文索引"></a>3.4 全文索引</h3><h2 id="三、索引选择"><a href="#三、索引选择" class="headerlink" title="三、索引选择"></a>三、索引选择</h2><h3 id="3-1-B-树索引"><a href="#3-1-B-树索引" class="headerlink" title="3.1 B+树索引"></a>3.1 B+树索引</h3><h4 id="优势"><a href="#优势" class="headerlink" title="优势"></a>优势</h4><ol>
+<h3 id="3-4-全文索引"><a href="#3-4-全文索引" class="headerlink" title="3.4 全文索引"></a>3.4 全文索引</h3><blockquote>
+<p>5.6之后开始支持全文索引，</p>
+</blockquote>
+<h2 id="三、索引选择"><a href="#三、索引选择" class="headerlink" title="三、索引选择"></a>三、索引选择</h2><h3 id="3-1-B-树索引"><a href="#3-1-B-树索引" class="headerlink" title="3.1 B+树索引"></a>3.1 B+树索引</h3><h4 id="优势"><a href="#优势" class="headerlink" title="优势"></a>优势</h4><ol>
 <li>完全匹配</li>
 <li>范围匹配</li>
 <li>前缀匹配（左模糊）</li>
@@ -1127,127 +1321,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/common-lang3/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/08/%E7%BB%84%E4%BB%B6/common-lang3/" class="post-title-link" itemprop="url">common-lang3</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-08 00:33:40" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:40+08:00">2022-03-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-11-06 11:57:54" itemprop="dateModified" datetime="2021-11-06T11:57:54+08:00">2021-11-06</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%BB%84%E4%BB%B6/" itemprop="url" rel="index"><span itemprop="name">组件</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/08/%E7%BB%84%E4%BB%B6/common-lang3/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/common-lang3/" class="cy_cmt_count" data-xid="2022/03/08/组件/common-lang3/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>5.1k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>5 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="common-lang3-参考"><a href="#common-lang3-参考" class="headerlink" title="common-lang3 参考"></a><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/1886903ed14c">common-lang3 参考</a></h1><p>[toc]</p>
-<h3 id="ArrayUtils"><a href="#ArrayUtils" class="headerlink" title="ArrayUtils"></a>ArrayUtils</h3><p>集合工具类</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//创建数组</span></span><br><span class="line">String[] array = ArrayUtils.toArray(<span class="string">&quot;1&quot;</span>, <span class="string">&quot;2&quot;</span>);</span><br><span class="line"><span class="comment">//判断两个数据是否相等，如果内容相同， 顺序相同 则返回 true</span></span><br><span class="line">ArrayUtils.isEquals(arr1,arr2);</span><br><span class="line"><span class="comment">//判断数组中是否包含某一对象</span></span><br><span class="line">ArrayUtils.contains(arr, <span class="string">&quot;33&quot;</span>);</span><br><span class="line"><span class="comment">//二维数组转换成MAP</span></span><br><span class="line">Map map = ArrayUtils.toMap(<span class="keyword">new</span> String[][] &#123; </span><br><span class="line">    &#123; <span class="string">&quot;RED&quot;</span>, <span class="string">&quot;#FF0000&quot;</span> &#125;, &#123; <span class="string">&quot;GREEN&quot;</span>, <span class="string">&quot;#00FF00&quot;</span> &#125;, &#123; <span class="string">&quot;BLUE&quot;</span>, <span class="string">&quot;#0000FF&quot;</span> &#125; &#125;);</span><br></pre></td></tr></table></figure>
-
-<h3 id="DateUtils"><a href="#DateUtils" class="headerlink" title="DateUtils"></a>DateUtils</h3><p>日期工具类</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//日期加n天</span></span><br><span class="line">DateUtils.addDays(<span class="keyword">new</span> Date(), n);</span><br><span class="line"><span class="comment">//判断是否同一天</span></span><br><span class="line">DateUtils.isSameDay(date1, date2);</span><br><span class="line"><span class="comment">//字符串时间转换为Date</span></span><br><span class="line">DateUtils.parseDate(str, parsePatterns);</span><br></pre></td></tr></table></figure>
-
-<h3 id="1、StringUtils"><a href="#1、StringUtils" class="headerlink" title="1、StringUtils"></a>1、StringUtils</h3><p>操作字符串的工具类</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//首字母大小写转换</span></span><br><span class="line">StringUtils.capitalize(<span class="string">&quot;cat&quot;</span>);<span class="comment">//---&quot;Cat&quot;</span></span><br><span class="line">StringUtils.uncapitalize(<span class="string">&quot;Cat&quot;</span>);<span class="comment">//---&quot;cat&quot;</span></span><br><span class="line"><span class="comment">//去除字符串中的&quot;\n&quot;, &quot;\r&quot;, or &quot;\r\n&quot;</span></span><br><span class="line">StringUtils.chomp(<span class="string">&quot;abc\r\n&quot;</span>);<span class="comment">//---&quot;abc&quot;</span></span><br><span class="line"><span class="comment">//判断一字符串是否包含另一字符串</span></span><br><span class="line">StringUtils.contains(<span class="string">&quot;abc&quot;</span>, <span class="string">&quot;z&quot;</span>);<span class="comment">//---false</span></span><br><span class="line">StringUtils.containsIgnoreCase(<span class="string">&quot;abc&quot;</span>, <span class="string">&quot;A&quot;</span>);<span class="comment">//---true</span></span><br><span class="line"><span class="comment">//删除字符串中的梭有空格</span></span><br><span class="line">StringUtils.deleteWhitespace(<span class="string">&quot;   ab  c  &quot;</span>);<span class="comment">//---&quot;abc&quot;</span></span><br><span class="line"><span class="comment">//检查字符串结尾后缀是否匹配</span></span><br><span class="line">StringUtils.endsWith(<span class="string">&quot;abcdef&quot;</span>, <span class="string">&quot;def&quot;</span>);<span class="comment">//---true</span></span><br><span class="line">StringUtils.endsWithIgnoreCase(<span class="string">&quot;ABCDEF&quot;</span>, <span class="string">&quot;def&quot;</span>);<span class="comment">//---true</span></span><br><span class="line">StringUtils.endsWithAny(<span class="string">&quot;abcxyz&quot;</span>, <span class="keyword">new</span> String[] &#123;<span class="keyword">null</span>, <span class="string">&quot;xyz&quot;</span>, <span class="string">&quot;abc&quot;</span>&#125;);<span class="comment">//---true</span></span><br><span class="line"><span class="comment">//判断两字符串是否相同</span></span><br><span class="line">StringUtils.equalsIgnoreCase(<span class="string">&quot;abc&quot;</span>, <span class="string">&quot;ABC&quot;</span>);<span class="comment">//---true</span></span><br><span class="line"><span class="comment">//比较字符串数组内的所有元素的字符序列，起始一致则返回一致的字符串，若无则返回&quot;&quot;</span></span><br><span class="line">StringUtils.getCommonPrefix(<span class="keyword">new</span> String[] &#123;<span class="string">&quot;abcde&quot;</span>, <span class="string">&quot;abxyz&quot;</span>&#125;);<span class="comment">//---&quot;ab&quot;</span></span><br><span class="line"><span class="comment">//判断字符串大写、小写</span></span><br><span class="line">StringUtils.isAllUpperCase(<span class="string">&quot;ABC&quot;</span>);<span class="comment">//---true</span></span><br><span class="line"><span class="comment">//判断是否为空(注：isBlank与isEmpty 区别)</span></span><br><span class="line">StringUtils.isBlank(<span class="keyword">null</span>);StringUtils.isBlank(<span class="string">&quot;&quot;</span>);StringUtils.isBlank(<span class="string">&quot; &quot;</span>);<span class="comment">//---true</span></span><br><span class="line">StringUtils.isNoneBlank(<span class="string">&quot; &quot;</span>, <span class="string">&quot;bar&quot;</span>);<span class="comment">//---false</span></span><br><span class="line">StringUtils.isEmpty(<span class="keyword">null</span>);StringUtils.isEmpty(<span class="string">&quot;&quot;</span>);<span class="comment">//---true</span></span><br><span class="line">StringUtils.isEmpty(<span class="string">&quot; &quot;</span>);<span class="comment">//---false</span></span><br><span class="line">StringUtils.isNoneEmpty(<span class="string">&quot; &quot;</span>, <span class="string">&quot;bar&quot;</span>);<span class="comment">//---true</span></span><br><span class="line"><span class="comment">//判断字符串数字</span></span><br><span class="line">StringUtils.isNumeric(<span class="string">&quot;123&quot;</span>);<span class="comment">//---false</span></span><br><span class="line">StringUtils.isNumericSpace(<span class="string">&quot;12 3&quot;</span>);<span class="comment">//---true</span></span><br><span class="line"><span class="comment">//数组中加入分隔符号</span></span><br><span class="line"><span class="comment">//StringUtils.join([1, 2, 3], ‘;‘);//---&quot;1;2;PKJjkkaf&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//大小写转换</span></span><br><span class="line">StringUtils.upperCase(<span class="string">&quot;aBc&quot;</span>);<span class="comment">//---&quot;ABC&quot;</span></span><br><span class="line">StringUtils.lowerCase(<span class="string">&quot;aBc&quot;</span>);<span class="comment">//---&quot;abc&quot;</span></span><br><span class="line">StringUtils.swapCase(<span class="string">&quot;The dog has a BONE&quot;</span>);<span class="comment">//---&quot;tHE DOG HAS A bone&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//替换字符串内容……（replacePattern、replceOnce）</span></span><br><span class="line">StringUtils.replace(<span class="string">&quot;aba&quot;</span>, <span class="string">&quot;a&quot;</span>, <span class="string">&quot;z&quot;</span>);<span class="comment">//---&quot;zbz&quot;</span></span><br><span class="line">StringUtils.overlay(<span class="string">&quot;abcdef&quot;</span>, <span class="string">&quot;zz&quot;</span>, <span class="number">2</span>, <span class="number">4</span>);<span class="comment">//---&quot;abzzef&quot;(指定区域)</span></span><br><span class="line">StringUtils.replaceEach(<span class="string">&quot;abcde&quot;</span>, <span class="keyword">new</span> String[]&#123;<span class="string">&quot;ab&quot;</span>, <span class="string">&quot;d&quot;</span>&#125;,</span><br><span class="line">                        <span class="keyword">new</span> String[]&#123;<span class="string">&quot;w&quot;</span>, <span class="string">&quot;t&quot;</span>&#125;);<span class="comment">//---&quot;wcte&quot;(多组指定替换ab-&gt;w，d-&gt;t)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//重复字符</span></span><br><span class="line">StringUtils.repeat(‘e‘, <span class="number">3</span>);<span class="comment">//---&quot;eee&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//反转字符串</span></span><br><span class="line">StringUtils.reverse(<span class="string">&quot;bat&quot;</span>);<span class="comment">//---&quot;tab&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//删除某字符</span></span><br><span class="line">StringUtils.remove(<span class="string">&quot;queued&quot;</span>, ‘u‘);<span class="comment">//---&quot;qeed&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//分割字符串</span></span><br><span class="line">StringUtils.split(<span class="string">&quot;a..b.c&quot;</span>, ‘.‘);<span class="comment">//---[&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]</span></span><br><span class="line">StringUtils.split(<span class="string">&quot;ab:cd:ef&quot;</span>, <span class="string">&quot;:&quot;</span>, <span class="number">2</span>);<span class="comment">//---[&quot;ab&quot;, &quot;cd:ef&quot;]</span></span><br><span class="line">StringUtils.splitByWholeSeparator(<span class="string">&quot;ab-!-cd-!-ef&quot;</span>, <span class="string">&quot;-!-&quot;</span>, <span class="number">2</span>);<span class="comment">//---[&quot;ab&quot;, &quot;cd-!-ef&quot;]</span></span><br><span class="line">StringUtils.splitByWholeSeparatorPreserveAllTokens(<span class="string">&quot;ab::cd:ef&quot;</span>, <span class="string">&quot;:&quot;</span>);<span class="comment">//-[&quot;ab&quot;,&quot; &quot;,&quot;cd&quot;,&quot;ef&quot;]</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//去除首尾空格，类似trim……（stripStart、stripEnd、stripAll、stripAccents）</span></span><br><span class="line">StringUtils.strip(<span class="string">&quot; ab c &quot;</span>);<span class="comment">//---&quot;ab c&quot;</span></span><br><span class="line">StringUtils.stripToNull(<span class="keyword">null</span>);<span class="comment">//---null</span></span><br><span class="line">StringUtils.stripToEmpty(<span class="keyword">null</span>);<span class="comment">//---&quot;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//截取字符串</span></span><br><span class="line">StringUtils.substring(<span class="string">&quot;abcd&quot;</span>, <span class="number">2</span>);<span class="comment">//---&quot;cd&quot;</span></span><br><span class="line">StringUtils.substring(<span class="string">&quot;abcdef&quot;</span>, <span class="number">2</span>, <span class="number">4</span>);<span class="comment">//---&quot;cd&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//left、right从左(右)开始截取n位字符</span></span><br><span class="line">StringUtils.left(<span class="string">&quot;abc&quot;</span>, <span class="number">2</span>);<span class="comment">//---&quot;ab&quot;</span></span><br><span class="line">StringUtils.right(<span class="string">&quot;abc&quot;</span>, <span class="number">2</span>);<span class="comment">//---&quot;bc&quot;</span></span><br><span class="line"><span class="comment">//从第n位开始截取m位字符       n  m</span></span><br><span class="line">StringUtils.mid(<span class="string">&quot;abcdefg&quot;</span>, <span class="number">2</span>, <span class="number">4</span>);<span class="comment">//---&quot;cdef&quot;</span></span><br><span class="line"></span><br><span class="line">StringUtils.substringBefore(<span class="string">&quot;abcba&quot;</span>, <span class="string">&quot;b&quot;</span>);<span class="comment">//---&quot;a&quot;</span></span><br><span class="line">StringUtils.substringBeforeLast(<span class="string">&quot;abcba&quot;</span>, <span class="string">&quot;b&quot;</span>);<span class="comment">//---&quot;abc&quot;</span></span><br><span class="line">StringUtils.substringAfter(<span class="string">&quot;abcba&quot;</span>, <span class="string">&quot;b&quot;</span>);<span class="comment">//---&quot;cba&quot;</span></span><br><span class="line">StringUtils.substringAfterLast(<span class="string">&quot;abcba&quot;</span>, <span class="string">&quot;b&quot;</span>);<span class="comment">//---&quot;a&quot;</span></span><br><span class="line"></span><br><span class="line">StringUtils.substringBetween(<span class="string">&quot;tagabctag&quot;</span>, <span class="string">&quot;tag&quot;</span>);<span class="comment">//---&quot;abc&quot;</span></span><br><span class="line">StringUtils.substringBetween(<span class="string">&quot;yabczyabcz&quot;</span>, <span class="string">&quot;y&quot;</span>, <span class="string">&quot;z&quot;</span>);<span class="comment">//---&quot;abc&quot;</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="2、RandomStringUtils"><a href="#2、RandomStringUtils" class="headerlink" title="2、RandomStringUtils"></a>2、RandomStringUtils</h3><p>随机数工具类</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//随机生成n位数数字</span></span><br><span class="line">RandomStringUtils.randomNumeric(n);</span><br><span class="line"><span class="comment">//在指定字符串中生成长度为n的随机字符串</span></span><br><span class="line">RandomStringUtils.random(n, <span class="string">&quot;abcdefghijk&quot;</span>);</span><br></pre></td></tr></table></figure>
-
-<h3 id="3、NumberUtils"><a href="#3、NumberUtils" class="headerlink" title="3、NumberUtils"></a>3、NumberUtils</h3><p>数字工具类</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//从数组中选出最大值</span></span><br><span class="line">NumberUtils.max(<span class="keyword">new</span> <span class="keyword">int</span>[] &#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span> &#125;);<span class="comment">//---4</span></span><br><span class="line"><span class="comment">//判断字符串是否全是整数</span></span><br><span class="line">NumberUtils.isDigits(<span class="string">&quot;153.4&quot;</span>);<span class="comment">//--false</span></span><br><span class="line"><span class="comment">//判断字符串是否是有效数字</span></span><br><span class="line">NumberUtils.isNumber(<span class="string">&quot;0321.1&quot;</span>);<span class="comment">//---false    </span></span><br></pre></td></tr></table></figure>
-
-
-
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1319,14 +1392,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">98</span>
+          <span class="site-state-item-count">100</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-count">24</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>
@@ -1370,12 +1443,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">267k</span>
+    <span title="站点总字数">271k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">4:03</span>
+    <span title="站点阅读时长">4:07</span>
 </div>
 
         
