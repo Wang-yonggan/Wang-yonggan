@@ -187,6 +187,267 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/27/408/%E7%BC%93%E5%AD%98%E4%B8%80%E8%87%B4%E6%80%A7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/27/408/%E7%BC%93%E5%AD%98%E4%B8%80%E8%87%B4%E6%80%A7/" class="post-title-link" itemprop="url">缓存一致性</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-03-27 15:17:59 / 修改时间：15:30:03" itemprop="dateCreated datePublished" datetime="2022-03-27T15:17:59+08:00">2022-03-27</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/27/408/%E7%BC%93%E5%AD%98%E4%B8%80%E8%87%B4%E6%80%A7/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/27/408/%E7%BC%93%E5%AD%98%E4%B8%80%E8%87%B4%E6%80%A7/" class="cy_cmt_count" data-xid="2022/03/27/408/缓存一致性/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>[toc]</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_40288381/article/details/89311425">参考</a></p>
+<h4 id="CPU缓存有什么意义？"><a href="#CPU缓存有什么意义？" class="headerlink" title="CPU缓存有什么意义？"></a>CPU缓存有什么意义？</h4><p>答:　1)  时间局部性：如果某个数据被访问，那么在不久的将来它有可能被再次访问。</p>
+<p>　　 2）空间局部性：如果某个数据被访问，那么与它相邻的数据很快也可能被访问。　     </p>
+<p>.缓存一致性（MESI）:用于保证多个CPU cache之间缓存共享数据的一致。</p>
+<h3 id="MESI协议"><a href="#MESI协议" class="headerlink" title="MESI协议"></a>MESI协议</h3><p>多核CPU都有自己的专门缓存(一般伪L1,L2),以及用一个CPU插槽之间的核共享缓存(一般为L3)，不同核心的CPU缓存中难免会加载同样的数据，那么如何保证数据的一致性呢，就是 MESI 协议了。<br>在 MESI 协议中，每个 Cache line 有4个状态，可用 2 个 bit 表示，它们分别是：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">M(Modified)：这行数据有效，数据被修改了，和内存中的数据不一致，数据只存在于本 Cache 中</span><br><span class="line">E(Exclusive)：这行数据有效，数据和内存中的数据一致，数据只存在于本 Cache 中；</span><br><span class="line">S(Shared)：这行数据有效，数据和内存中的数据一致，数据存在于很多 Cache 中</span><br><span class="line">I(Invalid)：这行数据无效</span><br></pre></td></tr></table></figure>
+
+<p>那么，假设有一个变量i=3（应该是包括变量i的缓存块，块大小为缓存行大小）；已经加载到多核（a,b,c）的缓存中，此时该缓存行的状态为S；此时其中的一个核a改变了变量i的值，那么在核a中的当前缓存行的状态将变为<code>M</code>，b,c核中的当前缓存行状态将变为<code>I</code>。如下图：</p>
+<p><strong>M: 被修改（Modified)</strong></p>
+<p>该缓存行只被缓存在该<code>CPU</code>的缓存中，并且是被修改过的（<code>dirty</code>),即与主存中的数据不一致，该缓存行中的内存需要在未来的某个时间点（允许其它<code>CPU</code>读取请主存中相应内存之前）写回（<code>write back</code>）主存。</p>
+<p>当被写回主存之后，该缓存行的状态会变成独享（<code>exclusive</code>)状态。</p>
+<p><strong>E: 独享的（Exclusive)</strong></p>
+<p>该缓存行只被缓存在该<code>CPU</code>的缓存中，它是未被修改过的（<code>clean</code>)，与主存中数据一致。该状态可以在任何时刻当有其它<code>CPU</code>读取该内存时变成共享状态（<code>shared</code>)。</p>
+<p>同样地，当<code>CPU</code>修改该缓存行中内容时，该状态可以变成<code>Modified</code>状态。</p>
+<p><strong>S: 共享的（Shared)</strong></p>
+<p>该状态意味着该缓存行可能被多个<code>CPU</code>缓存，并且各个缓存中的数据与主存数据一致（<code>clean</code>)，当有一个<code>CPU</code>修改该缓存行中，其它<code>CPU</code>中该缓存行可以被作废（变成无效状态（<code>Invalid</code>））。</p>
+<p><strong>I: 无效的（Invalid）</strong></p>
+<p>该缓存是无效的（可能有其它<code>CPU</code>修改了该缓存行）。</p>
+<h3 id="伪共享"><a href="#伪共享" class="headerlink" title="伪共享"></a>伪共享</h3><h4 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h4><p>然而缓存行也存在问题：假设CPU的第一个核需要操作<code>a</code>变量，第二个核需要操作<code>b</code>变量，表面看a和b是没有任何关系的，但是a和b在同一个<code>cache line</code>中，这样假设核心一修改了变量a的值，那么它将会刷新所有和a相关的缓存的数据，b变量也就会受到牵连，<strong>最后导致核心二再去缓存读取b变量的时候出现cache miss，需要重新到主存加载新数据，这就是所谓的false share(伪共享)</strong></p>
+<h4 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h4><ol>
+<li><p>缓存行填充技术：</p>
+<p>一个典型的例子就是lmax disruptor中的缓存行填充技术。假设cache line的大小是64字节，一个cache line能容纳8个long型变量，disruptor中的做法是在long变量的前面和后面分别填充7个long变量，这样就可以避免我们需要的变量和其他变量在同一个cache line，解决伪共享问题。这就是用空间换时间。</p>
+</li>
+<li><p>jdk8的sun.misc.Contended</p>
+</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/27/java/javaSE/JUC/JUC%E7%9A%84%E5%9F%BA%E7%A1%80/Synchronize/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/27/java/javaSE/JUC/JUC%E7%9A%84%E5%9F%BA%E7%A1%80/Synchronize/" class="post-title-link" itemprop="url">未命名</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-27 01:52:54" itemprop="dateCreated datePublished" datetime="2022-03-27T01:52:54+08:00">2022-03-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-28 01:24:10" itemprop="dateModified" datetime="2022-03-28T01:24:10+08:00">2022-03-28</time>
+              </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/27/java/javaSE/JUC/JUC%E7%9A%84%E5%9F%BA%E7%A1%80/Synchronize/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/27/java/javaSE/JUC/JUC%E7%9A%84%E5%9F%BA%E7%A1%80/Synchronize/" class="cy_cmt_count" data-xid="2022/03/27/java/javaSE/JUC/JUC的基础/Synchronize/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.7k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>著作权归<a target="_blank" rel="noopener" href="https://pdai.tech所有./">https://pdai.tech所有。</a> 链接：<a target="_blank" rel="noopener" href="https://pdai.tech/md/java/thread/java-thread-x-key-synchronized.html">https://pdai.tech/md/java/thread/java-thread-x-key-synchronized.html</a></p>
+<h3 id="synchronize实质"><a href="#synchronize实质" class="headerlink" title="synchronize实质"></a>synchronize实质</h3><blockquote>
+<p>object在堆中有对象头，对象头保存着monitor</p>
+<p>ObjectMonitor(){</p>
+<p>​    </p>
+<p>}</p>
+</blockquote>
+<blockquote>
+<p><code>Monitorenter</code>和<code>Monitorexit</code>指令，会让对象在执行，使其锁计数器加1或者减1。每一个对象在同一时间只与一个monitor(锁)相关联，而一个monitor在同一时间只能被一个线程获得，一个对象在尝试获得与这个对象相关联的Monitor锁的所有权的时候，monitorenter指令会发生如下3中情况之一：</p>
+</blockquote>
+<ul>
+<li><p>monitor计数器为0，意味着目前还没有被获得</p>
+</li>
+<li><p>如果这个monitor已经拿到了这个锁的所有权，又重入了这把锁，那<strong>锁计数器</strong>就会累加</p>
+</li>
+<li><p>退出synchronize就会让monitorenter-1</p>
+</li>
+<li><p>monitorenter=0的时候就会<strong>通知等待队列/池子</strong>，并吐出来一个</p>
+</li>
+<li><p>synchronized实际上是非公平的，新来的线程有可能立即获得监视器，而在等待区中等候已久的线程可能再次等待，这样有利于提高性能，但是也可能会导致饥饿现象</p>
+</li>
+</ul>
+<h3 id="锁优化"><a href="#锁优化" class="headerlink" title="锁优化"></a>锁优化</h3><p>不过在jdk1.6中对锁的实现引入了大量的优化，如**锁粗化(Lock Coarsening)、锁消除(Lock Elimination)、轻量级锁(Lightweight Locking)、偏向锁(Biased Locking)、适应性自旋(Adaptive Spinning)**等技术来减少锁操作的开销。</p>
+<p>​    著作权归<a target="_blank" rel="noopener" href="https://pdai.tech所有./">https://pdai.tech所有。</a> 链接：<a target="_blank" rel="noopener" href="https://pdai.tech/md/java/thread/java-thread-x-key-synchronized.html">https://pdai.tech/md/java/thread/java-thread-x-key-synchronized.html</a></p>
+<ul>
+<li><p><code>锁粗化(Lock Coarsening)</code>：也就是减少不必要的紧连在一起的unlock，lock操作，将多个连续的锁扩展成一个范围更大的锁。</p>
+</li>
+<li><p><code>锁消除(Lock Elimination)</code>：通过运行时JIT编译器的逃逸分析来消除一些没有在当前同步块以外被其他线程共享的数据的锁保护，通过逃逸分析也可以在线程本的Stack上进行对象空间的分配(同时还可以减少Heap上的垃圾收集开销)。</p>
+</li>
+<li><p><code>轻量级锁(Lightweight Locking)</code>：这种锁实现的背后基于这样一种假设，即在真实的情况下我们程序中的大部分同步代码一般都处于无锁竞争状态(即单线程执行环境)，在无锁竞争的情况下完全可以避免调用操作系统层面的重量级互斥锁，取而代之的是在monitorenter和monitorexit中只需要依靠一条CAS原子指令就可以完成锁的获取及释放。当存在锁竞争的情况下，执行CAS指令失败的线程将调用操作系统互斥锁进入到阻塞状态，当锁被释放的时候被唤醒(具体处理步骤下面详细讨论)。</p>
+</li>
+<li><p><code>偏向锁(Biased Locking)</code>：是为了在无锁竞争的情况下避免在锁获取过程中执行不必要的CAS原子指令，因为CAS原子指令虽然相对于重量级锁来说开销比较小但还是存在非常可观的本的延迟。</p>
+</li>
+<li><p><code>适应性自旋(Adaptive Spinning)</code>：当线程在获取轻量级锁的过程中执行CAS操作失败时，在进入与monitor相关联的操作系统重量级锁(mutex semaphore)前会进入忙等待(Spinning)然后再次尝试，当尝试一定的次数后如果仍然没有成功则调用与该monitor关联的semaphore(即互斥锁)进入到阻塞状态</p>
+</li>
+</ul>
+<p>在Java SE 1.6里Synchronied同步锁，一共有四种状态：<code>无锁</code>、<code>偏向锁</code>、<code>轻量级所</code>、<code>重量级锁</code>，它会随着竞争情况逐渐升级。锁可以升级但是不可以降级，目的是为了提供获取锁和释放锁的效率。</p>
+<p>锁膨胀方向： <strong>无锁 → 粗化 → 偏向锁 → 轻量级锁 → 自旋锁→ 重量级锁</strong> (此过程是不可逆的)</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/lkforce/article/details/81128115">膨化过程</a></p>
+<h4 id="自旋锁"><a href="#自旋锁" class="headerlink" title="自旋锁"></a>自旋锁</h4><p>​    共享数据的锁定状态只会持续很短的一段时间，为了这段时间去挂起和回复阻塞线程并不值得。在如今多处理器环境下，完全可以让另一个没有获取到锁的线程在门外等待一会(自旋)，但不放弃CPU的执行时间。等待持有锁的线程是否很快就会释放锁，自旋锁占用的时间非常的短，那么自旋锁的性能会非常的好，相反，其会带来更多的性能开销(因为在线程自旋时，始终会占用CPU的时间片，如果锁占用的时间太长，那么自旋的线程会白白消耗掉CPU资源)。因此自旋等待的时间必须要有一定的限度，如果自选超过了限定的次数仍然没有成功获取到锁，就应该使用传统的方式去挂起线程了，在JDK定义中，自旋锁默认的自旋次数为10次，用户可以使用参数<code>-XX:PreBlockSpin</code>来更改。</p>
+<h4 id="锁消除"><a href="#锁消除" class="headerlink" title="锁消除"></a>锁消除</h4><p>Java 有很多方法都是加了同步的，那么此时JVM会判断这段代码是否需要加锁。如果数据并不会逃逸，则会进行锁消除。比如如下操作：在操作String类型数据时，由于String是一个不可变类，对字符串的连接操作总是通过生成的新的String对象来进行的。因此Javac编译器会对String连接做自动优化。在JDK 1.5之前会使用<strong>StringBuffer</strong>对象的连续append()操作，在JDK 1.5及以后的版本中，会转化为<strong>StringBuidler</strong>对象的连续append()操作。    </p>
+<h4 id="锁粗化"><a href="#锁粗化" class="headerlink" title="锁粗化"></a>锁粗化</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">test04</span><span class="params">(String s1, String s2, String s3)</span> </span>&#123;</span><br><span class="line">    StringBuilder sb = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">    sb.append(s1);</span><br><span class="line">    sb.append(s2);</span><br><span class="line">    sb.append(s3);</span><br><span class="line">    <span class="keyword">return</span> sb.toString();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上述的连续append()操作中就属于这类情况。JVM会检测到这样<strong>一连串的操作都是对同一个对象加锁</strong>，那么JVM会将加锁同步的范围扩展(粗化)到整个一系列操作的 外部，使整个一连串的append()操作只需要加锁一次就可以了。</p>
+<h4 id="轻量级锁"><a href="#轻量级锁" class="headerlink" title="轻量级锁"></a>轻量级锁</h4><h4 id="偏向锁"><a href="#偏向锁" class="headerlink" title="偏向锁"></a>偏向锁</h4><ol>
+<li><p>原因：</p>
+<p>在大多实际环境下，锁不仅不存在多线程竞争，而且总是由同一个线程多次获取，那么在同一个线程反复获取所释放锁中，其中并还没有锁的竞争，那么这样看上去，多次的获取锁和释放锁带来了很多不必要的性能开销和上下文切换。</p>
+</li>
+<li><p>实现：</p>
+<p>当一个线程访问同步块并获取锁时，会在对象头和栈帧中的锁记录里存储锁偏向的线程ID，以后该线程在进入和推出同步块时不需要进行CAS操作来加锁和解锁。只需要简单的测试一下对象头的<code>Mark Word</code>里是否存储着指向当前线程的偏向锁。如果成功，表示线程已经获取到了锁</p>
+</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/26/spring/%E6%B3%A8%E8%A7%A3/schdule/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -376,7 +637,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-26 15:58:55" itemprop="dateModified" datetime="2022-03-26T15:58:55+08:00">2022-03-26</time>
+                <time title="修改时间：2022-03-27 17:40:35" itemprop="dateModified" datetime="2022-03-27T17:40:35+08:00">2022-03-27</time>
               </span>
 
           
@@ -401,7 +662,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>926</span>
+              <span>968</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -683,7 +944,7 @@
 <td>贪心，动态规划，字符串要euquals而非==</td>
 </tr>
 <tr>
-<td></td>
+<td>mid</td>
 <td></td>
 <td></td>
 </tr>
@@ -698,6 +959,12 @@
 </tr>
 </thead>
 <tbody><tr>
+<td>mid</td>
+<td><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/path-sum-ii/">113. 路径总和 II</a></td>
+<td><strong>clone传送原则</strong>，<strong>List<List>原则</strong>，<strong>clone()原则</strong></td>
+<td></td>
+</tr>
+<tr>
 <td></td>
 <td></td>
 <td></td>
@@ -923,253 +1190,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/20/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E4%BA%8B%E5%8A%A1-MVCC/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/20/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E4%BA%8B%E5%8A%A1-MVCC/" class="post-title-link" itemprop="url">事务-MVCC</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-20 13:50:28" itemprop="dateCreated datePublished" datetime="2022-03-20T13:50:28+08:00">2022-03-20</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-21 00:51:22" itemprop="dateModified" datetime="2022-03-21T00:51:22+08:00">2022-03-21</time>
-              </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/20/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E4%BA%8B%E5%8A%A1-MVCC/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/20/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E4%BA%8B%E5%8A%A1-MVCC/" class="cy_cmt_count" data-xid="2022/03/20/数据库/数据库概念2.0/事务-MVCC/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>2.7k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>`</p>
-<p>参考: <a target="_blank" rel="noopener" href="https://juejin.cn/post/7016165148020703246">掘金</a></p>
-<h2 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h2><blockquote>
-<p>C是事务的根本追求数据一致性的破坏主要来自两个方面</p>
-<ol>
-<li>事务的并发执行    —&gt;  并发控制技术MVCC(也可以用锁,但是锁性能太低)–&gt;undo</li>
-<li>事务故障或系统故障   —&gt; 日志恢复技 –&gt;redo</li>
-</ol>
-</blockquote>
-<h3 id="2-1-ACID"><a href="#2-1-ACID" class="headerlink" title="2.1 ACID"></a>2.1 ACID</h3><ol>
-<li><p>Atomicity 原子性</p>
-<ol>
-<li>begin</li>
-<li>sql1</li>
-<li>sql2</li>
-<li>commit</li>
-<li>构成逻辑整体的这些数据库操作,要么全部执行成功,要么全部不执行。基于以事务为单位执行</li>
-</ol>
-</li>
-</ol>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/03/20/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E4%BA%8B%E5%8A%A1-MVCC/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/20/408/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/http/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/20/408/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/http/" class="post-title-link" itemprop="url">http</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2022-03-20 02:12:50 / 修改时间：14:26:15" itemprop="dateCreated datePublished" datetime="2022-03-20T02:12:50+08:00">2022-03-20</time>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/20/408/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/http/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/20/408/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/http/" class="cy_cmt_count" data-xid="2022/03/20/408/计算机网络/http/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>874</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><a target="_blank" rel="noopener" href="https://juejin.cn/post/6994629873985650696">转载</a></p>
-<h4 id="报文"><a href="#报文" class="headerlink" title="报文"></a>报文</h4><p><strong>http报文</strong>：由<code>请求报文</code>和<code>响应报文</code>组成</p>
-<p><strong>请求报文</strong>：由<code>请求行</code>、<code>请求头</code>、<code>空行</code>、<code>请求体</code>四部分组成</p>
-<p><strong>响应报文</strong>：由<code>状态行</code>、<code>响应头</code>、<code>空行</code>、<code>响应体</code>四部分组成</p>
-<p><strong>请求行</strong>：包含http方法，请求地址，http协议以及版本</p>
-<p><strong>请求头/响应头</strong>：就是一些key:value来告诉服务端我要哪些内容，要注意什么类型等，<a href="https://link.juejin.cn/?target=https://kb.cnblogs.com/page/92320/">请求头/响应头每一个字段详解</a></p>
-<p><strong>空行</strong>：用来区分首部与实体，因为请求头都是key:value的格式，当解析遇到空行时，服务端就知道下一个不再是请求头部分，就该当作请求体来解析了</p>
-<p><strong>请求体</strong>：请求的参数</p>
-<p><strong>状态行</strong>：包含http协议及版本、数字状态码、状态码英文名称</p>
-<p><strong>响应体</strong>：服务端返回的数据</p>
-<h3 id="GET-和-POST-的区别"><a href="#GET-和-POST-的区别" class="headerlink" title="GET 和 POST 的区别"></a>GET 和 POST 的区别</h3><blockquote>
-<p>GET和POST本质上就是TCP链接，并无差别。</p>
-<p>由于HTTP的规定和浏览器&lt;===&gt;服务器的限制，导致他们在应用过程中体现出一些不同。 </p>
-</blockquote>
-<h4 id="浏览器上"><a href="#浏览器上" class="headerlink" title="浏览器上"></a>浏览器上</h4><ol>
-<li><code>GET</code>在浏览器回退时是无害的，而<code>POST</code>会再次发起请求</li>
-<li><strong><code>GET</code>请求会被浏览器主动缓存，而<code>POST</code>不会，除非手动设置</strong></li>
-<li><code>GET</code>请求参数会被安逗保留在浏览器历史记录里，而<code>POST</code>中的参数不会被保留</li>
-</ol>
-<h4 id="请求本身"><a href="#请求本身" class="headerlink" title="请求本身"></a>请求本身</h4><blockquote>
-<p>由url&lt;–&gt;body 而产生的差异</p>
-</blockquote>
-<ol>
-<li><strong><code>GET</code>参数通过<code>URL</code>传递，<code>POST</code>放在<code>Request body</code>中</strong></li>
-<li><strong><code>GET</code>请求在<code>URL</code>中传递的参数有长度限制(浏览器限制大小不同)，而<code>POST</code>没有限制</strong></li>
-<li><code>GET</code>没有<code>POST</code>安全，因为<code>GET</code>请求参数直接暴露在<code>URL</code>上，所以不能用来传递敏感信息</li>
-<li><code>GET</code>请求只能进行<code>URL</code>编码，而<code>POST</code>支持多种编码方式</li>
-<li><code>GET</code>产生一个TCP数据包，<code>POST</code>产生两个数据包(Firefox只发一次)。GET浏览器把 http header和data一起发出去，响应成功200，POST先发送header，响应100 continue，再发送data，响应成功200</li>
-</ol>
-<h3 id="常见-HTTP-状态码"><a href="#常见-HTTP-状态码" class="headerlink" title="常见 HTTP 状态码"></a>常见 HTTP 状态码</h3><p><strong>1xx: 指示信息——表示请求已接收，继续处理</strong></p>
-<p><strong>2xx: 成功——表示请求已被成功接收</strong></p>
-<p><strong>3xx: 重定向——表示要完成请求必须进行进一步操作</strong></p>
-<p><strong>4xx: 客户端错误——表示请求有语法错误或请求无法实现</strong></p>
-<p><strong>5xx: 服务端错误——表示服务器未能实现合法的请求</strong></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/20/">20</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/21/">21</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1237,7 +1261,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">100</span>
+          <span class="site-state-item-count">101</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1288,12 +1312,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">271k</span>
+    <span title="站点总字数">275k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">4:07</span>
+    <span title="站点阅读时长">4:10</span>
 </div>
 
         
