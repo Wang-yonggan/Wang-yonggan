@@ -187,238 +187,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/30/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/redis/redisTemplate/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/30/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/redis/redisTemplate/" class="post-title-link" itemprop="url">redisTemplate</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2022-03-30 18:17:48 / 修改时间：18:19:15" itemprop="dateCreated datePublished" datetime="2022-03-30T18:17:48+08:00">2022-03-30</time>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/30/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/redis/redisTemplate/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/30/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/redis/redisTemplate/" class="cy_cmt_count" data-xid="2022/03/30/数据库/nosql/redis/redisTemplate/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.2k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>[toc]</p>
-<p>[toc]</p>
-<p>1</p>
-<blockquote>
-<p>对jedis的封装</p>
-</blockquote>
-<ul>
-<li><p>连接池自动管理，提供了一个高度封装的“RedisTemplate”类。</p>
-</li>
-<li><p>针对jedis客户端中大量api进行了归类封装,将同一类型操作封装为operation接口。</p>
-<ul>
-<li>ValueOperations：简单K-V操作</li>
-<li>SetOperations：set类型数据操作</li>
-<li>ZSetOperations：zset类型数据操作</li>
-<li>HashOperations：针对map类型的数据操作</li>
-<li>ListOperations：针对list类型的数据操作</li>
-</ul>
-</li>
-<li><p>提供了对key的“bound”(绑定)便捷化操作API，可以通过bound封装指定的key，然后进行一系列的操作而无须“显式”的再次指定Key，即BoundKeyOperations将事务操作封装，由容器控制。</p>
-<ul>
-<li>BoundValueOperations</li>
-<li>BoundSetOperations</li>
-<li>BoundListOperations</li>
-<li>BoundSetOperations</li>
-<li>BoundHashOperations</li>
-</ul>
-</li>
-<li><p>针对数据的“序列化/反序列化”，提供了多种可选择策略(RedisSerializer)</p>
-</li>
-<li><ul>
-<li>JdkSerializationRedisSerializer：POJO对象的存取场景，使用JDK本身序列化机制，将pojo类通过ObjectInputStream/ObjectOutputStream进行序列化操作，最终redis-server中将存储字节序列。是目前最常用的序列化策略。</li>
-<li>StringRedisSerializer：Key或者value为字符串的场景，根据指定的charset对数据的字节序列编码成string，是“new String(bytes, charset)”和“string.getBytes(charset)”的直接封装。是最轻量级和高效的策略。</li>
-<li>JacksonJsonRedisSerializer：jackson-json工具提供了javabean与json之间的转换能力，可以将pojo实例序列化成json格式存储在redis中，也可以将json格式的数据转换成pojo实例。因为jackson工具在序列化和反序列化时，需要明确指定Class类型，因此此策略封装起来稍微复杂。【需要jackson-mapper-asl工具支持】</li>
-<li>OxmSerializer：提供了将javabean与xml之间的转换能力，目前可用的三方支持包括jaxb，apache-xmlbeans；redis存储的数据将是xml工具。不过使用此策略，编程将会有些难度，而且效率最低；不建议使用。【需要spring-oxm模块的支持】</li>
-</ul>
-</li>
-</ul>
-<p>如果你的数据需要被第三方工具解析，那么数据应该使用StringRedisSerializer而不是JdkSerializationRedisSerializer。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/30/javaWeb/request%E7%9A%84%E5%8F%82%E6%95%B0%E6%A0%BC%E5%BC%8F/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/30/javaWeb/request%E7%9A%84%E5%8F%82%E6%95%B0%E6%A0%BC%E5%BC%8F/" class="post-title-link" itemprop="url">request参数格式</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2022-03-30 17:05:59 / 修改时间：17:15:03" itemprop="dateCreated datePublished" datetime="2022-03-30T17:05:59+08:00">2022-03-30</time>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/30/javaWeb/request%E7%9A%84%E5%8F%82%E6%95%B0%E6%A0%BC%E5%BC%8F/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/30/javaWeb/request%E7%9A%84%E5%8F%82%E6%95%B0%E6%A0%BC%E5%BC%8F/" class="cy_cmt_count" data-xid="2022/03/30/javaWeb/request的参数格式/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.4k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="参数的编码格式"><a href="#参数的编码格式" class="headerlink" title="参数的编码格式"></a>参数的编码格式</h3><h4 id="enctype-application-x-www-form-urlencoded"><a href="#enctype-application-x-www-form-urlencoded" class="headerlink" title="enctype=application/x- www-form-urlencoded"></a>enctype=application/x- www-form-urlencoded</h4><blockquote>
-<p> 这种编码方式是默认的编码方式。</p>
-</blockquote>
-<p>编码后的结果通常是field1=value2&amp;field2=value2&amp;… 的形式，如 name=aaaa&amp;password=bbbb。</p>
-<p>通常使用的表单也是采用这种方式编码的，Servlet 的 API 提供了对这种 编码方式解码的支持，只需要调用 ServletRequest 类中的 getParameter()方法就可以得到用户表单中的字段和数据。</p>
-<p> 不足：</p>
-<p>这种编码方式（ application/x-www-form-urlencoded ）虽然简单，但对于传输大块的二进制数据显得力不从心。</p>
-<h4 id="multipart-form-data"><a href="#multipart-form-data" class="headerlink" title="multipart/form-data"></a>multipart/form-data</h4><blockquote>
-<p> 对于传输大块的二进制数这类数据，浏览器采用了另一种编码方式，即 “multipart/form-data” 的编码方式：</p>
-</blockquote>
-<p>浏览器可以很容易将表单内的数据和文件放在一起发送。这种编码方式先定义好一个不可能在数据中出现的字符串作为 分界符，然后用它将各个数据段分开，而对于每个数据段都对应着 HTML 页面表单中的一个 Input 区，包括一个 content-disposition 属性，说明了这个数据段的一些信息，如果这个数据段的内容是一个文件，还会有 Content-Type 属性，然后就是数据本身，如果以这种方式提交数据就要用request.getInputStream()或request.getReader()得到 提交的数据，用 request.getParameter()是得不到提交的数据的。</p>
-<p>3.需要注意的是：</p>
-<p>request.getParameter()、 request.getInputStream()、request.getReader()这三种方法是有冲突的，因为流只能被读一次。<br>比如：<br>当form表单内容采用 enctype=application/x-www-form-urlencoded编码时，先通过调用request.getParameter() 方法得到参数后，再调用request.getInputStream()或request.getReader()已经得不到流中的内容，因为在调用 request.getParameter()时系统可能对表单中提交的数据以流的形式读了一次,反之亦然。</p>
-<p>当form表单内容采用enctype=multipart/form-data编码时，即使先调用request.getParameter()也得不到数据，所以这时调用request.getParameter()方法对 request.getInputStream()或request.getReader()没有冲突，即使已经调用了 request.getParameter()方法也可以通过调用request.getInputStream()或request.getReader()得 到表单中的数据,而request.getInputStream()和request.getReader()在同一个响应中是不能混合使用的,如果混合使用就会抛异常。</p>
-<h3 id="多参数-多文件"><a href="#多参数-多文件" class="headerlink" title="多参数+多文件"></a>多参数+多文件</h3><blockquote>
-<p>MultipartHttpServletRequest</p>
-<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/codehello/articles/9324757.html">https://www.cnblogs.com/codehello/articles/9324757.html</a></p>
-</blockquote>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/27/java/javaSE/JUC/JUC%E7%9A%84%E5%9F%BA%E7%A1%80/AQS/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -695,7 +463,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/23/%E7%AE%97%E6%B3%95/base/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/22/java/javaSE/%E5%86%85%E9%83%A8%E7%B1%BB/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -709,7 +477,171 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/03/23/%E7%AE%97%E6%B3%95/base/" class="post-title-link" itemprop="url">未命名</a>
+            <a href="/2022/03/22/java/javaSE/%E5%86%85%E9%83%A8%E7%B1%BB/" class="post-title-link" itemprop="url">内部类</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-03-22 18:35:45 / 修改时间：18:44:47" itemprop="dateCreated datePublished" datetime="2022-03-22T18:35:45+08:00">2022-03-22</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/22/java/javaSE/%E5%86%85%E9%83%A8%E7%B1%BB/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/22/java/javaSE/%E5%86%85%E9%83%A8%E7%B1%BB/" class="cy_cmt_count" data-xid="2022/03/22/java/javaSE/内部类/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h4 id="1-作用"><a href="#1-作用" class="headerlink" title="1 作用"></a>1 作用</h4><ol>
+<li>可以实现多重继承：定义一个半成品类继承类1，</li>
+<li>可以直接访问外部类的成员，包括私有</li>
+</ol>
+<h4 id="2-内部类的分类"><a href="#2-内部类的分类" class="headerlink" title="2  内部类的分类"></a>2  内部类的分类</h4><ul>
+<li><p>成员内部类 –&gt; 类里的类</p>
+<blockquote>
+<p>不能定义静态变量，除了final修饰的</p>
+</blockquote>
+</li>
+<li><p>局部内部类 –&gt; 函数里面的类</p>
+</li>
+<li><p>静态内部类 –&gt; 类里面static类</p>
+<blockquote>
+<p>和普通的类差不多,引用方式  Out.Inner inner =  new Out.Inner();  inner.do();</p>
+</blockquote>
+</li>
+<li><p>匿名内部类 –&gt;  lambda</p>
+</li>
+</ul>
+<h4 id="3-注意点"><a href="#3-注意点" class="headerlink" title="3 注意点"></a>3 注意点</h4><ol>
+<li><p>各个类也有访问权限</p>
+<ol>
+<li>默认defalut</li>
+<li>只有public的能在别的包创建这个内部类</li>
+</ol>
+</li>
+<li><p>非static的成员内部类不能有static方法,也即不能有main函数</p>
+</li>
+<li><p>创建一个成员内类就相当于创建了两个类: 外部+内部</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211203232620875.png" alt="image-20211203232620875"></p>
+</li>
+<li><p>函数里面不能有权限符号 private等,所有局部内部类都是只有这个方法能访问的</p>
+</li>
+<li><p>为什么局部内部类访问局部变量必须加final修饰呢</p>
+<blockquote>
+<p>​    因为<strong>局部变量是随着方法的调用而调用</strong>，<strong>使用完毕就消失</strong>，<strong>而堆内存的数据并不会立即消失</strong>。</p>
+<p>所以，堆内存还是用该变量，而该变量已经没有了。<strong>为了让该值还存在，就加final修饰。</strong></p>
+<p>原因是，当我们使用final修饰变量后，堆内存直接存储的<strong>是值</strong>，而<strong>不是变量名</strong>。</p>
+</blockquote>
+</li>
+</ol>
+<h3 id="2-成员内部类"><a href="#2-成员内部类" class="headerlink" title="2. 成员内部类"></a>2. 成员内部类</h3><blockquote>
+<p>成员内部类不能定义静态变量。类初始化的时候先初始化静态成员，如果允许成员内。部类定义静态变量，那么成员内部类的静态变量初始化顺序是有歧义的</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SSS</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> age;</span><br><span class="line">	</span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Inner</span> </span>&#123;  	<span class="comment">//成员内部类</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">show</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            System.out.println(age);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Inner2</span> </span>&#123;  <span class="comment">//静态内部类/嵌套内部类</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">show</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            System.out.println(<span class="number">111</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">SSS.Inner a=<span class="keyword">new</span> SSS().<span class="function">new <span class="title">Inner</span><span class="params">()</span></span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-局部内部类"><a href="#3-局部内部类" class="headerlink" title="3. 局部内部类"></a>3. 局部内部类</h3><h3 id="4-HashMap内部类"><a href="#4-HashMap内部类" class="headerlink" title="4.  HashMap内部类"></a>4.  HashMap内部类</h3><ol>
+<li><p>keySet,Values</p>
+<blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">KeySet</span> <span class="keyword">extends</span> <span class="title">AbstractSet</span>&lt;<span class="title">K</span>&gt; </span></span><br></pre></td></tr></table></figure>
+
+
+
+<p>用于懒加载</p>
+</blockquote>
+</li>
+<li><p>EntrySet</p>
+<blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">EntrySet</span> <span class="keyword">extends</span> <span class="title">AbstractSet</span>&lt;<span class="title">Map</span>.<span class="title">Entry</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt;&gt;</span>&#123;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>懒加载类，</p>
+</blockquote>
+</li>
+<li><p>EntryIterator</p>
+<blockquote>
+<p>基于HashMap自身的next方法的迭代器</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">EntryIterator</span> <span class="keyword">extends</span> <span class="title">HashIterator</span> <span class="keyword">implements</span> <span class="title">Iterator</span>&lt;<span class="title">Map</span>.<span class="title">Entry</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt;&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">final</span> Map.<span class="function">Entry&lt;K,V&gt; <span class="title">next</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> nextNode(); &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">final</span> Node&lt;K,V&gt; <span class="title">nextNode</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Node&lt;K,V&gt;[] t;</span><br><span class="line">    Node&lt;K,V&gt; e = next;</span><br><span class="line">    <span class="keyword">if</span> (modCount != expectedModCount)</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> ConcurrentModificationException();</span><br><span class="line">    <span class="keyword">if</span> (e == <span class="keyword">null</span>)</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> NoSuchElementException();</span><br><span class="line">    <span class="keyword">if</span> ((next = (current = e).next) == <span class="keyword">null</span> &amp;&amp; (t = table) != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">do</span> &#123;&#125; <span class="keyword">while</span> (index &lt; t.length &amp;&amp; (next = t[index++]) == <span class="keyword">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> e;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h4 id="静态内部类"><a href="#静态内部类" class="headerlink" title="静态内部类"></a>静态内部类</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Node</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; <span class="keyword">implements</span> <span class="title">Map</span>.<span class="title">Entry</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt;</span>&#123;</span><br><span class="line">    Node(<span class="keyword">int</span> hash, K key, V value, Node&lt;K,V&gt; next) &#123;</span><br><span class="line">           <span class="keyword">this</span>.hash = hash;</span><br><span class="line">           <span class="keyword">this</span>.key = key;</span><br><span class="line">           <span class="keyword">this</span>.value = value;</span><br><span class="line">           <span class="keyword">this</span>.next = next;</span><br><span class="line">       &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="foreach实现"><a href="#foreach实现" class="headerlink" title="foreach实现"></a>foreach实现</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (Map.Entry&lt;K, V&gt; entry : entrySet()) &#123;</span><br><span class="line">    action.accept(k, v);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//  --&gt;  entrySet()=new EntrySet(); </span></span><br><span class="line"><span class="comment">//  --&gt;  EntrySet 实现了iterable接口 具体方法为</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> Iterator&lt;Map.Entry&lt;K,V&gt;&gt; iterator() &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> EntryIterator();</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//  --&gt; 迭代器next方法的本质为</span></span><br><span class="line"><span class="comment">// 1. .next遍历链表或者红黑树，直到为null</span></span><br><span class="line"><span class="comment">// 2. 遍历数组，找到新的元素再.next遍历</span></span><br><span class="line"><span class="function"><span class="keyword">final</span> Node&lt;K,V&gt; <span class="title">nextNode</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Node&lt;K,V&gt;[] t;</span><br><span class="line">    Node&lt;K,V&gt; e = next;</span><br><span class="line">    <span class="keyword">if</span> (modCount != expectedModCount)</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> ConcurrentModificationException();</span><br><span class="line">    <span class="keyword">if</span> ((next = (current = e).next) == <span class="keyword">null</span> &amp;&amp; (t = table) != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">do</span> &#123;&#125; <span class="keyword">while</span> (index &lt; t.length &amp;&amp; (next = t[index++]) == <span class="keyword">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> e;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//  --&gt; </span></span><br><span class="line"><span class="comment">//  --&gt; </span></span><br></pre></td></tr></table></figure></li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/20/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E4%BA%8B%E5%8A%A1-MVCC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/20/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E4%BA%8B%E5%8A%A1-MVCC/" class="post-title-link" itemprop="url">事务-MVCC</a>
         </h2>
 
         <div class="post-meta">
@@ -719,14 +651,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-03-23 00:53:11" itemprop="dateCreated datePublished" datetime="2022-03-23T00:53:11+08:00">2022-03-23</time>
+              <time title="创建时间：2022-03-20 13:50:28" itemprop="dateCreated datePublished" datetime="2022-03-20T13:50:28+08:00">2022-03-20</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-31 17:13:51" itemprop="dateModified" datetime="2022-03-31T17:13:51+08:00">2022-03-31</time>
+                <time title="修改时间：2022-03-21 00:51:22" itemprop="dateModified" datetime="2022-03-21T00:51:22+08:00">2022-03-21</time>
               </span>
 
           
@@ -739,8 +671,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/03/23/%E7%AE%97%E6%B3%95/base/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/23/%E7%AE%97%E6%B3%95/base/" class="cy_cmt_count" data-xid="2022/03/23/算法/base/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/03/20/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E4%BA%8B%E5%8A%A1-MVCC/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/20/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E4%BA%8B%E5%8A%A1-MVCC/" class="cy_cmt_count" data-xid="2022/03/20/数据库/数据库概念2.0/事务-MVCC/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -751,7 +683,128 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>1.1k</span>
+              <span>2.7k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>`</p>
+<p>参考: <a target="_blank" rel="noopener" href="https://juejin.cn/post/7016165148020703246">掘金</a></p>
+<h2 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h2><blockquote>
+<p>C是事务的根本追求数据一致性的破坏主要来自两个方面</p>
+<ol>
+<li>事务的并发执行    —&gt;  并发控制技术MVCC(也可以用锁,但是锁性能太低)–&gt;undo</li>
+<li>事务故障或系统故障   —&gt; 日志恢复技 –&gt;redo</li>
+</ol>
+</blockquote>
+<h3 id="2-1-ACID"><a href="#2-1-ACID" class="headerlink" title="2.1 ACID"></a>2.1 ACID</h3><ol>
+<li><p>Atomicity 原子性</p>
+<ol>
+<li>begin</li>
+<li>sql1</li>
+<li>sql2</li>
+<li>commit</li>
+<li>构成逻辑整体的这些数据库操作,要么全部执行成功,要么全部不执行。基于以事务为单位执行</li>
+</ol>
+</li>
+</ol>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/03/20/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E4%BA%8B%E5%8A%A1-MVCC/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/19/%E7%BB%84%E4%BB%B6/todo/oauth2.0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/19/%E7%BB%84%E4%BB%B6/todo/oauth2.0/" class="post-title-link" itemprop="url">Oauth2.0</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-19 21:48:24" itemprop="dateCreated datePublished" datetime="2022-03-19T21:48:24+08:00">2022-03-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-31 17:15:58" itemprop="dateModified" datetime="2022-03-31T17:15:58+08:00">2022-03-31</time>
+              </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/19/%E7%BB%84%E4%BB%B6/todo/oauth2.0/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/19/%E7%BB%84%E4%BB%B6/todo/oauth2.0/" class="cy_cmt_count" data-xid="2022/03/19/组件/todo/oauth2.0/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>828</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -770,412 +823,16 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <table>
-<thead>
-<tr>
-<th></th>
-<th align="center">名称</th>
-<th>类型</th>
-<th>时间</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>hard</code></td>
-<td align="center"><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/minimum-window-substring">76. 最小覆盖子串</a></td>
-<td>动态规划 hash</td>
-<td></td>
-</tr>
-<tr>
-<td>mid</td>
-<td align="center"><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/maximum-length-of-repeated-subarray">718. 最长重复子数组</a></td>
-<td>动态规划 滑窗 KMP?</td>
-<td></td>
-</tr>
-<tr>
-<td>mid</td>
-<td align="center"><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/subarray-sum-equals-k">560. 和为K的子数组</a></td>
-<td>动态规划</td>
-<td>3-23</td>
-</tr>
-<tr>
-<td>mid</td>
-<td align="center"><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/intersection-of-two-arrays">349. 两个数组的交集</a></td>
-<td>stream  set</td>
-<td></td>
-</tr>
-<tr>
-<td>mid</td>
-<td align="center"><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/top-k-frequent-elements">347. 前 K 个高频元素</a></td>
-<td>map–&gt;entry–&gt;sort 堆排序</td>
-<td></td>
-</tr>
-<tr>
-<td>mid</td>
-<td align="center"><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/4sum">18. 四数之和</a></td>
-<td>双指针，</td>
-<td></td>
-</tr>
-<tr>
-<td><code>hard</code></td>
-<td align="center"><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/maximal-rectangle">85. 最大矩形</a></td>
-<td>暴力法，单调栈</td>
-<td></td>
-</tr>
-<tr>
-<td><code>hard</code></td>
-<td align="center"><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/largest-rectangle-in-histogram/">84. 柱状图中最大的矩形</a></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>mid</td>
-<td align="center"><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/fraction-to-recurring-decimal/">166. 分数到小数</a></td>
-<td>map  模拟除法</td>
-<td></td>
-</tr>
-<tr>
-<td><code>hard</code></td>
-<td align="center"><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/sudoku-solver">37. 解数独</a></td>
-<td>回溯</td>
-<td></td>
-</tr>
-<tr>
-<td>mid</td>
-<td align="center"><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/remove-k-digits">402. 移掉K位数字</a></td>
-<td>单调栈，<code>字符串数字</code></td>
-<td></td>
-</tr>
-<tr>
-<td><code>hard</code></td>
-<td align="center"><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/lru-cache/">146. LRU 缓存</a></td>
-<td>LRU缓存</td>
-<td></td>
-</tr>
-<tr>
-<td>easy</td>
-<td align="center"><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/valid-parentheses/">20. 有效的括号</a></td>
-<td>&amp;|| if else {}逻辑</td>
-<td></td>
-</tr>
-</tbody></table>
-<h3 id="dp"><a href="#dp" class="headerlink" title="dp"></a>dp</h3><table>
-<thead>
-<tr>
-<th>难度</th>
-<th>名称</th>
-<th>类型</th>
-<th>备注</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>easy</td>
-<td><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/maximum-subarray">53. 最大子序和</a></td>
-<td>dp，数组复用</td>
-<td></td>
-</tr>
-<tr>
-<td>mid</td>
-<td><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/longest-increasing-subsequence/">300. 最长递增子序列</a></td>
-<td>dp</td>
-<td>dp，复用前面(双for)</td>
-</tr>
-<tr>
-<td></td>
-<td><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/maximum-product-subarray/">152. 乘积最大子数组</a></td>
-<td></td>
-<td>连续数组的dp一般：dp[i]表示以i为末尾的max</td>
-</tr>
-<tr>
-<td></td>
-<td><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/climbing-stairs/">70. 爬楼梯</a></td>
-<td></td>
-<td>使用l1 l2 两个变量记录，代替dp数组</td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-<td>类似题目：类似题目：<a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/house-robber/">198. 打家劫舍</a></td>
-</tr>
-<tr>
-<td></td>
-<td><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/longest-palindromic-substring/">5. 最长回文子串</a></td>
-<td>二维dp</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/contiguous-array/">525. 连续数组</a></td>
-<td><strong>前缀和 + map+ 首值</strong></td>
-<td></td>
-</tr>
-<tr>
-<td>mid</td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-</tbody></table>
-<h3 id="stack"><a href="#stack" class="headerlink" title="stack"></a>stack</h3><p>pop   push  peek</p>
-<h3 id="queue"><a href="#queue" class="headerlink" title="queue"></a>queue</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Queue q=<span class="keyword">new</span> LinkedList();</span><br></pre></td></tr></table></figure>
+          <h3 id="角色"><a href="#角色" class="headerlink" title="角色"></a>角色</h3><p>微信 OAuth2.0 授权登录让微信用户使用微信身份安全登录第三方应用或网站，在微信用户授权登录已接入微信 OAuth2.0 的第三方应用后，第三方可以获取到用户的接口调用凭证（access_token），通过 access_token 可以进行微信开放平台授权关系接口调用，从而可实现获取微信用户基本开放信息和帮助用户实现基础开放功能等。</p>
+<p>微信 OAuth2.0 授权登录目前支持 authorization_code 模式，适用于拥有 server 端的应用授权。该模式整体流程为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1. 第三方发起微信授权登录请求，微信用户允许授权第三方应用后，微信会拉起应用或重定向到第三方网站，并且带上授权临时票据code参数；</span><br><span class="line"></span><br><span class="line">2. 通过code参数加上AppID和AppSecret等，通过API换取access_token；</span><br><span class="line"></span><br><span class="line">3. 通过access_token进行接口调用，获取用户基本数据资源或帮助用户实现基本操作</span><br></pre></td></tr></table></figure>
 
-<p>poll offer peek</p>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody><tr>
-<td><strong>mid</strong></td>
-<td><strong><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/binary-tree-zigzag-level-order-traversal/">103. 二叉树的锯齿形层序遍历</a></strong></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/path-sum-ii/">113. 路径总和 II</a></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-</tbody></table>
-<h3 id="快慢指针"><a href="#快慢指针" class="headerlink" title="快慢指针"></a>快慢指针</h3><table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody><tr>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-</tbody></table>
-<h3 id="数组"><a href="#数组" class="headerlink" title="数组"></a>数组</h3><table>
-<thead>
-<tr>
-<th>难度</th>
-<th>类型</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>easy</td>
-<td><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/merge-sorted-array/">88. 合并两个有序数组</a></td>
-<td>数组后移 从n开始，而不能从0开始</td>
-</tr>
-<tr>
-<td><code>hard</code></td>
-<td><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/next-permutation/">31. 下一个排列</a></td>
-<td><strong>重要</strong></td>
-</tr>
-<tr>
-<td><code>hard</code></td>
-<td><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/median-of-two-sorted-arrays/">4. 寻找两个正序数组的中位数</a></td>
-<td></td>
-</tr>
-<tr>
-<td><code>hard</code></td>
-<td><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/first-missing-positive/">41. 缺失的第一个正数</a></td>
-<td>数组自旋，hash</td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>mid</td>
-<td><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/3sum/">15. 三数之和</a></td>
-<td></td>
-</tr>
-<tr>
-<td>mid</td>
-<td><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/subsets/">78. 子集</a></td>
-<td></td>
-</tr>
-<tr>
-<td>fe</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-</tbody></table>
-<h4 id="数组自正"><a href="#数组自正" class="headerlink" title="数组自正"></a>数组自正</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> n = nums.length;</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; ++i) &#123;</span><br><span class="line">    <span class="keyword">while</span> (nums[i] &gt; <span class="number">0</span> &amp;&amp; nums[i] &lt;= n &amp;&amp; nums[nums[i] - <span class="number">1</span>] != nums[i]) &#123;</span><br><span class="line">        <span class="keyword">int</span> temp = nums[nums[i] - <span class="number">1</span>];</span><br><span class="line">        nums[nums[i] - <span class="number">1</span>] = nums[i];</span><br><span class="line">        nums[i] = temp;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="贪心"><a href="#贪心" class="headerlink" title="贪心"></a>贪心</h3><table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody><tr>
-<td>mid</td>
-<td><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/jump-game">55. 跳跃游戏</a></td>
-<td>贪心</td>
-</tr>
-<tr>
-<td><code>hard</code></td>
-<td><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/candy/">135. 分发糖果</a></td>
-<td>贪心，左右遍历</td>
-</tr>
-<tr>
-<td><code>hard</code></td>
-<td><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/regular-expression-matching/">10. 正则表达式匹配</a></td>
-<td>贪心，动态规划，字符串要euquals而非==</td>
-</tr>
-<tr>
-<td>mid</td>
-<td></td>
-<td></td>
-</tr>
-</tbody></table>
-<h3 id="回溯"><a href="#回溯" class="headerlink" title="回溯"></a>回溯</h3><table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody><tr>
-<td>mid</td>
-<td><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/path-sum-ii/">113. 路径总和 II</a></td>
-<td><strong>clone传送原则</strong>，<strong>List<List>原则</strong>，<strong>clone()原则</strong></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-</tbody></table>
-<h3 id="链表"><a href="#链表" class="headerlink" title="链表"></a>链表</h3><table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody><tr>
-<td>mid</td>
-<td><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/remove-duplicates-from-sorted-list-ii/">82. 删除排序链表中的重复元素 II</a></td>
-<td>pre=new Ls</td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-</tbody></table>
-<h4 id="链表计数"><a href="#链表计数" class="headerlink" title="链表计数"></a>链表计数</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h4 id="链表排序"><a href="#链表排序" class="headerlink" title="链表排序"></a>链表排序</h4><h3 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h3><table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody><tr>
-<td>easy</td>
-<td><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/add-strings">415. 字符串相加</a></td>
-<td>string–&gt;int</td>
-</tr>
-<tr>
-<td>mi</td>
-<td><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/multiply-strings/">43. 字符串相乘</a></td>
-<td><strong>好思路</strong></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-</tbody></table>
-<h3 id="数学"><a href="#数学" class="headerlink" title="数学"></a>数学</h3><table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody><tr>
-<td>mid</td>
-<td><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/divide-two-integers/">29. 两数相除</a></td>
-<td></td>
-</tr>
-<tr>
-<td>mid</td>
-<td><a target="_blank" rel="noopener" href="https://leetcode-cn.com/problems/reverse-integer/">7. 整数反转</a></td>
-<td><strong>思路</strong></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-</tbody></table>
+<p><img src="E:\data-ana\ana-notes\experience\组件\image-20220319221027967.png" alt="image-20220319221027967"></p>
+<p>OAuth2 协议一共支持 4 种不同的授权模式：</p>
+<p>授权码模式：常见的第三方平台登录功能基本都是使用这种模式。<br>简化模式：简化模式是不需要客户端服务器参与，直接在浏览器中向授权服务器申请令牌（token），一般如果网站是纯静态页面则可以采用这种方式。<br>密码模式：密码模式是用户把用户名密码直接告诉客户端，客户端使用说这些信息向授权服务器申请令牌（token）。这需要用户对客户端高度信任，例如客户端应用和服务提供商就是同一家公司，我们自己做前后端分离登录就可以采用这种模式。<br>客户端模式：客户端模式是指客户端使用自己的名义而不是用户的名义向服务提供者申请授权，严格来说，客户端模式并不能算作 OAuth 协议要解决的问题的一种解决方案，但是，对于开发者而言，在一些前后端分离应用或者为移动端提供的认证授权服务器上使用这种模式还是非常方便的。</p>
+<p>授权码模式</p>
+<p>q</p>
+<p>授权服务器和资源服务器，授权服务器用来派发 Token，拿着 Token 则可以去资源服务器获取资源，这两个服务器可以分开，也可以合并</p>
 
       
     </div>
@@ -1194,7 +851,7 @@
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/21/">21</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/20/">20</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1262,7 +919,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">102</span>
+          <span class="site-state-item-count">97</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1313,12 +970,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">271k</span>
+    <span title="站点总字数">262k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">4:06</span>
+    <span title="站点阅读时长">3:58</span>
 </div>
 
         
