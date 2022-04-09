@@ -187,6 +187,356 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/08/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95/" class="post-title-link" itemprop="url">单点登录</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-08 00:33:40" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:40+08:00">2022-03-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-04-05 18:58:05" itemprop="dateModified" datetime="2022-04-05T18:58:05+08:00">2022-04-05</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%BB%84%E4%BB%B6/" itemprop="url" rel="index"><span itemprop="name">组件</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/08/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95/" class="cy_cmt_count" data-xid="2022/03/08/组件/登录/单点登录/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.6k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>[toc]</p>
+<h2 id="一、授权登录"><a href="#一、授权登录" class="headerlink" title="一、授权登录"></a>一、授权登录</h2><ol>
+<li>单点登录，自系统登录，SSO， Singal Sign on</li>
+<li>只需要登陆一次就能无需登录访问其他模块</li>
+</ol>
+<h2 id="二、SSO三种方法"><a href="#二、SSO三种方法" class="headerlink" title="二、SSO三种方法"></a>二、SSO三种方法</h2><blockquote>
+<p> 在百度浏览器登录后，打开百度贴吧就自动登录了，不需要二次登录。这就是单点登录</p>
+</blockquote>
+<h3 id="2-1-session广播"><a href="#2-1-session广播" class="headerlink" title="2.1 session广播"></a>2.1 session广播</h3><ol>
+<li><p>把session复制到其他模块</p>
+</li>
+<li><p>缺点：复制太浪费资源（时间+内存）</p>
+</li>
+<li><p>cookie+redis</p>
+<ol>
+<li>redis  放置  k:生成随即唯一值（用户ip,id）,v:用户信息</li>
+<li>cookie  将k放入cookie中</li>
+<li>访问其他模块时，带着cookie，取出k,查询redis,如果查到并正确</li>
+<li>也就是只需要验证签名，就能放心的取出的信息安全有效</li>
+</ol>
+</li>
+<li><p>token(令牌)</p>
+<ol>
+<li><p>token是按照一定规则生成的并加密的字符串</p>
+</li>
+<li><p>用户登录–&gt;生成随机字符串–&gt;拼接用户信息</p>
+</li>
+<li><p>每次访问其他模块，带着这个字符串，其他模块会解码取出用户信息并验证</p>
+</li>
+<li><p>也就是没到一个模块都要通过User数据库验证token才能确保信息安全有效</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/03/08/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/shiro/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/08/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/shiro/" class="post-title-link" itemprop="url">shiro</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-08 00:33:40" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:40+08:00">2022-03-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-04-08 14:14:18" itemprop="dateModified" datetime="2022-04-08T14:14:18+08:00">2022-04-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%B8%AD%E9%97%B4%E4%BB%B6/" itemprop="url" rel="index"><span itemprop="name">中间件</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/08/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/shiro/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/shiro/" class="cy_cmt_count" data-xid="2022/03/08/组件/登录/shiro/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>[toc]</p>
+<h2 id="一、功能"><a href="#一、功能" class="headerlink" title="一、功能"></a>一、功能</h2><ol>
+<li>认证</li>
+<li>授权</li>
+<li>方法加权</li>
+<li>自定义过滤</li>
+<li>会话管理：Session Manager  一次登录，所有信息保存在session中</li>
+<li>加密</li>
+</ol>
+<h3 id="1-1-Authentication-用户密码认证"><a href="#1-1-Authentication-用户密码认证" class="headerlink" title="1.1 Authentication 用户密码认证"></a>1.1 Authentication 用户密码认证</h3><h3 id="1-2-Authorization-验证是否有权限访问该方法"><a href="#1-2-Authorization-验证是否有权限访问该方法" class="headerlink" title="1.2 Authorization 验证是否有权限访问该方法"></a>1.2 Authorization 验证是否有权限访问该方法</h3><ol>
+<li><p>MyRealm extends AuthorizingRealm</p>
+<blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span><span class="comment">//授权</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> AuthorizationInfo <span class="title">doGetAuthorizationInfo</span><span class="params">(PrincipalCollection principalCollection)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//获得令牌/用户</span></span><br><span class="line">    User user=(User)principalCollection.asList().get(<span class="number">0</span>);</span><br><span class="line">    SimpleAuthorizationInfo authorizationInfo=<span class="keyword">new</span> SimpleAuthorizationInfo();</span><br><span class="line">    authorizationInfo.addRoles(user.getUserRoles());<span class="comment">//添加用户-授权</span></span><br><span class="line">    authorizationInfo.addStringPermissions(user.getUserPerms());<span class="comment">//添加权限-授权</span></span><br><span class="line">    <span class="keyword">return</span> authorizationInfo;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></blockquote>
+</li>
+</ol>
+<h3 id="1-3-其他功能"><a href="#1-3-其他功能" class="headerlink" title="1.3 其他功能"></a>1.3 其他功能</h3><h4 id="1-3-1-方法加权"><a href="#1-3-1-方法加权" class="headerlink" title="1.3.1 方法加权"></a>1.3.1 方法加权</h4><ol>
+<li><p>硬编码</p>
+<p>在每个方法体里面进行手动获取当前用户权限，然后和该方法的权限进行对比。</p>
+</li>
+<li><p>ShiroConfig添加路径</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">filterFactoryBean.setUnauthorizedUrl(<span class="string">&quot;/wq.html&quot;</span>);<span class="comment">//无权限跳到指定路径</span></span><br></pre></td></tr></table></figure></li>
+<li><p>注解</p>
+<ol>
+<li>@RequiresAuthentication 需要登录</li>
+<li>@RequiresUser 需要reamberMe</li>
+<li>@RequiresPermissions 需要权限</li>
+</ol>
+<ul>
+<li>没权限会直接报500错误</li>
+<li>需要异常处理机制</li>
+</ul>
+</li>
+</ol>
+<h4 id="1-3-2-自定义过滤"><a href="#1-3-2-自定义过滤" class="headerlink" title="1.3.2 自定义过滤"></a>1.3.2 自定义过滤</h4><ol>
+<li><p>@Componet注册过滤器</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">F1</span> <span class="keyword">implements</span> <span class="title">Filter</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doFilter</span><span class="params">(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)</span> <span class="keyword">throws</span> IOException, ServletException </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;自定义过滤开始&quot;</span>);</span><br><span class="line">        filterChain.doFilter(servletRequest,servletResponse);</span><br><span class="line">        System.out.println(<span class="string">&quot;自定义过滤结束&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>加入到请求过滤器</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">filters.put(<span class="string">&quot;oauth2&quot;</span>, <span class="keyword">new</span> F1());</span><br><span class="line">filterFactoryBean.setFilters(filters);</span><br></pre></td></tr></table></figure></li>
+<li></li>
+</ol>
+<h4 id="1-3-3-获取当前线程用户"><a href="#1-3-3-获取当前线程用户" class="headerlink" title="1.3.3 获取当前线程用户"></a>1.3.3 获取当前线程用户</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Subject subject = SecurityUtils.getSubject();</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li><p>认证</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">UsernamePasswordToken token = <span class="keyword">new</span> UsernamePasswordToken(user.getUsername(), user.getPassword());</span><br><span class="line">subject.login(token);</span><br></pre></td></tr></table></figure></li>
+<li><p>登录设置令牌</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">subject.getSession().setAttribute(<span class="string">&quot;currentUser&quot;</span>, subject.getPrincipal());</span><br></pre></td></tr></table></figure></li>
+<li><p>登出</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">subject.logout();<span class="comment">//或者在过滤器中配置   filterMap.put(&quot;/aaa&quot;,&quot;logout&quot;);</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="二、组件"><a href="#二、组件" class="headerlink" title="二、组件"></a>二、组件</h2><h3 id="2-1-核心组件"><a href="#2-1-核心组件" class="headerlink" title="2.1 核心组件"></a>2.1 核心组件</h3><ol>
+<li>Subjetc： 当前进程obj</li>
+<li>Shiro SecurityManager</li>
+<li>Realm ：安全中心，提供认证授权服务</li>
+<li>ShiroFilterFactoryBean：请求过滤器<ol>
+<li>设置Map&lt;路径，权限&gt;的过滤器Map</li>
+<li>设置自定义过滤器</li>
+<li>设置无权路径</li>
+</ol>
+</li>
+</ol>
+<h3 id="2-2-注解模式"><a href="#2-2-注解模式" class="headerlink" title="2.2 注解模式"></a>2.2 注解模式</h3><blockquote>
+<p>对于Map&lt;路径，权限&gt;</p>
+</blockquote>
+<ol>
+<li>@RequiresAuthentication 需登录</li>
+<li>@RequiresPermissions(“b”)  需b权限</li>
+<li>@RequiresRoles(“admin”)  需admin角色</li>
+</ol>
+<h3 id="2-3-user"><a href="#2-3-user" class="headerlink" title="2.3 user"></a>2.3 user</h3><ol>
+<li>user<ol>
+<li>userName</li>
+<li>pasword</li>
+<li>List&lt;String&gt;roles</li>
+<li>List&lt;String&gt;perms</li>
+</ol>
+</li>
+</ol>
+<h2 id="三、原理"><a href="#三、原理" class="headerlink" title="三、原理"></a>三、原理</h2><h3 id="3-1-基于token"><a href="#3-1-基于token" class="headerlink" title="3.1 基于token"></a>3.1 基于token</h3><h3 id="3-2-安全中心-MyRealm"><a href="#3-2-安全中心-MyRealm" class="headerlink" title="3.2 安全中心 MyRealm"></a>3.2 安全中心 MyRealm</h3><ul>
+<li><p>认证中心  AuthenticationInfo(username,password)</p>
+<ul>
+<li>登录的时候会用有一次</li>
+<li>传入账号信息，通过数据库获得用户信息，返回token(user，passwod，Nmae)</li>
+</ul>
+</li>
+<li><p>权限中心  AuthorizationInfo(user)</p>
+<ul>
+<li><p>每次访问需要权限的地方会用到</p>
+</li>
+<li><p>格式化user的权限</p>
+</li>
+<li><p>然后根据user权限对比[需要访问的方法]的权限，如果有权限，就退回到对应界面</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">filterFactoryBean.setLoginUrl(<span class="string">&quot;/login.html&quot;</span>);<span class="comment">//登录页面</span></span><br><span class="line">filterFactoryBean.setUnauthorizedUrl(<span class="string">&quot;/wq.html&quot;</span>);<span class="comment">//无权限</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h2 id="四、集成-改进"><a href="#四、集成-改进" class="headerlink" title="四、集成-改进"></a>四、集成-改进</h2><h3 id="5-1-shiro-redis集成"><a href="#5-1-shiro-redis集成" class="headerlink" title="5.1 shiro+redis集成"></a>5.1 shiro+redis集成</h3><h2 id="五、其他"><a href="#五、其他" class="headerlink" title="五、其他"></a>五、其他</h2><ol>
+<li><p>过滤顺序问题</p>
+<blockquote>
+<p>过滤设置规则是从上到下，详细的规则配在前面，大范围的配在后面。</p>
+</blockquote>
+</li>
+</ol>
+<h2 id="六、RDBC模型-role-based-access-control"><a href="#六、RDBC模型-role-based-access-control" class="headerlink" title="六、RDBC模型 role based access control"></a>六、RDBC模型 role based access control</h2><h3 id="依赖"><a href="#依赖" class="headerlink" title="依赖"></a>依赖</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">shiro-core</span><br><span class="line">shiro-spring</span><br><span class="line"></span><br><span class="line">f</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/%E7%BB%84%E4%BB%B6/ORM/mybatis/mybatis-plus/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -490,7 +840,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-20 12:05:27" itemprop="dateModified" datetime="2022-03-20T12:05:27+08:00">2022-03-20</time>
+                <time title="修改时间：2022-04-08 11:37:16" itemprop="dateModified" datetime="2022-04-08T11:37:16+08:00">2022-04-08</time>
               </span>
 
           
@@ -515,14 +865,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>3.8k</span>
+              <span>4.8k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>3 分钟</span>
+              <span>4 分钟</span>
             </span>
 
         </div>
@@ -555,9 +905,11 @@
 </ol>
 </li>
 </ol>
-<h3 id="tree-查询"><a href="#tree-查询" class="headerlink" title="tree 查询"></a>tree 查询</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AppInfo</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> id;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> parentid;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">    <span class="keyword">private</span> List&lt;AppInfo&gt; childList;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="tree-查询-树形查询"><a href="#tree-查询-树形查询" class="headerlink" title="tree 查询  树形查询"></a>tree 查询  树形查询</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AppInfo</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> id;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> parentid;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">    <span class="keyword">private</span> List&lt;AppInfo&gt; childList;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">resultMap</span> <span class="attr">id</span>=<span class="string">&quot;appsTree&quot;</span> <span class="attr">type</span>=<span class="string">&quot;com.lg.business.common.ws.AppInfo&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">id</span> <span class="attr">column</span>=<span class="string">&quot;id&quot;</span> <span class="attr">property</span>=<span class="string">&quot;id&quot;</span> <span class="attr">javaType</span>=<span class="string">&quot;int&quot;</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">&quot;parentid&quot;</span> <span class="attr">property</span>=<span class="string">&quot;parentid&quot;</span> <span class="attr">javaType</span>=<span class="string">&quot;int&quot;</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">&quot;name&quot;</span> <span class="attr">property</span>=<span class="string">&quot;name&quot;</span> <span class="attr">javaType</span>=<span class="string">&quot;String&quot;</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">collection</span> <span class="attr">column</span>=<span class="string">&quot;id&quot;</span> <span class="attr">property</span>=<span class="string">&quot;childList&quot;</span> <span class="attr">select</span>=<span class="string">&quot;getAppsByPid&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">resultMap</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;getAllWsAppList&quot;</span> <span class="attr">resultMap</span>=<span class="string">&quot;appsTree&quot;</span>&gt;</span></span><br><span class="line">        select id,parentid,name from flow_app_info where parentid=0</span><br><span class="line">    <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;getAppsByPid&quot;</span> <span class="attr">resultMap</span>=<span class="string">&quot;appsTree&quot;</span>&gt;</span></span><br><span class="line">        select id,parentid,name from flow_app_info where parentid=#&#123;id&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">mapper</span> <span class="meta-keyword">PUBLIC</span> <span class="meta-string">&quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;</span></span></span><br><span class="line"><span class="meta">        <span class="meta-string">&quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">mapper</span> <span class="attr">namespace</span>=<span class="string">&quot;com.example.learn.mapper.TreeMapper&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">resultMap</span> <span class="attr">id</span>=<span class="string">&quot;deptTree&quot;</span> <span class="attr">type</span>=<span class="string">&quot;com.example.learn.tree.Dep&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">id</span> <span class="attr">column</span>=<span class="string">&quot;id&quot;</span> <span class="attr">property</span>=<span class="string">&quot;id&quot;</span> <span class="attr">jdbcType</span>=<span class="string">&quot;INTEGER&quot;</span> /&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">&quot;name&quot;</span> <span class="attr">property</span>=<span class="string">&quot;name&quot;</span> <span class="attr">jdbcType</span>=<span class="string">&quot;VARCHAR&quot;</span> /&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">&quot;parentId&quot;</span> <span class="attr">property</span>=<span class="string">&quot;parentId&quot;</span> <span class="attr">jdbcType</span>=<span class="string">&quot;INTEGER&quot;</span> /&gt;</span></span><br><span class="line">        <span class="comment">&lt;!--id作为参数递归调用getDeptTree，查询子节点--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">collection</span> <span class="attr">property</span>=<span class="string">&quot;children&quot;</span> <span class="attr">column</span>=<span class="string">&quot;id&quot;</span> <span class="attr">select</span>=<span class="string">&quot;getDeptTree&quot;</span> <span class="attr">ofType</span>=<span class="string">&quot;com.example.learn.tree.Dep&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">collection</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">resultMap</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!--根据父id获取子节点--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;getDeptTree&quot;</span> <span class="attr">resultMap</span>=<span class="string">&quot;deptTree&quot;</span>&gt;</span></span><br><span class="line">        select * from dep where parentId = #&#123;id&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">mapper</span>&gt;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 
 
@@ -613,425 +965,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/linux/linux--%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/08/linux/linux--%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/" class="post-title-link" itemprop="url">未命名</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-02-08 18:34:25" itemprop="dateModified" datetime="2022-02-08T18:34:25+08:00">2022-02-08</time>
-              </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/08/linux/linux--%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/linux/linux--%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/" class="cy_cmt_count" data-xid="2022/03/08/linux/linux--定时任务/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.2k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <ol>
-<li><p>nohup(no hang up) 挂起运行  </p>
-</li>
-<li><p>crontab </p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">crontab</span> -e  <span class="comment">#进入当前用户b</span></span><br></pre></td></tr></table></figure></li>
-</ol>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">*    *    *    *    *</span><br><span class="line">-    -    -    -    -</span><br><span class="line">|    |    |    |    |</span><br><span class="line">|    |    |    |    +----- 星期中星期几 (<span class="number">0</span> - <span class="number">6</span>) (星期天 为<span class="number">0</span>)</span><br><span class="line">|    |    |    +---------- 月份 (<span class="number">1</span> - <span class="number">12</span>) </span><br><span class="line">|    |    +--------------- 一个月中的第几天 (<span class="number">1</span> - <span class="number">31</span>)</span><br><span class="line">|    +-------------------- 小时 (<span class="number">0</span> - <span class="number">23</span>)</span><br><span class="line">+------------------------- 分钟 (<span class="number">0</span> - <span class="number">59</span>)</span><br></pre></td></tr></table></figure>
-
-<p>例如：</p>
-<ol>
-<li><p>每一分钟执行一次 /bin/ls：</p>
-<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">*</span> <span class="emphasis">* *</span> <span class="emphasis">* *</span> /bin/ls</span><br></pre></td></tr></table></figure></li>
-<li><p>在 12 月内, 每天的早上 6 点到 12 点，每隔 3 个小时 0 分钟执行一次 /usr/bin/backup：</p>
-<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">0 </span><span class="number">6</span>-<span class="number">12</span>/<span class="number">3</span> * <span class="number">12</span> * /<span class="keyword">usr</span>/bin/backup</span><br></pre></td></tr></table></figure></li>
-<li><p>周一到周五每天下午 5:00 寄一封信给 <a href="mailto:&#97;&#x6c;&#x65;&#x78;&#x40;&#x64;&#111;&#x6d;&#97;&#x69;&#x6e;&#x2e;&#110;&#97;&#x6d;&#x65;">&#97;&#x6c;&#x65;&#x78;&#x40;&#x64;&#111;&#x6d;&#97;&#x69;&#x6e;&#x2e;&#110;&#97;&#x6d;&#x65;</a>：</p>
-<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">0 </span><span class="number">17</span> * * <span class="number">1</span>-<span class="number">5</span> mail -s <span class="string">&quot;hi&quot;</span> alex@domain.<span class="keyword">name</span> &lt; /tmp/maildata</span><br></pre></td></tr></table></figure></li>
-<li><p>每月每天的午夜 0 点 20 分, 2 点 20 分, 4 点 20 分….执行 echo “haha”：</p>
-<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">20 </span><span class="number">0</span>-<span class="number">23</span>/<span class="number">2</span> * * * echo <span class="string">&quot;haha&quot;</span></span><br></pre></td></tr></table></figure></li>
-<li><pre><code>0 */2 * * * /sbin/service httpd restart  意思是每两个小时重启一次apache 
-
-50 7 * * * /sbin/service sshd start  意思是每天7：50开启ssh服务 
-
-50 22 * * * /sbin/service sshd stop  意思是每天22：50关闭ssh服务 
-
-0 0 1,15 * * fsck /home  每月1号和15号检查/home 磁盘 
-
-1 * * * * /home/bruce/backup  每小时的第一分执行 /home/bruce/backup这个文件 
-
-00 03 * * 1-5 find /home &quot;*.xxx&quot; -mtime +4 -exec rm &#123;&#125; \;  每周一至周五3点钟，在目录/home中，查找文件名为*.xxx的文件，并删除4天前的文件。
-
-30 6 */10 * * ls  意思是每月的1、11、21、31日是的6：30执行一次ls命令
-</code></pre>
-</li>
-<li><p>ping baidu.com -c  3 请求三次baidu </p>
-</li>
-<li><p>ssh-keygen -t rsa 生成rsa型密钥默认在 ~/.ssh中，有两个文件，一个私钥，一个pub公钥</p>
-</li>
-<li><p>yum 类似于Pip</p>
-</li>
-<li><p>定时同步时间：0 1 * * * /usr/sbin/ntpdate cn.pool.ntp.org</p>
-</li>
-<li><p>防火墙</p>
-<ol>
-<li>systemctl status firewalld.service  查看防火墙状态</li>
-<li>systemctl stop firewalld.service 关闭防护墙</li>
-<li>systemctl disable firewalld.service 开启</li>
-</ol>
-</li>
-<li></li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/linux/linux%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/08/linux/linux%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4/" class="post-title-link" itemprop="url">linux高级命令</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-26 00:44:39" itemprop="dateModified" datetime="2022-03-26T00:44:39+08:00">2022-03-26</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/os/" itemprop="url" rel="index"><span itemprop="name">os</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/08/linux/linux%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/linux/linux%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4/" class="cy_cmt_count" data-xid="2022/03/08/linux/linux高级命令/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.8k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>·</p>
-<h2 id="Base"><a href="#Base" class="headerlink" title="Base"></a>Base</h2><h3 id="Sort"><a href="#Sort" class="headerlink" title="Sort"></a>Sort</h3><blockquote>
-<p>对文本文件中所有行进行排序。</p>
-</blockquote>
-<table>
-<thead>
-<tr>
-<th>命令</th>
-<th>作用</th>
-<th></th>
-</tr>
-</thead>
-<tbody><tr>
-<td>-n  -g</td>
-<td>根据数字</td>
-<td></td>
-</tr>
-<tr>
-<td>-r</td>
-<td>倒序</td>
-<td></td>
-</tr>
-<tr>
-<td>-R</td>
-<td>随机排序</td>
-<td></td>
-</tr>
-<tr>
-<td>-f</td>
-<td>忽略大小写</td>
-<td></td>
-</tr>
-<tr>
-<td>-k</td>
-<td>根据位置，第几个key</td>
-<td>ps -ef |sort -nk 2</td>
-</tr>
-<tr>
-<td>-u</td>
-<td>去重</td>
-<td></td>
-</tr>
-</tbody></table>
-<h2 id="一、查看cpu-内存占用情况"><a href="#一、查看cpu-内存占用情况" class="headerlink" title="一、查看cpu/内存占用情况"></a>一、查看cpu/内存占用情况</h2><ol>
-<li><p>free -h 查看内存情况</p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211111004922374.png" alt="image-20211111004922374"></p>
-<blockquote>
-<p>1.CPU占用最多的前10个进程：<br>ps auxw|head -1;ps auxw|sort -rn -k3|head -10<br>2.内存消耗最多的前10个进程<br>ps auxw|head -1;ps auxw|sort -rn -k4|head -10<br>3.虚拟内存使用最多的前10个进程</p>
-<p>ps auxw|head -1;ps auxw|sort -rn -k5|head -10</p>
-<p>%MEM 进程的内存占用率</p>
-<p>VSZ 进程所使用的虚存的大小</p>
-<p>RSS实际内存</p>
-</blockquote>
-</li>
-<li><p>具体进程</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat /proc/<span class="number">3664</span>(具体进程号)/status　</span><br></pre></td></tr></table></figure></li>
-</ol>
-<p>​        </p>
-<h2 id="二、硬件信息"><a href="#二、硬件信息" class="headerlink" title="二、硬件信息"></a>二、硬件信息</h2><h2 id="三、系统性能监控"><a href="#三、系统性能监控" class="headerlink" title="三、系统性能监控"></a>三、系统性能监控</h2><h2 id="四、内存、磁盘"><a href="#四、内存、磁盘" class="headerlink" title="四、内存、磁盘"></a>四、内存、磁盘</h2><ol>
-<li><p>free 显示内存使用信息</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">free -s 2 每两秒监控一次内存信息</span><br><span class="line">free -bkmh  以b,kb,mb方式显示 h:人类方式显示</span><br></pre></td></tr></table></figure>
-
-<ol>
-<li><p>说明</p>
-<p>total：总物理内存</p>
-<p>Shared：表示多个进程共享的内存总额。</p>
-<p>Buffers/cached：表示 磁盘缓存的大小。</p>
-<p>swap: 交换区/虚拟内存</p>
-</li>
-</ol>
-</li>
-<li><p>fdisk</p>
-</li>
-</ol>
-<h2 id="五、系统管理"><a href="#五、系统管理" class="headerlink" title="五、系统管理"></a>五、系统管理</h2><ol>
-<li><p>ps</p>
-<blockquote>
-<p>进程信息</p>
-</blockquote>
-<table>
-<thead>
-<tr>
-<th>参数</th>
-<th>作用</th>
-<th></th>
-</tr>
-</thead>
-<tbody><tr>
-<td>-a</td>
-<td>所有程序</td>
-<td></td>
-</tr>
-<tr>
-<td>-A  -e</td>
-<td>所有程序</td>
-<td></td>
-</tr>
-<tr>
-<td>-u</td>
-<td>指定用户</td>
-<td>ps -u root</td>
-</tr>
-<tr>
-<td>u</td>
-<td>显示用户</td>
-<td>ps -e    u</td>
-</tr>
-<tr>
-<td>-f</td>
-<td>UID,PPIP,C,STIME</td>
-<td></td>
-</tr>
-<tr>
-<td>f   -H</td>
-<td>线程父子树状结构</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-</tbody></table>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">ps axo pid,comm,pcpu <span class="comment"># 查看进程的PID、名称以及CPU 占用率</span></span><br><span class="line">ps aux | sort -rnk 4 <span class="comment"># 按内存资源的使用量对进程进行排序</span></span><br><span class="line">ps aux | sort -nk 3  <span class="comment"># 按 CPU 资源的使用量对进程进行排序</span></span><br><span class="line">ps -A <span class="comment"># 显示所有进程信息</span></span><br><span class="line">ps -u root <span class="comment"># 显示指定用户信息</span></span><br><span class="line">ps -efL <span class="comment"># 查看线程数</span></span><br><span class="line">ps -e -o <span class="string">&quot;%C : %p :%z : %a&quot;</span>|sort -k5 -nr <span class="comment"># 查看进程并按内存使用大小排列</span></span><br><span class="line">ps -ef <span class="comment"># 显示所有进程信息，连同命令行</span></span><br><span class="line">ps -ef | grep ssh <span class="comment"># ps 与grep 常用组合用法，查找特定进程</span></span><br><span class="line">ps -C nginx <span class="comment"># 通过名字或命令搜索进程</span></span><br><span class="line">ps aux --sort=-pcpu,+pmem <span class="comment"># CPU或者内存进行排序,-降序，+升序</span></span><br><span class="line">ps -f --forest -C nginx <span class="comment"># 用树的风格显示进程的层次关系</span></span><br><span class="line">ps -o pid,uname,comm -C nginx <span class="comment"># 显示一个父进程的子进程</span></span><br><span class="line">ps -e -o pid,uname=USERNAME,pcpu=CPU_USAGE,pmem,comm <span class="comment"># 重定义标签</span></span><br><span class="line">ps -e -o pid,comm,etime <span class="comment"># 显示进程运行的时间</span></span><br><span class="line">ps -aux | grep named <span class="comment"># 查看named进程详细信息</span></span><br><span class="line">ps -o <span class="built_in">command</span> -p 91730 | sed -n 2p <span class="comment"># 通过进程id获取服务名称</span></span><br></pre></td></tr></table></figure></li>
-<li><p>top 系统信息</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">时间：top - 09:44:56 </span><br><span class="line">开机天数：up 16 days, 21:23,  </span><br><span class="line">连接人数：1 user, </span><br><span class="line">处理任务平均时间：load average: 9.59, 4.75, 1.92</span><br><span class="line">进程数：Tasks: 145 total,  </span><br><span class="line">正在运行进程数：2 running,</span><br><span class="line">睡眠进程数：143 sleeping,  </span><br><span class="line">停止进程数：0 stopped</span><br><span class="line">冻结进程数：0 zombie</span><br><span class="line">cpu占比：Cpu(s): 99.8%us, </span><br><span class="line">内核占比：0.1%sy, 0.0%ni,  0.2%id,  0.0%wa,  0.0%hi,  0.0%si,  0.0%st</span><br><span class="line">物理总内存Mem:   4147888k total, </span><br><span class="line">已用内存：2493092k used, </span><br><span class="line">空闲内存：1654796k free, </span><br><span class="line">缓存区内存：158188k buffers</span><br><span class="line">虚拟内存：Swap:  5144568k total,       56k used,  5144512k free,  2013180k cached</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h2 id="六、进程"><a href="#六、进程" class="headerlink" title="六、进程"></a>六、进程</h2><ol>
-<li><p>jps查看java进程</p>
-</li>
-<li><p>lsof </p>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">lsof</span> -i:<span class="number">8001</span> 产看<span class="number">8001</span>端口的进程</span><br><span class="line"></span><br></pre></td></tr></table></figure></li>
-<li><p>lsof</p>
-<figure class="highlight tcl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">lsof -p <span class="keyword">pid</span>    该<span class="keyword">pid</span>打开的文件</span><br><span class="line">lsof filePath   操作该文件的进程</span><br></pre></td></tr></table></figure>
-
-<ol>
-<li>含义说明<ol>
-<li>commend 进程名称</li>
-<li>pid 进程标识</li>
-<li>ppid 父进程id</li>
-<li>user 进程所有者</li>
-<li>fd 文件描述符，表示对该文件的行为  如：读，写，</li>
-</ol>
-</li>
-</ol>
-</li>
-</ol>
-<h2 id="七、网络"><a href="#七、网络" class="headerlink" title="七、网络"></a>七、网络</h2><ol>
-<li>ifconfig 查看网络设备状态</li>
-<li>netstat</li>
-</ol>
-<h2 id="八、cpu"><a href="#八、cpu" class="headerlink" title="八、cpu"></a>八、cpu</h2><h2 id="九、配置"><a href="#九、配置" class="headerlink" title="九、配置"></a>九、配置</h2><ol>
-<li><p>查看位数  uname -a</p>
-</li>
-<li><p>查看是ubantu还是centos</p>
-<ol>
-<li><p>cat /etc/issue</p>
-</li>
-<li><p>uname -n</p>
-</li>
-</ol>
-</li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/6/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><span class="page-number current">7</span><a class="page-number" href="/page/8/">8</a><span class="space">&hellip;</span><a class="page-number" href="/page/20/">20</a><a class="extend next" rel="next" href="/page/8/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/6/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><span class="page-number current">7</span><a class="page-number" href="/page/8/">8</a><span class="space">&hellip;</span><a class="page-number" href="/page/21/">21</a><a class="extend next" rel="next" href="/page/8/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1099,7 +1036,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">100</span>
+          <span class="site-state-item-count">104</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1150,12 +1087,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">274k</span>
+    <span title="站点总字数">281k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">4:09</span>
+    <span title="站点阅读时长">4:16</span>
 </div>
 
         
