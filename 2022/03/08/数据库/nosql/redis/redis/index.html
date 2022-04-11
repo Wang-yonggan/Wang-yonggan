@@ -30,7 +30,7 @@
 <meta property="og:description" content="[toc] 一、介绍1.1 特点 redis 特点 原子性 单线程，避免了线程切换 多路IO复用 为什么说Redis是单线程的以及Redis为什么这么快   支持分布式，内置各种数据类型，可持久化，基于内存，支持多种语言   技术分类 功能性: java jsp tomcat html jdbc linux  性能: nosql java线程 hadoop nginx mq elasticSear">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-03-07T16:33:39.000Z">
-<meta property="article:modified_time" content="2022-04-02T08:04:52.647Z">
+<meta property="article:modified_time" content="2022-04-10T07:26:44.833Z">
 <meta property="article:author" content="勇敢">
 <meta name="twitter:card" content="summary">
 
@@ -220,7 +220,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-04-02 16:04:52" itemprop="dateModified" datetime="2022-04-02T16:04:52+08:00">2022-04-02</time>
+                <time title="修改时间：2022-04-10 15:26:44" itemprop="dateModified" datetime="2022-04-10T15:26:44+08:00">2022-04-10</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -254,7 +254,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>2.9k</span>
+              <span>3k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -367,12 +367,9 @@
 <li>AOF日志持久化，</li>
 </ol>
 <h4 id="一致性"><a href="#一致性" class="headerlink" title="一致性"></a>一致性</h4><ol>
-<li><p>先缓存，再数据库   可能存在数据库更新失败，缓存不一致</p>
-</li>
-<li><p>先数据库，再缓存，可能缓存更新失败，缓存不一致</p>
-</li>
-<li><p>删除缓存，再更新数据库，再更新缓存，</p>
-<ol>
+<li>先改缓存，再改数据库   可能存在数据库更新失败，缓存不一致</li>
+<li>先数据库，再缓存，可能缓存更新失败，缓存不一致</li>
+<li>删除缓存，再更新数据库，再更新缓存，<ol>
 <li>可能多线程间缓存乱序问题</li>
 <li>一开始 Key: a</li>
 <li>A更新Key：b</li>
@@ -381,15 +378,18 @@
 <li>最终缓存为key: a   数据 key: b</li>
 </ol>
 </li>
-<li><p>延时双闪，</p>
-<ol>
+<li>延时双闪，<ol>
 <li>先删除缓存；</li>
 <li>再写数据库；</li>
 <li>休眠100毫秒；</li>
 <li>再次删除缓存</li>
 </ol>
 </li>
-<li><p>先更新DB，再删除缓存(满足大部分，但是)</p>
+<li>先更新DB，再删除缓存<ol>
+<li>问题：一开始缓存就没有</li>
+<li>线程A  更新数据库   线程B查询</li>
+<li></li>
+</ol>
 </li>
 </ol>
 <h4 id="缓存穿透"><a href="#缓存穿透" class="headerlink" title="缓存穿透"></a>缓存穿透</h4><blockquote>
@@ -425,6 +425,18 @@
 <li><p>定时删除 给每个key 设置一个定时器，cpu每时每刻都扫描</p>
 </li>
 <li><p>折中：定期删除</p>
+</li>
+</ol>
+<h3 id="更新策略"><a href="#更新策略" class="headerlink" title="更新策略"></a>更新策略</h3><ol>
+<li>内存淘汰(被动删除)  <ol>
+<li>redis自身内存的容量不足时删除部分数据</li>
+<li>低一致性，高性能</li>
+</ol>
+</li>
+<li>过期删除  exparie</li>
+<li>主动更新(每次更新mysql,都要更新或者删除redis)<ol>
+<li>高一致性，</li>
+</ol>
 </li>
 </ol>
 <h2 id="二、reids–linux"><a href="#二、reids–linux" class="headerlink" title="二、reids–linux"></a>二、reids–linux</h2><ol>
@@ -555,8 +567,8 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2022/03/08/spring/%E9%85%8D%E7%BD%AE/pom/pom%E5%B8%B8%E7%94%A8%E4%BE%9D%E8%B5%96/" rel="prev" title="pom常用依赖">
-      <i class="fa fa-chevron-left"></i> pom常用依赖
+    <a href="/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JUtil/%E9%9B%86%E5%90%88/Arrays/" rel="prev" title="Arrays">
+      <i class="fa fa-chevron-left"></i> Arrays
     </a></div>
       <div class="post-nav-item">
     <a href="/2022/03/08/spring/%E9%85%8D%E7%BD%AE/pom/pom%E7%9F%A5%E8%AF%86/" rel="next" title="pom配置文件">
@@ -625,7 +637,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">一、介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E7%89%B9%E7%82%B9"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 特点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E9%97%AE%E9%A2%98"><span class="nav-number">1.2.</span> <span class="nav-text">解决问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF"><span class="nav-number">1.3.</span> <span class="nav-text">场景</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%89%B9%E7%82%B9"><span class="nav-number">1.3.1.</span> <span class="nav-text">特点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9E%E9%99%85%E5%9C%BA%E6%99%AF"><span class="nav-number">1.3.2.</span> <span class="nav-text">实际场景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%84%E4%B8%AA%E6%9C%BA%E6%9E%84%E7%9A%84%E5%9C%BA%E6%99%AF"><span class="nav-number">1.3.3.</span> <span class="nav-text">各个机构的场景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8C%81%E4%B9%85%E5%8C%96"><span class="nav-number">1.3.4.</span> <span class="nav-text">持久化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%80%E8%87%B4%E6%80%A7"><span class="nav-number">1.3.5.</span> <span class="nav-text">一致性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F"><span class="nav-number">1.3.6.</span> <span class="nav-text">缓存穿透</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9"><span class="nav-number">1.3.7.</span> <span class="nav-text">缓存雪崩</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E5%87%BB%E7%A9%BF"><span class="nav-number">1.3.8.</span> <span class="nav-text">缓存击穿</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#redis-%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%EF%BC%8C%E4%B8%BB%E4%BB%8E%E9%83%A8%E7%BD%B2"><span class="nav-number">1.3.9.</span> <span class="nav-text">redis 主从复制，主从部署</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%93%A8%E5%85%B5%E6%9C%BA%E5%88%B6"><span class="nav-number">1.3.10.</span> <span class="nav-text">哨兵机制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%87%E6%9C%9F%E7%AD%96%E7%95%A5"><span class="nav-number">1.3.11.</span> <span class="nav-text">过期策略</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81reids%E2%80%93linux"><span class="nav-number">2.</span> <span class="nav-text">二、reids–linux</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E4%B8%8B%E8%BD%BD"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 下载</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E4%BA%94%E5%A4%A7%E7%B1%BB%E5%9E%8B"><span class="nav-number">3.</span> <span class="nav-text">四、五大类型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-String%E5%AD%97%E7%AC%A6%E4%B8%B2"><span class="nav-number">3.1.</span> <span class="nav-text">4.1 String字符串</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-11-%E8%AF%B4%E6%98%8E"><span class="nav-number">3.1.1.</span> <span class="nav-text">4.11 说明</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%E9%93%BE%E8%A1%A8"><span class="nav-number">3.2.</span> <span class="nav-text">4.2 链表</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-21-%E8%AF%B4%E6%98%8E"><span class="nav-number">3.2.1.</span> <span class="nav-text">4.21 说明</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-%E9%9B%86%E5%90%88"><span class="nav-number">3.3.</span> <span class="nav-text">4.3 集合</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-31-%E8%AF%B4%E6%98%8E"><span class="nav-number">3.3.1.</span> <span class="nav-text">4.31 说明</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-32-%E6%93%8D%E4%BD%9C"><span class="nav-number">3.3.2.</span> <span class="nav-text">4.32 操作</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-ZSet%E6%9C%89%E5%BA%8F%E9%9B%86%E5%90%88"><span class="nav-number">3.4.</span> <span class="nav-text">4.4 ZSet有序集合</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-41-%E8%AF%B4%E6%98%8E"><span class="nav-number">3.4.1.</span> <span class="nav-text">4.41 说明</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-Hash-%E5%93%88%E5%B8%8C"><span class="nav-number">3.5.</span> <span class="nav-text">4.5 Hash-哈希</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-51-%E8%AF%B4%E6%98%8E"><span class="nav-number">3.5.1.</span> <span class="nav-text">4.51 说明</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-6-BitMap"><span class="nav-number">3.6.</span> <span class="nav-text">4.6 BitMap</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E5%8E%9F%E7%90%86"><span class="nav-number">4.</span> <span class="nav-text">六、原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E8%BF%9C%E7%A8%8B%E8%BF%9E%E6%8E%A5"><span class="nav-number">5.</span> <span class="nav-text">七、远程连接</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#7-1-%E9%85%8D%E7%BD%AE"><span class="nav-number">5.1.</span> <span class="nav-text">7.1 配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-2-%E8%BF%9E%E6%8E%A5"><span class="nav-number">5.2.</span> <span class="nav-text">7.2 连接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-3-%E6%93%8D%E4%BD%9C"><span class="nav-number">5.3.</span> <span class="nav-text">7.3 操作</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AB%E3%80%81%E5%AE%89%E8%A3%85"><span class="nav-number">6.</span> <span class="nav-text">八、安装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis6"><span class="nav-number">6.1.</span> <span class="nav-text">Redis6</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">6.2.</span> <span class="nav-text">参考</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F"><span class="nav-number">6.3.</span> <span class="nav-text">注意</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B0%E7%9A%84%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="nav-number">6.3.1.</span> <span class="nav-text">新的数据类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#redis%E6%96%B0%E4%BA%8B%E5%8A%A1"><span class="nav-number">6.3.2.</span> <span class="nav-text">redis新事务</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6"><span class="nav-number">6.3.3.</span> <span class="nav-text">主从复制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%9B%AA%E5%B4%A9"><span class="nav-number">6.3.4.</span> <span class="nav-text">雪崩</span></a></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">一、介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E7%89%B9%E7%82%B9"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 特点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E9%97%AE%E9%A2%98"><span class="nav-number">1.2.</span> <span class="nav-text">解决问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF"><span class="nav-number">1.3.</span> <span class="nav-text">场景</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%89%B9%E7%82%B9"><span class="nav-number">1.3.1.</span> <span class="nav-text">特点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9E%E9%99%85%E5%9C%BA%E6%99%AF"><span class="nav-number">1.3.2.</span> <span class="nav-text">实际场景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%84%E4%B8%AA%E6%9C%BA%E6%9E%84%E7%9A%84%E5%9C%BA%E6%99%AF"><span class="nav-number">1.3.3.</span> <span class="nav-text">各个机构的场景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8C%81%E4%B9%85%E5%8C%96"><span class="nav-number">1.3.4.</span> <span class="nav-text">持久化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%80%E8%87%B4%E6%80%A7"><span class="nav-number">1.3.5.</span> <span class="nav-text">一致性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F"><span class="nav-number">1.3.6.</span> <span class="nav-text">缓存穿透</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9"><span class="nav-number">1.3.7.</span> <span class="nav-text">缓存雪崩</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E5%87%BB%E7%A9%BF"><span class="nav-number">1.3.8.</span> <span class="nav-text">缓存击穿</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#redis-%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%EF%BC%8C%E4%B8%BB%E4%BB%8E%E9%83%A8%E7%BD%B2"><span class="nav-number">1.3.9.</span> <span class="nav-text">redis 主从复制，主从部署</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%93%A8%E5%85%B5%E6%9C%BA%E5%88%B6"><span class="nav-number">1.3.10.</span> <span class="nav-text">哨兵机制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%87%E6%9C%9F%E7%AD%96%E7%95%A5"><span class="nav-number">1.3.11.</span> <span class="nav-text">过期策略</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9B%B4%E6%96%B0%E7%AD%96%E7%95%A5"><span class="nav-number">1.4.</span> <span class="nav-text">更新策略</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81reids%E2%80%93linux"><span class="nav-number">2.</span> <span class="nav-text">二、reids–linux</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E4%B8%8B%E8%BD%BD"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 下载</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E4%BA%94%E5%A4%A7%E7%B1%BB%E5%9E%8B"><span class="nav-number">3.</span> <span class="nav-text">四、五大类型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-String%E5%AD%97%E7%AC%A6%E4%B8%B2"><span class="nav-number">3.1.</span> <span class="nav-text">4.1 String字符串</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-11-%E8%AF%B4%E6%98%8E"><span class="nav-number">3.1.1.</span> <span class="nav-text">4.11 说明</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%E9%93%BE%E8%A1%A8"><span class="nav-number">3.2.</span> <span class="nav-text">4.2 链表</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-21-%E8%AF%B4%E6%98%8E"><span class="nav-number">3.2.1.</span> <span class="nav-text">4.21 说明</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-%E9%9B%86%E5%90%88"><span class="nav-number">3.3.</span> <span class="nav-text">4.3 集合</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-31-%E8%AF%B4%E6%98%8E"><span class="nav-number">3.3.1.</span> <span class="nav-text">4.31 说明</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-32-%E6%93%8D%E4%BD%9C"><span class="nav-number">3.3.2.</span> <span class="nav-text">4.32 操作</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-ZSet%E6%9C%89%E5%BA%8F%E9%9B%86%E5%90%88"><span class="nav-number">3.4.</span> <span class="nav-text">4.4 ZSet有序集合</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-41-%E8%AF%B4%E6%98%8E"><span class="nav-number">3.4.1.</span> <span class="nav-text">4.41 说明</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-Hash-%E5%93%88%E5%B8%8C"><span class="nav-number">3.5.</span> <span class="nav-text">4.5 Hash-哈希</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-51-%E8%AF%B4%E6%98%8E"><span class="nav-number">3.5.1.</span> <span class="nav-text">4.51 说明</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-6-BitMap"><span class="nav-number">3.6.</span> <span class="nav-text">4.6 BitMap</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E5%8E%9F%E7%90%86"><span class="nav-number">4.</span> <span class="nav-text">六、原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E8%BF%9C%E7%A8%8B%E8%BF%9E%E6%8E%A5"><span class="nav-number">5.</span> <span class="nav-text">七、远程连接</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#7-1-%E9%85%8D%E7%BD%AE"><span class="nav-number">5.1.</span> <span class="nav-text">7.1 配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-2-%E8%BF%9E%E6%8E%A5"><span class="nav-number">5.2.</span> <span class="nav-text">7.2 连接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-3-%E6%93%8D%E4%BD%9C"><span class="nav-number">5.3.</span> <span class="nav-text">7.3 操作</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AB%E3%80%81%E5%AE%89%E8%A3%85"><span class="nav-number">6.</span> <span class="nav-text">八、安装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis6"><span class="nav-number">6.1.</span> <span class="nav-text">Redis6</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">6.2.</span> <span class="nav-text">参考</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F"><span class="nav-number">6.3.</span> <span class="nav-text">注意</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B0%E7%9A%84%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="nav-number">6.3.1.</span> <span class="nav-text">新的数据类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#redis%E6%96%B0%E4%BA%8B%E5%8A%A1"><span class="nav-number">6.3.2.</span> <span class="nav-text">redis新事务</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6"><span class="nav-number">6.3.3.</span> <span class="nav-text">主从复制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%9B%AA%E5%B4%A9"><span class="nav-number">6.3.4.</span> <span class="nav-text">雪崩</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -641,7 +653,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">104</span>
+          <span class="site-state-item-count">108</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -692,12 +704,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">281k</span>
+    <span title="站点总字数">292k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">4:16</span>
+    <span title="站点阅读时长">4:25</span>
 </div>
 
         

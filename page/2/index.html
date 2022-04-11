@@ -187,6 +187,289 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/02/java/javaSE/jvm/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/04/02/java/javaSE/jvm/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/" class="post-title-link" itemprop="url">垃圾回收</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-04-02 02:47:32" itemprop="dateCreated datePublished" datetime="2022-04-02T02:47:32+08:00">2022-04-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-04-07 12:14:25" itemprop="dateModified" datetime="2022-04-07T12:14:25+08:00">2022-04-07</time>
+              </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/04/02/java/javaSE/jvm/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/02/java/javaSE/jvm/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/" class="cy_cmt_count" data-xid="2022/04/02/java/javaSE/jvm/垃圾回收/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>963</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="垃圾回收器类别"><a href="#垃圾回收器类别" class="headerlink" title="垃圾回收器类别"></a>垃圾回收器类别</h3><p>`</p>
+<h3 id="一、圾回收器类别"><a href="#一、圾回收器类别" class="headerlink" title="一、圾回收器类别"></a>一、圾回收器类别</h3><ol>
+<li>串行垃圾回收器<ol>
+<li>单线程，cpu少</li>
+<li>堆内存小</li>
+</ol>
+</li>
+<li>吞吐量优先器<ol>
+<li>多线程，堆内存大</li>
+<li>单位时间内，SWT最短</li>
+</ol>
+</li>
+<li>响应占比优先<ol>
+<li>多线程，堆内存大</li>
+<li>单次SWT最短</li>
+</ol>
+</li>
+</ol>
+<h3 id="二、判断算法"><a href="#二、判断算法" class="headerlink" title="二、判断算法"></a>二、判断算法</h3><h4 id="引用计数法"><a href="#引用计数法" class="headerlink" title="引用计数法"></a>引用计数法</h4><h4 id="可达性分析算法"><a href="#可达性分析算法" class="headerlink" title="可达性分析算法"></a>可达性分析算法</h4><blockquote>
+<p>与根对象不相关的对象将被回收</p>
+</blockquote>
+<h3 id="回收算法"><a href="#回收算法" class="headerlink" title="回收算法"></a>回收算法</h3><ol>
+<li>标记清除</li>
+<li>标记整理</li>
+<li>复制</li>
+</ol>
+<h3 id="年代"><a href="#年代" class="headerlink" title="年代"></a>年代</h3><ol>
+<li>新生代用复制算法(三块区域：8：1：1)</li>
+<li>老年代用标记清除或标记整理</li>
+</ol>
+<h2 id="四种引用"><a href="#四种引用" class="headerlink" title="四种引用"></a>四种引用</h2><h3 id="强引用"><a href="#强引用" class="headerlink" title="强引用"></a>强引用</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Object obj = <span class="keyword">new</span> Object();</span><br></pre></td></tr></table></figure>
+
+<h3 id="软引用"><a href="#软引用" class="headerlink" title="软引用"></a>软引用</h3><blockquote>
+<p>被软引用关联的对象只有在内存不够的情况下才会被回收。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Object obj = <span class="keyword">new</span> Object();</span><br><span class="line">SoftReference&lt;Object&gt; sf = <span class="keyword">new</span> SoftReference&lt;Object&gt;(obj);<span class="comment">//SoftReference</span></span><br><span class="line">obj = <span class="keyword">null</span>;  <span class="comment">// 使对象只被软引用关联</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="弱引用"><a href="#弱引用" class="headerlink" title="弱引用"></a>弱引用</h3><blockquote>
+<p>被弱引用关联的对象一定会被回收，也就是说它只能存活到下一次垃圾回收发生之前</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Object obj = <span class="keyword">new</span> Object();</span><br><span class="line">WeakReference&lt;Object&gt; wf = <span class="keyword">new</span> WeakReference&lt;Object&gt;(obj);<span class="comment">//WeakReference 类来实现弱引用</span></span><br><span class="line">obj = <span class="keyword">null</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="虚引用"><a href="#虚引用" class="headerlink" title="虚引用"></a>虚引用</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Object obj = <span class="keyword">new</span> Object();</span><br><span class="line">PhantomReference&lt;Object&gt; pf = <span class="keyword">new</span> PhantomReference&lt;Object&gt;(obj);<span class="comment">//PhantomReference </span></span><br><span class="line">obj = <span class="keyword">null</span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="收集器种类"><a href="#收集器种类" class="headerlink" title="收集器种类"></a>收集器种类</h2><h3 id="分代收集器"><a href="#分代收集器" class="headerlink" title="分代收集器"></a>分代收集器</h3><h3 id="PreNew"><a href="#PreNew" class="headerlink" title="PreNew"></a>PreNew</h3><blockquote>
+<p>多线程回收器，对serise扩展，工作在young</p>
+</blockquote>
+<h3 id="CMS收集器-标记清除算法"><a href="#CMS收集器-标记清除算法" class="headerlink" title="CMS收集器 标记清除算法"></a>CMS收集器 标记清除算法</h3><blockquote>
+<p>Concurrent mark sweep，以获取<strong>最短回收停顿时间为目标</strong></p>
+</blockquote>
+<h4 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h4><ol>
+<li>初始标记 （先找到一些）</li>
+<li>并发标记(再根据找到的 –&gt;找到更多)</li>
+<li>重新标记(用户可能改变了一些)</li>
+<li>并发清除</li>
+</ol>
+<h3 id="分区回收"><a href="#分区回收" class="headerlink" title="分区回收"></a>分区回收</h3><h4 id="G1收集器"><a href="#G1收集器" class="headerlink" title="G1收集器"></a>G1收集器</h4><blockquote>
+<p>面向服务端，在多 CPU 和大内存的场景下有很好的性能,尽可能地<strong>满足垃圾收集暂停时间的要求</strong></p>
+</blockquote>
+<p>G1 把堆划分成多个大小相等的独立区域(Region)，新生代和老年代不再物理隔离。从而将原来的一整块内存空间划分成多个的小空间，使得每个小空间可以单独进行垃圾回收。这种划分方法带来了很大的灵活性</p>
+<h4 id="ZGC"><a href="#ZGC" class="headerlink" title="ZGC"></a>ZGC</h4><blockquote>
+<p>JDK11 低延迟垃圾回收器,适用于<strong>大内存低延迟服务的内存管理和回回收</strong></p>
+</blockquote>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/27/java/javaSE/JUC/JUC%E7%9A%84%E5%9F%BA%E7%A1%80/AQS/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/27/java/javaSE/JUC/JUC%E7%9A%84%E5%9F%BA%E7%A1%80/AQS/" class="post-title-link" itemprop="url">AQS</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-27 13:34:14" itemprop="dateCreated datePublished" datetime="2022-03-27T13:34:14+08:00">2022-03-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-04-10 03:22:58" itemprop="dateModified" datetime="2022-04-10T03:22:58+08:00">2022-04-10</time>
+              </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/27/java/javaSE/JUC/JUC%E7%9A%84%E5%9F%BA%E7%A1%80/AQS/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/27/java/javaSE/JUC/JUC%E7%9A%84%E5%9F%BA%E7%A1%80/AQS/" class="cy_cmt_count" data-xid="2022/03/27/java/javaSE/JUC/JUC的基础/AQS/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>[toc]</p>
+<blockquote>
+<p>AbstractQueuedSynchonizer，抽象队列同步器，是JUC锁的base，是JUC的base</p>
+</blockquote>
+<blockquote>
+<p>提供了一个基于FIFO队列，可以用于构建锁或者其他相关同步装置的基础框架。</p>
+</blockquote>
+<h3 id="基于AQS的组件"><a href="#基于AQS的组件" class="headerlink" title="基于AQS的组件"></a>基于AQS的组件</h3><ol>
+<li><p>Exclusive(独占)：只有一个线程能执行，如ReentrantLock。又可分为公平锁和非公平锁：</p>
+<ul>
+<li><p>公平锁：按照线程在队列中的排队顺序，先到者先拿到锁</p>
+</li>
+<li><p>非公平锁：当线程要获取锁时，无视队列顺序直接去抢锁，谁抢到就是谁的</p>
+</li>
+</ul>
+</li>
+<li><p>Share(共享)：多个线程可同时执行，如Semaphore/CountDownLatch。Semaphore、CountDownLatCh、 CyclicBarrier、ReadWriteLock 我们都会在后面讲到。</p>
+</li>
+</ol>
+<h3 id="一个State"><a href="#一个State" class="headerlink" title="一个State"></a>一个State</h3><h3 id="队列Node"><a href="#队列Node" class="headerlink" title="队列Node"></a>队列Node</h3><p><code>CLH(Craig,Landin,and Hagersten)队列</code>是一个虚拟的双向队列(虚拟的双向队列即不存在队列实例，仅存在结点之间的关联关系)。AQS是将每条请求共享资源的线程封装成一个CLH锁队列的一个结点(Node)来实现锁的分配。其中Sync queue，即同步队列，是双向链表，包括head结点和tail结点，head结点主要用作后续的调度。而Condition queue不是必须的，其是一个单向链表，只有当使用Condition时，才会存在此单向链表。并且可能会有多个Condition queue。</p>
+<h3 id="六个操作"><a href="#六个操作" class="headerlink" title="六个操作"></a>六个操作</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">isHeldExclusively()<span class="comment">//该线程是否正在独占资源。只有用到condition才需要去实现它。</span></span><br><span class="line">tryAcquire(<span class="keyword">int</span>)<span class="comment">//独占方式。尝试获取资源，成功则返回true，失败则返回false。</span></span><br><span class="line">tryRelease(<span class="keyword">int</span>)<span class="comment">//独占方式。尝试释放资源，成功则返回true，失败则返回false。</span></span><br><span class="line">tryAcquireShared(<span class="keyword">int</span>)<span class="comment">//共享方式。尝试获取资源。负数表示失败；0表示成功，但没有剩余可用资源；正数表示成功，且有剩余资源。</span></span><br><span class="line">tryReleaseShared(<span class="keyword">int</span>)<span class="comment">//共享方式。尝试释放资源，成功则返回true，失败则返回false。</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="其他操作"><a href="#其他操作" class="headerlink" title="其他操作"></a>其他操作</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">addWaiter(Node node)&#123;</span><br><span class="line">  flag=csa(node);<span class="comment">//先csa快速插入到尾节点  </span></span><br><span class="line">  <span class="keyword">if</span>(!flag)</span><br><span class="line">      enq(node);<span class="comment">//csa循环防止</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//h</span></span><br><span class="line">acquire(<span class="keyword">int</span> arg)&#123;</span><br><span class="line">    <span class="keyword">if</span>(!tryAcquire(arg)&amp;&amp;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="抢锁-acquire"><a href="#抢锁-acquire" class="headerlink" title="抢锁 acquire"></a>抢锁 acquire</h4><h4 id="释放锁"><a href="#释放锁" class="headerlink" title="释放锁"></a>释放锁</h4><h4 id="入队"><a href="#入队" class="headerlink" title="入队"></a>入队</h4><h4 id="出队"><a href="#出队" class="headerlink" title="出队"></a>出队</h4><h4 id="阻塞"><a href="#阻塞" class="headerlink" title="阻塞"></a>阻塞</h4><h4 id="唤醒"><a href="#唤醒" class="headerlink" title="唤醒"></a>唤醒</h4><h3 id="队列"><a href="#队列" class="headerlink" title="队列"></a>队列</h3><h4 id="AQS队列"><a href="#AQS队列" class="headerlink" title="AQS队列"></a>AQS队列</h4>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/26/spring/%E6%B3%A8%E8%A7%A3/schdule/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -644,311 +927,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/20/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E4%BA%8B%E5%8A%A1-MVCC/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/20/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E4%BA%8B%E5%8A%A1-MVCC/" class="post-title-link" itemprop="url">事务-MVCC</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-20 13:50:28" itemprop="dateCreated datePublished" datetime="2022-03-20T13:50:28+08:00">2022-03-20</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-21 00:51:22" itemprop="dateModified" datetime="2022-03-21T00:51:22+08:00">2022-03-21</time>
-              </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/20/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E4%BA%8B%E5%8A%A1-MVCC/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/20/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E4%BA%8B%E5%8A%A1-MVCC/" class="cy_cmt_count" data-xid="2022/03/20/数据库/数据库概念2.0/事务-MVCC/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>2.7k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>`</p>
-<p>参考: <a target="_blank" rel="noopener" href="https://juejin.cn/post/7016165148020703246">掘金</a></p>
-<h2 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h2><blockquote>
-<p>C是事务的根本追求数据一致性的破坏主要来自两个方面</p>
-<ol>
-<li>事务的并发执行    —&gt;  并发控制技术MVCC(也可以用锁,但是锁性能太低)–&gt;undo</li>
-<li>事务故障或系统故障   —&gt; 日志恢复技 –&gt;redo</li>
-</ol>
-</blockquote>
-<h3 id="2-1-ACID"><a href="#2-1-ACID" class="headerlink" title="2.1 ACID"></a>2.1 ACID</h3><ol>
-<li><p>Atomicity 原子性</p>
-<ol>
-<li>begin</li>
-<li>sql1</li>
-<li>sql2</li>
-<li>commit</li>
-<li>构成逻辑整体的这些数据库操作,要么全部执行成功,要么全部不执行。基于以事务为单位执行</li>
-</ol>
-</li>
-</ol>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/03/20/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E4%BA%8B%E5%8A%A1-MVCC/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/18/spring/spring%E4%BA%8B%E5%8A%A1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/18/spring/spring%E4%BA%8B%E5%8A%A1/" class="post-title-link" itemprop="url">spring事务</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-18 16:12:25" itemprop="dateCreated datePublished" datetime="2022-03-18T16:12:25+08:00">2022-03-18</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-04-05 00:01:51" itemprop="dateModified" datetime="2022-04-05T00:01:51+08:00">2022-04-05</time>
-              </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/18/spring/spring%E4%BA%8B%E5%8A%A1/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/18/spring/spring%E4%BA%8B%E5%8A%A1/" class="cy_cmt_count" data-xid="2022/03/18/spring/spring事务/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>775</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>1</p>
-<blockquote>
-<p>开启事务的实质–&gt;</p>
-<ol>
-<li><p>事务创建一个conn</p>
-</li>
-<li><p>conn.setAutoCommit(false)</p>
-</li>
-<li><p>target.method</p>
-</li>
-<li><p>try{</p>
-</li>
-<li><p>conn.commit</p>
-<p>}catch{ conn.rollback}</p>
-</li>
-<li></li>
-</ol>
-</blockquote>
-<h3 id="传播机制Propagation"><a href="#传播机制Propagation" class="headerlink" title="传播机制Propagation"></a>传播机制Propagation</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
-
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody><tr>
-<td>PROPAGATION_REQUIRED</td>
-<td>如果当前存在事务，则加入该事务；如果当前没有事务，则创建一个新的事务。这是<strong>默认值</strong>。</td>
-<td>可重入</td>
-</tr>
-<tr>
-<td>PROPAGATION_REQUIRES_NEW</td>
-<td>建一个<strong>新的事务</strong>，如果当前存在事务，则把当前事务<strong>挂起</strong>。</td>
-<td>new</td>
-</tr>
-<tr>
-<td>PROPAGATION_SUPPORTS</td>
-<td>如果当前存在事务，则加入该事务；如果当前没有事务，则以非事务的方式继续运行</td>
-<td>继承</td>
-</tr>
-<tr>
-<td>PROPAGATION_NEVER</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>PROPAGATION_NOT_SUPPORTED</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>PROPAGATION_MANDATORY</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>PROPAGATION_NESTED</td>
-<td></td>
-<td></td>
-</tr>
-</tbody></table>
-<h3 id="事务失效原因"><a href="#事务失效原因" class="headerlink" title="事务失效原因"></a>事务失效原因</h3><ol>
-<li>类不是@component</li>
-<li>方法public</li>
-<li>方法调用了this.方法</li>
-<li>方法启动了新的线程</li>
-<li><strong>异常被try cache</strong></li>
-<li>抛出了受检异常</li>
-<li>数据库自身不支持事务</li>
-</ol>
-<h4 id="回滚机制"><a href="#回滚机制" class="headerlink" title="回滚机制"></a>回滚机制</h4><ol>
-<li>抛出了runtimeExcept或者error</li>
-</ol>
-<h4 id="编程式事务"><a href="#编程式事务" class="headerlink" title="编程式事务"></a>编程式事务</h4><blockquote>
-<ul>
-<li><strong>编程式事务</strong>使用TransactionTemplate或者直接使用底层的PlatformTransactionManager。对于编程式事务管理，spring推荐使用TransactionTemplate。</li>
-</ul>
-</blockquote>
-<h4 id="声明式事务"><a href="#声明式事务" class="headerlink" title="声明式事务"></a>声明式事务</h4><blockquote>
-<ul>
-<li><strong>声明式事务</strong>是建立在AOP之上的。其本质是对方法前后进行拦截，然后在目标方法开始之前创建或者加入一个事务，在执行完目标方法之后根据执行情况提交或者回滚事务。声明式事务最大的优点就是不需要通过编程的方式管理事务，这样就不需要在业务逻辑代码中掺杂事务管理的代码，只需在配置文件中做相关的事务规则声明(或通过基于@Transactional注解的方式)，便可以将事务规则应用到业务逻辑中。</li>
-</ul>
-</blockquote>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/21/">21</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/22/">22</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1016,7 +998,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">104</span>
+          <span class="site-state-item-count">108</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1067,12 +1049,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">281k</span>
+    <span title="站点总字数">292k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">4:16</span>
+    <span title="站点阅读时长">4:25</span>
 </div>
 
         
