@@ -187,6 +187,733 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/%E5%A4%8D%E6%9D%82sql/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/08/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/%E5%A4%8D%E6%9D%82sql/" class="post-title-link" itemprop="url">复杂的sql</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-04-10 17:45:04" itemprop="dateModified" datetime="2022-04-10T17:45:04+08:00">2022-04-10</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/08/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/%E5%A4%8D%E6%9D%82sql/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/%E5%A4%8D%E6%9D%82sql/" class="cy_cmt_count" data-xid="2022/03/08/数据库/sql/复杂sql/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.5k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <ol>
+<li><p>查询这个entity=PPmoney的前十的关键字</p>
+<blockquote>
+<p>sort + limit </p>
+</blockquote>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">count</span>(<span class="operator">*</span>) b, keyword <span class="keyword">FROM</span> article_kw <span class="keyword">where</span> article_id <span class="keyword">in</span>  (<span class="keyword">SELECT</span> article_id <span class="keyword">FROM</span> article_entity <span class="keyword">where</span> entity<span class="operator">=</span><span class="string">&#x27;PPmoney&#x27;</span> ) <span class="keyword">GROUP</span> <span class="keyword">BY</span> keyword <span class="keyword">ORDER</span> <span class="keyword">BY</span> b <span class="keyword">desc</span> LIMIT <span class="number">10</span>; </span><br></pre></td></tr></table></figure></li>
+<li><p>再选出上面的名字</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> keyword <span class="keyword">FROM</span>(<span class="keyword">SELECT</span> <span class="built_in">count</span>(<span class="operator">*</span>) b, keyword <span class="keyword">FROM</span> article_kw <span class="keyword">where</span> article_id <span class="keyword">in</span>  (<span class="keyword">SELECT</span> article_id <span class="keyword">FROM</span> article_entity <span class="keyword">where</span> entity<span class="operator">=</span><span class="string">&#x27;PPmoney&#x27;</span> ) <span class="keyword">GROUP</span> <span class="keyword">BY</span> keyword <span class="keyword">ORDER</span> <span class="keyword">BY</span> b <span class="keyword">desc</span> LIMIT <span class="number">10</span>) c; </span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="一、统计"><a href="#一、统计" class="headerlink" title="一、统计"></a>一、统计</h2><ol>
+<li><p>按月统计</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> DATE_FORMAT(<span class="type">date</span>,<span class="string">&#x27;%Y-%m&#x27;</span>) <span class="keyword">as</span> <span class="keyword">month</span>,<span class="built_in">sum</span>(money) <span class="keyword">as</span> money</span><br><span class="line"><span class="keyword">from</span> finance</span><br><span class="line"><span class="keyword">where</span> DATE_FORMAT(<span class="type">date</span>,<span class="string">&#x27;%Y&#x27;</span>)<span class="operator">=</span><span class="number">2010</span> <span class="keyword">group</span> <span class="keyword">by</span> <span class="keyword">month</span></span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span> <span class="keyword">month</span></span><br></pre></td></tr></table></figure></li>
+<li><p>按周统计</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> DATE_FORMAT(<span class="type">date</span>,<span class="string">&#x27;%x年-第%v周&#x27;</span>) <span class="keyword">as</span> week,<span class="built_in">sum</span>(money) <span class="keyword">as</span> money <span class="keyword">from</span> finance_base <span class="keyword">where</span> DATE_FORMAT(<span class="type">date</span>,<span class="string">&#x27;%Y&#x27;</span>)<span class="operator">=</span><span class="number">2010</span> <span class="keyword">group</span> <span class="keyword">by</span> week</span><br></pre></td></tr></table></figure></li>
+<li><!-- 按日查询 -->  
+<p>SELECT DATE_FORMAT(created_date,’%Y-%m-%d’) as time,sum(money) money FROM o_finance_detail where org_id = 1000  GROUP BY  time  </p>
+<!-- 按月查询 -->  
+<p>SELECT DATE_FORMAT(created_date,’%Y-%m’) as time,sum(money)  money FROM o_finance_detail where org_id = 1000  GROUP BY  time  </p>
+<!-- 按年查询 -->  
+<p>SELECT DATE_FORMAT(created_date,’%Y’) as time,sum(money)  money FROM o_finance_detail where org_id = 1000  GROUP BY  time   </p>
+<!-- 按周查询 -->  
+<p>SELECT DATE_FORMAT(created_date,’%Y-%u’) as time,sum(money)  money FROM o_finance_detail where org_id = 1000  GROUP BY  time</p>
+</li>
+</ol>
+<h2 id="二、重复数据"><a href="#二、重复数据" class="headerlink" title="二、重复数据"></a>二、重复数据</h2><h3 id="2-1-统计重复数据"><a href="#2-1-统计重复数据" class="headerlink" title="2.1 统计重复数据"></a>2.1 统计重复数据</h3><p>以下我们将统计表中 first_name 和 last_name的重复记录数：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mysql<span class="operator">&gt;</span> <span class="keyword">SELECT</span> <span class="built_in">COUNT</span>(<span class="operator">*</span>) <span class="keyword">as</span> repetitions, last_name, first_name</span><br><span class="line">    <span class="operator">-</span><span class="operator">&gt;</span> <span class="keyword">FROM</span> person_tbl</span><br><span class="line">    <span class="operator">-</span><span class="operator">&gt;</span> <span class="keyword">GROUP</span> <span class="keyword">BY</span> last_name, first_name</span><br><span class="line">    <span class="operator">-</span><span class="operator">&gt;</span> <span class="keyword">HAVING</span> repetitions <span class="operator">&gt;</span> <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-去重"><a href="#2-2-去重" class="headerlink" title="2.2 去重"></a>2.2 去重</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 去重保留最小的</span></span><br><span class="line"><span class="comment">-- 步骤</span></span><br><span class="line"><span class="comment">-- 前提：选出每个id最大的value</span></span><br><span class="line"><span class="comment">-- 选出count&gt;1 and not in (最大的value&amp;&amp;count&gt;1)</span></span><br><span class="line"><span class="keyword">DELETE</span></span><br><span class="line"><span class="keyword">FROM</span> testdelete</span><br><span class="line"><span class="keyword">WHERE</span> <span class="keyword">ONE</span> <span class="keyword">IN</span>(<span class="keyword">SELECT</span></span><br><span class="line">               <span class="keyword">ONE</span></span><br><span class="line">             <span class="keyword">FROM</span> (<span class="keyword">SELECT</span></span><br><span class="line">                     <span class="keyword">ONE</span></span><br><span class="line">                   <span class="keyword">FROM</span> testdelete</span><br><span class="line">                   <span class="keyword">GROUP</span> <span class="keyword">BY</span> <span class="keyword">ONE</span></span><br><span class="line">                   <span class="keyword">HAVING</span> <span class="built_in">COUNT</span>(<span class="keyword">ONE</span>) <span class="operator">&gt;</span> <span class="number">1</span>) a)</span><br><span class="line">    <span class="keyword">AND</span> id <span class="keyword">NOT</span> <span class="keyword">IN</span>(<span class="keyword">SELECT</span></span><br><span class="line">                    <span class="operator">*</span></span><br><span class="line">                  <span class="keyword">FROM</span> (<span class="keyword">SELECT</span></span><br><span class="line">                          <span class="built_in">MIN</span>(id)</span><br><span class="line">                        <span class="keyword">FROM</span> testdelete</span><br><span class="line">                        <span class="keyword">GROUP</span> <span class="keyword">BY</span> <span class="keyword">ONE</span></span><br><span class="line">                        <span class="keyword">HAVING</span> <span class="built_in">COUNT</span>(<span class="keyword">ONE</span>) <span class="operator">&gt;</span> <span class="number">1</span>) b)</span><br></pre></td></tr></table></figure>
+
+<h4 id="方式2-新建表"><a href="#方式2-新建表" class="headerlink" title="方式2 新建表"></a>方式2 新建表</h4><blockquote>
+<p>主要用于实时删除</p>
+</blockquote>
+<ol>
+<li><p>新建一个表进行迁移</p>
+</li>
+<li><p>代码解决</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> <span class="keyword">delete</span>  <span class="keyword">from</span> student <span class="keyword">where</span> id <span class="keyword">not</span> <span class="keyword">in</span> (selete id,<span class="built_in">max</span>(age) <span class="keyword">from</span> student <span class="keyword">group</span> <span class="keyword">by</span> (name) <span class="keyword">as</span> a)</span><br><span class="line"></span><br><span class="line"><span class="number">2.</span> <span class="keyword">DELETE</span> <span class="keyword">from</span> el_paper <span class="keyword">where</span> id <span class="keyword">not</span> <span class="keyword">in</span> (<span class="keyword">SELECT</span> id <span class="keyword">from</span> (<span class="keyword">SELECT</span> id,user_score <span class="keyword">FROM</span> el_paper <span class="keyword">GROUP</span> <span class="keyword">BY</span>(user_id)) <span class="keyword">as</span> a )</span><br></pre></td></tr></table></figure></li>
+<li><p>实时删除：先找到重复的数据，复制到新表，对新表逻辑去重，然后根据新表的is_delete字段删除旧表重复数据</p>
+</li>
+</ol>
+<h4 id="方式3-建立主键"><a href="#方式3-建立主键" class="headerlink" title="方式3 建立主键"></a>方式3 建立主键</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> IGNORE <span class="keyword">TABLE</span> person_tbl <span class="keyword">ADD</span> <span class="keyword">PRIMARY</span> KEY (last_name, first_name);</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="三、聚合"><a href="#三、聚合" class="headerlink" title="三、聚合"></a>三、聚合</h2><h3 id="group-by"><a href="#group-by" class="headerlink" title="group by"></a>group by</h3><ol>
+<li><p>聚集user，exam选出用户每场考试的最高分和其他详细信息。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> user_id,exam_id,depart_id,title,<span class="built_in">max</span>(qualify_score) <span class="keyword">from</span> el_paper <span class="keyword">group</span> <span class="keyword">by</span> user_id,exam_id;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="四、子查询"><a href="#四、子查询" class="headerlink" title="四、子查询"></a>四、子查询</h2><h3 id="select-后面"><a href="#select-后面" class="headerlink" title="select 后面"></a>select 后面</h3><ol>
+<li><p>带外表的聚合数据， a.name,a.age, b. count(a.name)</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">a.dept_name,(<span class="keyword">SELECT</span> <span class="built_in">count</span>(<span class="operator">*</span>) <span class="keyword">FROM</span> dept_emp b <span class="keyword">WHERE</span> b.dept_no <span class="operator">=</span> a.dept_no) <span class="keyword">AS</span> 员工个数</span><br><span class="line"><span class="keyword">FROM</span> departments a;</span><br></pre></td></tr></table></figure></li>
+<li><p>普通的 类似于连接</p>
+<blockquote>
+<p>测试结果没有连接快</p>
+</blockquote>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> a.<span class="operator">*</span> ,(<span class="keyword">SELECT</span> b.dept_name <span class="keyword">from</span> departments b <span class="keyword">where</span> a.dept_no<span class="operator">=</span>b.dept_no) name <span class="keyword">FROM</span> dept_emp a LIMIT <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--  测试二</span></span><br><span class="line"><span class="comment">-- 大表 left join 小表   时间 0.6s </span></span><br><span class="line"><span class="keyword">SELECT</span> a.<span class="operator">*</span>,b.dept_name <span class="keyword">FROM</span> dept_emp a   <span class="keyword">LEFT</span> <span class="keyword">JOIN</span> departments  b <span class="keyword">on</span> a.dept_no<span class="operator">=</span>b.dept_no;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 大表 right join 小表   时间 0.7s </span></span><br><span class="line"><span class="keyword">SELECT</span> a.<span class="operator">*</span>,b.dept_name <span class="keyword">FROM</span> dept_emp a   R <span class="keyword">JOIN</span> departments  b <span class="keyword">on</span> a.dept_no<span class="operator">=</span>b.dept_no;</span><br></pre></td></tr></table></figure></li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%B0%83%E4%BC%982.0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/08/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%B0%83%E4%BC%982.0/" class="post-title-link" itemprop="url">数据库调优2</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-04-10 14:52:29" itemprop="dateModified" datetime="2022-04-10T14:52:29+08:00">2022-04-10</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/08/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%B0%83%E4%BC%982.0/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%B0%83%E4%BC%982.0/" class="cy_cmt_count" data-xid="2022/03/08/数据库/数据库概念2.0/数据库调优2.0/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>4.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211223120007692.png" alt="image-20211223120007692"></p>
+<h2 id="一、优化维度"><a href="#一、优化维度" class="headerlink" title="一、优化维度"></a>一、优化维度</h2><h3 id="1-1-业务需求"><a href="#1-1-业务需求" class="headerlink" title="1.1 业务需求"></a>1.1 业务需求</h3><ol>
+<li>分页减少查询</li>
+<li>砍掉不必要的join(用详情代替join)</li>
+</ol>
+<h3 id="1-2-系统架构"><a href="#1-2-系统架构" class="headerlink" title="1.2  系统架构"></a>1.2  系统架构</h3><ol>
+<li>读写分离</li>
+<li>分库分表</li>
+<li>主从配置</li>
+<li>数据库选择,nosql,mysql,orcle,hbase</li>
+</ol>
+<h3 id="1-3-sql索引"><a href="#1-3-sql索引" class="headerlink" title="1.3 sql索引"></a>1.3 sql索引</h3><h3 id="1-4-表结构"><a href="#1-4-表结构" class="headerlink" title="1.4 表结构"></a>1.4 表结构</h3><h3 id="1-5-数据库配置参数"><a href="#1-5-数据库配置参数" class="headerlink" title="1.5 数据库配置参数"></a>1.5 数据库配置参数</h3><ol>
+<li>sort buffer</li>
+<li></li>
+</ol>
+<h3 id="1-6-系统配置"><a href="#1-6-系统配置" class="headerlink" title="1.6 系统配置"></a>1.6 系统配置</h3><h3 id="1-7-硬件"><a href="#1-7-硬件" class="headerlink" title="1.7 硬件"></a>1.7 硬件</h3><h2 id="数据源"><a href="#数据源" class="headerlink" title="数据源"></a>数据源</h2><p>mysq官网–&gt;document–&gt;more–&gt;employee data</p>
+<h2 id="二、慢查询与sql分析"><a href="#二、慢查询与sql分析" class="headerlink" title="二、慢查询与sql分析"></a>二、慢查询与sql分析</h2><h3 id="2-1-explain配置参数"><a href="#2-1-explain配置参数" class="headerlink" title="2.1 explain配置参数"></a>2.1 explain配置参数</h3><table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>log_output</td>
+<td>慢查询日志文件类型,默认File</td>
+<td></td>
+</tr>
+<tr>
+<td>long_query_time</td>
+<td>进入日志的最短时间</td>
+<td></td>
+</tr>
+<tr>
+<td>slow_query_log_file</td>
+<td>日志路径，默认在mysql.slow_log</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id="2-2-修改慢查询参数"><a href="#2-2-修改慢查询参数" class="headerlink" title="2.2 修改慢查询参数"></a>2.2 修改慢查询参数</h3><h4 id="2-2-1-方法1-修改my-conf"><a href="#2-2-1-方法1-修改my-conf" class="headerlink" title="2.2.1 方法1 修改my.conf"></a>2.2.1 方法1 修改my.conf</h4><blockquote>
+<p>永久配置，需要重启</p>
+</blockquote>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">slow_query_log</span> = <span class="literal">ON</span></span><br><span class="line"><span class="attr">long_query_time</span> = <span class="number">0.1</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="2-2-2-方法2-set-变量"><a href="#2-2-2-方法2-set-变量" class="headerlink" title="2.2.2 方法2 set 变量"></a>2.2.2 方法2 set 变量</h4><blockquote>
+<p>一次性，不要重启，但是需要重新连接session</p>
+</blockquote>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">set</span> global long_query_time = <span class="number">0</span>.<span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-3-explain参数"><a href="#2-3-explain参数" class="headerlink" title="2.3 explain参数"></a>2.3 explain参数</h3><table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>id</td>
+<td>指定父子查询，id大的先执行，如果没有子查询，一般都是1</td>
+<td></td>
+</tr>
+<tr>
+<td>select_type</td>
+<td>查询类型(父查询，子查询，普通查询，联合查询)</td>
+<td></td>
+</tr>
+<tr>
+<td>table</td>
+<td>使用的表别名</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>type</strong></td>
+<td>all: 全表扫描 index:遍历所引述 range:</td>
+<td></td>
+</tr>
+<tr>
+<td>ref做分界线</td>
+<td>system &gt; const &gt; eq_ref &gt; <strong>[ref]</strong> &gt; fulltext &gt; ref_or_null &gt; index_merge &gt; unique_subquery &gt; index_subquery &gt; range &gt; index &gt; ALL</td>
+<td></td>
+</tr>
+<tr>
+<td>possiable_keys</td>
+<td>可能使用的索引</td>
+<td></td>
+</tr>
+<tr>
+<td>key</td>
+<td>实际用的索引</td>
+<td></td>
+</tr>
+<tr>
+<td>key_len</td>
+<td>当前使用索引的长度</td>
+<td></td>
+</tr>
+<tr>
+<td>ref</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>rows</td>
+<td>需要扫描的行数</td>
+<td></td>
+</tr>
+<tr>
+<td>filtered</td>
+<td>表示符合条件条数占比</td>
+<td></td>
+</tr>
+<tr>
+<td>extra</td>
+<td>useTemp 使用临时表，useFileSory 使用文件排序(需要被优化)</td>
+<td></td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>描述</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody><tr>
+<td></td>
+<td><strong>查询</strong>时间 &lt; <strong>扫描</strong>时间</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>system</strong></td>
+<td>查询系统表</td>
+<td>select * from mysql.time_zone</td>
+</tr>
+<tr>
+<td>const</td>
+<td>where主键索引或唯一索引，且为常量</td>
+<td>select * from user where id=1</td>
+</tr>
+<tr>
+<td>eq_ref</td>
+<td>用到了唯一索引 数量很多</td>
+<td></td>
+</tr>
+<tr>
+<td>ref</td>
+<td>用到了不唯一索引，join 索引=外键索引</td>
+<td>select * from u1,u2 where u1.name=u2.name</td>
+</tr>
+<tr>
+<td>range</td>
+<td>索引范围<strong>查询</strong>，避免了<strong>扫描</strong>索引</td>
+<td>select * from user where id &lt; 10</td>
+</tr>
+<tr>
+<td>index</td>
+<td>扫描全部索引文件，且不需要回表(<strong>索引覆盖</strong>)</td>
+<td>select count(*) from user</td>
+</tr>
+<tr>
+<td>all</td>
+<td>没命中索引全表扫描</td>
+<td>select * from user where age=10</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>select * from user limit 2</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id="2-4-使用profiling分"><a href="#2-4-使用profiling分" class="headerlink" title="2.4 使用profiling分"></a>2.4 使用profiling分</h3><ol>
+<li>可以观察一条语句经历了几个阶段</li>
+<li>每个阶段消耗的时间</li>
+<li>每个阶段占用的内存</li>
+</ol>
+<h2 id="三、索引"><a href="#三、索引" class="headerlink" title="三、索引"></a>三、索引</h2><h3 id="3-1-索引数据结构"><a href="#3-1-索引数据结构" class="headerlink" title="3.1 索引数据结构"></a>3.1 索引数据结构</h3><h2 id="四、语句优化"><a href="#四、语句优化" class="headerlink" title="四、语句优化"></a>四、语句优化</h2><h2 id="五、mysql存储过程"><a href="#五、mysql存储过程" class="headerlink" title="五、mysql存储过程"></a>五、mysql存储过程</h2><blockquote>
+<p>存储例程是存储在数据库服务器中的一组sql语句，通过在查询中调用一个指定的名称来执行这些sql语句命令</p>
+</blockquote>
+<h3 id="存储过程的优点"><a href="#存储过程的优点" class="headerlink" title="存储过程的优点"></a>存储过程的优点</h3><ol>
+<li>减少网络通信量</li>
+<li>执行速度更快<ol>
+<li>在存储过程创建的时候，数据库已经对其进行了一次解析和优化</li>
+<li>存储过程会(备份)保存在内存中</li>
+</ol>
+</li>
+<li>更强的适应性</li>
+</ol>
+<h3 id="5-1-DELIMITER"><a href="#5-1-DELIMITER" class="headerlink" title="5.1 DELIMITER"></a>5.1 DELIMITER</h3><p> 声明自定义分隔符：DELIMITER //      </p>
+<h3 id="5-2-PROCEDURE"><a href="#5-2-PROCEDURE" class="headerlink" title="5.2 PROCEDURE"></a>5.2 PROCEDURE</h3><p>声明存储过程：CREATE PROCEDURE demo_in_parameter(IN p_in int) </p>
+<h3 id="5-3-IN、OUT"><a href="#5-3-IN、OUT" class="headerlink" title="5.3 IN、OUT"></a>5.3 IN、OUT</h3><ol>
+<li>IN  形式参数</li>
+<li>OUT 实际参数(会影响到外面的值)，传入为null</li>
+<li>INOUT 输入输出参数:调用时指定，并且可被改变和返回</li>
+</ol>
+<h3 id="5-4-BEGIN、END"><a href="#5-4-BEGIN、END" class="headerlink" title="5.4 BEGIN、END"></a>5.4 BEGIN、END</h3><p>存储过程开始和结束符号</p>
+<h3 id="5-5-SET-p-in-1-变量赋值"><a href="#5-5-SET-p-in-1-变量赋值" class="headerlink" title="5.5 SET @p_in=1 变量赋值"></a>5.5 SET @p_in=1 变量赋值</h3><h4 id="5-5-1-变量声明declare"><a href="#5-5-1-变量声明declare" class="headerlink" title="5.5.1 变量声明declare"></a>5.5.1 变量声明declare</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">declare</span> variable_name  datatype [<span class="keyword">DEFAULT</span> <span class="keyword">value</span>];</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li><p>变量类型datatype</p>
+<p>int, float, date,varchar(length),datetim</p>
+</li>
+<li><p>例子</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DECLARE</span> l_int <span class="type">int</span> unsigned <span class="keyword">default</span> <span class="number">4000000</span>;</span><br><span class="line"><span class="keyword">DECLARE</span> l_numeric number(<span class="number">8</span>,<span class="number">2</span>) <span class="keyword">DEFAULT</span> <span class="number">9.95</span>;  </span><br><span class="line"><span class="keyword">DECLARE</span> l_date <span class="type">date</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;1999-12-31&#x27;</span>;  </span><br><span class="line"><span class="keyword">DECLARE</span> l_datetime datetime <span class="keyword">DEFAULT</span> <span class="string">&#x27;1999-12-31 23:59:59&#x27;</span>;  </span><br><span class="line"><span class="keyword">DECLARE</span> l_varchar <span class="type">varchar</span>(<span class="number">255</span>) <span class="keyword">DEFAULT</span> <span class="string">&#x27;This will not be padded&#x27;</span>; </span><br></pre></td></tr></table></figure></li>
+</ol>
+<h4 id="5-5-2-变量赋值set"><a href="#5-5-2-变量赋值set" class="headerlink" title="5.5.2 变量赋值set"></a>5.5.2 变量赋值set</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SET</span> <span class="variable">@x</span> <span class="operator">=</span> <span class="number">1</span><span class="operator">+</span><span class="number">2</span><span class="operator">+</span><span class="number">3</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="string">&#x27;Hello World&#x27;</span> <span class="keyword">into</span> <span class="variable">@x</span>;  </span><br></pre></td></tr></table></figure>
+
+<h3 id="5-6-call-调用存储过程"><a href="#5-6-call-调用存储过程" class="headerlink" title="5.6 call 调用存储过程"></a>5.6 call 调用存储过程</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="number">1.</span> delimiter <span class="operator">/</span><span class="operator">/</span></span><br><span class="line"><span class="number">2.</span> <span class="keyword">create</span> <span class="keyword">procedure</span> out_param(<span class="keyword">out</span> p_out <span class="type">int</span>)</span><br><span class="line">     <span class="keyword">begin</span></span><br><span class="line">       <span class="keyword">select</span> p_out;</span><br><span class="line">        <span class="keyword">set</span> p_out<span class="operator">=</span><span class="number">2</span>;</span><br><span class="line">        <span class="keyword">select</span> p_out;</span><br><span class="line">       <span class="keyword">end</span></span><br><span class="line">     <span class="operator">/</span><span class="operator">/</span></span><br><span class="line"><span class="number">3.</span> <span class="keyword">set</span> <span class="variable">@p</span>_out<span class="operator">=</span><span class="number">1</span>;</span><br><span class="line"><span class="number">4.</span> <span class="keyword">call</span> out_param(<span class="variable">@p</span>_out);</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-7-条件-case-if-then-else"><a href="#5-7-条件-case-if-then-else" class="headerlink" title="5.7 条件 case-if-then-else"></a>5.7 条件 case-if-then-else</h3><h4 id=""><a href="#" class="headerlink" title=""></a></h4><h3 id="5-8-循环-while-lables"><a href="#5-8-循环-while-lables" class="headerlink" title="5.8 循环 while-lables"></a>5.8 循环 while-lables</h3><h3 id="存储函数"><a href="#存储函数" class="headerlink" title="存储函数"></a>存储函数</h3><p>见附录1.1 </p>
+<h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><h3 id="1-存储函数"><a href="#1-存储函数" class="headerlink" title="1. 存储函数"></a>1. 存储函数</h3><h4 id="1-1-字符串类"><a href="#1-1-字符串类" class="headerlink" title="1.1 字符串类"></a>1.1 字符串类</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">CHARSET(str) <span class="operator">/</span><span class="operator">/</span>返回字串字符集</span><br><span class="line">CONCAT (string2 [,... ]) <span class="operator">/</span><span class="operator">/</span>连接字串</span><br><span class="line">INSTR (string ,substring ) <span class="operator">/</span><span class="operator">/</span>返回substring首次在string中出现的位置,不存在返回<span class="number">0</span></span><br><span class="line">LCASE (string2 ) <span class="operator">/</span><span class="operator">/</span>转换成小写</span><br><span class="line"><span class="keyword">LEFT</span> (string2 ,length ) <span class="operator">/</span><span class="operator">/</span>从string2中的左边起取length个字符</span><br><span class="line">LENGTH (string ) <span class="operator">/</span><span class="operator">/</span>string长度</span><br><span class="line">LOAD_FILE (file_name ) <span class="operator">/</span><span class="operator">/</span>从文件读取内容</span><br><span class="line">LOCATE (substring , string [,start_position ] ) 同INSTR,但可指定开始位置</span><br><span class="line">LPAD (string2 ,length ,pad ) <span class="operator">/</span><span class="operator">/</span>重复用pad加在string开头,直到字串长度为length</span><br><span class="line">LTRIM (string2 ) <span class="operator">/</span><span class="operator">/</span>去除前端空格</span><br><span class="line">REPEAT (string2 ,count ) <span class="operator">/</span><span class="operator">/</span>重复count次</span><br><span class="line">REPLACE (str ,search_str ,replace_str ) <span class="operator">/</span><span class="operator">/</span>在str中用replace_str替换search_str</span><br><span class="line">RPAD (string2 ,length ,pad) <span class="operator">/</span><span class="operator">/</span>在str后用pad补充,直到长度为length</span><br><span class="line">RTRIM (string2 ) <span class="operator">/</span><span class="operator">/</span>去除后端空格</span><br><span class="line">STRCMP (string1 ,string2 ) <span class="operator">/</span><span class="operator">/</span>逐字符比较两字串大小,</span><br><span class="line"><span class="built_in">SUBSTRING</span> (str , position [,length ]) <span class="operator">/</span><span class="operator">/</span>从str的position开始,取length个字符,</span><br><span class="line"><span class="built_in">TRIM</span>([[<span class="keyword">BOTH</span><span class="operator">|</span><span class="keyword">LEADING</span><span class="operator">|</span><span class="keyword">TRAILING</span>][padding] <span class="keyword">FROM</span>]string2) <span class="operator">/</span><span class="operator">/</span>去除指定位置的指定字符</span><br><span class="line">UCASE (string2 ) <span class="operator">/</span><span class="operator">/</span>转换成大写</span><br><span class="line"><span class="keyword">RIGHT</span>(string2,length) <span class="operator">/</span><span class="operator">/</span>取string2最后length个字符</span><br><span class="line">SPACE(count) <span class="operator">/</span><span class="operator">/</span>生成count个空格</span><br></pre></td></tr></table></figure>
+
+<h4 id="1-2-数字类"><a href="#1-2-数字类" class="headerlink" title="1.2 数字类"></a>1.2 数字类</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">ABS</span> (number2 ) <span class="operator">/</span><span class="operator">/</span>绝对值</span><br><span class="line">BIN (decimal_number ) <span class="operator">/</span><span class="operator">/</span>十进制转二进制</span><br><span class="line"><span class="built_in">CEILING</span> (number2 ) <span class="operator">/</span><span class="operator">/</span>向上取整</span><br><span class="line">CONV(number2,from_base,to_base) <span class="operator">/</span><span class="operator">/</span>进制转换</span><br><span class="line"><span class="built_in">FLOOR</span> (number2 ) <span class="operator">/</span><span class="operator">/</span>向下取整</span><br><span class="line">FORMAT (number,decimal_places ) <span class="operator">/</span><span class="operator">/</span>保留小数位数</span><br><span class="line">HEX (DecimalNumber ) <span class="operator">/</span><span class="operator">/</span>转十六进制</span><br><span class="line">LEAST (number , number2 [,..]) <span class="operator">/</span><span class="operator">/</span>求最小值</span><br><span class="line"><span class="built_in">MOD</span> (numerator ,denominator ) <span class="operator">/</span><span class="operator">/</span>求余</span><br><span class="line"><span class="built_in">POWER</span> (number ,power ) <span class="operator">/</span><span class="operator">/</span>求指数</span><br><span class="line">RAND([seed]) <span class="operator">/</span><span class="operator">/</span>随机数</span><br><span class="line">ROUND (number [,decimals ]) <span class="operator">/</span><span class="operator">/</span>四舍五入,decimals为小数位数]</span><br></pre></td></tr></table></figure>
+
+<h4 id="1-4-日期时间类"><a href="#1-4-日期时间类" class="headerlink" title="1.4 日期时间类"></a>1.4 日期时间类</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">ADDTIME (date2 ,time_interval )<span class="operator">/</span><span class="operator">/</span>将time_interval加到date2</span><br><span class="line">CONVERT_TZ (datetime2 ,fromTZ ,toTZ ) <span class="operator">/</span><span class="operator">/</span>转换时区</span><br><span class="line"><span class="built_in">CURRENT_DATE</span> ( ) <span class="operator">/</span><span class="operator">/</span>当前日期</span><br><span class="line"><span class="built_in">CURRENT_TIME</span> ( ) <span class="operator">/</span><span class="operator">/</span>当前时间</span><br><span class="line"><span class="built_in">CURRENT_TIMESTAMP</span> ( ) <span class="operator">/</span><span class="operator">/</span>当前时间戳</span><br><span class="line"><span class="type">DATE</span> (datetime ) <span class="operator">/</span><span class="operator">/</span>返回datetime的日期部分</span><br><span class="line">DATE_ADD (date2 , <span class="type">INTERVAL</span> d_value d_type ) <span class="operator">/</span><span class="operator">/</span>在date2中加上日期或时间</span><br><span class="line">DATE_FORMAT (datetime ,FormatCodes ) <span class="operator">/</span><span class="operator">/</span>使用formatcodes格式显示datetime</span><br><span class="line">DATE_SUB (date2 , <span class="type">INTERVAL</span> d_value d_type ) <span class="operator">/</span><span class="operator">/</span>在date2上减去一个时间</span><br><span class="line">DATEDIFF (date1 ,date2 ) <span class="operator">/</span><span class="operator">/</span>两个日期差</span><br><span class="line"><span class="keyword">DAY</span> (<span class="type">date</span> ) <span class="operator">/</span><span class="operator">/</span>返回日期的天</span><br><span class="line">DAYNAME (<span class="type">date</span> ) <span class="operator">/</span><span class="operator">/</span>英文星期</span><br><span class="line">DAYOFWEEK (<span class="type">date</span> ) <span class="operator">/</span><span class="operator">/</span>星期(<span class="number">1</span><span class="number">-7</span>) ,<span class="number">1</span>为星期天</span><br><span class="line">DAYOFYEAR (<span class="type">date</span> ) <span class="operator">/</span><span class="operator">/</span>一年中的第几天</span><br><span class="line"><span class="built_in">EXTRACT</span> (interval_name <span class="keyword">FROM</span> <span class="type">date</span> ) <span class="operator">/</span><span class="operator">/</span>从<span class="type">date</span>中提取日期的指定部分</span><br><span class="line">MAKEDATE (<span class="keyword">year</span> ,<span class="keyword">day</span> ) <span class="operator">/</span><span class="operator">/</span>给出年及年中的第几天,生成日期串</span><br><span class="line">MAKETIME (<span class="keyword">hour</span> ,<span class="keyword">minute</span> ,<span class="keyword">second</span> ) <span class="operator">/</span><span class="operator">/</span>生成时间串</span><br><span class="line">MONTHNAME (<span class="type">date</span> ) <span class="operator">/</span><span class="operator">/</span>英文月份名</span><br><span class="line">NOW ( ) <span class="operator">/</span><span class="operator">/</span>当前时间</span><br><span class="line">SEC_TO_TIME (seconds ) <span class="operator">/</span><span class="operator">/</span>秒数转成时间</span><br><span class="line">STR_TO_DATE (string ,format ) <span class="operator">/</span><span class="operator">/</span>字串转成时间,以format格式显示</span><br><span class="line">TIMEDIFF (datetime1 ,datetime2 ) <span class="operator">/</span><span class="operator">/</span>两个时间差</span><br><span class="line">TIME_TO_SEC (<span class="type">time</span> ) <span class="operator">/</span><span class="operator">/</span>时间转秒数]</span><br><span class="line">WEEK (date_time [,start_of_week ]) <span class="operator">/</span><span class="operator">/</span>第几周</span><br><span class="line"><span class="keyword">YEAR</span> (datetime ) <span class="operator">/</span><span class="operator">/</span>年份</span><br><span class="line">DAYOFMONTH(datetime) <span class="operator">/</span><span class="operator">/</span>月的第几天</span><br><span class="line"><span class="keyword">HOUR</span>(datetime) <span class="operator">/</span><span class="operator">/</span>小时</span><br><span class="line">LAST_DAY(<span class="type">date</span>) <span class="operator">/</span><span class="operator">/</span><span class="type">date</span>的月的最后日期</span><br><span class="line">MICROSECOND(datetime) <span class="operator">/</span><span class="operator">/</span>微秒</span><br><span class="line"><span class="keyword">MONTH</span>(datetime) <span class="operator">/</span><span class="operator">/</span>月</span><br><span class="line"><span class="keyword">MINUTE</span>(datetime) <span class="operator">/</span><span class="operator">/</span>分返回符号,正负或<span class="number">0</span></span><br><span class="line"><span class="built_in">SQRT</span>(number2) <span class="operator">/</span><span class="operator">/</span>开平方</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/java/javaSE/JUC/JUC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/08/java/javaSE/JUC/JUC/" class="post-title-link" itemprop="url">JUC</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-04-08 03:53:07" itemprop="dateModified" datetime="2022-04-08T03:53:07+08:00">2022-04-08</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/JUC/" itemprop="url" rel="index"><span itemprop="name">JUC</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/08/java/javaSE/JUC/JUC/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/08/java/javaSE/JUC/JUC/" class="cy_cmt_count" data-xid="2022/03/08/java/javaSE/JUC/JUC/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>679</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>.</p>
+<h2 id="一、线程和进程概念"><a href="#一、线程和进程概念" class="headerlink" title="一、线程和进程概念"></a>一、线程和进程概念</h2><h3 id="1-1-进程与线程"><a href="#1-1-进程与线程" class="headerlink" title="1.1 进程与线程"></a>1.1 进程与线程</h3><ol>
+<li>进程是<strong>分配资源</strong>的基本单元，运行的一个程序</li>
+<li>线程是<strong>cpu调度</strong>的基本单元，程序执行的基本单位</li>
+<li>管程:<ol>
+<li>Monitor、监视器、锁</li>
+<li>同步机制，保证只有一个线程能访问资源</li>
+</ol>
+</li>
+<li>用户线程和守护线程<ol>
+<li>用户线程：普通的线程，main结束了，用户线程还会继续运行</li>
+<li>守护线程：后台默默运行的线程 isDaemon，main结束，收回线程会结束</li>
+</ol>
+</li>
+</ol>
+<h3 id="1-2-线程的状态"><a href="#1-2-线程的状态" class="headerlink" title="1.2 线程的状态"></a>1.2 线程的状态</h3><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220325162011992.png" alt="image-20220325162011992"></p>
+<ol>
+<li>新建</li>
+<li>就绪</li>
+<li>等待</li>
+<li>运行</li>
+<li>死亡</li>
+</ol>
+<h3 id="1-3-wati和sleep"><a href="#1-3-wati和sleep" class="headerlink" title="1.3 wati和sleep"></a>1.3 wati和sleep</h3><ol>
+<li>Object.wait<ol>
+<li>释放锁</li>
+</ol>
+</li>
+<li>Thread.sleep<ol>
+<li>不释放当前锁</li>
+</ol>
+</li>
+</ol>
+<h3 id="1-4-并发和并行"><a href="#1-4-并发和并行" class="headerlink" title="1.4 并发和并行"></a>1.4 并发和并行</h3><ol>
+<li>串行：排队执行</li>
+<li>并行：一并执行</li>
+<li>并发：一个cpu表面上运行多个线程</li>
+<li>并行：多个cpu</li>
+</ol>
+<h3 id="1-5-Lock、synchronize"><a href="#1-5-Lock、synchronize" class="headerlink" title="1.5 Lock、synchronize"></a>1.5 Lock、synchronize</h3><h4 id="1-5-1-synchronize，同步锁"><a href="#1-5-1-synchronize，同步锁" class="headerlink" title="1.5.1 synchronize，同步锁"></a>1.5.1 synchronize，同步锁</h4><ol>
+<li>修饰代码块<ol>
+<li>作用于对象是调用这个代码块的对象</li>
+</ol>
+</li>
+<li>修饰方法<ol>
+<li>被修饰的方法称为同步方法，其</li>
+<li>作用的对象是调用这个方法的对象； </li>
+</ol>
+</li>
+<li>修饰静态方法<ol>
+<li>作用的对象是这个类的所有对象</li>
+</ol>
+</li>
+<li>修饰类<ol>
+<li>作用主的对象是这个类的所有对象</li>
+</ol>
+</li>
+</ol>
+<h4 id="1-5-2-lock和synchronized区别"><a href="#1-5-2-lock和synchronized区别" class="headerlink" title="1.5.2 lock和synchronized区别"></a>1.5.2 lock和synchronized区别</h4><ol>
+<li><p>lock可获得更广泛的锁</p>
+</li>
+<li><p>lock是类，不是java内置</p>
+</li>
+<li><p>lock是手动锁，synchronized是自动锁</p>
+</li>
+<li><p>synchronized发生异常或者结束会自动释放，而lock发生了异常会一直占用锁</p>
+</li>
+<li><p>lock可以判断是否得到了锁</p>
+</li>
+<li><p>lock可以在竞争激烈的情况下提高效率</p>
+</li>
+<li><p>1. </p>
+</li>
+</ol>
+<h3 id="多线程编程步骤"><a href="#多线程编程步骤" class="headerlink" title="多线程编程步骤"></a>多线程编程步骤</h3><ol>
+<li>创建资源类</li>
+<li>资源类的消费和供给方法<ol>
+<li>判断<ol>
+<li>否：wait等待其他线程的natify</li>
+<li>是：干活<ol>
+<li>通知</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>创建线程，调用消费、共给方法</li>
+</ol>
+<h2 id="线程间通信"><a href="#线程间通信" class="headerlink" title="线程间通信"></a>线程间通信</h2><h3 id="线程间定制化通信"><a href="#线程间定制化通信" class="headerlink" title="线程间定制化通信"></a>线程间定制化通信</h3><ol>
+<li>标志位</li>
+</ol>
+<h3 id="特殊"><a href="#特殊" class="headerlink" title="特殊"></a>特殊</h3><ol>
+<li>wait 需要用while循环放置虚假唤醒</li>
+</ol>
+<h3 id="疑惑"><a href="#疑惑" class="headerlink" title="疑惑"></a>疑惑</h3><ol>
+<li>lock原理</li>
+<li>wait</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/java/javaSE/JUC/java%E9%98%BB%E5%A1%9E/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -478,586 +1205,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/java/javaSE/jvm/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/08/java/javaSE/jvm/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B/" class="post-title-link" itemprop="url">类加载</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-22 18:04:19" itemprop="dateModified" datetime="2022-03-22T18:04:19+08:00">2022-03-22</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/JVM/" itemprop="url" rel="index"><span itemprop="name">JVM</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/08/java/javaSE/jvm/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/java/javaSE/jvm/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B/" class="cy_cmt_count" data-xid="2022/03/08/java/javaSE/jvm/类加载过程/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>3k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>3 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>[toc]</p>
-<h2 id="一、生命周期"><a href="#一、生命周期" class="headerlink" title="一、生命周期"></a>一、生命周期</h2><blockquote>
-<p>  JVM把class文件加载的内存，并对数据进行校验、转换解析和初始化，最终形成JVM可以直接使用的Java类型的过程就是加载机制。</p>
-</blockquote>
-<h3 id="1-1-加载-参考"><a href="#1-1-加载-参考" class="headerlink" title="1.1 加载-参考"></a>1.1 <a target="_blank" rel="noopener" href="https://my.oschina.net/winHerson/blog/114180?p=%7B%7BtotalPage%7D%7D">加载-参考</a></h3><ol>
-<li>通过一个类的权限定名从文件(.class、.jar、网络)中来获取定义此类的二进制字节流</li>
-<li>将这个字节流所代表的静态存储结构转化为方法去的运行时数据结构</li>
-<li>在java堆中生成一个代表这个类的java.lang.Class对象，作为方法去这些数据的访问入口。</li>
-</ol>
-<h3 id="1-2-连接"><a href="#1-2-连接" class="headerlink" title="1.2 连接"></a>1.2 连接</h3><h4 id="1-2-1-验证"><a href="#1-2-1-验证" class="headerlink" title="1.2.1 验证"></a>1.2.1 验证</h4><ol>
-<li><p>文件格式验证</p>
-<p>验证class文件格式规范，例如： class文件是否已魔术0xCAFEBABE开头 ， 主、次版本号是否在当前虚拟机处理范围之内等</p>
-</li>
-<li><p>元数据验证</p>
-<p>这个阶段是对字节码描述的信息进行语义分析，以保证起描述的信息符合java语言规范要求。验证点可能包括：这个类是否有父类(除了java.lang.Object之外，所有的类都应当有父类)、这个类是否继承了不允许被继承的类(被final修饰的)、如果这个类的父类是抽象类，是否实现了起父类或接口中要求实现的所有方法。</p>
-</li>
-<li><p>字节码验证</p>
-<p>进行数据流和控制流分析，这个阶段对类的方法体进行校验分析，这个阶段的任务是保证被校验类的方法在运行时不会做出危害虚拟机安全的行为.如：保证访法体中的类型转换有效，例如可以把一个子类对象赋值给父类数据类型，这是安全的，但不能把一个父类对象赋值给子类数据类型、保证跳转命令不会跳转到方法体以外的字节码命令上。</p>
-</li>
-<li><p>符号引用验证</p>
-<p>符号引用中通过字符串描述的全限定名是否能找到对应的类、符号引用类中的类，字段和方法的访问性(private、protected、public、default)是否可被当前类访问。</p>
-</li>
-</ol>
-<h4 id="1-2-1-准备"><a href="#1-2-1-准备" class="headerlink" title="1.2.1 准备"></a>1.2.1 准备</h4><blockquote>
-<p>为类变量分配内存并设置变量初始值(零值)的阶段，这些内存都将在方法去中进行分配。</p>
-</blockquote>
-<ol>
-<li><p>进行内存分配的仅包括类变量（被static修饰的变量），而不包括实例变量，实例变量将会在对象实例化时随着对象一起分配在java堆中</p>
-</li>
-<li><p>初始值是指数据类型为零值，主要是为了初始化内存，并不做逻辑代码</p>
-<ul>
-<li><p>public static int value = 123</p>
-<p>那么变量value在准备阶段过后的值是0，而不是123，因为这时候尚未开始执行任何java方法。</p>
-</li>
-<li><p>public static final int value = 123</p>
-<p>final修饰的字段，子啊准备阶段虚拟机就会根据赋值，value的值为123.</p>
-</li>
-</ul>
-</li>
-</ol>
-<h4 id="1-2-3-解析"><a href="#1-2-3-解析" class="headerlink" title="1.2.3 解析"></a>1.2.3 解析</h4><blockquote>
-<p> 虚拟机将常量池内的符号引用替换为直接引用的过程</p>
-</blockquote>
-<h5 id="1-2-3-1-符号、直接引用"><a href="#1-2-3-1-符号、直接引用" class="headerlink" title="1.2.3.1 符号、直接引用"></a>1.2.3.1 符号、直接引用</h5><ul>
-<li>符号引用：描述所引用的目标对象的符号，可以是任何形式的字面量，只要使用时能无歧义地定位到目标即可。引用的目标对象并不一定已经加载到内存中。</li>
-<li>直接引用：指向目标对象的指针、相对偏移量、一个能间接定位到目标的句柄。直接引用的目标必定已经在内存中存在。</li>
-<li>例如 String a=”str”; 这个a在解析阶段之前就是符号引用，解析之后就是直接引用</li>
-</ul>
-<h5 id="1-2-3-2-解析内容"><a href="#1-2-3-2-解析内容" class="headerlink" title="1.2.3.2 解析内容"></a>1.2.3.2 解析内容</h5><ol>
-<li><p>类或接口的解析</p>
-</li>
-<li><p>字段解析：解析出类的方法表的class_index项中索引的字段所属的类或接口的符号引用</p>
-</li>
-<li><p>类方法解析：首先解析出类的方法表的class_index项中索引的方法所属的类或接口的符号引用</p>
-</li>
-<li><p>接口方法解析：首先解析出类的方法表的class_index项中索引的方法所属的类或接口的符号引用。</p>
-</li>
-</ol>
-<h3 id="1-3-初始化"><a href="#1-3-初始化" class="headerlink" title="1.3 初始化"></a>1.3 初始化</h3><blockquote>
-<p>执行类中定义的java程序逻辑代码</p>
-</blockquote>
-<h4 id="1-3-1-触发条件"><a href="#1-3-1-触发条件" class="headerlink" title="1.3.1 触发条件"></a>1.3.1 触发条件</h4><p>以下四种情况触发执行类构造器clinit()方法</p>
-<ol>
-<li>new关键字实例化对象</li>
-<li>访问一个类的静态字段(被final修饰、已在编译器把结果放入常量池的静态字段除外)</li>
-<li>调用类的静态方法</li>
-<li>使用java.lang.reflect包的方法对类进行反射调用的时候</li>
-<li>jvm启动时，用户指定一个执行的主类(包含main方法的那个类)，虚拟机会先初始化这个类</li>
-<li>当初始化一个类的时候，如果发现其父类还没有进行过初始化、则需要先出发其父类的初始化</li>
-</ol>
-<h3 id="1-4-使用"><a href="#1-4-使用" class="headerlink" title="1.4 使用"></a>1.4 使用</h3><h3 id="1-5-卸载"><a href="#1-5-卸载" class="headerlink" title="1.5 卸载"></a>1.5 卸载</h3><h2 id="二、其他"><a href="#二、其他" class="headerlink" title="二、其他"></a>二、其他</h2><h3 id="2-1-双亲委派机制"><a href="#2-1-双亲委派机制" class="headerlink" title="2.1 双亲委派机制"></a>2.1 双亲委派机制</h3><h3 id="2-2-实例化对象的方式"><a href="#2-2-实例化对象的方式" class="headerlink" title="2.2 实例化对象的方式"></a>2.2 实例化对象的方式</h3><ol>
-<li>创建<ol>
-<li>new</li>
-<li>newInstance(要求有无参构造)</li>
-<li>clone</li>
-</ol>
-</li>
-<li>序列化<ol>
-<li>加载文件</li>
-<li>反序列化</li>
-<li>网络请求</li>
-</ol>
-</li>
-</ol>
-<h3 id="2-3-newInstance与new"><a href="#2-3-newInstance与new" class="headerlink" title="2.3 newInstance与new"></a>2.3 <a target="_blank" rel="noopener" href="https://www.cnblogs.com/zouxiangzhongyan/p/10722118.html">newInstance与new</a></h3><blockquote>
-<p>spring中有很多的newInstance</p>
-</blockquote>
-<ol>
-<li>newInstance要求<ol>
-<li>这个类已经加载</li>
-<li>这个类已经连接了</li>
-<li>这两步可用Class.forname完成</li>
-</ol>
-</li>
-<li>newInstance是通过反射创建对象的，在创建一个类的对象的时候，你可以对该类一无所知，一些开源框架比如Spring内部大都是通过反射来创建实例的，当然这种方法创建对象的时候必须拥有该类的句柄，甚至必要的时候还要有相关的权限设置（比如无参构造函数是私有的），而句柄是可以动态载入的，实际上JVM内部也是这样加载类的。该方法创建对象的时候，只会调用该类的无参数构造函数，不会调用其他的有参构造函数。</li>
-<li>new  后面接类名参数，是最常见的创建实例的方式。这是必须要知道一个明确的类才能使用</li>
-</ol>
-<h4 id="2-3-2-解耦"><a href="#2-3-2-解耦" class="headerlink" title="2.3.2 解耦"></a>2.3.2 解耦</h4><blockquote>
-<p>newInstance实际上是把new方式分解为两步</p>
-</blockquote>
-<ol>
-<li>首先调用Class加载方法加载某个类</li>
-<li>然后实例化。</li>
-</ol>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"> Class a1 = Class.forName(<span class="string">&quot;A&quot;</span>);</span><br><span class="line">BeanFactory a2 =  (BeanFactory) a1.newInstance();</span><br><span class="line">System.out.println(a2);</span><br><span class="line">Class b1 = Class.forName(<span class="string">&quot;B&quot;</span>);</span><br><span class="line">BeanFactory b2 =  (BeanFactory) b1.newInstance();</span><br><span class="line">System.out.println(b2); <span class="comment">//两个l</span></span><br></pre></td></tr></table></figure>
-
-
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">String className = readfromXMlConfig;<span class="comment">//从xml 配置文件中获需要加载的类</span></span><br><span class="line">Class c = Class.forName（className）；</span><br><span class="line">factory = （AInterface）c.newInstance（）；<span class="comment">//这样，在不知道是实现类的类名的情况下创建到了实现类</span></span><br></pre></td></tr></table></figure>
-
-<p>可以在调用class.forName时获得更好的灵活性（获得更宽泛的类名），提供给了一种降耦(降低耦合度)的手段。</p>
-<h4 id="2-3-3-区别总结"><a href="#2-3-3-区别总结" class="headerlink" title="2.3.3  区别总结"></a>2.3.3  区别总结</h4><ul>
-<li>newInstance: 方法级别，弱类型。低效率。只能调用无参构造。</li>
-<li>new: 关键字级别，强类型。相对高效。能调用任何public构造。</li>
-</ul>
-<h4 id="2-3-4-newInstance用途"><a href="#2-3-4-newInstance用途" class="headerlink" title="2.3.4 newInstance用途"></a>2.3.4 newInstance用途</h4><p>是实现IOC、反射、依赖倒置 等技术方法的必然选择，new 只能实现具体类的实例化，不适合于接口编程。类里面就是经过这个类的默认构造函数构建了一个对象，若是没有默认构造函数就抛出InstantiationException, 若是没有访问默认构造函数的权限就抛出IllegalAccessException xml</p>
-<h2 id="三、类加载器"><a href="#三、类加载器" class="headerlink" title="三、类加载器"></a>三、类加载器</h2><h3 id="3-1-三级"><a href="#3-1-三级" class="headerlink" title="3.1 三级"></a>3.1 三级</h3><h4 id="3-1-1-Bootstrap类加载器"><a href="#3-1-1-Bootstrap类加载器" class="headerlink" title="3.1.1 Bootstrap类加载器"></a>3.1.1 Bootstrap类加载器</h4><ul>
-<li>作用：加载java.lib下面的核心类库<ul>
-<li>rt.jar</li>
-<li>resources.jar</li>
-</ul>
-</li>
-<li>获取：System.getProperty(“sun.boot.class.path”)</li>
-</ul>
-<h4 id="3-1-2-Extension类加载器"><a href="#3-1-2-Extension类加载器" class="headerlink" title="3.1.2 Extension类加载器"></a>3.1.2 Extension类加载器</h4><ul>
-<li>作用：加载java.lib.ext下的类</li>
-<li>System.getProperty(“java.ext.dirs”)</li>
-</ul>
-<h4 id="3-1-3-System类加载器"><a href="#3-1-3-System类加载器" class="headerlink" title="3.1.3 System类加载器"></a>3.1.3 System类加载器</h4><ul>
-<li>作用：加载javaclasspath下的类</li>
-</ul>
-<h3 id="3-2-双亲委派机制"><a href="#3-2-双亲委派机制" class="headerlink" title="3.2 双亲委派机制"></a>3.2 双亲委派机制</h3>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/spring/spring%E6%A0%B8%E5%BF%83/aop/springAOP/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/08/spring/spring%E6%A0%B8%E5%BF%83/aop/springAOP/" class="post-title-link" itemprop="url">springAOP</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-18 16:28:19" itemprop="dateModified" datetime="2022-03-18T16:28:19+08:00">2022-03-18</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/08/spring/spring%E6%A0%B8%E5%BF%83/aop/springAOP/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/spring/spring%E6%A0%B8%E5%BF%83/aop/springAOP/" class="cy_cmt_count" data-xid="2022/03/08/spring/spring核心/aop/springAOP/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>2.1k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>[toc]</p>
-<h2 id="一、AOP术语"><a href="#一、AOP术语" class="headerlink" title="一、AOP术语"></a>一、AOP术语</h2><p><a target="_blank" rel="noopener" href="https://mrbird.cc/AOP%E6%9C%AF%E8%AF%AD.html">参考</a></p>
-<h3 id="1-通知"><a href="#1-通知" class="headerlink" title="1. 通知"></a>1. 通知</h3><ol>
-<li><code>Before</code> —— 在方法被调用之前调用通知。</li>
-<li><code>After</code> —— 在方法完成之后调用通知，无论方法是否执行成功。</li>
-<li><code>After-returning</code> —— 在方法成功执行之后调用通知。</li>
-<li><code>After-throwing</code> —— 在方法抛出异常以后调用通知。</li>
-<li><code>Around</code> —— 通知包裹了被通知的方法，在被通知的方法调用之前和调用之后执行自定义的行为。</li>
-</ol>
-<h3 id="2-连接点-Joinpoint"><a href="#2-连接点-Joinpoint" class="headerlink" title="2. 连接点(Joinpoint)"></a>2. 连接点(Joinpoint)</h3><blockquote>
-<p>​    连接点是在应用执行过程中能够插入切面的一个点。这个点可以是调用方法时，抛出异常时，甚至是修改一个字段时。切面代码可以利用这些点插入到应用的正常流程之中，并添加新的行为。</p>
-</blockquote>
-<h3 id="3-切点-Pointcut"><a href="#3-切点-Pointcut" class="headerlink" title="3. 切点(Pointcut)"></a>3. 切点(Pointcut)</h3><blockquote>
-<p>​    切点的定义会匹配通知所要织入的一个或多个连接点。我们通常使用明确的类和方法名称来指定这些切点，或是利用正则表达式定义匹配的类和方法名称模式来指定这些切点。</p>
-</blockquote>
-<h3 id="4-切面-Aspect"><a href="#4-切面-Aspect" class="headerlink" title="4. 切面(Aspect)"></a>4. 切面(Aspect)</h3><blockquote>
-<p>​    切面是通知和切点的结合。通知和切点共同定义了关于切面的全部内容 —— 它是什么，在何时和何处完成其功能。</p>
-</blockquote>
-<h3 id="5-引入-Introduction"><a href="#5-引入-Introduction" class="headerlink" title="5. 引入(Introduction)"></a>5. 引入(Introduction)</h3><blockquote>
-<p>​    引入允许我们向现有的类添加新的方法和属性。</p>
-</blockquote>
-<h3 id="6-织入-Weaving"><a href="#6-织入-Weaving" class="headerlink" title="6. 织入(Weaving)"></a>6. 织入(Weaving)</h3><blockquote>
-<p>​    织入是将切面应用到目标对象来创建新的代理对象的过程。切面在指定的连接点被织入到目标对象中。在目标对象的生命周期里有多个点可以进行织入：</p>
-</blockquote>
-<ul>
-<li>编译器 —— 切面在目标类编译时被织入。</li>
-<li>类加载期 —— 切面在目标类加载到JVM时被织入。</li>
-<li>运行期 —— 切面在应用运行的某个时候被织入。Spring AOP就是以这种方式织入切面的。</li>
-</ul>
-<h2 id="二、springAop关键对象"><a href="#二、springAop关键对象" class="headerlink" title="二、springAop关键对象"></a>二、springAop关键对象</h2><table>
-<thead>
-<tr>
-<th align="left">Aspect</th>
-<th>一个模块具有一组提供横切需求的 APIs。例如，一个日志模块为了记录日志将被 AOP 方面调用。应用程序可以拥有任意数量的方面，这取决于需求。</th>
-<th>切面</th>
-<th>@Aspect</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">Join point</td>
-<td>在你的应用程序中它代表一个点，你可以在插件 AOP 方面。你也能说，它是在实际的应用程序中，其中一个操作将使用 Spring AOP 框架。</td>
-<td>连接点</td>
-<td>ProceedingJoinPoint</td>
-</tr>
-<tr>
-<td align="left">Advice</td>
-<td>这是实际行动之前或之后执行的方法。这是在程序执行期间通过 Spring AOP 框架实际被调用的代码。</td>
-<td>通知</td>
-<td>@before,after</td>
-</tr>
-<tr>
-<td align="left">Pointcut</td>
-<td>这是一组一个或多个连接点，通知应该被执行。你可以使用表达式或模式指定切入点正如我们将在 AOP 的例子中看到的。</td>
-<td>切点</td>
-<td>@Pointcut</td>
-</tr>
-<tr>
-<td align="left">Introduction</td>
-<td>引用允许你添加新方法或属性到现有的类中。</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td align="left">Target object</td>
-<td>被一个或者多个方面所通知的对象，这个对象永远是一个被代理对象。也称为被通知对象。</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td align="left">Weaving</td>
-<td>Weaving 把方面连接到其它的应用程序类型或者对象上，并创建一个被通知的对象。这些可以在编译时，类加载时和运行时完成。</td>
-<td></td>
-<td></td>
-</tr>
-</tbody></table>
-<h2 id="切入点表达式"><a href="#切入点表达式" class="headerlink" title="切入点表达式"></a>切入点表达式</h2><h3 id="execution-标准式"><a href="#execution-标准式" class="headerlink" title="@execution 标准式"></a>@execution 标准式</h3><h3 id="within-包、类的所有方法"><a href="#within-包、类的所有方法" class="headerlink" title="within 包、类的所有方法"></a>within 包、类的所有方法</h3><h3 id="annotation-注解"><a href="#annotation-注解" class="headerlink" title="@annotation 注解"></a>@annotation 注解</h3><h2 id="三、AOP使用"><a href="#三、AOP使用" class="headerlink" title="三、AOP使用"></a>三、AOP使用</h2><h3 id="3-1-日志"><a href="#3-1-日志" class="headerlink" title="3.1 日志"></a>3.1 日志</h3><figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">``</span><span class="string">`</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">#### 2.1.1 基于注解</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">1. 设置注解</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">   `</span><span class="string">``</span>java</span><br><span class="line">   <span class="keyword">public</span> <span class="meta">@interface</span> Log &#123;</span><br><span class="line">   	<span class="built_in">String</span> value() <span class="keyword">default</span> <span class="string">&quot;&quot;</span>;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
-
-<ol start="2">
-<li><p>加入切入点</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Pointcut(&quot;@annotation(com.wyg.myAnnotation.Log)&quot;)</span><span class="comment">//任意有这个注解的切入</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">pointcut</span><span class="params">()</span> </span>&#123;&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p>加入环绕方法</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Around(&quot;pointcut()&quot;)</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">around</span><span class="params">(ProceedingJoinPoint point)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">long</span> beginTime = System.currentTimeMillis();</span><br><span class="line">    point.proceed();			<span class="comment">// 执行方法</span></span><br><span class="line">    <span class="comment">// 执行时长(毫秒)</span></span><br><span class="line">    <span class="keyword">long</span> time = System.currentTimeMillis() - beginTime;</span><br><span class="line">    <span class="comment">// 保存日志</span></span><br><span class="line">    saveLog(point, time);</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h4 id="2-1-2-基于方法名称"><a href="#2-1-2-基于方法名称" class="headerlink" title="2.1.2 基于方法名称"></a>2.1.2 基于方法名称</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Pointcut(&quot;@execution(com.springboot.controller.TestController.methodTwo)&quot;)</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">pointcut</span><span class="params">()</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="三、execution语法"><a href="#三、execution语法" class="headerlink" title="三、execution语法"></a>三、execution语法</h2><h3 id="3-1-基本格式"><a href="#3-1-基本格式" class="headerlink" title="3.1 基本格式"></a>3.1 基本格式</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">execution(A com.<span class="keyword">package</span>..B.C(..))</span><br></pre></td></tr></table></figure>
-
-<p>A 返回类型</p>
-<p>B 类名</p>
-<p>C 方法名</p>
-<p>第一个 .. 当前包和子包，还可以写. 表示当前包</p>
-<p>第二个.. 表示任意参数 </p>
-<h2 id="四、JointPoint-获取连接点信息"><a href="#四、JointPoint-获取连接点信息" class="headerlink" title="四、JointPoint  获取连接点信息"></a>四、JointPoint  获取连接点信息</h2><p><strong>ProceedingJoinPoint只支持around</strong></p>
-<table>
-<thead>
-<tr>
-<th>方法名</th>
-<th>功能</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Signature getSignature();</td>
-<td>获取封装了署名信息的对象,在该对象中可以获取到目标方法名,所属类的Class等信息</td>
-</tr>
-<tr>
-<td>Object[] getArgs();</td>
-<td>获取传入目标方法的参数对象</td>
-</tr>
-<tr>
-<td>Object getTarget();</td>
-<td>获取被代理的对象</td>
-</tr>
-<tr>
-<td>Object getThis();</td>
-<td>获取代理对象</td>
-</tr>
-</tbody></table>
-<h2 id="五、ProceedingJoinPoint"><a href="#五、ProceedingJoinPoint" class="headerlink" title="五、ProceedingJoinPoint"></a>五、ProceedingJoinPoint</h2>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JUtil/Objects/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JUtil/Objects/" class="post-title-link" itemprop="url">Objects</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-12-20 00:20:42" itemprop="dateModified" datetime="2021-12-20T00:20:42+08:00">2021-12-20</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JUtil/Objects/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JUtil/Objects/" class="cy_cmt_count" data-xid="2022/03/08/java/java源码解读/JUtil/Objects/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.6k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>[toc]</p>
-<h2 id="一、属性"><a href="#一、属性" class="headerlink" title="一、属性"></a>一、属性</h2><p>1</p>
-<h2 id="二、方法"><a href="#二、方法" class="headerlink" title="二、方法"></a>二、方法</h2><blockquote>
-<p>私有构造，工具方法类</p>
-</blockquote>
-<h3 id="2-1-equals"><a href="#2-1-equals" class="headerlink" title="2.1 equals"></a>2.1 equals</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object a, Object b)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> (a == b) || (a != <span class="keyword">null</span> &amp;&amp; a.equals(b));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-2-deepEquals"><a href="#2-2-deepEquals" class="headerlink" title="2.2 deepEquals"></a>2.2 deepEquals</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">deepEquals</span><span class="params">(Object a, Object b)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (a == b)</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (a == <span class="keyword">null</span> || b == <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            <span class="keyword">return</span> Arrays.deepEquals0(a, b);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-3-hashCode"><a href="#2-3-hashCode" class="headerlink" title="2.3 hashCode"></a>2.3 hashCode</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">(Object o)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> o != <span class="keyword">null</span> ? o.hashCode() : <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-4-hash"><a href="#2-4-hash" class="headerlink" title="2.4 hash"></a>2.4 hash</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">hash</span><span class="params">(Object... values)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> Arrays.hashCode(values);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-
-
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">package</span> java.util;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.function.Supplier;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">Objects</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">Objects</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> AssertionError(<span class="string">&quot;No java.util.Objects instances for you!&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"> </span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">toString</span><span class="params">(Object o)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> String.valueOf(o);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">toString</span><span class="params">(Object o, String nullDefault)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> (o != <span class="keyword">null</span>) ? o.toString() : nullDefault;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function"><span class="keyword">int</span> <span class="title">compare</span><span class="params">(T a, T b, Comparator&lt;? <span class="keyword">super</span> T&gt; c)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> (a == b) ? <span class="number">0</span> :  c.compare(a, b);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"> </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">T <span class="title">requireNonNull</span><span class="params">(T obj)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (obj == <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException();</span><br><span class="line">        <span class="keyword">return</span> obj;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">T <span class="title">requireNonNull</span><span class="params">(T obj, String message)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (obj == <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException(message);</span><br><span class="line">        <span class="keyword">return</span> obj;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">isNull</span><span class="params">(Object obj)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> obj == <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">nonNull</span><span class="params">(Object obj)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> obj != <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">   </span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">T <span class="title">requireNonNull</span><span class="params">(T obj, Supplier&lt;String&gt; messageSupplier)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (obj == <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException(messageSupplier.get());</span><br><span class="line">        <span class="keyword">return</span> obj;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/19/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/19/">19</a><span class="page-number current">20</span><a class="page-number" href="/page/21/">21</a><a class="page-number" href="/page/22/">22</a><a class="extend next" rel="next" href="/page/21/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/19/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/19/">19</a><span class="page-number current">20</span><a class="page-number" href="/page/21/">21</a><span class="space">&hellip;</span><a class="page-number" href="/page/23/">23</a><a class="extend next" rel="next" href="/page/21/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1125,7 +1276,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">108</span>
+          <span class="site-state-item-count">111</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1176,12 +1327,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">292k</span>
+    <span title="站点总字数">306k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">4:25</span>
+    <span title="站点阅读时长">4:38</span>
 </div>
 
         

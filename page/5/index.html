@@ -187,6 +187,444 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/13/java/javaSE/JUC/%E9%98%BB%E5%A1%9E%E9%98%9F%E5%88%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/13/java/javaSE/JUC/%E9%98%BB%E5%A1%9E%E9%98%9F%E5%88%97/" class="post-title-link" itemprop="url">阻塞队列BlockingQeque</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-03-13 18:29:58 / 修改时间：22:02:44" itemprop="dateCreated datePublished" datetime="2022-03-13T18:29:58+08:00">2022-03-13</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/13/java/javaSE/JUC/%E9%98%BB%E5%A1%9E%E9%98%9F%E5%88%97/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/13/java/javaSE/JUC/%E9%98%BB%E5%A1%9E%E9%98%9F%E5%88%97/" class="cy_cmt_count" data-xid="2022/03/13/java/javaSE/JUC/阻塞队列/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>BlockingQeque </p>
+<p>put–&gt;[1,2,3,4,5]–&gt;take</p>
+<p>当队列为空，take操作会被阻塞，直到有元素</p>
+<p>当队列为满，put操作会被阻塞，直到有空位</p>
+<p>优点：把生产者、消费者进行了封装</p>
+<h2 id="二、类型"><a href="#二、类型" class="headerlink" title="二、类型"></a>二、类型</h2><p><strong>Deque</strong>是双向队列</p>
+<h3 id="2-1-ArrayBlockingQueue"><a href="#2-1-ArrayBlockingQueue" class="headerlink" title="2.1 ArrayBlockingQueue"></a>2.1 ArrayBlockingQueue</h3><blockquote>
+<p>基于数组结构的有界队列</p>
+</blockquote>
+<h3 id="2-2-LinkedBlockingQueue"><a href="#2-2-LinkedBlockingQueue" class="headerlink" title="2.2 LinkedBlockingQueue"></a>2.2 LinkedBlockingQueue</h3><blockquote>
+<p>基于链表的有界队列</p>
+</blockquote>
+<h3 id="2-3-LinkedBlockingDeque"><a href="#2-3-LinkedBlockingDeque" class="headerlink" title="2.3 LinkedBlockingDeque"></a>2.3 LinkedBlockingDeque</h3><blockquote>
+<p>基于链表的双向队列</p>
+</blockquote>
+<h3 id="2-4-PriorityBlockingQueue"><a href="#2-4-PriorityBlockingQueue" class="headerlink" title="2.4 PriorityBlockingQueue"></a>2.4 PriorityBlockingQueue</h3><blockquote>
+<p>基于优先队列的，可延迟、无界</p>
+</blockquote>
+<h3 id="2-5-增删操作"><a href="#2-5-增删操作" class="headerlink" title="2.5 增删操作"></a>2.5 增删操作</h3><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>异常</th>
+<th>bool</th>
+<th>阻塞</th>
+<th>超时</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>插入</td>
+<td>add</td>
+<td>offer</td>
+<td>put</td>
+<td>offer(time,unit)</td>
+</tr>
+<tr>
+<td>删除</td>
+<td>remove</td>
+<td>poll</td>
+<td>take</td>
+<td>poll(time,unit)</td>
+</tr>
+<tr>
+<td>检查</td>
+<td>element</td>
+<td>peek</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>说明</td>
+<td>抛出异常</td>
+<td>成功：true</td>
+<td>一直等待成功</td>
+<td></td>
+</tr>
+</tbody></table>
+<h4 id="2-6-阻塞队列解决生产者消费者"><a href="#2-6-阻塞队列解决生产者消费者" class="headerlink" title="2.6 阻塞队列解决生产者消费者"></a>2.6 阻塞队列解决生产者消费者</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> 生产者消费者 </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//创建消费者</span></span><br><span class="line">        <span class="keyword">int</span> customerNum=<span class="number">2</span>;</span><br><span class="line">        <span class="keyword">int</span> producerNum=<span class="number">1</span>;</span><br><span class="line">        List&lt;Thread&gt;customers=<span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        List&lt;Thread&gt;producers=<span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;customerNum;i++)</span><br><span class="line">            customers.add(<span class="keyword">new</span> Thread(<span class="keyword">new</span> Customer()));</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;producerNum;i++)</span><br><span class="line">            producers.add(<span class="keyword">new</span> Thread(<span class="keyword">new</span> Producer()));</span><br><span class="line">        customers.forEach(Thread::start);</span><br><span class="line">        producers.forEach(Thread::start);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Foot</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Customer</span> <span class="keyword">extends</span> <span class="title">Resource</span> <span class="keyword">implements</span> <span class="title">Runnable</span></span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                queue.take();</span><br><span class="line">                System.out.println(<span class="string">&quot;消费了第&quot;</span> + customFoot++ + <span class="string">&quot;个foot,现在容量为:&quot;</span> + queue.size());</span><br><span class="line">                TimeUnit.MILLISECONDS.sleep(<span class="number">20</span>);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (InterruptedException ex) &#123;</span><br><span class="line">                ex.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Producer</span> <span class="keyword">extends</span> <span class="title">Resource</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                queue.put(<span class="keyword">new</span> 生产者消费者.Foot());</span><br><span class="line">                System.out.println(<span class="string">&quot;生产了第&quot;</span> + productFoot++ + <span class="string">&quot;个foot,现在容量为:&quot;</span> + queue.size());</span><br><span class="line">                TimeUnit.MILLISECONDS.sleep(<span class="number">20</span>);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Resource</span> </span>&#123;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> productFoot = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> customFoot = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">int</span> size = <span class="number">100</span>;</span><br><span class="line">    <span class="keyword">static</span> BlockingQueue&lt;生产者消费者.Foot&gt; queue = <span class="keyword">new</span> ArrayBlockingQueue&lt;&gt;(size);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="BlockingDeque-阻塞双端队列"><a href="#BlockingDeque-阻塞双端队列" class="headerlink" title="BlockingDeque 阻塞双端队列"></a>BlockingDeque 阻塞双端队列</h2><p>deque: double ended queue 双端队列，可以从首部和尾部插入元素</p>
+<h2 id="BlockingQeque-阻塞队列"><a href="#BlockingQeque-阻塞队列" class="headerlink" title="BlockingQeque 阻塞队列"></a>BlockingQeque 阻塞队列</h2><h2 id="ArrayBlockingQueue"><a href="#ArrayBlockingQueue" class="headerlink" title="ArrayBlockingQueue"></a>ArrayBlockingQueue</h2><h2 id="ConcurrentHashMap"><a href="#ConcurrentHashMap" class="headerlink" title="ConcurrentHashMap"></a>ConcurrentHashMap</h2><h2 id="ConcurrentLinkedDeque"><a href="#ConcurrentLinkedDeque" class="headerlink" title="ConcurrentLinkedDeque"></a>ConcurrentLinkedDeque</h2><h2 id="ConcurrentLinkedQueue"><a href="#ConcurrentLinkedQueue" class="headerlink" title="ConcurrentLinkedQueue"></a>ConcurrentLinkedQueue</h2><h2 id="CopyOnWriteArrayList"><a href="#CopyOnWriteArrayList" class="headerlink" title="CopyOnWriteArrayList"></a>CopyOnWriteArrayList</h2><h2 id="CopyOnWriteArraySet"><a href="#CopyOnWriteArraySet" class="headerlink" title="CopyOnWriteArraySet"></a>CopyOnWriteArraySet</h2><h2 id="DelayQueue"><a href="#DelayQueue" class="headerlink" title="DelayQueue"></a>DelayQueue</h2>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/13/java/javaSE/JUC/%E9%94%81/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/13/java/javaSE/JUC/%E9%94%81/" class="post-title-link" itemprop="url">锁</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-13 18:08:46" itemprop="dateCreated datePublished" datetime="2022-03-13T18:08:46+08:00">2022-03-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-04-08 04:05:01" itemprop="dateModified" datetime="2022-04-08T04:05:01+08:00">2022-04-08</time>
+              </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/13/java/javaSE/JUC/%E9%94%81/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/13/java/javaSE/JUC/%E9%94%81/" class="cy_cmt_count" data-xid="2022/03/13/java/javaSE/JUC/锁/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>·</p>
+<h2 id="一、Lock的使用"><a href="#一、Lock的使用" class="headerlink" title="一、Lock的使用"></a>一、Lock的使用</h2><blockquote>
+<p><code>ReentrantLock</code>的实现是基于其内部类<code>FairSync</code>(公平锁)和<code>NonFairSync</code>(非公平锁)实现的。 其可重入性是基于<code>Thread.currentThread()</code>实现的: 如果当前线程已经获得了执行序列中的锁， 那执行序列之后的所有方法都可以获得这个锁。</p>
+</blockquote>
+<blockquote>
+<p>自增 lock上锁，condition 状态转换</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">Lock lock = <span class="keyword">new</span> ReentrantLock();<span class="comment">//可重入锁，lock.lock()上锁 unlock解锁</span></span><br><span class="line">Condition condition = lock.newCondition();<span class="comment">//状态监视-转换器 await 等待， signalAll 唤醒全部</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">int</span> num;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">increment</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    lock.lock();<span class="comment">//上锁</span></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">while</span> (num != <span class="number">0</span>) &#123;</span><br><span class="line">            condition.await();<span class="comment">//等待</span></span><br><span class="line">        &#125;</span><br><span class="line">        num++;</span><br><span class="line">        condition.signal();<span class="comment">//唤醒</span></span><br><span class="line">    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line"></span><br><span class="line">    &#125;<span class="keyword">finally</span>&#123;</span><br><span class="line">    	lock.unlock();<span class="comment">//解锁</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h4><blockquote>
+<p>基于AQS+CSA</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (compareAndSetState(<span class="number">0</span>, <span class="number">1</span>))</span><br><span class="line">    setExclusiveOwnerThread(Thread.currentThread());</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    acquire(<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="精准唤醒"><a href="#精准唤醒" class="headerlink" title="精准唤醒"></a>精准唤醒</h4><h2 id="synchonized"><a href="#synchonized" class="headerlink" title="synchonized"></a>synchonized</h2><h3 id="内存语义"><a href="#内存语义" class="headerlink" title="内存语义"></a>内存语义</h3><h3 id="synchonized和Lock区别"><a href="#synchonized和Lock区别" class="headerlink" title="synchonized和Lock区别"></a>synchonized和Lock区别</h3><ol>
+<li>synchonized是一个关键字，Lock是一个类</li>
+<li>synchonized是隐式锁，自动上锁解锁，Lock是显式锁，手动操作</li>
+<li>synchonized无法获得所得状态，Lock可以判断是否获得了锁，更灵活</li>
+<li>synchonized是<code>非公平锁</code>，Lock默认是<code>非公平锁</code>，可设置</li>
+<li>synchonized适合锁少量的代码，Lock是否大量代码<ol>
+<li>conditon可以精准唤醒，可以灵活调整获得锁的顺序</li>
+</ol>
+</li>
+</ol>
+<h3 id="乐观锁"><a href="#乐观锁" class="headerlink" title="乐观锁"></a>乐观锁</h3><blockquote>
+<p>基于版本</p>
+</blockquote>
+<ol>
+<li><p>支持并发</p>
+</li>
+<li><p>在提交任务之前比较版本号，不一致就放弃，再申请提交，知道提交完成</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">update t_goods </span><br><span class="line"><span class="keyword">set</span> status<span class="operator">=</span><span class="number">2</span>,version<span class="operator">=</span>version<span class="operator">+</span><span class="number">1</span></span><br><span class="line"><span class="keyword">where</span> id<span class="operator">=</span>#&#123;id&#125; <span class="keyword">and</span> version<span class="operator">=</span>#&#123;version&#125;;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="悲观锁"><a href="#悲观锁" class="headerlink" title="悲观锁"></a>悲观锁</h3><ol>
+<li>串行化</li>
+</ol>
+<h3 id="表锁"><a href="#表锁" class="headerlink" title="表锁"></a>表锁</h3><h3 id="行锁"><a href="#行锁" class="headerlink" title="行锁"></a>行锁</h3><h3 id="读锁、共享锁、S锁、"><a href="#读锁、共享锁、S锁、" class="headerlink" title="读锁、共享锁、S锁、"></a>读锁、共享锁、S锁、</h3><blockquote>
+<p>如果事务T对数据A加上共享锁后，则其他事务只能对A再加共享锁，不能加排他锁。获准共享锁的事务只能读数据，不能修改数据。</p>
+</blockquote>
+<h3 id="写锁、独占锁、排他锁、T锁"><a href="#写锁、独占锁、排他锁、T锁" class="headerlink" title="写锁、独占锁、排他锁、T锁"></a>写锁、独占锁、排他锁、T锁</h3><blockquote>
+<p>如果事务T对数据A加上排他锁后，则其他事务不能再对A加任任何类型的封锁。获准排他锁的事务既能读数据，又能修改数据。</p>
+</blockquote>
+<h3 id="公平锁，非公平锁"><a href="#公平锁，非公平锁" class="headerlink" title="公平锁，非公平锁"></a>公平锁，非公平锁</h3><blockquote>
+<p>最早请求的锁最早获得锁，需要队列实现，影响性能</p>
+</blockquote>
+<h3 id="对写锁"><a href="#对写锁" class="headerlink" title="对写锁"></a>对写锁</h3><blockquote>
+<p>有独占锁，也有共享锁</p>
+</blockquote>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">Book</span>&#123;</span><br><span class="line">	<span class="keyword">private</span> Lock=<span class="keyword">new</span> ReetranWriteReadLock();</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">read</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">		<span class="keyword">lock</span>.writeLock().<span class="keyword">lock</span>();</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">wirte</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">		<span class="keyword">lock</span>.rLock().<span class="keyword">lock</span>();</span><br><span class="line">	</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/13/java/javaSE/JUC/%E8%BE%85%E5%8A%A9%E7%B1%BB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/13/java/javaSE/JUC/%E8%BE%85%E5%8A%A9%E7%B1%BB/" class="post-title-link" itemprop="url">CountDownLatch</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-13 17:19:25" itemprop="dateCreated datePublished" datetime="2022-03-13T17:19:25+08:00">2022-03-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-04-02 00:34:13" itemprop="dateModified" datetime="2022-04-02T00:34:13+08:00">2022-04-02</time>
+              </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/13/java/javaSE/JUC/%E8%BE%85%E5%8A%A9%E7%B1%BB/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/13/java/javaSE/JUC/%E8%BE%85%E5%8A%A9%E7%B1%BB/" class="cy_cmt_count" data-xid="2022/03/13/java/javaSE/JUC/辅助类/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.8k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="CountDownLatch"><a href="#CountDownLatch" class="headerlink" title="CountDownLatch"></a>CountDownLatch</h3><blockquote>
+<p>组线程 任务完成记录 技术</p>
+<p>用于主线程汇总子线程</p>
+<p>以前用join方法完成，现在用优美的CountDownLatch完成</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> n=<span class="number">30</span>;</span><br><span class="line">    CountDownLatch latch=<span class="keyword">new</span> CountDownLatch(n);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">        <span class="keyword">new</span> Thread(() -&gt; &#123;</span><br><span class="line">            System.out.println(Thread.currentThread().getName() + <span class="string">&quot;号离开&quot;</span>);<span class="comment">//任务</span></span><br><span class="line">            latch.countDown();<span class="comment">//每个线程完成就减少一次</span></span><br><span class="line">                         &#125;, String.valueOf(i)<span class="comment">//线程名称</span></span><br><span class="line"></span><br><span class="line">                  ).start();</span><br><span class="line">    &#125;</span><br><span class="line">    latch.await();<span class="comment">//还没减少到0，等待</span></span><br><span class="line">    System.out.println(Thread.currentThread().getName()+<span class="string">&quot;锁门&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="CyclicBarrier循环屏障"><a href="#CyclicBarrier循环屏障" class="headerlink" title="CyclicBarrier循环屏障"></a>CyclicBarrier循环屏障</h3><blockquote>
+<p>循环栅栏</p>
+<p>可以重复利用</p>
+<p>收集到7个后就会运行run方法，然后可以再收集7个</p>
+<p>原理：index = 7   index–;  if(index==0)  breakBarrier()    ;</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//设置固定值</span></span><br><span class="line"> <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> NUM=<span class="number">10</span>;</span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">     CyclicBarrier cyclicBarrier=<span class="keyword">new</span> CyclicBarrier(NUM,()-&gt; System.out.println(<span class="string">&quot;收集完成&quot;</span>));<span class="comment">//</span></span><br><span class="line">     <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;NUM;i++)&#123;</span><br><span class="line">         <span class="keyword">int</span> finalI = i;</span><br><span class="line">         <span class="keyword">new</span> Thread(()-&gt;&#123;</span><br><span class="line">             System.out.println(Thread.currentThread().getName()+<span class="string">&quot;被收集&quot;</span>);</span><br><span class="line">             <span class="keyword">try</span> &#123;</span><br><span class="line">                 cyclicBarrier.await();</span><br><span class="line">             &#125; <span class="keyword">catch</span> (InterruptedException | BrokenBarrierException e) &#123;</span><br><span class="line">                 e.printStackTrace();</span><br><span class="line">             &#125;</span><br><span class="line">             System.out.println(<span class="string">&quot;结束&quot;</span>+finalI);<span class="comment">//都完成后</span></span><br><span class="line">         &#125;,String.valueOf(i)).start();</span><br><span class="line">     &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="Semaphore信号灯"><a href="#Semaphore信号灯" class="headerlink" title="Semaphore信号灯"></a>Semaphore信号灯</h3><blockquote>
+<p>限流，最多三个能同时进行</p>
+<p>原理：资源抢占</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">Semaphore semaphore=<span class="keyword">new</span> Semaphore(<span class="number">3</span>);<span class="comment">//创建资源</span></span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;<span class="number">6</span>;i++)&#123;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">int</span> x=i;</span><br><span class="line">    <span class="keyword">new</span> Thread(()-&gt;&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            semaphore.acquire();<span class="comment">//抢占资源</span></span><br><span class="line">            System.out.println(x+<span class="string">&quot;抢到资源&quot;</span>);</span><br><span class="line">            TimeUnit.SECONDS.sleep(<span class="number">2</span>);<span class="comment">//占用资源</span></span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;<span class="keyword">finally</span> &#123;</span><br><span class="line">            semaphore.release();<span class="comment">//释放资源</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;).start();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="区别"><a href="#区别" class="headerlink" title="区别"></a>区别</h3><ul>
+<li><p>CountdownLatch执行流程</p>
+<ul>
+<li>执行一组线程</li>
+<li>CountdownLatch.awite()  阻塞主线程等待。知道全部完成</li>
+<li>没有总结线程，他的main线程可以近似总结线程</li>
+</ul>
+</li>
+<li><p>Syslicbarrier的执行流程是</p>
+<ul>
+<li><p>任务定义</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">work&#123;</span><br><span class="line">	beforeWork();</span><br><span class="line">	cyclicBarrier.await();</span><br><span class="line">	afterWork();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>执行一组任务的beforeWork</p>
+</li>
+<li><p>全部完成后执行cyclicBarrier的<code>总结</code>线程</p>
+</li>
+<li><p>执行这组任务的afterWork()</p>
+</li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/12/java/javaSE/jvm/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -669,714 +1107,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/12/java/socket%E7%BC%96%E7%A8%8B/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/12/java/socket%E7%BC%96%E7%A8%8B/" class="post-title-link" itemprop="url">socket编程</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-12 14:11:08" itemprop="dateCreated datePublished" datetime="2022-03-12T14:11:08+08:00">2022-03-12</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-26 22:44:10" itemprop="dateModified" datetime="2022-03-26T22:44:10+08:00">2022-03-26</time>
-              </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/12/java/socket%E7%BC%96%E7%A8%8B/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/12/java/socket%E7%BC%96%E7%A8%8B/" class="cy_cmt_count" data-xid="2022/03/12/java/socket编程/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>934</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>`</p>
-<blockquote>
-<p>socket就是对UDP、TCP的封装</p>
-</blockquote>
-<h3 id="TCP-UDP"><a href="#TCP-UDP" class="headerlink" title="TCP UDP"></a>TCP UDP</h3><ul>
-<li><strong>TCP</strong>：传输控制协议，是一种面向连接的、可靠的、基于字节流的传输层通信协议，TCP 层是位于 IP 层之上，应用层之下的中间层。TCP 保障了两个应用程序之间的可靠通信。通常用于互联网协议，被称 TCP / IP。</li>
-<li><strong>UDP</strong>：用户数据报协议，位于 OSI 模型的传输层。一个无连接的协议。提供了应用程序之间要发送数据的数据报。由于UDP缺乏可靠性且属于无连接协议，所以应用程序通常必须容许一些丢失、错误或重复的数据包。不局限于端到端，可以广播</li>
-</ul>
-<h3 id="socket"><a href="#socket" class="headerlink" title="socket"></a>socket</h3><ol>
-<li><p>在计算机网络中，叫套接字socket (ip:port)</p>
-<p>top连接={socket1,socket2}</p>
-</li>
-<li><p>在程序通信中，叫socket Api，网络通信接口，这是对TCP、IP的封装</p>
-</li>
-</ol>
-<h3 id="socket编程"><a href="#socket编程" class="headerlink" title="socket编程"></a>socket编程</h3><blockquote>
-<p>当连接建立时，服务器会创建一个 Socket 对象。客户端和服务器现在可以通过对 Socket 对象的写入和读取来进行通信。</p>
-</blockquote>
-<h2 id="二、类"><a href="#二、类" class="headerlink" title="二、类"></a>二、类</h2><h3 id="2-1-ServerSocket"><a href="#2-1-ServerSocket" class="headerlink" title="2.1 ServerSocket"></a>2.1 ServerSocket</h3><table>
-<thead>
-<tr>
-<th>序号</th>
-<th>方法名</th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>1</td>
-<td>ServerSocket(int port)</td>
-<td>构造函数</td>
-</tr>
-<tr>
-<td>2</td>
-<td><strong>getLocalPort</strong></td>
-<td>获得端口</td>
-</tr>
-<tr>
-<td>3</td>
-<td><strong>accept</strong></td>
-<td>监听</td>
-</tr>
-<tr>
-<td>4</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>5</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>6</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>7</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>8</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>9</td>
-<td></td>
-<td></td>
-</tr>
-</tbody></table>
-<h3 id="2-2-Socket"><a href="#2-2-Socket" class="headerlink" title="2.2 Socket"></a>2.2 Socket</h3><table>
-<thead>
-<tr>
-<th>序号</th>
-<th>方法名</th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>1</td>
-<td>Socket(String host, int port)</td>
-<td>构造函数</td>
-</tr>
-<tr>
-<td>2</td>
-<td>**connect(**SocketAddress host, int timeout)</td>
-<td>连接</td>
-</tr>
-<tr>
-<td>3</td>
-<td><strong>getInetAddress</strong></td>
-<td>获得地址</td>
-</tr>
-<tr>
-<td>4</td>
-<td><strong>getPort</strong></td>
-<td></td>
-</tr>
-<tr>
-<td>5</td>
-<td><strong>getInputStream</strong></td>
-<td>获得输入流</td>
-</tr>
-<tr>
-<td>6</td>
-<td>OutputStream</td>
-<td>获得输出流</td>
-</tr>
-<tr>
-<td></td>
-<td><strong>close</strong></td>
-<td>关闭</td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-</tbody></table>
-<h3 id="2-3-InetAddress"><a href="#2-3-InetAddress" class="headerlink" title="2.3 InetAddress"></a>2.3 InetAddress</h3><table>
-<thead>
-<tr>
-<th>序号</th>
-<th>方法名</th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-</tbody></table>
-<h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><h4 id="阻塞IO"><a href="#阻塞IO" class="headerlink" title="阻塞IO"></a>阻塞IO</h4><p>进程进行IO操作的适合被挂起，防止被运行，指导IO操作完成。</p>
-<h4 id="非阻塞IO"><a href="#非阻塞IO" class="headerlink" title="非阻塞IO"></a>非阻塞IO</h4><p>IO操作立即返回，返回值为读取到的数据大小。等到总线发送了中断信号，就表示IO操作完成。</p>
-<h2 id="三、步骤"><a href="#三、步骤" class="headerlink" title="三、步骤"></a>三、步骤</h2><ol>
-<li>创建一个ServerSocket，监听并绑定一个端口</li>
-<li>一系列客户端来请求这个端口</li>
-<li>服务器使用Accept，获得一个来自客户端的Socket连接对象 </li>
-<li>启动一个新线程处理连接 <ol>
-<li>读Socket，得到字节流</li>
-<li>解码协议，得到Http请求对象 </li>
-<li>处理Http请求，得到一个结果，封装成一个HttpResponse对象 </li>
-<li>编码协议，将结果序列化字节流 写Socket，将字节流发给客户端 </li>
-</ol>
-</li>
-<li>继续循环步骤3</li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/12/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%B4%A2%E5%BC%95/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/12/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%B4%A2%E5%BC%95/" class="post-title-link" itemprop="url">mysql索引</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-12 03:01:52" itemprop="dateCreated datePublished" datetime="2022-03-12T03:01:52+08:00">2022-03-12</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-04-07 10:16:12" itemprop="dateModified" datetime="2022-04-07T10:16:12+08:00">2022-04-07</time>
-              </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/12/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%B4%A2%E5%BC%95/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/12/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%B4%A2%E5%BC%95/" class="cy_cmt_count" data-xid="2022/03/12/数据库/mysql索引/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.8k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>​    </p>
-<h2 id="一、索引原理"><a href="#一、索引原理" class="headerlink" title="一、索引原理"></a>一、索引原理</h2><blockquote>
-<p>索引原理：</p>
-<p>索引是一种利用某种规则的数据结构与实际数据的关系加快数据查找的功能；索引数据节点中有着实际文件的位置，因为索引是根据特定的规则和算法构建的,在查找的时候遵循索引的规则可以快速查找到对应数据的节点，从而达到快速查找数据的效果；其实宏观来说索引其实是一种概念而不是具体的某项技术，只是我们在某个技术中运用得比较广泛和鲜明（比如说数据库）渐渐的有了特定领域的标签，其实在生活中索引的使用无处不在，比如说：书本里的目录；读书时的座位号，考试编号都有类似索引的功能;</p>
-<p>总结来所有通过某规则数据结构和实际目标关联，根据特定规则算法快速寻址的功能都可以称之为索引；</p>
-</blockquote>
-<h3 id="术语"><a href="#术语" class="headerlink" title="术语"></a>术语</h3><h4 id="索引覆盖"><a href="#索引覆盖" class="headerlink" title="索引覆盖"></a>索引覆盖</h4><blockquote>
-<p>正好命中索引，不需要回表</p>
-<p>select id,name from user  索引覆盖的前提是name有索引，因为name的索引表中存储的是（name,id），一个表就存储了name和id</p>
-</blockquote>
-<h4 id="索引下推"><a href="#索引下推" class="headerlink" title="索引下推"></a>索引下推</h4><figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">联合索引的情况:</span></span><br><span class="line">	对索引中包含的字段先做判断，过滤掉不符合条件的记录，减少回表字数。</span><br></pre></td></tr></table></figure>
-
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220404235036297.png" alt="image-20220404235036297"></p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220404235043708.png" alt="image-20220404235043708"></p>
-<h2 id="二、索引结构"><a href="#二、索引结构" class="headerlink" title="二、索引结构"></a>二、索引结构</h2><h3 id="1-1-为什么是b-树"><a href="#1-1-为什么是b-树" class="headerlink" title="1.1 为什么是b+树"></a>1.1 为什么是b+树</h3><ol>
-<li>索引的表象是一个目录</li>
-<li>底层原理   [字段值,地址] 某种数据结构的映射</li>
-</ol>
-<h3 id="1-2-排序的结构"><a href="#1-2-排序的结构" class="headerlink" title="1.2 排序的结构"></a>1.2 排序的结构</h3><ol>
-<li>二叉树   —&gt; 递增有序的情况    <strong>树高度==n</strong></li>
-<li>AVL 平衡二叉树   旋转次数多</li>
-<li>红黑树 弱平衡二叉树         弊端: 高度高</li>
-<li>B树   m叉树+平衡查找树     扩大横分叉，高度可控</li>
-<li>B+树  每个节点从左到右一次递增<ol>
-<li>非叶子节点不存数据，只存冗余索引</li>
-<li>叶子节点从大到小相互连接</li>
-<li>每个页16KB<ol>
-<li>如果满了  节点分裂  高度增加</li>
-</ol>
-</li>
-</ol>
-</li>
-</ol>
-<h4 id="B-树相对于B树优点"><a href="#B-树相对于B树优点" class="headerlink" title="B+树相对于B树优点"></a>B+树相对于B树优点</h4><ol>
-<li>非叶子节点都存有冗余，这样的目的是为了让叶子节点存有所有的数据</li>
-<li>非叶子节点<strong>不带有指向记录</strong>的指针，则一个块可以存储更多的索引项，如此可以降低树的高度。</li>
-<li>叶子节点之间有指针连接，则在范围扫描时避免了在内部节点来回移动。</li>
-</ol>
-<h4 id="B-树搜索过程"><a href="#B-树搜索过程" class="headerlink" title="B+树搜索过程"></a>B+树搜索过程</h4><ol>
-<li>根据冗余索引找到data叶子节点</li>
-<li>把data加载到内存 然后二分查找</li>
-</ol>
-<h4 id="特别的"><a href="#特别的" class="headerlink" title="特别的"></a>特别的</h4><ol>
-<li>如果只有一层  那么就相当于二分查找 ，但是，但是这意味着把所有的数据加载到内存，内存吃不消。 </li>
-<li>hash表<ol>
-<li>数组+链表</li>
-<li>hash运算—&gt;存到链表(hash冲突直接加在链表尾部)</li>
-<li><strong>不支持范围查找</strong></li>
-<li>不支持模糊查询</li>
-<li>大量重复数据，会严重影响查询性能</li>
-</ol>
-</li>
-<li>mysql的memory支持hash索引，一般hash索引用于名字，而不用于数字</li>
-<li>innodb不支持hash索引，</li>
-</ol>
-<h2 id="三、索引分类"><a href="#三、索引分类" class="headerlink" title="三、索引分类"></a>三、索引分类</h2><blockquote>
-<p>索引分类 innodb才有   mylsam没有分类</p>
-<blockquote>
-<p>主键是不能为null的唯一索引</p>
-<p>唯一索引null可以出现多次,</p>
-<p>普通索引的所有值都能出现多次</p>
-</blockquote>
-</blockquote>
-<h3 id="3-1-聚集索引："><a href="#3-1-聚集索引：" class="headerlink" title="3.1 聚集索引："></a>3.1 聚集索引：</h3><blockquote>
-<p> InnoDB必须要有，且只有一个聚集索引</p>
-<ol>
-<li>如果表定义了PK，则PK就是聚集索引；</li>
-<li>如果表没有定义PK，则第一个not NULL unique列是聚集索引；</li>
-<li>否则，InnoDB会创建一个隐藏的row-id作为聚集索引；</li>
-</ol>
-</blockquote>
-<blockquote>
-<p>存(id,data)    </p>
-<p>数据按照索引的顺序来存储的，索引的顺序与表中记录的物理顺序一致。对于聚集索引，叶子结点即存储了真实的数据行，不再有另外单独的数据页。 在一张表上最多只能创建一个聚集索引，因为真实数据的物理顺序只能有一种</p>
-</blockquote>
-<ol>
-<li><p>索引和数据一起存储 ，找到了索引就是找到了数据</p>
-</li>
-<li><p>一个文件 idb</p>
-</li>
-<li><p><strong>优势</strong>：</p>
-<ol>
-<li>直接拿到数据，不需要二次查询。</li>
-<li>范围查询好</li>
-<li>是否排序的场合</li>
-</ol>
-</li>
-<li><p>劣势</p>
-<ol>
-<li><p>维护差，需要大量操作</p>
-</li>
-<li><p>使用uuid做主键，插入就会变得随机性，</p>
-</li>
-<li><p>id很大的化，辅助索引也会占用很大的空间</p>
-<blockquote>
-<p>辅助索引就是存(age,id)</p>
-</blockquote>
-</li>
-</ol>
-</li>
-</ol>
-<h3 id="3-2-非聚集-稀疏，二级索引-索引："><a href="#3-2-非聚集-稀疏，二级索引-索引：" class="headerlink" title="3.2 非聚集(稀疏，二级索引)索引："></a>3.2 非聚集(稀疏，二级索引)索引：</h3><blockquote>
-<p>存储(key,主键)</p>
-</blockquote>
-<ol>
-<li><p>查完得到主键</p>
-</li>
-<li><p>再回表去主键索引查询位置</p>
-</li>
-</ol>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220320213638194.png" alt="image-20220320213638194"></p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220320213755722.png" alt="image-20220320213755722"></p>
-<h3 id="3-3-联合索引"><a href="#3-3-联合索引" class="headerlink" title="3.3 联合索引"></a>3.3 联合索引</h3><ol>
-<li><p>底层</p>
-</li>
-<li><p>最左前缀原则(a,b,c)</p>
-<ol>
-<li><p>为什么最左前缀</p>
-<p>在相同的a下才会排序b</p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211014212733501.png" alt="image-20211014212733501"></p>
-</li>
-<li></li>
-</ol>
-</li>
-</ol>
-<h3 id="3-4-全文索引"><a href="#3-4-全文索引" class="headerlink" title="3.4 全文索引"></a>3.4 全文索引</h3><blockquote>
-<p>5.6之后开始支持全文索引，</p>
-</blockquote>
-<h2 id="三、索引选择"><a href="#三、索引选择" class="headerlink" title="三、索引选择"></a>三、索引选择</h2><h3 id="3-1-B-树索引"><a href="#3-1-B-树索引" class="headerlink" title="3.1 B+树索引"></a>3.1 B+树索引</h3><h4 id="优势"><a href="#优势" class="headerlink" title="优势"></a>优势</h4><ol>
-<li>完全匹配</li>
-<li>范围匹配</li>
-<li>前缀匹配（左模糊）</li>
-</ol>
-<h4 id="限制"><a href="#限制" class="headerlink" title="限制"></a>限制</h4><ol>
-<li>对于index(a,b,c)，有最左原则，也就是只有选了a才能用索引</li>
-</ol>
-<h3 id="3-2-hash索引"><a href="#3-2-hash索引" class="headerlink" title="3.2 hash索引"></a>3.2 hash索引</h3><h4 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h4><ol>
-<li>简单</li>
-<li>快</li>
-</ol>
-<h4 id="限制-1"><a href="#限制-1" class="headerlink" title="限制"></a>限制</h4><ol>
-<li>不能范围</li>
-<li>不能排序</li>
-<li>不能模糊查询</li>
-<li>考虑hash冲突</li>
-</ol>
-<h2 id="四、索引创建原则"><a href="#四、索引创建原则" class="headerlink" title="四、索引创建原则"></a>四、索引创建原则</h2><h3 id="需要建立索引"><a href="#需要建立索引" class="headerlink" title="需要建立索引"></a>需要建立索引</h3><ol>
-<li>该字段经常select+where, update+where delete where</li>
-<li>需要分组、排序的字段</li>
-<li>唯一的字段</li>
-</ol>
-<h3 id="不需要建立索引"><a href="#不需要建立索引" class="headerlink" title="不需要建立索引"></a>不需要建立索引</h3><ol>
-<li><p>数据量小不建立</p>
-</li>
-<li><p>经常update,delete,insert</p>
-</li>
-<li><p>不经常where</p>
-</li>
-<li><p>数据重复严重 </p>
-<blockquote>
-<p>索引的目的是为了加速，比如把sex建立索引，加速太小，反而还需要维护索引，不如全表扫描</p>
-</blockquote>
-</li>
-<li><p>字段长度太大</p>
-</li>
-</ol>
-<h2 id="五、索引失效"><a href="#五、索引失效" class="headerlink" title="五、索引失效"></a>五、索引失效</h2><blockquote>
-<p>模：代表模糊查询。</p>
-<p>型：代表数据类型。</p>
-<p>数：代表函数。</p>
-<p>空：是Null的意思。</p>
-<p>运：代表运算。</p>
-<p>最：代表最左原则。</p>
-<p>快：全表扫描更快的意思</p>
-</blockquote>
-<h2 id="六、索引调优"><a href="#六、索引调优" class="headerlink" title="六、索引调优"></a>六、索引调优</h2><h3 id="6-1-长字段索引"><a href="#6-1-长字段索引" class="headerlink" title="6.1 长字段索引"></a>6.1 长字段索引</h3><p>字符串长度太大不适合索引</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/11/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/elasticsearch%E8%AF%AD%E6%B3%95/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/11/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/elasticsearch%E8%AF%AD%E6%B3%95/" class="post-title-link" itemprop="url">elasticSearch语法</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-11 10:57:57" itemprop="dateCreated datePublished" datetime="2022-03-11T10:57:57+08:00">2022-03-11</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-04-03 15:37:40" itemprop="dateModified" datetime="2022-04-03T15:37:40+08:00">2022-04-03</time>
-              </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/11/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/elasticsearch%E8%AF%AD%E6%B3%95/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/11/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/elasticsearch%E8%AF%AD%E6%B3%95/" class="cy_cmt_count" data-xid="2022/03/11/数据库/nosql/elasticsearch语法/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>2.4k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="Rest-Api"><a href="#Rest-Api" class="headerlink" title="Rest Api"></a>Rest Api</h2><p>122133</p>
-<h2 id="一、Rest-Api"><a href="#一、Rest-Api" class="headerlink" title="一、Rest Api"></a>一、Rest Api</h2><h3 id="1-1-索引的增删改查"><a href="#1-1-索引的增删改查" class="headerlink" title="1.1 索引的增删改查"></a>1.1 索引的增删改查</h3><h4 id="创建索引"><a href="#创建索引" class="headerlink" title="创建索引"></a>创建索引</h4><figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">put</span> /shopping</span><br></pre></td></tr></table></figure>
-
-<h4 id="删除索引"><a href="#删除索引" class="headerlink" title="删除索引"></a>删除索引</h4><figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">delete</span> /shopping</span><br></pre></td></tr></table></figure>
-
-<h4 id="获得所有的索引信息"><a href="#获得所有的索引信息" class="headerlink" title="获得所有的索引信息"></a>获得所有的索引信息</h4><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="regexp">/_cat/i</span>ndices?v</span><br></pre></td></tr></table></figure>
-
-<h3 id="1-2-文档的增删改查"><a href="#1-2-文档的增删改查" class="headerlink" title="1.2 文档的增删改查"></a>1.2 文档的增删改查</h3><h4 id="创建文档"><a href="#创建文档" class="headerlink" title="创建文档"></a>创建文档</h4><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">post <span class="regexp">/index1/</span>_doc/ +json</span><br><span class="line">post <span class="regexp">/index1/</span>_doc/id +json</span><br></pre></td></tr></table></figure>
-
-<h4 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h4><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">delete</span>     /index1</span><br><span class="line"><span class="keyword">delete</span>     <span class="regexp">/index1/</span>_doc/id</span><br></pre></td></tr></table></figure>
-
-<h4 id="更改"><a href="#更改" class="headerlink" title="更改"></a>更改</h4><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">全量更新 put  <span class="regexp">/index1/</span>_doc/id +json</span><br><span class="line">局部更新 post <span class="regexp">/index1/</span>_update/id +json</span><br></pre></td></tr></table></figure>
-
-<h4 id="根据id查询文档"><a href="#根据id查询文档" class="headerlink" title="根据id查询文档"></a>根据id查询文档</h4><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="regexp">/index1/</span>_doc/<span class="number">1001</span></span><br></pre></td></tr></table></figure>
-
-<h4 id="获得引的所有文档"><a href="#获得引的所有文档" class="headerlink" title="获得引的所有文档"></a>获得引的所有文档</h4><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="regexp">/index1/</span>_search</span><br></pre></td></tr></table></figure>
-
-<h4 id="批量"><a href="#批量" class="headerlink" title="批量"></a>批量</h4><pre><code>1. 插入
-1. 删除
-</code></pre>
-<h2 id="二、查询"><a href="#二、查询" class="headerlink" title="二、查询"></a>二、查询</h2><h3 id="2-0-两种"><a href="#2-0-两种" class="headerlink" title="2.0 两种"></a>2.0 两种</h3><h4 id="2-0-1-get-url"><a href="#2-0-1-get-url" class="headerlink" title="2.0.1 get+url"></a>2.0.1 get+url</h4><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ip:port<span class="regexp">/shopping/</span>_search?q=name:<span class="string">&quot;wyg&quot;</span></span><br></pre></td></tr></table></figure>
-
-<h4 id="2-0-2-get-json"><a href="#2-0-2-get-json" class="headerlink" title="2.0.2  get+json"></a>2.0.2  get+json</h4><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="comment">//条件查询</span></span><br><span class="line">    </span><br><span class="line">	<span class="attr">&quot;query&quot;</span>:&#123;</span><br><span class="line">		<span class="attr">&quot;match&quot;</span>:&#123;</span><br><span class="line">			<span class="attr">&quot;name&quot;</span>:<span class="string">&quot;wyg&quot;</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">     <span class="comment">//只需要特定字段</span></span><br><span class="line">    <span class="string">&quot;_source&quot;</span>:[<span class="string">&quot;name&quot;</span>,<span class="string">&quot;id&quot;</span>,<span class="string">&quot;age&quot;</span>],</span><br><span class="line">	<span class="comment">//排序</span></span><br><span class="line">	<span class="attr">&quot;sort&quot;</span>:&#123;  </span><br><span class="line">        <span class="attr">&quot;age&quot;</span>:&#123;</span><br><span class="line">            <span class="attr">&quot;order&quot;</span>:<span class="string">&quot;desc&quot;</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">	<span class="comment">//分页</span></span><br><span class="line">    <span class="attr">&quot;from&quot;</span>:<span class="number">3</span>,  <span class="comment">//当前页</span></span><br><span class="line">    <span class="attr">&quot;size&quot;</span>:<span class="number">10</span>  <span class="comment">//一页数量</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;   <span class="comment">//查询全部</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span>:&#123;</span><br><span class="line">		<span class="attr">&quot;match_all&quot;</span>:&#123;	</span><br><span class="line">		&#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
-
-<h3 id="2-1-base"><a href="#2-1-base" class="headerlink" title="2.1 base"></a>2.1 base</h3><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="comment">//条件查询</span></span><br><span class="line">	<span class="attr">&quot;query&quot;</span>:&#123;</span><br><span class="line">		<span class="attr">&quot;match&quot;</span>:&#123;</span><br><span class="line">			<span class="attr">&quot;name&quot;</span>:<span class="string">&quot;wyg&quot;</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-2-多条件查询"><a href="#2-2-多条件查询" class="headerlink" title="2.2 多条件查询"></a>2.2 多条件查询</h3><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">	<span class="attr">&quot;query&quot;</span>:&#123;</span><br><span class="line">		<span class="attr">&quot;bool&quot;</span>:&#123;  <span class="comment">//条件</span></span><br><span class="line">			<span class="attr">&quot;should&quot;</span>:[  <span class="comment">//多条件必须匹配,还有must</span></span><br><span class="line">                &#123; </span><br><span class="line">                    <span class="attr">&quot;match&quot;</span>:&#123;</span><br><span class="line">                        <span class="attr">&quot;name&quot;</span>:<span class="string">&quot;wyg&quot;</span></span><br><span class="line">                	&#125;</span><br><span class="line">                &#125;,</span><br><span class="line">                &#123;</span><br><span class="line">                	<span class="attr">&quot;mathch&quot;</span>:&#123;</span><br><span class="line">                	    <span class="attr">&quot;name&quot;</span>:<span class="string">&quot;abc&quot;</span></span><br><span class="line">                	&#125;</span><br><span class="line">                &#125;</span><br><span class="line">            ],</span><br><span class="line">            <span class="attr">&quot;filter&quot;</span>:&#123;  <span class="comment">//过滤条件</span></span><br><span class="line">                <span class="attr">&quot;range&quot;</span>:&#123; <span class="comment">//范围</span></span><br><span class="line">                    <span class="attr">&quot;age&quot;</span>:&#123;</span><br><span class="line">                        <span class="attr">&quot;gt&quot;</span>:<span class="number">20</span><span class="comment">//20岁以上</span></span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="2-3-模糊查询—-gt-基于倒排索引"><a href="#2-3-模糊查询—-gt-基于倒排索引" class="headerlink" title="2.3 模糊查询—&gt;基于倒排索引"></a>2.3 模糊查询—&gt;基于倒排索引</h3><h4 id="模糊"><a href="#模糊" class="headerlink" title="模糊"></a>模糊</h4><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">/ &#123;<span class="comment">//条件查询</span></span><br><span class="line">	<span class="attr">&quot;query&quot;</span>:&#123;</span><br><span class="line">		<span class="attr">&quot;match&quot;</span>:&#123;</span><br><span class="line">			<span class="attr">&quot;name&quot;</span>:<span class="string">&quot;wyg&quot;</span> <span class="comment">//拆解 w y g </span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h4 id="完全匹配"><a href="#完全匹配" class="headerlink" title="完全匹配"></a>完全匹配</h4><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">	<span class="attr">&quot;query&quot;</span>:&#123;</span><br><span class="line">		<span class="attr">&quot;match_phrase&quot;</span>:&#123;</span><br><span class="line">			<span class="attr">&quot;name&quot;</span>:<span class="string">&quot;wyg&quot;</span> <span class="comment">//拆解 w y g </span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;,</span><br><span class="line">    <span class="comment">//对字段高亮</span></span><br><span class="line">    <span class="attr">&quot;highlight&quot;</span>:&#123;</span><br><span class="line">        <span class="attr">&quot;fields&quot;</span>:&#123;</span><br><span class="line">            <span class="attr">&quot;name&quot;</span>:&#123;&#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="三、mapping"><a href="#三、mapping" class="headerlink" title="三、mapping"></a>三、mapping</h2><blockquote>
-<p>mapping 是对<strong>文档</strong>的约束， 类似于DDL，create table（）</p>
-</blockquote>
-<table>
-<thead>
-<tr>
-<th>属性</th>
-<th>名称</th>
-<th>选项</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>type</td>
-<td>数据类型</td>
-<td>text（可拆分）  keyword  八大类型 date  object</td>
-</tr>
-<tr>
-<td>index</td>
-<td>释放创建倒排索引</td>
-<td>true  false</td>
-</tr>
-<tr>
-<td>analyzer</td>
-<td>分词器</td>
-<td></td>
-</tr>
-<tr>
-<td>properties</td>
-<td>字段</td>
-<td></td>
-</tr>
-</tbody></table>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">	<span class="attr">&quot;mapping&quot;</span>:&#123;</span><br><span class="line">        <span class="attr">&quot;properties&quot;</span>:&#123;</span><br><span class="line">            <span class="attr">&quot;name&quot;</span>:&#123;</span><br><span class="line">                type:<span class="string">&quot;keyword&quot;</span>,</span><br><span class="line">                index:<span class="string">&quot;false&quot;</span></span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="attr">&quot;info&quot;</span>:&#123;</span><br><span class="line">                <span class="attr">&quot;type&quot;</span>:<span class="string">&quot;text&quot;</span>,</span><br><span class="line">                <span class="attr">&quot;index&quot;</span>:<span class="string">&quot;true&quot;</span></span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="attr">&quot;edu&quot;</span>:&#123;</span><br><span class="line">                <span class="attr">&quot;type&quot;</span>:<span class="string">&quot;object&quot;</span>,</span><br><span class="line">                <span class="attr">&quot;properties&quot;</span>&#123;</span><br><span class="line">                </span><br><span class="line">            &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-
-
-<h2 id="四、elasticsearch-java"><a href="#四、elasticsearch-java" class="headerlink" title="四、elasticsearch-java"></a>四、elasticsearch-java</h2><blockquote>
-<p>操作elasticSearch的两种方式，通过restApi http:9200  通过tco:9300</p>
-</blockquote>
-<p><a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/java-rest-high-search.html">官网</a></p>
-<h3 id="三个组件"><a href="#三个组件" class="headerlink" title="三个组件"></a>三个组件</h3><ol>
-<li>api cilent</li>
-<li>json mapping</li>
-<li>传输层</li>
-<li>、、</li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/22/">22</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/23/">23</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1444,7 +1178,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">108</span>
+          <span class="site-state-item-count">111</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1495,12 +1229,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">292k</span>
+    <span title="站点总字数">306k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">4:25</span>
+    <span title="站点阅读时长">4:38</span>
 </div>
 
         
