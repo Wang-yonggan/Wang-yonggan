@@ -187,7 +187,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/java/java%E8%AE%BE%E8%AE%A1/SPI%E6%9C%BA%E5%88%B6/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/27/java/java%E7%BB%84%E4%BB%B6/%E6%97%B6%E9%97%B4%E7%B1%BB/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -201,7 +201,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/03/08/java/java%E8%AE%BE%E8%AE%A1/SPI%E6%9C%BA%E5%88%B6/" class="post-title-link" itemprop="url">SPI机制</a>
+            <a href="/2022/04/27/java/java%E7%BB%84%E4%BB%B6/%E6%97%B6%E9%97%B4%E7%B1%BB/" class="post-title-link" itemprop="url">时间组件</a>
         </h2>
 
         <div class="post-meta">
@@ -211,14 +211,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
+              <time title="创建时间：2022-04-27 03:09:53" itemprop="dateCreated datePublished" datetime="2022-04-27T03:09:53+08:00">2022-04-27</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-12 23:29:20" itemprop="dateModified" datetime="2022-03-12T23:29:20+08:00">2022-03-12</time>
+                <time title="修改时间：2022-04-09 20:49:26" itemprop="dateModified" datetime="2022-04-09T20:49:26+08:00">2022-04-09</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -226,7 +226,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java%E9%AB%98%E7%BA%A7/" itemprop="url" rel="index"><span itemprop="name">java高级</span></a>
+                  <a href="/categories/javautils/" itemprop="url" rel="index"><span itemprop="name">javautils</span></a>
                 </span>
             </span>
 
@@ -240,379 +240,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/03/08/java/java%E8%AE%BE%E8%AE%A1/SPI%E6%9C%BA%E5%88%B6/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/java/java%E8%AE%BE%E8%AE%A1/SPI%E6%9C%BA%E5%88%B6/" class="cy_cmt_count" data-xid="2022/03/08/java/java设计/SPI机制/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>2k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="一、SPI-Jdbc"><a href="#一、SPI-Jdbc" class="headerlink" title="一、SPI-Jdbc"></a>一、SPI-Jdbc</h2><p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/51b0cf78210f">参考-JavaSPI</a></p>
-<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/97c01234ba79">参考-SpringSPI</a></p>
-<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/3a3edbcd8f24">参考-jdbcSPI</a></p>
-<blockquote>
-<p>SPI , Service Provider Interface，是一种服务发现机制。它通过在ClassPath路径下的META-INF/services文件夹查找文件，自动加载文件里所定义的类</p>
-</blockquote>
-<h3 id="1-1-JDBC的class-foname"><a href="#1-1-JDBC的class-foname" class="headerlink" title="1.1 JDBC的class.foname"></a>1.1 JDBC的class.foname</h3><ol>
-<li><p>jdbc执行Class.forName(‘com.mysql.cj.jdbc.Driver’)是加载Driver的意思</p>
-<p>但是再Driver这个类有个静态代码块（再类信息第一次加载到内存的时候会运行一次）</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> &#123; </span><br><span class="line">	DriverManager.registerDriver(<span class="keyword">new</span> Driver());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">//registerDriver会根据一系列过程把driver加进来</span></span><br><span class="line">Object[] newElements = Arrays.copyOf(current, len + <span class="number">1</span>);</span><br><span class="line">newElements[len] = e;<span class="comment">//就是driver</span></span><br><span class="line">setArray(newElements);</span><br></pre></td></tr></table></figure></li>
-<li><p>DriverManager.getConnection(url,info)</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(DriverInfo aDriver : registeredDrivers) &#123;</span><br><span class="line">    Connection con = aDriver.driver.connect(url, info);</span><br><span class="line">    <span class="keyword">if</span> (con != <span class="keyword">null</span>) </span><br><span class="line">        <span class="keyword">return</span> (con);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h3 id="1-2-JDBC加入SPI机制之后"><a href="#1-2-JDBC加入SPI机制之后" class="headerlink" title="1.2 JDBC加入SPI机制之后"></a>1.2 JDBC加入SPI机制之后</h3><ol>
-<li><p>DriverManager的static代码块 </p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> &#123;</span><br><span class="line">    loadInitialDrivers();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">loadInitialDrivers</span> <span class="params">()</span></span>&#123;</span><br><span class="line">     AccessController.doPrivileged(<span class="keyword">new</span> PrivilegedAction&lt;Void&gt;() &#123;</span><br><span class="line">            <span class="function"><span class="keyword">public</span> Void <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                ServiceLoader&lt;Driver&gt; loadedDrivers = ServiceLoader.load(Driver.class);</span><br><span class="line">                Iterator&lt;Driver&gt; driversIterator = loadedDrivers.iterator();</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h2 id="二、我对spi的解读"><a href="#二、我对spi的解读" class="headerlink" title="二、我对spi的解读"></a>二、我对spi的解读</h2><h3 id="2-1-先决条件"><a href="#2-1-先决条件" class="headerlink" title="2.1 先决条件"></a>2.1 先决条件</h3><h4 id="2-1-1-类接口与类实现"><a href="#2-1-1-类接口与类实现" class="headerlink" title="2.1.1 类接口与类实现"></a>2.1.1 类接口与类实现</h4><blockquote>
-<p>面向接口编程，Java标准库提供接口，研发者提供实现</p>
-</blockquote>
-<ol>
-<li><p>Java官方的接口</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Driver</span></span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p>我的实现</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.wyg.service.abc;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyDriverImpl</span> <span class="keyword">implements</span> <span class="title">Driver</span></span>&#123;</span><br><span class="line">	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h4 id="2-1-2-文件结构"><a href="#2-1-2-文件结构" class="headerlink" title="2.1.2 文件结构"></a>2.1.2 文件结构</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">META-INF</span><br><span class="line">--services</span><br><span class="line">-----java.sql.Driver</span><br></pre></td></tr></table></figure>
-
-<p>内容为</p>
-<figure class="highlight tex"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">com.wyg.service.abc.MyDriverImpl</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-2-关键代码"><a href="#2-2-关键代码" class="headerlink" title="2.2 关键代码"></a>2.2 关键代码</h3><h4 id="2-2-1-构造函数"><a href="#2-2-1-构造函数" class="headerlink" title="2.2.1 构造函数"></a>2.2.1 构造函数</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String PREFIX = <span class="string">&quot;META-INF/services/&quot;</span>;</span><br><span class="line"><span class="keyword">private</span> LinkedHashMap&lt;String,S&gt; providers = <span class="keyword">new</span> LinkedHashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="title">ServiceLoader</span><span class="params">(Class&lt;S&gt; svc, ClassLoader cl)</span> </span>&#123;</span><br><span class="line">      service = Objects.requireNonNull(svc, <span class="string">&quot;Service interface cannot be null&quot;</span>);</span><br><span class="line">      loader = (cl == <span class="keyword">null</span>) ? ClassLoader.getSystemClassLoader() : cl;</span><br><span class="line">      acc = (System.getSecurityManager() != <span class="keyword">null</span>) ? AccessController.getContext() : <span class="keyword">null</span>;</span><br><span class="line">      reload();</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-
-<h4 id="2-2-2-找到所有的全限定类名"><a href="#2-2-2-找到所有的全限定类名" class="headerlink" title="2.2.2 找到所有的全限定类名"></a>2.2.2 找到所有的全限定类名</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">String fullName = PREFIX + service.getName();</span><br><span class="line">configs = ClassLoader.getSystemResources(fullName);</span><br><span class="line">Class  pending = parse(service, configs.nextElement());</span><br></pre></td></tr></table></figure>
-
-<h4 id="2-2-3-加载类并实例化"><a href="#2-2-3-加载类并实例化" class="headerlink" title="2.2.3 加载类并实例化"></a>2.2.3 加载类并实例化</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">c = Class.forName(cn, <span class="keyword">false</span>, loader);</span><br><span class="line">S p = service.cast(c.newInstance());</span><br><span class="line">providers.put(cn, p)</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/java/java%E8%AE%BE%E8%AE%A1/java%E6%87%92%E5%8A%A0%E8%BD%BD/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/08/java/java%E8%AE%BE%E8%AE%A1/java%E6%87%92%E5%8A%A0%E8%BD%BD/" class="post-title-link" itemprop="url">java懒加载</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-10 01:57:11" itemprop="dateModified" datetime="2022-03-10T01:57:11+08:00">2022-03-10</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java%E8%AE%BE%E8%AE%A1/" itemprop="url" rel="index"><span itemprop="name">java设计</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/08/java/java%E8%AE%BE%E8%AE%A1/java%E6%87%92%E5%8A%A0%E8%BD%BD/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/java/java%E8%AE%BE%E8%AE%A1/java%E6%87%92%E5%8A%A0%E8%BD%BD/" class="cy_cmt_count" data-xid="2022/03/08/java/java设计/java懒加载/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.6k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <ol>
-<li><p>[参考](<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/428095023?utm_source=qq&utm_medium=social&utm_oi=1044004825763094528">函数式编程的Java编码实践：利用惰性写出高性能且抽象的代码 - 知乎 (zhihu.com)</a>)</p>
-</li>
-<li><p>懒加载的例子</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Supplier&lt; Integer&gt; a = () -&gt; <span class="number">10</span> + <span class="number">1</span>;</span><br><span class="line"><span class="keyword">int</span> b = a.get() + <span class="number">1</span>;<span class="comment">//创建b的时候才会运算a</span></span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/03/08/java/java%E8%AE%BE%E8%AE%A1/java%E6%87%92%E5%8A%A0%E8%BD%BD/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/linux/%E9%85%8D%E7%BD%AE%E7%8E%AF%E5%A2%83/linux%E9%85%8D%E7%BD%AE/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/08/linux/%E9%85%8D%E7%BD%AE%E7%8E%AF%E5%A2%83/linux%E9%85%8D%E7%BD%AE/" class="post-title-link" itemprop="url">linux配置</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-11 00:56:02" itemprop="dateModified" datetime="2022-03-11T00:56:02+08:00">2022-03-11</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/os/" itemprop="url" rel="index"><span itemprop="name">os</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/08/linux/%E9%85%8D%E7%BD%AE%E7%8E%AF%E5%A2%83/linux%E9%85%8D%E7%BD%AE/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/linux/%E9%85%8D%E7%BD%AE%E7%8E%AF%E5%A2%83/linux%E9%85%8D%E7%BD%AE/" class="cy_cmt_count" data-xid="2022/03/08/linux/配置环境/linux配置/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.2k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>[toc]</p>
-<h2 id="一、免密配置"><a href="#一、免密配置" class="headerlink" title="一、免密配置"></a>一、免密配置</h2><ol>
-<li><p>ssh免密登录</p>
-<ol>
-<li><p>编写主机名 gedit /etc/hostname</p>
-<p>master</p>
-</li>
-<li><p>临时设置hostname hostname master</p>
-</li>
-<li><p>上一步生效 bash</p>
-</li>
-<li><p>验证主机名 hostname</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/03/08/linux/%E9%85%8D%E7%BD%AE%E7%8E%AF%E5%A2%83/linux%E9%85%8D%E7%BD%AE/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/spring/spring%E5%AE%B6%E6%97%8F/springCloud/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/08/spring/spring%E5%AE%B6%E6%97%8F/springCloud/" class="post-title-link" itemprop="url">SpringCloud</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-12-14 00:31:37" itemprop="dateModified" datetime="2021-12-14T00:31:37+08:00">2021-12-14</time>
-              </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/08/spring/spring%E5%AE%B6%E6%97%8F/springCloud/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/spring/spring%E5%AE%B6%E6%97%8F/springCloud/" class="cy_cmt_count" data-xid="2022/03/08/spring/spring家族/springCloud/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/04/27/java/java%E7%BB%84%E4%BB%B6/%E6%97%B6%E9%97%B4%E7%B1%BB/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/27/java/java%E7%BB%84%E4%BB%B6/%E6%97%B6%E9%97%B4%E7%B1%BB/" class="cy_cmt_count" data-xid="2022/04/27/java/java组件/时间类/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -643,21 +272,39 @@
 
       
           <p>[toc]</p>
-<ol>
-<li><p>springCloud是一系列框架的集合</p>
+<h2 id="一、java-util-Date"><a href="#一、java-util-Date" class="headerlink" title="一、java.util.Date"></a>一、java.util.Date</h2><h2 id="二、java-util-calendar"><a href="#二、java-util-calendar" class="headerlink" title="二、java.util.calendar"></a>二、java.util.calendar</h2><h2 id="三、java-time"><a href="#三、java-time" class="headerlink" title="三、java.time"></a>三、java.time</h2><blockquote>
+<p>jdk8的新类，</p>
+</blockquote>
+<h3 id="新类出现的原因"><a href="#新类出现的原因" class="headerlink" title="新类出现的原因"></a>新类出现的原因</h3><ol>
+<li><p>原始的Date的toString显示的是Tue Sep 10 09:34:04 CST 2019，</p>
 </li>
-<li><p>自动挡的房车</p>
-</li>
-<li><p>依赖.pom+配置.properties+@注解</p>
-</li>
-<li><p>微服务架构技术落地实现的集合体，是微服务架构下的一站式解决方案</p>
-<p>服务发现——Netflix Eureka /  nacos<br>客服端负载均衡——Netflix Ribbon</p>
-<p>服务调用—— netflix fergn</p>
-<p>断路器——Netflix Hystrix<br>服务网关——Netflix Zuul /Sprin Cloud CateWay<br>分布式配置——Spring Cloud Config /nacos</p>
-<p>消息总线 —— Spring Cloud Bus/ nacos</p>
+<li><p>可以用sdf格式化，但是sdf线程不安全，而且格式化类和本类不在一起，影响性能</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> StringBuffer <span class="title">format</span><span class="params">(Date)</span></span>&#123;</span><br><span class="line">	calendar.setTime(date);</span><br><span class="line">&#125;<span class="comment">//sdf的格式默认为year-month-day pm hour:mounth</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="三、Calendar"><a href="#三、Calendar" class="headerlink" title="三、Calendar"></a>三、Calendar</h3><h4 id="3-1-创建"><a href="#3-1-创建" class="headerlink" title="3.1 创建"></a>3.1 创建</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Calendar c = Calendar.getInstance();</span><br><span class="line">System.out.println(c.getTime());</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-2-获得部分日期"><a href="#3-2-获得部分日期" class="headerlink" title="3.2 获得部分日期"></a>3.2 获得部分日期</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Calendar c = Calendar.getInstance();</span><br><span class="line">System.out.println(c.get(Calendar.YEAR)); 输出：<span class="number">2021</span></span><br><span class="line">System.out.println(c.get(Calendar.MONTH)); 输出：<span class="number">7</span></span><br><span class="line">System.out.println(c.get(Calendar.DAY_OF_MONTH)); 输出：<span class="number">26</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="3-3-赋值"><a href="#3-3-赋值" class="headerlink" title="3.3 赋值"></a>3.3 赋值</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Calendar ca = Calendar.getInstance();</span><br><span class="line">ca.set(Calendar.YEAR, <span class="number">2019</span>);</span><br><span class="line">ca.set(Calendar.MONTH, <span class="number">0</span>);</span><br><span class="line">ca.set(Calendar.DATE, <span class="number">1</span>);</span><br><span class="line">ca.set(Calendar.HOUR_OF_DAY, <span class="number">0</span>);</span><br><span class="line">ca.set(Calendar.MINUTE, <span class="number">0</span>);</span><br><span class="line">ca.set(Calendar.SECOND, <span class="number">0</span>);</span><br><span class="line">SimpleDateFormat sdf = <span class="keyword">new</span> SimpleDateFormat(<span class="string">&quot;yyyy-MM-dd HH:mm:ss&quot;</span>);</span><br><span class="line">System.out.println(sdf.format(ca.getTime())); 输出：<span class="number">2019</span>-<span class="number">01</span>-<span class="number">01</span> <span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="3-4-转换"><a href="#3-4-转换" class="headerlink" title="3.4 转换"></a>3.4 转换</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Cal.setTime(<span class="keyword">new</span> Date());</span><br><span class="line">Date date = cal.getTime;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h3 id="LocalDate"><a href="#LocalDate" class="headerlink" title="LocalDate"></a>LocalDate</h3><h3 id="LocalTime"><a href="#LocalTime" class="headerlink" title="LocalTime"></a>LocalTime</h3><h3 id="LocalDateTime"><a href="#LocalDateTime" class="headerlink" title="LocalDateTime"></a>LocalDateTime</h3><h3 id="自定义"><a href="#自定义" class="headerlink" title="自定义"></a>自定义</h3><ol>
+<li><p>sql—util转换</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">java.sql.Date sqlDate = <span class="keyword">new</span> java.sql.Date(utilDate.getTime());</span><br><span class="line">Date date = <span class="keyword">new</span> Date(sqlDate.getTime());<span class="comment">//sql.Date转util.Date        </span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="jar包–joda"><a href="#jar包–joda" class="headerlink" title="jar包–joda"></a>jar包–joda</h3><ol>
+<li><p>joda</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>joda-time<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>joda-time<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>主要获取当前时间 好看字符串</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">DateTime dt = <span class="keyword">new</span> DateTime();</span><br><span class="line">DateTime dt1 = DateTime.now();<span class="comment">//2021-10-21T13:59:41.040+08:00</span></span><br><span class="line">DateTime dt2 = <span class="keyword">new</span> DateTime(<span class="keyword">new</span> Date());<span class="comment">//2021-10-21T13:59:41.132+08:00</span></span><br><span class="line"><span class="comment">// 指定年月日点分秒生成(参数依次是：年,月,日,时,分,秒,毫秒)</span></span><br><span class="line">DateTime dt3 = <span class="keyword">new</span> DateTime(<span class="number">2012</span>, <span class="number">5</span>, <span class="number">20</span>, <span class="number">13</span>, <span class="number">14</span>, <span class="number">0</span>, <span class="number">0</span>);        <span class="comment">// 制定ISO8601生成</span></span><br><span class="line">DateTime dt4 = <span class="keyword">new</span> DateTime(<span class="string">&quot;2014-08-01T12:32:3&quot;</span>);</span><br><span class="line">DateTime dt5 = <span class="keyword">new</span> DateTime(<span class="string">&quot;2014-08-01&quot;</span>);</span><br><span class="line">DateTime dt6 = <span class="keyword">new</span> DateTime(Calendar.getInstance())</span><br></pre></td></tr></table></figure>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2022/03/08/spring/spring%E5%AE%B6%E6%97%8F/springCloud/#more" rel="contents">
+              <a class="btn" href="/2022/04/27/java/java%E7%BB%84%E4%BB%B6/%E6%97%B6%E9%97%B4%E7%B1%BB/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -681,7 +328,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/08/spring/spring%E5%AE%B6%E6%97%8F/springMVC/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/27/java/java%E7%BB%84%E4%BB%B6/%E6%96%87%E4%BB%B6/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -695,7 +342,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/03/08/spring/spring%E5%AE%B6%E6%97%8F/springMVC/" class="post-title-link" itemprop="url">springMVC</a>
+            <a href="/2022/04/27/java/java%E7%BB%84%E4%BB%B6/%E6%96%87%E4%BB%B6/" class="post-title-link" itemprop="url">文件组件</a>
         </h2>
 
         <div class="post-meta">
@@ -705,14 +352,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-03-08 00:33:39" itemprop="dateCreated datePublished" datetime="2022-03-08T00:33:39+08:00">2022-03-08</time>
+              <time title="创建时间：2022-04-27 03:09:53" itemprop="dateCreated datePublished" datetime="2022-04-27T03:09:53+08:00">2022-04-27</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-02-21 22:17:02" itemprop="dateModified" datetime="2022-02-21T22:17:02+08:00">2022-02-21</time>
+                <time title="修改时间：2021-12-15 16:53:10" itemprop="dateModified" datetime="2021-12-15T16:53:10+08:00">2021-12-15</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -720,7 +367,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
                 </span>
             </span>
 
@@ -734,8 +381,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/03/08/spring/spring%E5%AE%B6%E6%97%8F/springMVC/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/08/spring/spring%E5%AE%B6%E6%97%8F/springMVC/" class="cy_cmt_count" data-xid="2022/03/08/spring/spring家族/springMVC/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/04/27/java/java%E7%BB%84%E4%BB%B6/%E6%96%87%E4%BB%B6/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/27/java/java%E7%BB%84%E4%BB%B6/%E6%96%87%E4%BB%B6/" class="cy_cmt_count" data-xid="2022/04/27/java/java组件/文件/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -746,7 +393,360 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>2.6k</span>
+              <span>2.8k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="File-api"><a href="#File-api" class="headerlink" title="File  api"></a>File  api</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/m0_37989184/article/details/93025734">参考</a></p>
+<p>File类的常见方法（参考一位大牛的，不小心把链接关了）</p>
+<ol>
+<li><p>创建</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">createNewFile</span><span class="params">()</span></span>; <span class="comment">//创建文件</span></span><br><span class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">mkdir</span><span class="params">()</span></span>;创建文件夹</span><br><span class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">mkdirs</span><span class="params">()</span></span>;创建多级文件夹。	</span><br></pre></td></tr></table></figure></li>
+<li><p>删除</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">delete</span><span class="params">()</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">deleteOnExit</span><span class="params">()</span></span>;在程序退出时删除文件。</span><br></pre></td></tr></table></figure></li>
+</ol>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/04/27/java/java%E7%BB%84%E4%BB%B6/%E6%96%87%E4%BB%B6/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/27/java/java%E7%BB%84%E4%BB%B6/file-content-type/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/04/27/java/java%E7%BB%84%E4%BB%B6/file-content-type/" class="post-title-link" itemprop="url">未命名</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-04-27 03:09:53" itemprop="dateCreated datePublished" datetime="2022-04-27T03:09:53+08:00">2022-04-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-11-10 17:58:39" itemprop="dateModified" datetime="2021-11-10T17:58:39+08:00">2021-11-10</time>
+              </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/04/27/java/java%E7%BB%84%E4%BB%B6/file-content-type/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/27/java/java%E7%BB%84%E4%BB%B6/file-content-type/" class="cy_cmt_count" data-xid="2022/04/27/java/java组件/file-content-type/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>9.3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>8 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>[toc]</p>
+<h3 id="一、比较全面的contentType的类型值"><a href="#一、比较全面的contentType的类型值" class="headerlink" title="一、比较全面的contentType的类型值"></a>一、比较全面的contentType的类型值</h3><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_37651267/article/details/91380351">参考</a></p>
+<p>文件扩展名    Content-Type(Mime-Type)    文件扩展名    Content-Type(Mime-Type)</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/04/27/java/java%E7%BB%84%E4%BB%B6/file-content-type/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/27/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JUtil/%E9%9B%86%E5%90%88/HashMap/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/04/27/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JUtil/%E9%9B%86%E5%90%88/HashMap/" class="post-title-link" itemprop="url">hashmap</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-04-27 03:09:53" itemprop="dateCreated datePublished" datetime="2022-04-27T03:09:53+08:00">2022-04-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-04-10 00:12:46" itemprop="dateModified" datetime="2022-04-10T00:12:46+08:00">2022-04-10</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/04/27/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JUtil/%E9%9B%86%E5%90%88/HashMap/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/27/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JUtil/%E9%9B%86%E5%90%88/HashMap/" class="cy_cmt_count" data-xid="2022/04/27/java/java源码解读/JUtil/集合/HashMap/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>5.3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>5 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="一、原理"><a href="#一、原理" class="headerlink" title="一、原理"></a>一、原理</h2><p>基于哈希表的实现的<code>Map</code>接口。此实现提供了所有可选的map操作，并允许<code>null的</code>值和<code>null</code>键。（  <code>HashMap</code>类大致相当于<code>Hashtable</code> ，除了它是不同步的，并允许null）。这个类不能保证map的。</p>
+<p>假设哈希函数在这些存储桶之间正确分散元素，这个实现为基本操作（ <code>get</code>和<code>put</code>  ）提供了恒定的时间性能。 收集视图的迭代需要与<code>HashMap</code>实例（桶数）加上其大小（键值映射数）的“容量”  <code>成正比</code> 。 因此，如果迭代性能很重要，不要将初始容量设置得太高（或负载因子太低）是非常重要的。 </p>
+<p><code>HashMap的</code>一个实例有两个影响其性能的参数： <em>初始容量</em>和<em>负载因子</em> 。  <em>容量</em>是哈希表中的桶数，初始容量只是创建哈希表时的容量。  <em>负载因子</em>是在容量自动增加之前允许哈希表得到满足的度量。  当在散列表中的条目的数量超过了负载因数和电流容量的乘积，哈希表被<em>重新散列</em>  （即，内部数据结构被重建），使得哈希表具有桶的大约两倍。 </p>
+<p>作为一般规则，默认负载因子（.75）提供了时间和空间成本之间的良好折中。  更高的值会降低空间开销，但会增加查找成本（反映在<code>HashMap</code>类的大部分操作中，包括<code>get</code>和<code>put</code>  ）。 在设置其初始容量时，应考虑map中预期的条目数及其负载因子，以便最小化重新组播操作的数量。  如果初始容量大于最大条目数除以负载因子，则不会发生重新排列操作。 </p>
+<p>如果许多映射要存储在<code>HashMap</code>实例中，则以足够大的容量创建映射将允许映射的存储效率高于使其根据需要执行自动重新排序以增长表。  请注意，使用同一个<code>hashCode()</code>多个密钥是降低任何哈希表的<code>hashCode()</code>的一种方法。  为了改善影响，当按键是<a href="../../java/lang/Comparable.html"><code>Comparable</code></a>时，这个类可以使用键之间的比较顺序来帮助打破关系。 </p>
+<p>当链表大于 8 并且容量大于 64 时，链表结构会转换成红黑树结构，大体结构如下图：</p>
+<ol>
+<li>基于equals</li>
+</ol>
+<h2 id="二、属性"><a href="#二、属性" class="headerlink" title="二、属性"></a>二、属性</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> DEFAULT_INITIAL_CAPACITY = <span class="number">1</span> &lt;&lt; <span class="number">4</span>; <span class="comment">// 默认容量 16</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> MAXIMUM_CAPACITY = <span class="number">1</span> &lt;&lt; <span class="number">30</span>; <span class="comment">//最大容量</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">float</span> DEFAULT_LOAD_FACTOR = <span class="number">0.75f</span>;<span class="comment">//默认负载因子</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> TREEIFY_THRESHOLD = <span class="number">8</span>;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> UNTREEIFY_THRESHOLD = <span class="number">6</span>;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> MIN_TREEIFY_CAPACITY = <span class="number">64</span>;</span><br><span class="line"><span class="keyword">transient</span> Node&lt;K,V&gt;[] table;<span class="comment">//表.分配时，长度始终为2的幂。</span></span><br><span class="line"><span class="keyword">transient</span> Set&lt;Map.Entry&lt;K,V&gt;&gt; entrySet;<span class="comment">//保存缓存的entrySet</span></span><br><span class="line"><span class="keyword">transient</span> <span class="keyword">int</span> size;<span class="comment">//现在容量</span></span><br><span class="line"><span class="keyword">transient</span> <span class="keyword">int</span> modCount;<span class="comment">//Fail-Fast机制</span></span><br><span class="line"><span class="keyword">int</span> threshold; <span class="comment">//要调整大小的下一个大小值（容量*负载系数）。</span></span><br><span class="line"><span class="keyword">final</span> <span class="keyword">float</span> loadFactor;<span class="comment">//f</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="三、-方法"><a href="#三、-方法" class="headerlink" title="三、 方法"></a>三、 方法</h2><h3 id="2-1-hash-key"><a href="#2-1-hash-key" class="headerlink" title="2.1 hash(key)"></a>2.1 hash(key)</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">hash</span><span class="params">(Object key)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">int</span> h;</span><br><span class="line">       <span class="keyword">return</span> (key == <span class="keyword">null</span>) ? <span class="number">0</span> : (h = key.hashCode()) ^ (h &gt;&gt;&gt; <span class="number">16</span>);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-put"><a href="#2-2-put" class="headerlink" title="2.2 put"></a>2.2 put</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> V <span class="title">put</span><span class="params">(K key, V value)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> putVal(hash(key), key, value, <span class="keyword">false</span>, <span class="keyword">true</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">final</span> V <span class="title">putVal</span><span class="params">(<span class="keyword">int</span> hash, K key, V value, <span class="keyword">boolean</span> onlyIfAbsent,</span></span></span><br><span class="line"><span class="params"><span class="function">               <span class="keyword">boolean</span> evict)</span> </span>&#123;</span><br><span class="line">    Node&lt;K,V&gt;[] tab; Node&lt;K,V&gt; p; <span class="keyword">int</span> n, i;</span><br><span class="line">   </span><br><span class="line">    <span class="keyword">if</span> ((tab = table) == <span class="keyword">null</span> || (n = tab.length) == <span class="number">0</span>)</span><br><span class="line">        n = (tab = resize()).length;</span><br><span class="line">   <span class="comment">//n 为长度</span></span><br><span class="line">    <span class="comment">// p 为这个位置的Node</span></span><br><span class="line">    <span class="keyword">if</span> ((p = tab[i = (n - <span class="number">1</span>) &amp; hash]) == <span class="keyword">null</span>)</span><br><span class="line">        <span class="comment">//如果这个位置为null，就newNode</span></span><br><span class="line">        tab[i] = newNode(hash, key, value, <span class="keyword">null</span>);</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        Node&lt;K,V&gt; e; K k;</span><br><span class="line">        <span class="keyword">if</span> (p.hash == hash &amp;&amp;</span><br><span class="line">            <span class="comment">//  p.key==key||p.key.equal(key)</span></span><br><span class="line">            ((k = p.key) == key || (key != <span class="keyword">null</span> &amp;&amp; key.equals(k))))</span><br><span class="line">            e = p;<span class="comment">//e 就是找到了这个key</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (p <span class="keyword">instanceof</span> TreeNode)</span><br><span class="line">            e = ((TreeNode&lt;K,V&gt;)p).putTreeVal(<span class="keyword">this</span>, tab, hash, key, value);</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">//对于链表形式，迭代，binCount是为了防止链表超过8</span></span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> binCount = <span class="number">0</span>; ; ++binCount) &#123;</span><br><span class="line">                <span class="comment">//第一种情况   e到链表结尾，那么直接尾插法  ① e==null</span></span><br><span class="line">                <span class="keyword">if</span> ((e = p.next) == <span class="keyword">null</span>) &#123;，</span><br><span class="line">                    p.next = newNode(hash, key, value, <span class="keyword">null</span>);</span><br><span class="line">                    <span class="keyword">if</span> (binCount &gt;= TREEIFY_THRESHOLD - <span class="number">1</span>) <span class="comment">// -1 for 1st</span></span><br><span class="line">                        treeifyBin(tab, hash);</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">//第二种 找到了Key 那么就赋值给p，等待后续操作. ②e!=null</span></span><br><span class="line">                <span class="keyword">if</span> (e.hash == hash &amp;&amp;</span><br><span class="line">                    ((k = e.key) == key || (key != <span class="keyword">null</span> &amp;&amp; key.equals(k))))</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                p = e;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 第②种情况，更新</span></span><br><span class="line">        <span class="keyword">if</span> (e != <span class="keyword">null</span>) &#123; <span class="comment">// existing mapping for key</span></span><br><span class="line">            V oldValue = e.value;</span><br><span class="line">            <span class="keyword">if</span> (!onlyIfAbsent || oldValue == <span class="keyword">null</span>)</span><br><span class="line">                e.value = value;</span><br><span class="line">            afterNodeAccess(e);</span><br><span class="line">            <span class="keyword">return</span> oldValue;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    ++modCount;</span><br><span class="line">    <span class="keyword">if</span> (++size &gt; threshold)</span><br><span class="line">        resize();</span><br><span class="line">    afterNodeInsertion(evict);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/b7b55fbaeb2948b5a50496d7a2f67c88.png" alt="b7b55fbaeb2948b5a50496d7a2f67c88"></p>
+<h3 id="2-3-resize"><a href="#2-3-resize" class="headerlink" title="2.3 resize"></a>2.3 resize</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> Node&lt;K,V&gt;[] resize() &#123;</span><br><span class="line">    Node&lt;K,V&gt;[] oldTab = table;</span><br><span class="line">    <span class="keyword">int</span> oldCap = (oldTab == <span class="keyword">null</span>) ? <span class="number">0</span> : oldTab.length;</span><br><span class="line">    <span class="keyword">int</span> oldThr = threshold;</span><br><span class="line">    <span class="keyword">int</span> newCap, newThr = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">if</span> (oldCap &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (oldCap &gt;= MAXIMUM_CAPACITY) &#123;</span><br><span class="line">            threshold = Integer.MAX_VALUE;</span><br><span class="line">            <span class="keyword">return</span> oldTab;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> ((newCap = oldCap &lt;&lt; <span class="number">1</span>) &lt; MAXIMUM_CAPACITY &amp;&amp;</span><br><span class="line">                 oldCap &gt;= DEFAULT_INITIAL_CAPACITY)</span><br><span class="line">            newThr = oldThr &lt;&lt; <span class="number">1</span>; <span class="comment">// double threshold</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (oldThr &gt; <span class="number">0</span>) <span class="comment">// initial capacity was placed in threshold</span></span><br><span class="line">        newCap = oldThr;</span><br><span class="line">    <span class="keyword">else</span> &#123;               <span class="comment">// zero initial threshold signifies using defaults</span></span><br><span class="line">        newCap = DEFAULT_INITIAL_CAPACITY;</span><br><span class="line">        newThr = (<span class="keyword">int</span>)(DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (newThr == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">float</span> ft = (<span class="keyword">float</span>)newCap * loadFactor;</span><br><span class="line">        newThr = (newCap &lt; MAXIMUM_CAPACITY &amp;&amp; ft &lt; (<span class="keyword">float</span>)MAXIMUM_CAPACITY ?</span><br><span class="line">                  (<span class="keyword">int</span>)ft : Integer.MAX_VALUE);</span><br><span class="line">    &#125;</span><br><span class="line">    threshold = newThr;</span><br><span class="line">    Node&lt;K,V&gt;[] newTab = (Node&lt;K,V&gt;[])<span class="keyword">new</span> Node[newCap];</span><br><span class="line">    table = newTab;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; oldCap; ++j) &#123;</span><br><span class="line">        Node&lt;K,V&gt; e;</span><br><span class="line">        <span class="keyword">if</span> ((e = oldTab[j]) != <span class="keyword">null</span>) &#123;</span><br><span class="line">            oldTab[j] = <span class="keyword">null</span>;</span><br><span class="line">            <span class="keyword">if</span> (e.next == <span class="keyword">null</span>)</span><br><span class="line">                newTab[e.hash &amp; (newCap - <span class="number">1</span>)] = e;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (e <span class="keyword">instanceof</span> TreeNode)</span><br><span class="line">                ((TreeNode&lt;K,V&gt;)e).split(<span class="keyword">this</span>, newTab, j, oldCap);</span><br><span class="line">            <span class="keyword">else</span> &#123; <span class="comment">// preserve order</span></span><br><span class="line">                Node&lt;K,V&gt; loHead = <span class="keyword">null</span>, loTail = <span class="keyword">null</span>;</span><br><span class="line">                Node&lt;K,V&gt; hiHead = <span class="keyword">null</span>, hiTail = <span class="keyword">null</span>;</span><br><span class="line">                Node&lt;K,V&gt; next;</span><br><span class="line">                <span class="keyword">do</span> &#123;</span><br><span class="line">                    next = e.next;</span><br><span class="line">                    <span class="keyword">if</span> ((e.hash &amp; oldCap) == <span class="number">0</span>) &#123;</span><br><span class="line">                        <span class="keyword">if</span> (loTail == <span class="keyword">null</span>)</span><br><span class="line">                            loHead = e;</span><br><span class="line">                        <span class="keyword">else</span></span><br><span class="line">                            loTail.next = e;</span><br><span class="line">                        loTail = e;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">else</span> &#123;</span><br><span class="line">                        <span class="keyword">if</span> (hiTail == <span class="keyword">null</span>)</span><br><span class="line">                            hiHead = e;</span><br><span class="line">                        <span class="keyword">else</span></span><br><span class="line">                            hiTail.next = e;</span><br><span class="line">                        hiTail = e;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; <span class="keyword">while</span> ((e = next) != <span class="keyword">null</span>);</span><br><span class="line">                <span class="keyword">if</span> (loTail != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    loTail.next = <span class="keyword">null</span>;</span><br><span class="line">                    newTab[j] = loHead;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (hiTail != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    hiTail.next = <span class="keyword">null</span>;</span><br><span class="line">                    newTab[j + oldCap] = hiHead;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> newTab;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、类"><a href="#四、类" class="headerlink" title="四、类"></a>四、类</h2><h3 id="4-1-Node"><a href="#4-1-Node" class="headerlink" title="4.1 Node"></a>4.1 Node</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//hash: 移位16的结果 </span></span><br><span class="line">tab[i] = newNode(hash, key, value, <span class="keyword">null</span>);</span><br><span class="line">Node(<span class="keyword">int</span> hash, K key, V value, Node&lt;K,V&gt; next) &#123;</span><br><span class="line">    <span class="keyword">this</span>.hash = hash;</span><br><span class="line">    <span class="keyword">this</span>.key = key;</span><br><span class="line">    <span class="keyword">this</span>.value = value;</span><br><span class="line">    <span class="keyword">this</span>.next = next;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="五、细节"><a href="#五、细节" class="headerlink" title="五、细节"></a>五、细节</h2><ol>
+<li>在散列表中的条目的数量超过了负载因数和电流容量的乘积，哈希表被<em>重新散列</em> （即，内部数据结构被重建），使得哈希表具有桶的大约两倍。</li>
+<li>如果许多映射要存储在<code>HashMap</code>实例中，则以足够大的容量创建映射将允许映射的存储效率高于使其根据需要执行自动重新排序以增长表。  请注意，使用同一个<code>hashCode()</code>多个密钥是降低任何哈希表的<code>hashCode()</code>的一种方法。  为了改善影响，当按键是<a href="../../java/lang/Comparable.html"><code>Comparable</code></a>时，这个类可以使用键之间的比较顺序来帮助打破关系</li>
+</ol>
+<h3 id="HashMap和HashTable区别"><a href="#HashMap和HashTable区别" class="headerlink" title="HashMap和HashTable区别"></a>HashMap和HashTable区别</h3><ol>
+<li>hashmap线程不安全</li>
+<li>hashmap的key可以为null</li>
+</ol>
+<h3 id="HashMap、LinkedHashMap、TreeMap-区别"><a href="#HashMap、LinkedHashMap、TreeMap-区别" class="headerlink" title="HashMap、LinkedHashMap、TreeMap 区别"></a>HashMap、LinkedHashMap、TreeMap 区别</h3><ol>
+<li>LinkedHashMap底层双向链表，有序</li>
+<li>TreeMap 可以用于排序</li>
+<li>HashMap</li>
+</ol>
+<h4 id="红黑树排序"><a href="#红黑树排序" class="headerlink" title="红黑树排序"></a>红黑树排序</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//首先判断是否能比较 comparableClassFor</span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span> <span class="title">tieBreakOrder</span><span class="params">(Object a, Object b)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> d;</span><br><span class="line">    <span class="keyword">if</span> (a == <span class="keyword">null</span> || b == <span class="keyword">null</span> ||</span><br><span class="line">        (d = a.getClass().getName().</span><br><span class="line">         compareTo(b.getClass().getName())) == <span class="number">0</span>)</span><br><span class="line">        d = (System.identityHashCode(a) &lt;= System.identityHashCode(b) ?</span><br><span class="line">             -<span class="number">1</span> : <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">return</span> d;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/27/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JUtil/%E9%9B%86%E5%90%88/Arrays/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/04/27/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JUtil/%E9%9B%86%E5%90%88/Arrays/" class="post-title-link" itemprop="url">Arrays</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-04-27 03:09:53" itemprop="dateCreated datePublished" datetime="2022-04-27T03:09:53+08:00">2022-04-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-12-24 12:44:45" itemprop="dateModified" datetime="2021-12-24T12:44:45+08:00">2021-12-24</time>
+              </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/04/27/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JUtil/%E9%9B%86%E5%90%88/Arrays/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/27/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JUtil/%E9%9B%86%E5%90%88/Arrays/" class="cy_cmt_count" data-xid="2022/04/27/java/java源码解读/JUtil/集合/Arrays/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.8k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -765,204 +765,10 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>[toc]</p>
-<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/bsjl/p/7723440.html">优秀文章</a></p>
-<h2 id="一、MVC的理解"><a href="#一、MVC的理解" class="headerlink" title="一、MVC的理解"></a>一、MVC的理解</h2><blockquote>
-<p>MVC包括MVC、MVP、MVVM</p>
-</blockquote>
-<h3 id="1-1-侠义MVC"><a href="#1-1-侠义MVC" class="headerlink" title="1.1 侠义MVC"></a>1.1 侠义MVC</h3><blockquote>
-<p>mvc是前后端不分离的model view controller 对应springmvc的</p>
-</blockquote>
-<h4 id="1-1-1-mvc含义"><a href="#1-1-1-mvc含义" class="headerlink" title="1.1.1 mvc含义"></a>1.1.1 mvc含义</h4><ol>
-<li>model=pojo    数据模型，核心</li>
-<li>view=jsp/html+modelAndView 渲染数据</li>
-<li>controller=controller，接收用户请求<ol>
-<li>前端控制器 dispatch</li>
-<li>后端控制器 controller</li>
-</ol>
-</li>
-</ol>
-<h4 id="1-1-2-ModelAndView"><a href="#1-1-2-ModelAndView" class="headerlink" title="1.1.2 ModelAndView"></a>1.1.2 ModelAndView</h4><ol>
-<li>model 响应数据（map结构）/ javaBean    <ol>
-<li>请求的最后阶段 框架会把数据加入到request作用域</li>
-</ol>
-</li>
-<li>view jsp地址<ol>
-<li>框架对视图执行forward重定向操作</li>
-</ol>
-</li>
-</ol>
-<h4 id="1-1-3-model-返回的数据"><a href="#1-1-3-model-返回的数据" class="headerlink" title="1.1.3 model  返回的数据"></a>1.1.3 model  返回的数据</h4><ol>
-<li>modelAndView.addObject(“name”,”王勇敢”);其实和request.serAttribute(“name”,”王勇敢”)</li>
-<li>四种数据<ol>
-<li>obj<ol>
-<li>json的转换   和    返回设置格式 context:json是固定重复代码</li>
-<li>除去重复代码：基于消息转换器.jackon<ol>
-<li>加入依赖  jackson-core  jackson-databind  注意版本</li>
-<li>加入注解驱动 注意是mvc的driven</li>
-<li>加@ResponseBody</li>
-</ol>
-</li>
-<li>返回json原理<ol>
-<li>注解驱动的接口httpMessageConverter定义很多obj转换方法，如xml,json,txt</li>
-<li>spring注入这个接口的是是实现类。</li>
-</ol>
-</li>
-</ol>
-</li>
-<li>string(视图路径)</li>
-<li>string,int 数据</li>
-<li>void使用response.WriteStream响应（只有数据，没有视图）</li>
-</ol>
-</li>
-</ol>
-<h3 id="1-2-MVVM"><a href="#1-2-MVVM" class="headerlink" title="1.2 MVVM"></a>1.2 MVVM</h3><blockquote>
-<p>MVVM是流行的前后端分离model view modelAndView，这个更多的体现在前端</p>
-</blockquote>
-<ol>
-<li>model=controller+pojo</li>
-<li>view=html(model)</li>
-<li>modelAndView=model-view转换器</li>
-</ol>
-<h3 id="1-3-mvc优缺点"><a href="#1-3-mvc优缺点" class="headerlink" title="1.3 mvc优缺点"></a>1.3 mvc优缺点</h3><h4 id="1-3-1-优点"><a href="#1-3-1-优点" class="headerlink" title="1.3.1 优点"></a>1.3.1 优点</h4><ol>
-<li>耦合度低：表改了，只需修改model</li>
-<li>复用性高：model可以在不同的视图中使用</li>
-<li>可维护性高</li>
-<li>分层，结构清晰，开发快</li>
-</ol>
-<h4 id="1-3-2-缺点："><a href="#1-3-2-缺点：" class="headerlink" title="1.3.2 缺点："></a>1.3.2 缺点：</h4><ol>
-<li>适合大型项目，但是现在的小型项目也在使用这种模式，就有点得不偿失</li>
-<li>增加了系统的复杂性，降低了运行效率</li>
-</ol>
-<h2 id="二、SpringMVC"><a href="#二、SpringMVC" class="headerlink" title="二、SpringMVC"></a>二、SpringMVC</h2><h3 id="2-1-概念"><a href="#2-1-概念" class="headerlink" title="2.1 概念"></a>2.1 概念</h3><ol>
-<li><p>spring web mvc   spring&gt;3.0</p>
-</li>
-<li><p>支持restful</p>
-</li>
-<li><p>单例 每个servlet只有一个。所以说ssm是基于方法的，struts2是基于类的。</p>
-</li>
-<li><p>模块化，各个组件一次进行</p>
-<ol>
-<li>dispatch前端控制器</li>
-<li>controller后端配置器</li>
-<li>handler请求映射器</li>
-<li>handlerAdapter处理适配器</li>
-<li>ViewRelover视图解析器</li>
-<li>验证器viliader Jsr303</li>
-</ol>
-</li>
-<li><p>springmvc  spring、IOC是容器，ioc管理对象  </p>
-<ol>
-<li>&lt;bean&gt; @controller @respository @ mapper</li>
-<li>@controller是控制器对象  不是servlet</li>
-</ol>
-</li>
-</ol>
-<h3 id="2-2-dispatcherservlet"><a href="#2-2-dispatcherservlet" class="headerlink" title="2.2 dispatcherservlet"></a>2.2 dispatcherservlet</h3><ol>
-<li><p>springmvc 内置的<strong>超级servlet</strong> 用于接受所有请求 ，然后把请求分发给controller</p>
-</li>
-<li><p>dispatcherservlet别名</p>
-<ol>
-<li>超级servlet  继承自httpserlvet</li>
-<li>中央调度器</li>
-<li>前端控制器</li>
-</ol>
-</li>
-<li><p>dispatcherservlet作用</p>
-<ol>
-<li>接受所有请求 调用控制器对象</li>
-<li>把请求响应返还个用户</li>
-<li>核心方法 doDispatch(req,resp)</li>
-</ol>
-</li>
-</ol>
-<h3 id="2-3-mvc启动过程"><a href="#2-3-mvc启动过程" class="headerlink" title="2.3 mvc启动过程"></a>2.3 mvc启动过程</h3><ol>
-<li><p>tomcat启动  </p>
-</li>
-<li><p>创建dispatcher</p>
-</li>
-<li><p>执行servlet.inti() 创建sprig容器webapplicationContext</p>
-</li>
-<li><p>把spring容器放进serlevtContext</p>
-<p>getServletContext().setAttribute(name,webapplicationContext)</p>
-<p>这个servlet就是dispatcher</p>
-</li>
-<li><p>把对象注入spring容器</p>
-</li>
-</ol>
-<h2 id="三、创建springmvc项目"><a href="#三、创建springmvc项目" class="headerlink" title="三、创建springmvc项目"></a>三、创建springmvc项目</h2><ol>
-<li><p>创建</p>
-<ol>
-<li><p>maven -&gt;maven-archetype-webapp模板</p>
-</li>
-<li><p>加入依赖</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">groupId</span>&gt;</span>javax.servlet<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>javax.servlet-api<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-webmvc<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-<li><p>wel.xml 全局serlvet配置</p>
-</li>
-<li><p>创建springmvc配置</p>
-</li>
-<li><p>创建控制器@Controller 加入@requetMapping</p>
-</li>
-<li><p>创建jsp</p>
-</li>
-</ol>
-</li>
-<li><p>idea配置</p>
-<ol>
-<li>项目结构–模块–删除部署描述  添加部署描述为web1.xml </li>
-<li>更改web1.xml 为web.xml</li>
-</ol>
-</li>
-<li><p>web.xml配置</p>
-<ol>
-<li>servlet<ol>
-<li>name </li>
-<li>url-partter</li>
-</ol>
-</li>
-<li>过滤器 ：处理请求乱码</li>
-</ol>
-</li>
-<li><p>st.xml配置</p>
-<ol>
-<li>控制器扫描器</li>
-<li>视图解析器</li>
-</ol>
-</li>
-<li><p>tomcat配置</p>
-</li>
-</ol>
-<h3 id="注入mybatis的-mapper"><a href="#注入mybatis的-mapper" class="headerlink" title="注入mybatis的@mapper"></a>注入mybatis的@mapper</h3><h3 id="访问html"><a href="#访问html" class="headerlink" title="访问html"></a>访问html</h3><p>servlet-01.xml</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">mvc:resources</span> <span class="attr">mapping</span>=<span class="string">&quot;/html/**&quot;</span> <span class="attr">location</span>=<span class="string">&quot;classpath:html/&quot;</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+          <h2 id=""><a href="#" class="headerlink" title=""></a></h2><h2 id="-1"><a href="#-1" class="headerlink" title=""></a></h2><h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><h3 id="内置对象ArrayList"><a href="#内置对象ArrayList" class="headerlink" title="内置对象ArrayList"></a>内置对象ArrayList</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ArrayList</span>&lt;<span class="title">E</span>&gt; <span class="keyword">extends</span> <span class="title">AbstractList</span>&lt;<span class="title">E</span>&gt;</span></span><br><span class="line"><span class="class">        <span class="keyword">implements</span> <span class="title">RandomAccess</span>, <span class="title">java</span>.<span class="title">io</span>.<span class="title">Serializable</span></span></span><br><span class="line"><span class="class">    </span>&#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = -<span class="number">2764017481108945198L</span>;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">final</span> E[] a;</span><br><span class="line"></span><br><span class="line">        ArrayList(E[] array) &#123;</span><br><span class="line">            a = Objects.requireNonNull(array);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">size</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> a.length;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> Object[] toArray() &#123;</span><br><span class="line">            <span class="keyword">return</span> a.clone();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="meta">@SuppressWarnings(&quot;unchecked&quot;)</span></span><br><span class="line">        <span class="keyword">public</span> &lt;T&gt; T[] toArray(T[] a) &#123;</span><br><span class="line">            <span class="keyword">int</span> size = size();</span><br><span class="line">            <span class="keyword">if</span> (a.length &lt; size)</span><br><span class="line">                <span class="keyword">return</span> Arrays.copyOf(<span class="keyword">this</span>.a, size,</span><br><span class="line">                                     (Class&lt;? extends T[]&gt;) a.getClass());</span><br><span class="line">            System.arraycopy(<span class="keyword">this</span>.a, <span class="number">0</span>, a, <span class="number">0</span>, size);</span><br><span class="line">            <span class="keyword">if</span> (a.length &gt; size)</span><br><span class="line">                a[size] = <span class="keyword">null</span>;</span><br><span class="line">            <span class="keyword">return</span> a;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> E <span class="title">get</span><span class="params">(<span class="keyword">int</span> index)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> a[index];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> E <span class="title">set</span><span class="params">(<span class="keyword">int</span> index, E element)</span> </span>&#123;</span><br><span class="line">            E oldValue = a[index];</span><br><span class="line">            a[index] = element;</span><br><span class="line">            <span class="keyword">return</span> oldValue;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">indexOf</span><span class="params">(Object o)</span> </span>&#123;</span><br><span class="line">            E[] a = <span class="keyword">this</span>.a;</span><br><span class="line">            <span class="keyword">if</span> (o == <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; a.length; i++)</span><br><span class="line">                    <span class="keyword">if</span> (a[i] == <span class="keyword">null</span>)</span><br><span class="line">                        <span class="keyword">return</span> i;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; a.length; i++)</span><br><span class="line">                    <span class="keyword">if</span> (o.equals(a[i]))</span><br><span class="line">                        <span class="keyword">return</span> i;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">contains</span><span class="params">(Object o)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> indexOf(o) != -<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> Spliterator&lt;E&gt; <span class="title">spliterator</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> Spliterators.spliterator(a, Spliterator.ORDERED);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">forEach</span><span class="params">(Consumer&lt;? <span class="keyword">super</span> E&gt; action)</span> </span>&#123;</span><br><span class="line">            Objects.requireNonNull(action);</span><br><span class="line">            <span class="keyword">for</span> (E e : a) &#123;</span><br><span class="line">                action.accept(e);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">replaceAll</span><span class="params">(UnaryOperator&lt;E&gt; operator)</span> </span>&#123;</span><br><span class="line">            Objects.requireNonNull(operator);</span><br><span class="line">            E[] a = <span class="keyword">this</span>.a;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; a.length; i++) &#123;</span><br><span class="line">                a[i] = operator.apply(a[i]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sort</span><span class="params">(Comparator&lt;? <span class="keyword">super</span> E&gt; c)</span> </span>&#123;</span><br><span class="line">            Arrays.sort(a, c);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 
 
-<h2 id="四、其他"><a href="#四、其他" class="headerlink" title="四、其他"></a>四、其他</h2><ol>
-<li>@requestMapper{“a”,”b”} 访问两个路径都可以</li>
-<li>url-parrten 为接受所有请求 且表示优先级最高 一般用于过滤器</li>
-<li>访问资源<ol>
-<li>动态资源.html/jsp的路径tomcat</li>
-<li>静态资源  tomcat      因为tomcat内置一个dafaultServlet(在tomcat.conf)    启动的时候自动创建 ,<ol>
-<li>处理为映射到controller.Mapping的路径</li>
-<li>对所有的静态资源 </li>
-<li>当某个servlet的url-patter为/或者/* 那么这个servlet就会接手这个内置servlet的工作</li>
-</ol>
-</li>
-<li>url(controller)  有mvc内置的servlet    dispatchServlet处理</li>
-</ol>
-</li>
-</ol>
-<h2 id="五、SpringMVC问题"><a href="#五、SpringMVC问题" class="headerlink" title="五、SpringMVC问题"></a>五、SpringMVC问题</h2><ol>
-<li>静态资源访问失败<ol>
-<li>原因可能是servlet的partten接手了//资源，而静态资源默认是//路径</li>
-<li>处理：加配置</li>
-</ol>
-</li>
-</ol>
-<h3 id="springmvc处理请求流程"><a href="#springmvc处理请求流程" class="headerlink" title="springmvc处理请求流程"></a>springmvc处理请求流程</h3><ol>
-<li>tomcat–&gt;url-partter匹配—&gt;dispatcher—&gt;st.servlet—&gt;wyg.controller–&gt;TestController</li>
-</ol>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211019003549650.png" alt="image-20211019003549650"></p>
 
       
     </div>
