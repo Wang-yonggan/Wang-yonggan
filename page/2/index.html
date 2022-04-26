@@ -187,6 +187,138 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/mysql%E4%B8%80%E6%9D%A1%E8%AF%AD%E5%8F%A5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/mysql%E4%B8%80%E6%9D%A1%E8%AF%AD%E5%8F%A5/" class="post-title-link" itemprop="url">mysql分析</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-04-10 03:27:13 / 修改时间：14:35:22" itemprop="dateCreated datePublished" datetime="2022-04-10T03:27:13+08:00">2022-04-10</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/mysql%E4%B8%80%E6%9D%A1%E8%AF%AD%E5%8F%A5/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/mysql%E4%B8%80%E6%9D%A1%E8%AF%AD%E5%8F%A5/" class="cy_cmt_count" data-xid="2022/04/10/数据库/nosql/mysql一条语句/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="Buffer-pool"><a href="#Buffer-pool" class="headerlink" title="Buffer pool"></a>Buffer pool</h3><p>第一次在查询的时候会将查询的结果存到  Buffer Pool 中，这样后面再有请求的时候就会先从缓冲池中去查询，如果没有再去磁盘中查找，然后在放到  Buffer Pool 中</p>
+<h3 id="执行顺序"><a href="#执行顺序" class="headerlink" title="执行顺序"></a>执行顺序</h3><p>undo</p>
+<p>磁盘——–&gt;buffer Pool———&gt;在buffer中完成运算—&gt;结果写入到redo log buffer —-&gt;写入redo log —&gt;</p>
+<p>​      ——-&gt;将更新语句反句加载到undo</p>
+<ul>
+<li>准备更新一条 SQL 语句</li>
+<li>MySQL（innodb）会先去缓冲池（BufferPool）中去查找这条数据，没找到就会去磁盘中查找，如果查找到就会将这条数据加载到缓冲池（BufferPool）中</li>
+<li>在加载到 Buffer Pool 的同时，会将这条数据的原始记录保存到 undo 日志文件中</li>
+<li>innodb 会在 Buffer Pool 中执行更新操作</li>
+<li>更新后的数据会记录在 redo log buffer 中</li>
+<li>MySQL 提交事务的时候，会将 redo log buffer 中的数据写入到 redo 日志文件中 刷磁盘可以通过 innodb_flush_log_at_trx_commit 参数来设置<ul>
+<li>值为 0 表示不刷入磁盘</li>
+<li>值为 1 表示立即刷入磁盘</li>
+<li>值为 2 表示先刷到 os cache</li>
+</ul>
+</li>
+<li>myslq 重启的时候会将 redo 日志恢复到缓冲池中</li>
+</ul>
+<h4 id="当前读"><a href="#当前读" class="headerlink" title="当前读"></a>当前读</h4><blockquote>
+<p>当前读, 读取的是最新版本, 并且<strong>对读取的记录加锁, 阻塞其他事务同时改动相同</strong>记录，避免出现安全问题</p>
+</blockquote>
+<p>当前读的实现方式：next-key锁(行记录锁+Gap间隙锁)</p>
+<ol>
+<li>对主键或唯一索引，如果当前读时，where条件全部精确命中(=或者in)，这种场景本身就不会出现幻读，所以只会加行记录锁。</li>
+<li>没有索引的列，当前读操作时，会加全表gap锁，生产环境要注意。</li>
+<li>非唯一索引列，如果where条件部分命中(&gt;、&lt;、like等)或者全未命中，则会加附近Gap间隙锁。例如，某表数据如下，非唯一索引2,6,9,9,11,15。如下语句要操作非唯一索引列9的数据，gap锁将会锁定的列是(6,11]，该区间内无法插入数据。</li>
+</ol>
+<h4 id="快照读"><a href="#快照读" class="headerlink" title="快照读"></a>快照读</h4><blockquote>
+<p>readView  [未提交事务数组]、max_id</p>
+<p>执行DML才会给事务id</p>
+</blockquote>
+<blockquote>
+<p>版本链上适合自己的一个版本快照</p>
+<p>通过 </p>
+<p>生成时机：begin<strong>之后第一条</strong>语句</p>
+<p>作用范围：库的所有表，每个表都对应一个版本链，</p>
+</blockquote>
+<p>只读事务不分配trx_id（会分配一个假trx_id），只有涉及到数据更新才会分配事务ID。</p>
+<ul>
+<li>在事务隔离级别为<code>RR</code>时，在第一次进行<code>select</code>查询时生成<code>read view</code>;</li>
+<li>在事务隔离级别为<code>RC</code>时，每一次<code>select</code>查询都会生成<code>read view</code>;</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/lmlzww/article/details/119087426?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-0.pc_relevant_default&amp;spm=1001.2101.3001.4242.1&amp;utm_relevant_index=2">https://blog.csdn.net/lmlzww/article/details/119087426?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-0.pc_relevant_default&amp;spm=1001.2101.3001.4242.1&amp;utm_relevant_index=2</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_44823898/article/details/115718622">https://blog.csdn.net/qq_44823898/article/details/115718622</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/09/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%B3%BB%E7%BB%9F%E8%A1%A8/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -474,7 +606,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-04-06 04:54:58" itemprop="dateModified" datetime="2022-04-06T04:54:58+08:00">2022-04-06</time>
+                <time title="修改时间：2022-04-26 01:59:12" itemprop="dateModified" datetime="2022-04-26T01:59:12+08:00">2022-04-26</time>
               </span>
 
           
@@ -499,14 +631,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>2k</span>
+              <span>3.6k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
+              <span>3 分钟</span>
             </span>
 
         </div>
@@ -554,7 +686,7 @@
 <p>我把 <code>code</code>，<code>client_id</code>，<code>client_secret</code>  一组和，gitee <code>第二个url</code>就出现了</p>
 <p>我拿着第二个url请求gitee 让他给我userinfo</p>
 </blockquote>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#第二个gitee  url</span></span><br><span class="line">https://gitee.com/oauth/token?code=18848b9a2e151f79ed94bdcf38f89eda206b08a87a966ebc6f38decb4383d07d&amp;</span><br><span class="line">client_id=3e9bf70483cccc65147eded006a80c3d8a511f5a965b61d4c61d6a54926886f004&amp;   client_secret=9698c0445da7a8f599b6b02b26897a2e6ea22243639ed22ffc3e8b7e7b5f1c0e4bc22&amp;</span><br><span class="line">grant_type=authorization_code&amp;</span><br><span class="line">redirect_uri=http://<span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">8443</span>/oauth/callback/gitee</span><br></pre></td></tr></table></figure></li>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#第二个gitee  url</span></span><br><span class="line">https://gitee.com/oauth/token?code=18848b9a2e151f79ed94bdcf38f89e206b08a87a966ebc6f38decb4383d0&amp;</span><br><span class="line">client_id=3e9bf70483cccc65147eded006a80c3d8a511f5a965b61d4c61d6a54926886f0&amp;   client_secret=9698c0445da7a8f599b6b02b26897a2e6ea22243639ed22ffc3e8b7e7b50e4bc&amp;</span><br><span class="line">grant_type=authorization_code&amp;</span><br><span class="line">redirect_uri=http://<span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">8443</span>/oauth/callback/gitee</span><br></pre></td></tr></table></figure></li>
 <li><p>gitee的回应</p>
 <blockquote>
 <p><code>gitee的老板</code> 收到请求后，经过一系列认证，从hashmap中取到了userInfo，然后响应给我 </p>
@@ -567,6 +699,33 @@
 </li>
 <li><p>如果没找到，就是临时用户</p>
 </li>
+</ol>
+<h3 id="简化讲述"><a href="#简化讲述" class="headerlink" title="简化讲述"></a>简化讲述</h3><ol>
+<li><p>用户访问–&gt;服务器随机生成state，然后根据 p1 : {state，cilent_id，redirect_uri，<a target="_blank" rel="noopener" href="http://gitee.com/login">http://gitee.com/login</a> }等信息生成一个url1，并用response让用户浏览器转发到这个url1，用户输入信息p2{username,password}</p>
+</li>
+<li><p>gitee 官方接收到用户浏览器的请求后，保存请求信息p1，p2 ，随机生成一个code，保存p3{code: userInfo}</p>
+<p>带着p4{ code , state} 访问 p1.redirect_uri，</p>
+</li>
+<li><p>服务器根据p5{code，cilent_id，client_secret，redirect_uri，，<a target="_blank" rel="noopener" href="http://gitee.com/auth/token%7D">http://gitee.com/auth/token}</a> 生成url2，访问url2等到authToken</p>
+</li>
+<li><p>服务器根据authToken生成url3 访问url3得到userInfo</p>
+</li>
+</ol>
+<h4 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h4><ol>
+<li><p>url1</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">https</span>://gitee.com/oauth/authorize?response_type=code&amp;client_id=<span class="number">3</span>e<span class="number">9</span>bf<span class="number">70483</span>cccc<span class="number">65147</span>eded<span class="number">006</span>a<span class="number">80</span>c<span class="number">3</span>d<span class="number">8</span>a<span class="number">5</span>f<span class="number">5</span>a<span class="number">965</span>b<span class="number">661</span>d<span class="number">6</span>a<span class="number">54926886</span>f<span class="number">004</span>&amp;redirect_uri=http://<span class="number">127.0.0.1:8443</span>/oauth/callback/gitee&amp;state=<span class="number">32</span>ca<span class="number">6594</span>d<span class="number">002</span>e<span class="number">6</span>f<span class="number">2</span>f<span class="number">7</span>d<span class="number">9</span>ee<span class="number">1</span>a<span class="number">12</span>b<span class="number">6</span>f<span class="number">5</span>a<span class="number">5</span>&amp;scope=user_info</span><br></pre></td></tr></table></figure></li>
+<li><p>p4</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="attr">&quot;code&quot;</span>:<span class="string">&quot;53732710f7337894000f5f3ff9a453d99b88daca8267162c2b92a75fe6e726aa&quot;</span>,<span class="attr">&quot;state&quot;</span>:<span class="string">&quot;32ca6594d002e6f2f7d9ee1a12b6f5a5&quot;</span>&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>url2</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">https</span>://gitee.com/oauth/token?code=<span class="number">1488557</span>e<span class="number">82</span>c<span class="number">1</span>bf<span class="number">1</span>fdd<span class="number">8</span>c<span class="number">29</span>c<span class="number">6</span>b<span class="number">653</span>c<span class="number">62</span>e<span class="number">511</span>be<span class="number">2</span>c<span class="number">7</span>fc<span class="number">3</span>e<span class="number">7</span>d<span class="number">78013</span>b<span class="number">4</span>f<span class="number">32</span>d<span class="number">0157</span>d<span class="number">8</span>d&amp;client_id=<span class="number">3</span>e<span class="number">9</span>bf<span class="number">70483</span>cccc<span class="number">65147</span>eded<span class="number">006</span>a<span class="number">80</span>c<span class="number">3</span>d<span class="number">8</span>a<span class="number">5</span>f<span class="number">5</span>a<span class="number">965</span>b<span class="number">61</span>d<span class="number">4</span>c<span class="number">61</span>d<span class="number">6</span>a<span class="number">54886</span>f&amp;client_secret=<span class="number">96</span>c<span class="number">045</span>da<span class="number">7</span>a<span class="number">8</span>f<span class="number">599</span>b<span class="number">6</span>b<span class="number">02</span>b<span class="number">26897</span>a<span class="number">2</span>e<span class="number">6</span>ea<span class="number">43639</span>ed<span class="number">22</span>ffc<span class="number">3</span>e<span class="number">8</span>b<span class="number">7</span>e<span class="number">7</span>b<span class="number">5</span>f<span class="number">1</span>c<span class="number">0</span>e<span class="number">4</span>&amp;grant_type=authorization_code&amp;redirect_uri=http://<span class="number">127.0.0.1:8443</span>/oauth/callback/gitee</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">https</span>://gitee.com/oauth/token?code=eb<span class="number">5181</span>da<span class="number">1</span>f<span class="number">225000</span>d<span class="number">0</span>fa<span class="number">220</span>a<span class="number">896</span>a<span class="number">8</span>eda<span class="number">81</span>d<span class="number">8</span>d<span class="number">0385</span>fe<span class="number">269</span>ee<span class="number">5</span>fa<span class="number">2</span>aa<span class="number">19</span>d<span class="number">0054</span>d<span class="number">7</span>e&amp;client_id=e<span class="number">2</span>c<span class="number">295</span>ef<span class="number">1</span>c<span class="number">1</span>aa<span class="number">096</span>e<span class="number">4</span>f<span class="number">0</span>d<span class="number">2</span>a<span class="number">30590</span>ef<span class="number">91</span>e<span class="number">35</span>d<span class="number">3</span>a<span class="number">7</span>e<span class="number">2971</span>acdf<span class="number">82</span>fc<span class="number">837</span>b<span class="number">55439</span>fb<span class="number">1</span>&amp;client_secret=<span class="number">4</span>cda<span class="number">46</span>d<span class="number">4432</span>bf<span class="number">77</span>dd<span class="number">865002</span>c<span class="number">91</span>eb<span class="number">8232756607</span>f<span class="number">60</span>fb<span class="number">8</span>bfb<span class="number">2</span>f<span class="number">46</span>cf<span class="number">0</span>f<span class="number">92</span>d<span class="number">4339</span>ac&amp;grant_type=authorization_code&amp;redirect_uri=http://<span class="number">127.0.0.1:8001</span>/auth/gitee</span><br></pre></td></tr></table></figure></li>
+<li><p>url3</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">https</span>://gitee.com/api/v<span class="number">5</span>/user?access_token=f<span class="number">8119934124</span>cb<span class="number">931</span>bd<span class="number">8</span>de<span class="number">62</span>e<span class="number">838</span>d<span class="number">6</span>ef<span class="number">2</span>f</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h2><ol>
+<li><p>url</p>
+<figure class="highlight isbl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">utils.HttpUtils</span> <span class="number">35</span>行 <span class="function"><span class="title">post</span>(<span class="variable">url</span>)</span></span><br></pre></td></tr></table></figure></li>
 </ol>
 
       
@@ -850,126 +1009,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/27/java/javaSE/JUC/JUC%E7%9A%84%E5%9F%BA%E7%A1%80/AQS/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/27/java/javaSE/JUC/JUC%E7%9A%84%E5%9F%BA%E7%A1%80/AQS/" class="post-title-link" itemprop="url">AQS</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-27 13:34:14" itemprop="dateCreated datePublished" datetime="2022-03-27T13:34:14+08:00">2022-03-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-04-10 03:22:58" itemprop="dateModified" datetime="2022-04-10T03:22:58+08:00">2022-04-10</time>
-              </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/27/java/javaSE/JUC/JUC%E7%9A%84%E5%9F%BA%E7%A1%80/AQS/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/27/java/javaSE/JUC/JUC%E7%9A%84%E5%9F%BA%E7%A1%80/AQS/" class="cy_cmt_count" data-xid="2022/03/27/java/javaSE/JUC/JUC的基础/AQS/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.1k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>[toc]</p>
-<blockquote>
-<p>AbstractQueuedSynchonizer，抽象队列同步器，是JUC锁的base，是JUC的base</p>
-</blockquote>
-<blockquote>
-<p>提供了一个基于FIFO队列，可以用于构建锁或者其他相关同步装置的基础框架。</p>
-</blockquote>
-<h3 id="基于AQS的组件"><a href="#基于AQS的组件" class="headerlink" title="基于AQS的组件"></a>基于AQS的组件</h3><ol>
-<li><p>Exclusive(独占)：只有一个线程能执行，如ReentrantLock。又可分为公平锁和非公平锁：</p>
-<ul>
-<li><p>公平锁：按照线程在队列中的排队顺序，先到者先拿到锁</p>
-</li>
-<li><p>非公平锁：当线程要获取锁时，无视队列顺序直接去抢锁，谁抢到就是谁的</p>
-</li>
-</ul>
-</li>
-<li><p>Share(共享)：多个线程可同时执行，如Semaphore/CountDownLatch。Semaphore、CountDownLatCh、 CyclicBarrier、ReadWriteLock 我们都会在后面讲到。</p>
-</li>
-</ol>
-<h3 id="一个State"><a href="#一个State" class="headerlink" title="一个State"></a>一个State</h3><h3 id="队列Node"><a href="#队列Node" class="headerlink" title="队列Node"></a>队列Node</h3><p><code>CLH(Craig,Landin,and Hagersten)队列</code>是一个虚拟的双向队列(虚拟的双向队列即不存在队列实例，仅存在结点之间的关联关系)。AQS是将每条请求共享资源的线程封装成一个CLH锁队列的一个结点(Node)来实现锁的分配。其中Sync queue，即同步队列，是双向链表，包括head结点和tail结点，head结点主要用作后续的调度。而Condition queue不是必须的，其是一个单向链表，只有当使用Condition时，才会存在此单向链表。并且可能会有多个Condition queue。</p>
-<h3 id="六个操作"><a href="#六个操作" class="headerlink" title="六个操作"></a>六个操作</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">isHeldExclusively()<span class="comment">//该线程是否正在独占资源。只有用到condition才需要去实现它。</span></span><br><span class="line">tryAcquire(<span class="keyword">int</span>)<span class="comment">//独占方式。尝试获取资源，成功则返回true，失败则返回false。</span></span><br><span class="line">tryRelease(<span class="keyword">int</span>)<span class="comment">//独占方式。尝试释放资源，成功则返回true，失败则返回false。</span></span><br><span class="line">tryAcquireShared(<span class="keyword">int</span>)<span class="comment">//共享方式。尝试获取资源。负数表示失败；0表示成功，但没有剩余可用资源；正数表示成功，且有剩余资源。</span></span><br><span class="line">tryReleaseShared(<span class="keyword">int</span>)<span class="comment">//共享方式。尝试释放资源，成功则返回true，失败则返回false。</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="其他操作"><a href="#其他操作" class="headerlink" title="其他操作"></a>其他操作</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">addWaiter(Node node)&#123;</span><br><span class="line">  flag=csa(node);<span class="comment">//先csa快速插入到尾节点  </span></span><br><span class="line">  <span class="keyword">if</span>(!flag)</span><br><span class="line">      enq(node);<span class="comment">//csa循环防止</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//h</span></span><br><span class="line">acquire(<span class="keyword">int</span> arg)&#123;</span><br><span class="line">    <span class="keyword">if</span>(!tryAcquire(arg)&amp;&amp;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-<h4 id="抢锁-acquire"><a href="#抢锁-acquire" class="headerlink" title="抢锁 acquire"></a>抢锁 acquire</h4><h4 id="释放锁"><a href="#释放锁" class="headerlink" title="释放锁"></a>释放锁</h4><h4 id="入队"><a href="#入队" class="headerlink" title="入队"></a>入队</h4><h4 id="出队"><a href="#出队" class="headerlink" title="出队"></a>出队</h4><h4 id="阻塞"><a href="#阻塞" class="headerlink" title="阻塞"></a>阻塞</h4><h4 id="唤醒"><a href="#唤醒" class="headerlink" title="唤醒"></a>唤醒</h4><h3 id="队列"><a href="#队列" class="headerlink" title="队列"></a>队列</h3><h4 id="AQS队列"><a href="#AQS队列" class="headerlink" title="AQS队列"></a>AQS队列</h4>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1041,7 +1080,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">111</span>
+          <span class="site-state-item-count">113</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1092,12 +1131,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">306k</span>
+    <span title="站点总字数">312k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">4:38</span>
+    <span title="站点阅读时长">4:44</span>
 </div>
 
         

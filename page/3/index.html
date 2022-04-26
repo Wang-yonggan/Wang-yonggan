@@ -187,6 +187,126 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/27/java/javaSE/JUC/JUC%E7%9A%84%E5%9F%BA%E7%A1%80/AQS/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/27/java/javaSE/JUC/JUC%E7%9A%84%E5%9F%BA%E7%A1%80/AQS/" class="post-title-link" itemprop="url">AQS</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-27 13:34:14" itemprop="dateCreated datePublished" datetime="2022-03-27T13:34:14+08:00">2022-03-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-04-10 03:22:58" itemprop="dateModified" datetime="2022-04-10T03:22:58+08:00">2022-04-10</time>
+              </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/27/java/javaSE/JUC/JUC%E7%9A%84%E5%9F%BA%E7%A1%80/AQS/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/27/java/javaSE/JUC/JUC%E7%9A%84%E5%9F%BA%E7%A1%80/AQS/" class="cy_cmt_count" data-xid="2022/03/27/java/javaSE/JUC/JUC的基础/AQS/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>[toc]</p>
+<blockquote>
+<p>AbstractQueuedSynchonizer，抽象队列同步器，是JUC锁的base，是JUC的base</p>
+</blockquote>
+<blockquote>
+<p>提供了一个基于FIFO队列，可以用于构建锁或者其他相关同步装置的基础框架。</p>
+</blockquote>
+<h3 id="基于AQS的组件"><a href="#基于AQS的组件" class="headerlink" title="基于AQS的组件"></a>基于AQS的组件</h3><ol>
+<li><p>Exclusive(独占)：只有一个线程能执行，如ReentrantLock。又可分为公平锁和非公平锁：</p>
+<ul>
+<li><p>公平锁：按照线程在队列中的排队顺序，先到者先拿到锁</p>
+</li>
+<li><p>非公平锁：当线程要获取锁时，无视队列顺序直接去抢锁，谁抢到就是谁的</p>
+</li>
+</ul>
+</li>
+<li><p>Share(共享)：多个线程可同时执行，如Semaphore/CountDownLatch。Semaphore、CountDownLatCh、 CyclicBarrier、ReadWriteLock 我们都会在后面讲到。</p>
+</li>
+</ol>
+<h3 id="一个State"><a href="#一个State" class="headerlink" title="一个State"></a>一个State</h3><h3 id="队列Node"><a href="#队列Node" class="headerlink" title="队列Node"></a>队列Node</h3><p><code>CLH(Craig,Landin,and Hagersten)队列</code>是一个虚拟的双向队列(虚拟的双向队列即不存在队列实例，仅存在结点之间的关联关系)。AQS是将每条请求共享资源的线程封装成一个CLH锁队列的一个结点(Node)来实现锁的分配。其中Sync queue，即同步队列，是双向链表，包括head结点和tail结点，head结点主要用作后续的调度。而Condition queue不是必须的，其是一个单向链表，只有当使用Condition时，才会存在此单向链表。并且可能会有多个Condition queue。</p>
+<h3 id="六个操作"><a href="#六个操作" class="headerlink" title="六个操作"></a>六个操作</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">isHeldExclusively()<span class="comment">//该线程是否正在独占资源。只有用到condition才需要去实现它。</span></span><br><span class="line">tryAcquire(<span class="keyword">int</span>)<span class="comment">//独占方式。尝试获取资源，成功则返回true，失败则返回false。</span></span><br><span class="line">tryRelease(<span class="keyword">int</span>)<span class="comment">//独占方式。尝试释放资源，成功则返回true，失败则返回false。</span></span><br><span class="line">tryAcquireShared(<span class="keyword">int</span>)<span class="comment">//共享方式。尝试获取资源。负数表示失败；0表示成功，但没有剩余可用资源；正数表示成功，且有剩余资源。</span></span><br><span class="line">tryReleaseShared(<span class="keyword">int</span>)<span class="comment">//共享方式。尝试释放资源，成功则返回true，失败则返回false。</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="其他操作"><a href="#其他操作" class="headerlink" title="其他操作"></a>其他操作</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">addWaiter(Node node)&#123;</span><br><span class="line">  flag=csa(node);<span class="comment">//先csa快速插入到尾节点  </span></span><br><span class="line">  <span class="keyword">if</span>(!flag)</span><br><span class="line">      enq(node);<span class="comment">//csa循环防止</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//h</span></span><br><span class="line">acquire(<span class="keyword">int</span> arg)&#123;</span><br><span class="line">    <span class="keyword">if</span>(!tryAcquire(arg)&amp;&amp;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="抢锁-acquire"><a href="#抢锁-acquire" class="headerlink" title="抢锁 acquire"></a>抢锁 acquire</h4><h4 id="释放锁"><a href="#释放锁" class="headerlink" title="释放锁"></a>释放锁</h4><h4 id="入队"><a href="#入队" class="headerlink" title="入队"></a>入队</h4><h4 id="出队"><a href="#出队" class="headerlink" title="出队"></a>出队</h4><h4 id="阻塞"><a href="#阻塞" class="headerlink" title="阻塞"></a>阻塞</h4><h4 id="唤醒"><a href="#唤醒" class="headerlink" title="唤醒"></a>唤醒</h4><h3 id="队列"><a href="#队列" class="headerlink" title="队列"></a>队列</h3><h4 id="AQS队列"><a href="#AQS队列" class="headerlink" title="AQS队列"></a>AQS队列</h4>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/26/spring/%E6%B3%A8%E8%A7%A3/schdule/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -814,127 +934,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/20/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E4%BA%8B%E5%8A%A1-MVCC/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/20/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E4%BA%8B%E5%8A%A1-MVCC/" class="post-title-link" itemprop="url">事务-MVCC</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-20 13:50:28" itemprop="dateCreated datePublished" datetime="2022-03-20T13:50:28+08:00">2022-03-20</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-21 00:51:22" itemprop="dateModified" datetime="2022-03-21T00:51:22+08:00">2022-03-21</time>
-              </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/20/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E4%BA%8B%E5%8A%A1-MVCC/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/20/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E4%BA%8B%E5%8A%A1-MVCC/" class="cy_cmt_count" data-xid="2022/03/20/数据库/数据库概念2.0/事务-MVCC/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>2.7k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>`</p>
-<p>参考: <a target="_blank" rel="noopener" href="https://juejin.cn/post/7016165148020703246">掘金</a></p>
-<h2 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h2><blockquote>
-<p>C是事务的根本追求数据一致性的破坏主要来自两个方面</p>
-<ol>
-<li>事务的并发执行    —&gt;  并发控制技术MVCC(也可以用锁,但是锁性能太低)–&gt;undo</li>
-<li>事务故障或系统故障   —&gt; 日志恢复技 –&gt;redo</li>
-</ol>
-</blockquote>
-<h3 id="2-1-ACID"><a href="#2-1-ACID" class="headerlink" title="2.1 ACID"></a>2.1 ACID</h3><ol>
-<li><p>Atomicity 原子性</p>
-<ol>
-<li>begin</li>
-<li>sql1</li>
-<li>sql2</li>
-<li>commit</li>
-<li>构成逻辑整体的这些数据库操作,要么全部执行成功,要么全部不执行。基于以事务为单位执行</li>
-</ol>
-</li>
-</ol>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/03/20/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E4%BA%8B%E5%8A%A1-MVCC/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1006,7 +1005,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">111</span>
+          <span class="site-state-item-count">113</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1057,12 +1056,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">306k</span>
+    <span title="站点总字数">312k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">4:38</span>
+    <span title="站点阅读时长">4:44</span>
 </div>
 
         
