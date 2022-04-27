@@ -187,7 +187,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/27/%E5%88%86%E5%B8%83%E5%BC%8F/docker/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/07/java/javaSE/jvm/JVM%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -201,7 +201,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/04/27/%E5%88%86%E5%B8%83%E5%BC%8F/docker/" class="post-title-link" itemprop="url">docker</a>
+            <a href="/2022/04/07/java/javaSE/jvm/JVM%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84/" class="post-title-link" itemprop="url">JVM内存模型</a>
         </h2>
 
         <div class="post-meta">
@@ -211,244 +211,19 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-04-27 03:09:54" itemprop="dateCreated datePublished" datetime="2022-04-27T03:09:54+08:00">2022-04-27</time>
+              <time title="创建时间：2022-04-07 11:17:05" itemprop="dateCreated datePublished" datetime="2022-04-07T11:17:05+08:00">2022-04-07</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-04-24 09:42:52" itemprop="dateModified" datetime="2022-04-24T09:42:52+08:00">2022-04-24</time>
-              </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/04/27/%E5%88%86%E5%B8%83%E5%BC%8F/docker/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/27/%E5%88%86%E5%B8%83%E5%BC%8F/docker/" class="cy_cmt_count" data-xid="2022/04/27/分布式/docker/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>2.4k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="一、概念"><a href="#一、概念" class="headerlink" title="一、概念"></a>一、概念</h2><ol>
-<li>docker与虚拟机<ol>
-<li>虚拟机是创建一个新的操作系统，重量级</li>
-<li>docker是把递归找到各个依赖，环境，配置，然后打包，轻量级</li>
-</ol>
-</li>
-</ol>
-<h3 id="1-2-组件"><a href="#1-2-组件" class="headerlink" title="1.2 组件"></a>1.2 组件</h3><h4 id="1-2-1-镜像"><a href="#1-2-1-镜像" class="headerlink" title="1.2.1 镜像"></a>1.2.1 镜像</h4><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[<span class="symbol">repority</span>]:<span class="link">[tag] </span></span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>类：docker将所需要的环境，依赖，配置打包到一起，叫镜像。</p>
-</blockquote>
-<h4 id="1-2-2-容器"><a href="#1-2-2-容器" class="headerlink" title="1.2.2 容器"></a>1.2.2 容器</h4><blockquote>
-<p>实例：</p>
-</blockquote>
-<h4 id="1-2-3-数据卷"><a href="#1-2-3-数据卷" class="headerlink" title="1.2.3 数据卷"></a>1.2.3 数据卷</h4><blockquote>
-<p>类似共享内存 volume</p>
-<ol>
-<li>容器数据持久化</li>
-<li>外部机器和容器间通信</li>
-<li>容器之间通信</li>
-</ol>
-</blockquote>
-<ol>
-<li>数据卷是宿<strong>主机</strong>中的一个目录或文件</li>
-<li>当容器目录和数据卷目录绑定后，<strong>对方的修改会立即同步</strong></li>
-<li>一个数据卷可以被多个容器同时<strong>挂载</strong></li>
-<li>一个容器也可以被挂载多个数据卷</li>
-</ol>
-<h3 id="1-3-架构"><a href="#1-3-架构" class="headerlink" title="1.3 架构"></a>1.3 架构</h3><ol>
-<li>c/s架构</li>
-<li>clinet发送命令，server回应返回</li>
-</ol>
-<h2 id="二、操作"><a href="#二、操作" class="headerlink" title="二、操作"></a>二、操作</h2><h3 id="2-1-安装"><a href="#2-1-安装" class="headerlink" title="2.1 安装"></a>2.1 安装</h3><ol>
-<li><p>下载</p>
-<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -fsSL <span class="keyword">https</span>://<span class="built_in">get</span>.docker.com | bash -s docker <span class="comment">--mirror Aliyun</span></span><br></pre></td></tr></table></figure></li>
-<li><p>镜像加速</p>
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">sudo mkdir -p <span class="regexp">/etc/</span>docker</span><br><span class="line">sudo tee <span class="regexp">/etc/</span>docker/daemon.json &lt;&lt;-<span class="string">&#x27;EOF&#x27;</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;registry-mirrors&quot;</span>: [<span class="string">&quot;https://zck14spt.mirror.aliyuncs.com&quot;</span>]</span><br><span class="line">&#125;</span><br><span class="line">EOF</span><br><span class="line">sudo systemctl daemon-reload</span><br><span class="line">sudo systemctl restart docker</span><br></pre></td></tr></table></figure></li>
-<li><p>启动docker   systemctl start docker</p>
-</li>
-</ol>
-<h3 id="2-2-镜像"><a href="#2-2-镜像" class="headerlink" title="2.2 镜像"></a>2.2 镜像</h3><ol>
-<li><p>查看镜像</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker images</span><br></pre></td></tr></table></figure></li>
-<li><p>查找镜像</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker search 镜像名称</span><br></pre></td></tr></table></figure></li>
-<li><p>从docker.hub拉取远程镜像</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull redis:<span class="number">3.4</span></span><br></pre></td></tr></table></figure></li>
-<li><p>删除镜像</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker rmi 镜像id / 删除指定本地镜像</span><br></pre></td></tr></table></figure></li>
-<li><p>推送 docker push</p>
-</li>
-<li><p>保存  docker save -o test nginx:latest</p>
-</li>
-<li><p> 加载 docker load</p>
-</li>
-<li><p>构建 docker builder</p>
-</li>
-</ol>
-<h3 id="2-3-远程仓库"><a href="#2-3-远程仓库" class="headerlink" title="2.3 远程仓库"></a>2.3 远程仓库</h3><p>docker search mysql<br>docker pull mysql:5.7</p>
-<h3 id="2-4-容器"><a href="#2-4-容器" class="headerlink" title="2.4 容器"></a>2.4 容器</h3><ol>
-<li><p>创建/启动容器</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">docker run -it --name=c1 redis:5 /bin/bash</span> </span><br><span class="line">docker run -it -p 9000:8080 app </span><br><span class="line">docker run --name rds-d redis redis-server --save 60 1 --loglevel warning</span><br><span class="line">docker run --name rds -p 6379:6379 -d redis</span><br><span class="line"><span class="meta">#</span><span class="bash"> -p a:b 用a映射b  a可以任意一个服务器free的端口,b为镜像内容器的端口，比如tomcat默认是8080</span>        </span><br><span class="line"><span class="meta">#</span><span class="bash"> -d  后台运行</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -t 创建并进入</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -i 允许输入(交互式bash)</span></span><br></pre></td></tr></table></figure></li>
-<li><p>查看容器</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker ps # 查看正在运行的容器</span><br><span class="line">docker ps –a # 查看所有容器</span><br><span class="line">docker logs  name  查看name的日志</span><br></pre></td></tr></table></figure></li>
-<li><p>进入容器</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker exec -it name bash  <span class="comment">//执行命令;</span></span><br><span class="line">docker exec mycentos </span><br></pre></td></tr></table></figure></li>
-<li><p>暂停</p>
-<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker unpause  <span class="keyword">pause</span></span><br></pre></td></tr></table></figure></li>
-<li><p>停止/启动</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker stop name</span><br><span class="line">docker start name</span><br></pre></td></tr></table></figure></li>
-<li><p>删除</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker rm name</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h3 id="2-5-数据卷"><a href="#2-5-数据卷" class="headerlink" title="2.5 数据卷"></a>2.5 数据卷</h3><h4 id="数据卷操作"><a href="#数据卷操作" class="headerlink" title="数据卷操作"></a>数据卷操作</h4><p>docker volume+</p>
-<ol>
-<li>create 创建</li>
-<li>inspect 显示信息</li>
-<li>ls 列出</li>
-<li>rm 删除</li>
-<li>prune 删除未使用到的</li>
-</ol>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker run -it --name=c1 –v ~/java:/root/test imageName </span><br><span class="line"><span class="comment">//目录必须是绝对路径</span></span><br><span class="line"><span class="comment">// 如果目录不存在，会自动创建</span></span><br></pre></td></tr></table></figure>
-
-<h4 id="数据卷容器"><a href="#数据卷容器" class="headerlink" title="数据卷容器"></a>数据卷容器</h4><p>映射数据卷 -v  a:b</p>
-<ol>
-<li><p>创建数据卷容器 -v /volume</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run –it --name=c3 –v /volume centos:<span class="number">7</span> /bin/bash </span><br></pre></td></tr></table></figure></li>
-<li><p>直接挂载</p>
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -it --name=c1 –v <span class="regexp">/root/</span>java<span class="regexp">/test:/</span>root/test imageName </span><br></pre></td></tr></table></figure></li>
-<li><p>创建容器并挂载   –volumes-from c3</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker run –it --name=c1 --volumes-from c3 centos:<span class="number">7</span> /bin/bash</span><br><span class="line">docker run –it --name=c2 --volumes-from c3 centos:<span class="number">7</span> /bin/bash  </span><br></pre></td></tr></table></figure></li>
-</ol>
-<ol>
-<li><p>实例</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mkdir mysql</span><br><span class="line">cd mysql </span><br><span class="line">docker run -id -p 3307:3306 -v $PWD/conf:/etc/mysql/conf.d -v $PWD/logs:/logs \</span><br><span class="line">-v $PWD/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=root mysql:5.7</span><br><span class="line"><span class="meta">#</span><span class="bash"> -v 映射</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="variable">$PWD</span>当前文件夹</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -e 参数</span></span><br></pre></td></tr></table></figure></li>
-</ol>
-<h2 id="三、自定义镜像"><a href="#三、自定义镜像" class="headerlink" title="三、自定义镜像"></a>三、自定义镜像</h2><h3 id="3-1-镜像结构"><a href="#3-1-镜像结构" class="headerlink" title="3.1 镜像结构"></a>3.1 镜像结构</h3><blockquote>
-<p>linux基础–&gt; 环境变量–&gt; mysql的依赖—&gt; mysql —&gt; mysql配置 –&gt; entryPoint 入口脚本</p>
-<p>分层结构，这样的<strong>优点是其中一个变了只需要改变这个层</strong>，不需要全部更改</p>
-</blockquote>
-<h3 id="3-2dockerFile"><a href="#3-2dockerFile" class="headerlink" title="3.2dockerFile"></a>3.2dockerFile</h3><blockquote>
-<p>dockerFile，指令文件</p>
-<p>用于快速构建(build)镜像</p>
-</blockquote>
-<ol>
-<li><p>dockerfile语法</p>
-<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span>：定制的镜像都是基于 <span class="keyword">FROM</span> 的镜像，这里的 nginx 就是定制需要的基础镜像。后续的操作都是基于 nginx。</span><br><span class="line"></span><br><span class="line">RUN：用于执行后面跟着的命令行命令,每一个run创建一层。有以下俩种格式：</span><br><span class="line">	<span class="builtin-name">RUN</span> [<span class="string">&quot;可执行文件&quot;</span>, <span class="string">&quot;参数1&quot;</span>, <span class="string">&quot;参数2&quot;</span>]</span><br><span class="line">	<span class="builtin-name">RUN</span> &lt;命令行命令&gt;</span><br></pre></td></tr></table></figure></li>
-<li><p>dickerfile 构建镜像</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker build -f app.jar -t appName:version</span><br><span class="line"># -f 指定df路径  -t指定新的镜像的名字和版本</span><br></pre></td></tr></table></figure></li>
-<li><p>镜像启动（创建容器）</p>
-</li>
-</ol>
-<h3 id="docker-compose-服务编排"><a href="#docker-compose-服务编排" class="headerlink" title="docker compose 服务编排"></a>docker compose 服务编排</h3><blockquote>
-<p>用于快速构建分布式集群项目</p>
-<p>按照一定规则批量管理容器</p>
-<p>比如 定义启动顺序，</p>
-</blockquote>
-<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><ol>
-<li><p>容器转换成镜像</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker commit id name:version</span><br></pre></td></tr></table></figure></li>
-<li><p>压缩</p>
-<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">docker</span> </span><br></pre></td></tr></table></figure></li>
-</ol>
-<h4 id="docker镜像原理"><a href="#docker镜像原理" class="headerlink" title="docker镜像原理"></a>docker镜像原理</h4><ol>
-<li>docker镜像其实是一个文件层次系统</li>
-<li></li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/27/utils/python/python%E7%88%AC%E8%99%AB/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/04/27/utils/python/python%E7%88%AC%E8%99%AB/" class="post-title-link" itemprop="url">python爬虫</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-04-27 03:09:54" itemprop="dateCreated datePublished" datetime="2022-04-27T03:09:54+08:00">2022-04-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-11-21 18:40:51" itemprop="dateModified" datetime="2021-11-21T18:40:51+08:00">2021-11-21</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/utils/" itemprop="url" rel="index"><span itemprop="name">utils</span></a>
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/JVM/" itemprop="url" rel="index"><span itemprop="name">JVM</span></a>
                 </span>
             </span>
 
@@ -462,8 +237,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/04/27/utils/python/python%E7%88%AC%E8%99%AB/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/27/utils/python/python%E7%88%AC%E8%99%AB/" class="cy_cmt_count" data-xid="2022/04/27/utils/python/python爬虫/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/04/07/java/javaSE/jvm/JVM%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/07/java/javaSE/jvm/JVM%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84/" class="cy_cmt_count" data-xid="2022/04/07/java/javaSE/jvm/JVM内存结构/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -474,14 +249,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>5k</span>
+              <span>4.2k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>5 分钟</span>
+              <span>4 分钟</span>
             </span>
 
         </div>
@@ -494,182 +269,221 @@
 
       
           <p>[toc]</p>
-<h2 id="BS4-以下内容参考自官方文档"><a href="#BS4-以下内容参考自官方文档" class="headerlink" title="BS4-以下内容参考自官方文档"></a><a target="_blank" rel="noopener" href="https://beautifulsoup.readthedocs.io/zh_CN/v4.4.0/">BS4-以下内容参考自官方文档</a></h2><h3 id="2-1-语法"><a href="#2-1-语法" class="headerlink" title="2.1 语法"></a>2.1 语法</h3><ol>
-<li><p>基本</p>
+<h2 id="一、JVM内存结构"><a href="#一、JVM内存结构" class="headerlink" title="一、JVM内存结构"></a>一、JVM内存结构</h2><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211214035039329.png" alt="image-20211214035039329"></p>
+<blockquote>
+<p>包括：栈、堆、程序计数器、本地方法栈、方法区</p>
+</blockquote>
+<h3 id="1-1-JVM栈"><a href="#1-1-JVM栈" class="headerlink" title="1.1 JVM栈 "></a>1.1 <a target="_blank" rel="noopener" href="https://blog.csdn.net/heart_mine/article/details/79495032">JVM栈 </a></h3><blockquote>
+<p>每个线程对应一个栈</p>
+<p>栈：方法栈</p>
+<p>栈帧：某个方法所需的内存 ：参数，局部变量，返回值(返回地址)</p>
+</blockquote>
+<blockquote>
+<p>默认1024KB，影响递归的深度</p>
+</blockquote>
 <ul>
-<li>找到第一个: find</li>
-<li>找到所有的: find_all</li>
+<li>每深入一个方法，以栈帧为单位的压栈或者出栈</li>
+<li>每退出一个方法，退栈</li>
+</ul>
+<h4 id="1-1-1-存储内容"><a href="#1-1-1-存储内容" class="headerlink" title="1.1.1 存储内容"></a>1.1.1 存储内容</h4><p>​    栈中只保存基础数据类型的对象和自定义对象的引用(不是整个对象)，对象都存放在堆区中 每个栈中的数据(原始类型和对象引用)都是私有的，其他栈不能访问。</p>
+<p>​     栈分为3个部分：基本类型变量区、执行环境上下文、操作指令区(存放操作指令)。</p>
+<h4 id="1-1-2-特殊"><a href="#1-1-2-特殊" class="headerlink" title="1.1.2 特殊"></a>1.1.2 特殊</h4><ol>
+<li><p>Java方法本身没有线程安不安全，全都依赖它的变量的作用范围</p>
+</li>
+<li><p>synchronized修饰方法，意思是锁住调用者</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">changeStudent</span><span class="params">(Student s)</span></span>&#123;</span><br><span class="line">	s.setName(<span class="string">&quot;小明&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>当普通方法</p>
+</li>
+</ol>
+<h3 id="1-2-堆内存"><a href="#1-2-堆内存" class="headerlink" title="1.2 堆内存"></a>1.2 堆内存</h3><h4 id="1-2-1-存储内容"><a href="#1-2-1-存储内容" class="headerlink" title="1.2.1 存储内容"></a>1.2.1 存储内容</h4><ol>
+<li><p>全部是对象，每个对象包含一个与之对应的class信息–class的目的是得到操作指令。</p>
+</li>
+<li><p>JDK7之后存储静态变量、字符常量池，JDK7之前存在方法区</p>
+</li>
+</ol>
+<h4 id="1-2-2-堆内存特点"><a href="#1-2-2-堆内存特点" class="headerlink" title="1.2.2 堆内存特点"></a>1.2.2 堆内存特点</h4><p>jvm只有一个堆区（heap）被所有线程共享，堆区中不存放基本类型和对象引用，只存放对象本身。  </p>
+<ul>
+<li>堆的优势是可以动态地分配内存大小，生存期也不必事先告诉编译器，因为它是在运行时动态分配内存的，Java的垃圾收集器会自动收走这些不再使用的数据。 </li>
+<li>缺点是，由于要在运行时动态分配内存，存取速度较慢。</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/shamo89/p/9775122.html">Java堆完全是自动化管理</a>，通过垃圾收集机制，垃圾对象会自动清理，不需自己去释放</p>
+<p>Java堆分为新生代(Young Gen)和老年代(Tenured Gen)</p>
+<h3 id="1-3-方法区"><a href="#1-3-方法区" class="headerlink" title="1.3 方法区"></a>1.3 方法区</h3><blockquote>
+<p>方法区看作是一块独立于Java堆的内存空间，属于共享内存</p>
+</blockquote>
+<h4 id="1-3-1-存储内容"><a href="#1-3-1-存储内容" class="headerlink" title="1.3.1 存储内容"></a>1.3.1 存储内容</h4><ol>
+<li>类头信息<ol>
+<li>名称</li>
+<li>父类</li>
+<li>修饰符</li>
+<li>接口</li>
+</ol>
+</li>
+<li>类域信息：字段信息</li>
+<li>类方法信息<ol>
+<li>名称</li>
+<li>参数数量、类型</li>
+<li>修饰符</li>
+<li>方法字节码(操作+局部变量)</li>
+<li>异常表</li>
+</ol>
+</li>
+<li>运行时常量，它是每一个类或接口的常量池的运行时表示形式，在类和接口被加载到JVM后，对应的运行时常量池就被创建出来。在运行期间也可将新的常量放入运行时常量池中，比如String的intern方法。虽然JVM规范把方法区描述为堆的一个逻辑部分， 但它却有个别名non-heap（非堆）。<strong>方法区的大小决定了系统可以加载多少个类</strong>， 如果系统定义的类太多，可能会产生OOM</li>
+</ol>
+<h4 id="1-3-2-常量池"><a href="#1-3-2-常量池" class="headerlink" title="1.3.2 常量池"></a>1.3.2 常量池</h4><p> 运行时常量池与常量池的区别</p>
+<ol>
+<li>存放内容：存放编译期间生成的<ol>
+<li>各种字面量（字符串和final常量）</li>
+<li>字段表、方法表、属性表</li>
+<li>符号引用（类和接口的全限定名、字段的名称和描述符、方法句柄和方法类型、方法的名称和描述符 ）</li>
+</ol>
+</li>
+<li>区别<ul>
+<li>常量池：存放在.class文件中</li>
+<li>运行时常量池：内存中</li>
 </ul>
 </li>
-<li><p>属性</p>
+<li>运行时常量池是常量池表在运行时的表现形式，通过ClassLoader将字节码文件的常量池中的信息加载到内存中，存储在了方法区的运行时常量池中。</li>
+</ol>
+<h4 id="1-3-3-方法区的演进"><a href="#1-3-3-方法区的演进" class="headerlink" title="1.3.3 方法区的演进"></a>1.3.3 方法区的演进</h4><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211214042049855.png" alt="image-20211214042049855"></p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211214042305858.png" alt="image-20211214042305858"></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_43232955/article/details/107411378">图片来源</a></p>
+<h4 id="1-3-4-元空间与永久代"><a href="#1-3-4-元空间与永久代" class="headerlink" title="1.3.4 元空间与永久代"></a>1.3.4 元空间与永久代</h4><p>​    元空间不在虚拟机设置的内存中，而是使用本地内存，相对于虚拟机的内存，本地内存空间更大,元空间的大小仅受本地内存限制，更不容易出现OOM</p>
+<h4 id="1-3-5-新生代与老年代"><a href="#1-3-5-新生代与老年代" class="headerlink" title="1.3.5 新生代与老年代"></a>1.3.5 <a target="_blank" rel="noopener" href="https://www.cnblogs.com/shamo89/p/9775122.html">新生代与老年代</a></h4><blockquote>
+<p>新生代存放新生的对象或者年龄不大的对象，老年代则存放老年对象。</p>
+</blockquote>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211214110956494.png" alt="image-20211214110956494"></p>
+<ol>
+<li><p>新生代分为edn区，s0区，s1区</p>
+<p>s0和s1也被称为from和to区域，他们是两块大小相等，并且可以互相转换的空间。</p>
+</li>
+<li><p>绝大多数情况下，对象首先分配在edn区，在新生代回收后，如果对象还存活，则进入s0或s1区，之后每经过一次新生代回收，如果对象存活则他的年龄就加1，对象达到一定的年龄后，则进入老年代。</p>
+</li>
+</ol>
+<p>举例：A a=new A()；首先把对象存放到堆内存当中，发现这个A只用了一次，首先会进入新生代里边去，存放到edn区域里面，因为Java堆自动化管理，垃圾收集机制，发现这个a只用了一次，如果a又被一段代码引用，垃圾回收机制有算法，每引用一次记录一次，就会马上进入到s0或者是s1区域，一旦a这个对象引用次数非常多了，就会存放到老年代里去。</p>
+<h3 id="1-4-本地方法栈"><a href="#1-4-本地方法栈" class="headerlink" title="1.4 本地方法栈"></a>1.4 本地方法栈</h3><p>和java栈的作用差不多，只不过是为JVM使用到的native方法服务的。</p>
+<p>Java官方对于本地方法的定义为methods written in a language other than the Java programming language，就是使用非Java语言实现的方法，但是通常我们指的一般为C或者C++，因此这个栈也有着C栈这一称号。一个不支持本地方法执行的JVM没有必要实现这个数据区域。本地方法栈基本和JVM栈一样，其大小也是可以设置为固定值或者动态增加，因此也会对应抛出StackOverflowError和OutOfMemoryError错误。 </p>
+<p>在HotSopt虚拟机中直接就把本地方法栈和Java栈合二为一。</p>
+<h3 id="1-5-程序计数器"><a href="#1-5-程序计数器" class="headerlink" title="1.5 程序计数器"></a>1.5 程序计数器</h3><blockquote>
+<p>用于保存下一条指令的内存地址。</p>
+</blockquote>
+<p>​    由于JVM程序是多线程执行的（线程轮流切换），所以为了保证线程切换回来后，还能恢复到原先状态，就需要一个独立的计数器，记录之前中断的地方，可见程序计数器也是线程私有的。</p>
+<p><strong>注意这个区域是唯一一个不抛出OutOfMemoryError的运行时数据区。</strong></p>
+<h3 id="1-6-直接内存"><a href="#1-6-直接内存" class="headerlink" title="1.6 直接内存"></a>1.6 直接内存</h3><blockquote>
+<p>常见与IO操作</p>
+<p>效率高</p>
+<p>不受垃圾回收影响，基于Unsafe释放内存</p>
+<ol>
+<li>手动Unsafe</li>
+<li>自动回收：bf=null，虚引用对象触发unsafe垃圾回收</li>
+</ol>
+</blockquote>
+<h2 id="二、Java内存模型"><a href="#二、Java内存模型" class="headerlink" title="二、Java内存模型"></a>二、Java内存模型</h2><blockquote>
+<p>JMM，只是一个抽象的概念，是和多线程相关的，他描述了一组规则或规范，这个规范定义了一个线程对共享变量的写入时对另一个线程是可见的。</p>
+</blockquote>
+<p>Java堆和方法区的区域是多个线程共享的数据区域，多个线程可能可以操作保存在堆或者方法区中的同一个数据。这也就是我们常说的“Java的线程间通过共享内存进行通信”。<br>在通信过程中会存在一系列如可见性、原子性、顺序性等问题，而JMM就是围绕着多线程通信以及与其相关的一系列特性而建立的模型，JMM定义了一些语法集，这些语法集映射到Java语言中就是volatile、synchronized等关键字。</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211214040257190.png" alt="image-20211214040257190"></p>
+<h2 id="三、Java对象模型"><a href="#三、Java对象模型" class="headerlink" title="三、Java对象模型"></a>三、Java对象模型</h2><ol>
+<li>每一个Java类在被JVM加载的时候，JVM会给这个类创建一个<code>instanceKlass</code>，保存在方法区</li>
+<li>new一个对象的时候，JVM会创建一个<code>instanceOopDesc</code>对象，这个对象中包含了对象头以及实例数据。报保存在堆内</li>
+</ol>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211214040801845.png" alt="image-20211214040801845"></p>
+<p><a target="_blank" rel="noopener" href="https://www.hollischuang.com/archives/2509">图片来源</a></p>
+<h2 id="四、疑惑"><a href="#四、疑惑" class="headerlink" title="四、疑惑"></a>四、疑惑</h2><h3 id="4-1-为什么分栈、堆、方法区的区别"><a href="#4-1-为什么分栈、堆、方法区的区别" class="headerlink" title="4.1 为什么分栈、堆、方法区的区别"></a>4.1 <a target="_blank" rel="noopener" href="https://blog.csdn.net/JustKian/article/details/104559654?utm_medium=distribute.pc_aggpage_search_result.none-task-blog-2~aggregatepage~first_rank_ecpm_v1~rank_v31_ecpm-1-104559654.pc_agg_new_rank&utm_term=jvm%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E7%94%A8%E6%A0%88&spm=1000.2123.3001.4430">为什么分栈、堆、方法区的区别</a></h3><blockquote>
+<p>堆，栈，方法区等都有自己特有的内存管理方式，都有自己合适存储的内容，方便jvm去调用和进行内存管理</p>
+</blockquote>
+<p>​    人们发现 变量主要是两种形式</p>
 <ul>
-<li>name  就是&lt;&gt;中间的  比如&lt;a&gt; 就是a</li>
+<li><p>一种内容短小（比如一个int整数），需要频繁访问，但是生命周期很短，通常只在一个方法内存活</p>
+</li>
+<li><p>而另一种内容可能很多（比如很长一个字符串），可能不需要太频繁的访问，但生命周期较长，通常很多个方法中可能都要用到</p>
+<p>那么自然将这两类变量分开就显得比较理性，一类存储在栈区，通常是局部变量、操作符栈、函数参数传递和返回值，另一类存储在堆区，通常是较大的结构体（或者OOP中的对象）、需要反复访问的全局变量。堆区就是各种慢，申请内存慢，访问慢，修改慢，释放慢，整理慢（或者说GC垃圾回收），但优点也不言而喻，访问随机灵活，空间超大，在不超可用内存的情况下你要多大就给多大</p>
+</li>
 </ul>
+<h3 id="4-2-栈内存"><a href="#4-2-栈内存" class="headerlink" title="4.2 栈内存"></a>4.2 栈内存</h3><blockquote>
+<p>栈内存实际上就是满足先进后出的性质的数学或数据结构。</p>
+</blockquote>
+<h4 id="4-2-1-存储内容"><a href="#4-2-1-存储内容" class="headerlink" title="4.2.1 存储内容"></a>4.2.1 存储内容</h4><p>​    栈内存在函数中定义的一些基本类型的变量和对象的引用变量都在函数的栈内存中分配。当在一段代码块定义一个变量时，Java就在栈中为这个变量分配内存空间，当超过变量的作用域后，Java会自动释放掉为该变量所分配的内存空间，该内存空间可以立即被另作他用。栈中主要存放一些基本类型的变量（,int, short, long, byte, float, double, boolean, char）和对象句柄。栈有一个很重要的特殊性，就是存在栈中的数据可以共享。</p>
+<h4 id="4-2-2-特点"><a href="#4-2-2-特点" class="headerlink" title="4.2.2 特点"></a>4.2.2 特点</h4><ul>
+<li><p>优点</p>
+<p>存取速度比堆要快，仅次于寄存器，栈数据可以共享。</p>
 </li>
-<li><p>获取链接</p>
+<li><p>缺点</p>
+<p>存在栈中的数据大小与生存期必须是确定的，缺乏灵活性。</p>
+</li>
+</ul>
+<h3 id="4-3-堆内存"><a href="#4-3-堆内存" class="headerlink" title="4.3 堆内存"></a>4.3 堆内存</h3><h4 id="4-3-1-存储内容"><a href="#4-3-1-存储内容" class="headerlink" title="4.3.1 存储内容"></a>4.3.1 存储内容</h4><ol>
+<li>方法区</li>
+<li>运行时常量池</li>
+<li>类实例</li>
+</ol>
+<h4 id="4-3-2-特点"><a href="#4-3-2-特点" class="headerlink" title="4.3.2 特点"></a>4.3.2 特点</h4><p>允许程序在运行时动态地申请某个大小的内存空间</p>
+<h2 id="五、JVM内存"><a href="#五、JVM内存" class="headerlink" title="五、JVM内存"></a>五、JVM内存</h2><h3 id="5-1-变量"><a href="#5-1-变量" class="headerlink" title="5.1 变量"></a>5.1 变量</h3><p>java有三种变量</p>
+<ul>
+<li>类变量–static—方法区</li>
+<li>成员变量–private int age– 堆内存</li>
+<li>局部变量—栈</li>
+</ul>
+<h3 id="5-2-运行时常量池"><a href="#5-2-运行时常量池" class="headerlink" title="5.2 运行时常量池"></a>5.2 运行时常量池</h3><ol>
+<li><p>二进制字节码：</p>
 <ol>
-<li><p>从文档中找到所有<a>标签的链接:</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> link <span class="keyword">in</span> soup.find_all(<span class="string">&#x27;a&#x27;</span>):</span><br><span class="line">    <span class="built_in">print</span>(link.get(<span class="string">&#x27;href&#x27;</span>))</span><br></pre></td></tr></table></figure></li>
-<li><p>所有内容  print(soup.get_text())</p>
+<li><p>类基本信息：修改实践，版本，创建时间，父类，访问权限</p>
 </li>
-</ol>
-</li>
-</ol>
-<h3 id="2-2-遍历文档树"><a href="#2-2-遍历文档树" class="headerlink" title="2.2 遍历文档树"></a>2.2 遍历文档树</h3><h4 id="2-2-1-通过名字"><a href="#2-2-1-通过名字" class="headerlink" title="2.2.1 通过名字"></a>2.2.1 通过名字</h4><p>​    tag[‘class’] –&gt; # u’boldest’</p>
-<p>​    tag.a  -&gt;# &lt;a class=”sister” href=”<a target="_blank" rel="noopener" href="http://example.com/elsie&quot;">http://example.com/elsie&quot;</a> id=”link1”&gt;Elsie</a></p>
+<li><p>常量池(常量表)</p>
 <blockquote>
-<p>这种方法只能获得第一个,若要多个 用get_all</p>
+<p>方法，Class，Field，f</p>
 </blockquote>
-<h4 id="2-2-2-contents-descendants"><a href="#2-2-2-contents-descendants" class="headerlink" title="2.2.2 contents descendants"></a>2.2.2 contents descendants</h4><p>tag的contents属性可以将tag的子节点以列表的方式输出</p>
-<p>descendants包括子孙节点</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">head_tag = soup.head</span><br><span class="line">head_tag</span><br><span class="line"><span class="comment"># &lt;head&gt;&lt;title&gt;The Dormouse&#x27;s story&lt;/title&gt;&lt;/head&gt;</span></span><br><span class="line">head_tag.contents</span><br><span class="line">[&lt;title&gt;The Dormouse<span class="string">&#x27;s story&lt;/title&gt;]</span></span><br><span class="line"><span class="string">title_tag = head_tag.contents[0]</span></span><br><span class="line"><span class="string">title_tag</span></span><br><span class="line"><span class="string"># &lt;title&gt;The Dormouse&#x27;</span>s story&lt;/title&gt;</span><br><span class="line">title_tag.contents</span><br><span class="line"><span class="comment"># [u&#x27;The Dormouse&#x27;s story&#x27;]</span></span><br></pre></td></tr></table></figure>
-
-
-
-<h4 id="2-2-3-children-parent"><a href="#2-2-3-children-parent" class="headerlink" title="2.2.3 children parent"></a>2.2.3 children parent</h4><h4 id="2-2-4-next-sibling-previous-sibling-兄弟节点"><a href="#2-2-4-next-sibling-previous-sibling-兄弟节点" class="headerlink" title="2.2.4 next_sibling previous_sibling  兄弟节点"></a>2.2.4 next_sibling previous_sibling  兄弟节点</h4><p>​    .next_siblings 和 .previous_siblings 兄弟节点们</p>
-<h4 id="2-2-1"><a href="#2-2-1" class="headerlink" title="2.2.1"></a>2.2.1</h4><h3 id="2-3-搜索文档树"><a href="#2-3-搜索文档树" class="headerlink" title="2.3 搜索文档树"></a>2.3 搜索文档树</h3><blockquote>
-<p>​    记住: <code>find_all()</code> 和 <code>find()</code> 只搜索当前节点的所有子节点,孙子节点等. <code>find_parents()</code> 和 <code>find_parent()</code> 用来搜索当前节点的父辈节点,搜索方法与普通tag的搜索方法相同,搜索文档搜索文档包含的内容. 我们从一个文档中的一个叶子节点开始:</p>
-</blockquote>
-<h4 id="2-3-1-find"><a href="#2-3-1-find" class="headerlink" title="2.3.1 find"></a>2.3.1 find</h4><h4 id="2-3-2-find-all"><a href="#2-3-2-find-all" class="headerlink" title="2.3.2 find_all()"></a>2.3.2 find_all()</h4><blockquote>
-<p>find_all( <a target="_blank" rel="noopener" href="https://beautifulsoup.readthedocs.io/zh_CN/v4.4.0/#id35">name</a> , <a target="_blank" rel="noopener" href="https://beautifulsoup.readthedocs.io/zh_CN/v4.4.0/#css">attrs</a> , <a target="_blank" rel="noopener" href="https://beautifulsoup.readthedocs.io/zh_CN/v4.4.0/#recursive">recursive</a> , <a target="_blank" rel="noopener" href="https://beautifulsoup.readthedocs.io/zh_CN/v4.4.0/#id36">string</a> , <a target="_blank" rel="noopener" href="https://beautifulsoup.readthedocs.io/zh_CN/v4.4.0/#keyword">**kwargs</a> )</p>
-</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#<span class="number">1</span> = Methodref #<span class="number">6.</span>#<span class="number">20</span></span><br><span class="line">#<span class="number">2</span> = Fieldref #<span class="number">3.</span>#<span class="number">4</span> <span class="comment">//java.lang.System.out</span></span><br><span class="line">#<span class="number">3</span> = Class #<span class="number">28</span> <span class="comment">//java.lang.System</span></span><br><span class="line">#<span class="number">4</span> = Utf8 out</span><br></pre></td></tr></table></figure></li>
+<li><p><strong>类方法信息</strong></p>
 <ol>
-<li><p>name=[String]</p>
+<li>方法信息：描述-&gt;返回值.参数.地址</li>
+<li>虚拟机指令</li>
+</ol>
 </li>
-<li><p>string</p>
-<blockquote>
-<p>stirng=re,String,lambda-bool</p>
-<p>搜索text用到,常与正则和lambda使用</p>
+</ol>
+</li>
+</ol>
+<h3 id="5-3-StringTable"><a href="#5-3-StringTable" class="headerlink" title="5.3 StringTable"></a>5.3 StringTable</h3><blockquote>
+<p>属于运行时常量池，存的是<code>符号</code>，而不是String对象。</p>
+<p>字符串常量池：StringTable(HashTable[String,Index])</p>
 </blockquote>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">soup.find_all(string=re.<span class="built_in">compile</span>(<span class="string">&quot;Dormouse&quot;</span>)) <span class="comment">#包含Dormouse的text</span></span><br><span class="line">[<span class="string">u&quot;The Dormouse&#x27;s story&quot;</span>, <span class="string">u&quot;The Dormouse&#x27;s story&quot;</span>]</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">is_the_only_string_within_a_tag</span>(<span class="params">s</span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;</span>Return <span class="literal">True</span> <span class="keyword">if</span> this string <span class="keyword">is</span> the only child of its parent tag.<span class="string">&quot;&quot;</span></span><br><span class="line">    <span class="keyword">return</span> (s == s.parent.string)</span><br><span class="line">soup.find_all(string=is_the_only_string_within_a_tag)</span><br><span class="line"><span class="comment"># [u&quot;The Dormouse&#x27;s story&quot;, u&quot;The Dormouse&#x27;s story&quot;, u&#x27;Elsie&#x27;, u&#x27;Lacie&#x27;, u&#x27;Tillie&#x27;, u&#x27;...&#x27;]</span></span><br></pre></td></tr></table></figure></li>
-<li><p>kewords</p>
-<blockquote>
-<p>kewords:   1. href id link 等tag.name   2. limit=2取两条 3. recursive=False 只搜子节点</p>
-<p>=String、正则、列表、boolean</p>
+<h4 id="5-3-0注意"><a href="#5-3-0注意" class="headerlink" title="5.3.0注意"></a>5.3.0注意</h4><ol>
+<li>jdk1.7开始，ST被放在堆中</li>
+</ol>
+<h4 id="5-3-1-字符串拼接"><a href="#5-3-1-字符串拼接" class="headerlink" title="5.3.1 字符串拼接"></a>5.3.1 字符串拼接</h4><p>单一原则：”a”+”b”—&gt;字符串对象”ab”—&gt;存到StringTable(如果ST已经有了,那么会直接用)</p>
+<ul>
+<li><p>常量拼接</p>
+<p>“ab”==”a”+”b”  常量字符串拼接的javac优化，”a”与”b”都不会变了，javac直接判为”ab”</p>
+</li>
+<li><p>变量拼接</p>
+<p>“ab”!=a+b  因为后者通过StringBuffer的  toString():return new String()</p>
+</li>
+</ul>
+<h4 id="5-3-2-intern"><a href="#5-3-2-intern" class="headerlink" title="5.3.2 intern"></a>5.3.2 intern</h4><blockquote>
+<p>将String变量ab的符号放入ST中,但不会改变ab的地址</p>
 </blockquote>
+<ul>
+<li>如果ST中已有，那么就返回这个地址，ab地址不变，即ab!=”ab”</li>
+<li>如果ST中没有，那么就把ab的地址直接放入ST中，以后就会有ab==”ab”</li>
+</ul>
 <ol>
-<li><p>String–正则</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">soup.find_all(href=re.<span class="built_in">compile</span>(<span class="string">&quot;elsie&quot;</span>), <span class="built_in">id</span>=<span class="string">&#x27;link1&#x27;</span>)<span class="comment"># 找到 包含elsie且id为link1的href</span></span><br></pre></td></tr></table></figure></li>
-<li><p>boolean</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">soup.find_all(<span class="built_in">id</span>=<span class="literal">True</span>)<span class="comment">#找到包含id的tags</span></span><br></pre></td></tr></table></figure></li>
-</ol>
+<li><p>new的String在堆中，不在StringTable中</p>
+<p>比如String s=new String(“ab”) 那么StringTable中没有”ab”</p>
 </li>
-<li></li>
-</ol>
-<h4 id="2-3-3-正则表达式"><a href="#2-3-3-正则表达式" class="headerlink" title="2.3.3 正则表达式"></a>2.3.3 正则表达式</h4><blockquote>
-<p>如果传入正则表达式作为参数,Beautiful Soup会通过正则表达式的 <code>match()</code> 来匹配内容.</p>
-</blockquote>
-<p>找出所有以b开头的标签,这表示<body>和<b>标签都应该被找到:</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="keyword">for</span> tag <span class="keyword">in</span> soup.find_all(re.<span class="built_in">compile</span>(<span class="string">&quot;^b&quot;</span>)):</span><br><span class="line">    <span class="built_in">print</span>(tag.name)       <span class="comment"># body  # b</span></span><br></pre></td></tr></table></figure>
-
-<p>找出所有名字中包含”t”的标签:</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> tag <span class="keyword">in</span> soup.find_all(re.<span class="built_in">compile</span>(<span class="string">&quot;t&quot;</span>)):</span><br><span class="line">    <span class="built_in">print</span>(tag.name)  <span class="comment"># html  # title</span></span><br></pre></td></tr></table></figure>
-
-<h4 id="2-3-4-基础参数-：String、正则、列表、boolean"><a href="#2-3-4-基础参数-：String、正则、列表、boolean" class="headerlink" title="2.3.4 基础参数 ：String、正则、列表、boolean"></a>2.3.4 基础参数 ：String、正则、列表、boolean</h4><ol>
-<li><p>boolean–lambda</p>
-<p>下面方法校验了当前元素,如果包含 <code>class</code> 属性却不包含 <code>id</code> 属性,那么将返回 <code>True</code>:</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">has_class_but_no_id</span>(<span class="params">tag</span>):</span></span><br><span class="line">    <span class="keyword">return</span> tag.has_attr(<span class="string">&#x27;class&#x27;</span>) <span class="keyword">and</span> <span class="keyword">not</span> tag.has_attr(<span class="string">&#x27;id&#x27;</span>)</span><br><span class="line">soup.find_all(has_class_but_no_id)</span><br><span class="line"><span class="comment"># [&lt;p class=&quot;title&quot;&gt;&lt;b&gt;The Dormouse&#x27;s story&lt;/b&gt;&lt;/p&gt;,</span></span><br><span class="line"><span class="comment">#  &lt;p class=&quot;story&quot;&gt;Once upon a time there were...&lt;/p&gt;,</span></span><br><span class="line"><span class="comment">#  &lt;p class=&quot;story&quot;&gt;...&lt;/p&gt;]</span></span><br></pre></td></tr></table></figure></li>
-</ol>
-<h4 id="2-3-5-keyword"><a href="#2-3-5-keyword" class="headerlink" title="2.3.5 keyword"></a>2.3.5 keyword</h4><ol>
-<li>id</li>
-<li>href</li>
-</ol>
-<h4 id="2-3-6-keyword-值"><a href="#2-3-6-keyword-值" class="headerlink" title="2.3.6 keyword 值"></a>2.3.6 keyword 值</h4><ol>
-<li><p>正则      href=re.compile(“elsie”)</p>
-</li>
-<li><p>string   id=”testEle”</p>
-</li>
-<li><p>bool</p>
-</li>
-<li><p>列表</p>
-<p>如果传入列表参数,Beautiful Soup会将与列表中任一元素匹配的内容返回.</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">soup.find_all([<span class="string">&quot;a&quot;</span>, <span class="string">&quot;b&quot;</span>])</span><br><span class="line"><span class="comment"># [&lt;b&gt;The Dormouse&#x27;s story&lt;/b&gt;,</span></span><br><span class="line"><span class="comment">#  &lt;a class=&quot;sister&quot; href=&quot;http://example.com/elsie&quot; id=&quot;link1&quot;&gt;Elsie&lt;/a&gt;,</span></span><br></pre></td></tr></table></figure></li>
-</ol>
-<h4 id="2-3-7-attrs"><a href="#2-3-7-attrs" class="headerlink" title="2.3.7 attrs"></a>2.3.7 attrs</h4><blockquote>
-<p>对于keyword没有的key，那么用attr字典</p>
-</blockquote>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">data_soup.find_all(attrs=&#123;<span class="string">&quot;data-foo&quot;</span>: <span class="string">&quot;value&quot;</span>&#125;)</span><br><span class="line"><span class="comment"># [&lt;div data-foo=&quot;value&quot;&gt;foo!&lt;/div&gt;]</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="2-5-四种对象"><a href="#2-5-四种对象" class="headerlink" title="2.5 四种对象"></a>2.5 四种对象</h3><blockquote>
-<p>Beautiful Soup将复杂HTML文档转换成一个复杂的树形结构,每个节点都是Python对象,所有对象可以归纳为4种: <code>Tag</code> , <code>NavigableString</code> , <code>BeautifulSoup</code> , <code>Comment</code> .</p>
-</blockquote>
-<h4 id="2-5-1-Tag-tag-soup-b"><a href="#2-5-1-Tag-tag-soup-b" class="headerlink" title="2.5.1 Tag  tag = soup.b"></a>2.5.1 Tag  tag = soup.b</h4><p>​    BeautifulSoup中的所有标签都是Tag类型,并且BeautifulSoup的对象Beautiful的对象其实本质上也是一个Tag类型,tag的属性可以被添加,删除或修改. 再说一次, tag的属性操作方法与字典一样。</p>
-<h4 id="2-5-2-NavigableString"><a href="#2-5-2-NavigableString" class="headerlink" title="2.5.2 NavigableString"></a>2.5.2 NavigableString</h4><p>​    继承自python中的str,用起来就跟使用python的str是一样的。</p>
-<h4 id="2-5-2-BeautifulSoup"><a href="#2-5-2-BeautifulSoup" class="headerlink" title="2.5.2 BeautifulSoup"></a>2.5.2 BeautifulSoup</h4><p>​    继承自Tag,用来生成BeautifulSoup树的。对于一些查找方法,比如find,select这些,其实还是Tag的</p>
-<h4 id="2-5-2-Comment"><a href="#2-5-2-Comment" class="headerlink" title="2.5.2 Comment"></a>2.5.2 Comment</h4><p>​    继承NavigableString</p>
-<h3 id="2-6-对象方法"><a href="#2-6-对象方法" class="headerlink" title="2.6 对象方法"></a>2.6 对象方法</h3><h4 id="2-6-1-tag"><a href="#2-6-1-tag" class="headerlink" title="2.6.1 tag"></a>2.6.1 tag</h4><ol>
-<li>通过tag的名字获取属性 tag.title     <title>The Dormouse’s story</title> </li>
-<li>tag.title.name   title   </li>
-<li>获取有效字符串 tag.title.string    The Dormouse’s story</li>
-<li>替换有效字符串 tag.string.replace_with(“No longer bold”)</li>
-<li>tag.title.parent.name   head</li>
-<li>获取所有属性tag.attrs   –&gt; # {u’class’:  u’boldest’}</li>
-<li>获取特定属性 tag[‘class’] –&gt; # u’boldest’</li>
-</ol>
-<h3 id="2-7-其他"><a href="#2-7-其他" class="headerlink" title="2.7 其他"></a>2.7 其他</h3><h4 id="2-7-1-解析器"><a href="#2-7-1-解析器" class="headerlink" title="2.7.1 解析器"></a>2.7.1 解析器</h4><table>
-<thead>
-<tr>
-<th>解析器</th>
-<th>使用方法</th>
-<th>优势</th>
-<th>劣势</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Python标准库</td>
-<td>BeautifulSoup(markup, “html.parser”)</td>
-<td>Python的内置标准库执行速度适中文档容错能力强</td>
-<td>Python 2.7.3 or 3.2.2)前 的版本中文档容错能力差</td>
-</tr>
-<tr>
-<td>lxml HTML 解析器</td>
-<td>BeautifulSoup(markup, “lxml”)</td>
-<td>速度快文档容错能力强</td>
-<td>需要安装C语言库</td>
-</tr>
-<tr>
-<td>lxml XML 解析器</td>
-<td><code>BeautifulSoup(markup, [&quot;lxml-xml&quot;])``BeautifulSoup(markup, &quot;xml&quot;)</code></td>
-<td>速度快唯一支持XML的解析器</td>
-<td>需要安装C语言库</td>
-</tr>
-<tr>
-<td>html5lib</td>
-<td><code>BeautifulSoup(markup, &quot;html5lib&quot;)</code></td>
-<td>最好的容错性以浏览器的方式解析文档生成HTML5格式的文档</td>
-<td>速度慢不依赖外部扩展</td>
-</tr>
-</tbody></table>
-<h4 id="2-7-2-等价代码"><a href="#2-7-2-等价代码" class="headerlink" title="2.7.2 等价代码"></a>2.7.2 等价代码</h4><ol>
-<li><p> soup.find_all(“a”) = soup(“a”)</p>
-</li>
-<li><p>soup.title.find_all(string=True) = soup.title(string=True)</p>
-</li>
-<li><p>soup.find_all(‘title’, limit=1) = soup.find(‘title’)</p>
-</li>
-<li><p>soup.head.title = soup.find(“head”).find(“title”) # <title>The Dormouse’s story</title></p>
+<li><p>将s放入ST的方法时intern</p>
+<p>String s2=s.intern()</p>
 </li>
 </ol>
-<h3 id="2-8-神技"><a href="#2-8-神技" class="headerlink" title="2.8 神技"></a>2.8 神技</h3><blockquote>
-<p>tag的三大基本类型  attr,string,child</p>
-</blockquote>
-<h4 id="2-8-1-find-all"><a href="#2-8-1-find-all" class="headerlink" title="2.8.1 find_all"></a>2.8.1 find_all</h4><h4 id="2-8-1-自定义过滤"><a href="#2-8-1-自定义过滤" class="headerlink" title="2.8.1 自定义过滤"></a>2.8.1 自定义过滤</h4><ol>
-<li><p>基于attr</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">atags=[tag <span class="keyword">for</span> tag <span class="keyword">in</span> tags <span class="keyword">if</span> tag.has_attr(<span class="string">&#x27;name&#x27;</span>) <span class="keyword">and</span> tag.attrs[<span class="string">&#x27;name&#x27;</span>]==<span class="string">&#x27;周六&#x27;</span>]</span><br></pre></td></tr></table></figure></li>
-<li><p>基于string</p>
-</li>
-<li></li>
+<h4 id="5-3-3-StringTable调优"><a href="#5-3-3-StringTable调优" class="headerlink" title="5.3.3 StringTable调优"></a>5.3.3 StringTable调优</h4><ol>
+<li>会存在垃圾回收</li>
+<li>建议常用intern()</li>
 </ol>
-<h4 id="2-8-3-tag获取attr-用"><a href="#2-8-3-tag获取attr-用" class="headerlink" title="2.8.3 tag获取attr  用[]"></a>2.8.3 tag获取attr  用[]</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">tag[<span class="string">&#x27;id&#x27;</span>]</span><br><span class="line"><span class="comment"># &#x27;id1&#x27;</span></span><br></pre></td></tr></table></figure>
-
-<h4 id="2-8-4-tag获取child用’-‘-children用"><a href="#2-8-4-tag获取child用’-‘-children用" class="headerlink" title="2.8.4 tag获取child用’ . ‘  children用()"></a>2.8.4 tag获取child用’ . ‘  children用()</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">tag.div</span><br><span class="line"><span class="comment"># &lt;div&gt;aaaa&lt;/div&gt;</span></span><br><span class="line">tag(<span class="string">&#x27;div&#x27;</span>)</span><br><span class="line"><span class="comment"># [&lt;div class=&quot;top_adimg&quot; id=&quot;dv_top_adimg&quot; style=&quot;margin: 0 auto; clear: both;width: 1000px;&quot;&gt;&lt;a href=&quot;http://www.310win.com/Recommend/RecommendIndex.aspx?t=1&amp;amp;bt=1&quot; target=&quot;_blank&quot;&gt;&lt;img height=&quot;40&quot; src=&quot;/Files/ff/fc_637196007271076151.jpg&quot; width=&quot;1000&quot;/&gt;&lt;/a&gt;&lt;/div&gt;]</span></span><br></pre></td></tr></table></figure>
-
-
-
-
-
-
-
+<h4 id="5-4-直接内存"><a href="#5-4-直接内存" class="headerlink" title="5.4 直接内存"></a>5.4 直接内存</h4><ol>
+<li>常用于NIO操作(属于操作系统内存，而非JVM内存)</li>
+<li>分配回收消耗大</li>
+<li>读写性能高</li>
+<li>不受JVM内存管理</li>
+</ol>
 
       
     </div>
@@ -689,7 +503,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/27/utils/python/matplotlib/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/07/java/javaSE/%E9%87%8D%E5%86%99%E3%80%81%E9%87%8D%E8%BD%BD/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -703,7 +517,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/04/27/utils/python/matplotlib/" class="post-title-link" itemprop="url">matplotlib基本用法</a>
+            <a href="/2022/04/07/java/javaSE/%E9%87%8D%E5%86%99%E3%80%81%E9%87%8D%E8%BD%BD/" class="post-title-link" itemprop="url">java重写、重载</a>
         </h2>
 
         <div class="post-meta">
@@ -713,23 +527,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-04-27 03:09:54" itemprop="dateCreated datePublished" datetime="2022-04-27T03:09:54+08:00">2022-04-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-12-30 16:47:56" itemprop="dateModified" datetime="2021-12-30T16:47:56+08:00">2021-12-30</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
-                </span>
+              <time title="创建时间：2022-04-07 10:11:20" itemprop="dateCreated datePublished" datetime="2022-04-07T10:11:20+08:00">2022-04-07</time>
             </span>
 
           
@@ -742,8 +540,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/04/27/utils/python/matplotlib/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/27/utils/python/matplotlib/" class="cy_cmt_count" data-xid="2022/04/27/utils/python/matplotlib/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/04/07/java/javaSE/%E9%87%8D%E5%86%99%E3%80%81%E9%87%8D%E8%BD%BD/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/07/java/javaSE/%E9%87%8D%E5%86%99%E3%80%81%E9%87%8D%E8%BD%BD/" class="cy_cmt_count" data-xid="2022/04/07/java/javaSE/重写、重载/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -754,7 +552,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>1.4k</span>
+              <span>713</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -773,81 +571,64 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="一、介绍"><a href="#一、介绍" class="headerlink" title="一、介绍"></a>一、介绍</h2><h3 id="1-1-简单使用"><a href="#1-1-简单使用" class="headerlink" title="1.1 简单使用"></a>1.1 简单使用</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line">x=[<span class="number">0</span>,<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>]</span><br><span class="line">y=[<span class="number">0</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">3</span>]</span><br><span class="line">plt.plot(x,y)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="二、API"><a href="#二、API" class="headerlink" title="二、API"></a>二、API</h2><h3 id="2-1-常见API"><a href="#2-1-常见API" class="headerlink" title="2.1 常见API"></a>2.1 常见API</h3><ol>
-<li><p>plt.plot 画图</p>
-</li>
-<li><p>plt.axis 修改坐标</p>
-</li>
-<li><p>plt.show 显示</p>
-</li>
-<li><p>plt.grid(True) 设置网格</p>
-</li>
-<li><p>添加说明：explain</p>
-<ol>
-<li><p>xy轴标注：plt.xlabel(“Money Earned”)  plt.ylabel(“Consume Level”)</p>
-</li>
-<li><p>标题：plt.title(“Figure.1”)</p>
-</li>
-<li><p>添加图内文字：plt.text(2,3,”text”)  ：在坐标(2,3)处显示”text”</p>
-</li>
-<li><p>添加箭头</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">plt.annotate(<span class="string">&#x27;箭头说明文字&#x27;</span>, xy=(<span class="number">20</span>, <span class="number">400</span>), xytext=(<span class="number">12.5</span>, <span class="number">400</span>),</span><br><span class="line">             arrowprops=<span class="built_in">dict</span>(facecolor=<span class="string">&#x27;black&#x27;</span>, shrink=<span class="number">0.05</span>),)</span><br></pre></td></tr></table></figure></li>
-</ol>
-</li>
-</ol>
-<h3 id="2-2-plt-plot"><a href="#2-2-plt-plot" class="headerlink" title="2.2 plt.plot()"></a>2.2 plt.plot()</h3><blockquote>
-<p>plt.plot(x, y, format_string, **kwargs) ,返回Line2D 对象</p>
+          <table>
+<thead>
+<tr>
+<th>规则</th>
+<th>重写override</th>
+<th>重载</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>参数</td>
+<td>必须一样</td>
+<td>必须不一样</td>
+</tr>
+<tr>
+<td>异常</td>
+<td>受检异常：子类方法不能抛出父类<strong>没抛出的异常</strong>，也能不抛出。<strong>非受检异常：无规则</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>返回值类型</td>
+<td>同上（可以理解为返回的范围更小）</td>
+<td></td>
+</tr>
+<tr>
+<td>权限</td>
+<td>只有父类和子类在同一个包中，才能重写default方法，否则被重写的<strong>最低权限是protected</strong>、并且<strong>访问权限&gt;父亲</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>其他</td>
+<td>final static 不能被重写</td>
+<td><strong>被重载的方法已经不再是父类方法，不受override规则约束</strong></td>
+</tr>
+</tbody></table>
+<h3 id="一、重写-override"><a href="#一、重写-override" class="headerlink" title="一、重写 override"></a>一、重写 override</h3><blockquote>
+<p>继承，外壳不变，内容改变</p>
 </blockquote>
-<h4 id="2-2-1-format-string"><a href="#2-2-1-format-string" class="headerlink" title="2.2.1 format_string"></a>2.2.1 format_string</h4><blockquote>
-<p>控制颜色字符、风格字符、标记字</p>
+<h4 id="1-1-参数规则"><a href="#1-1-参数规则" class="headerlink" title="1.1 参数规则"></a>1.1 参数规则</h4><p>​    参数列表必须相同</p>
+<h4 id="1-2-异常规则"><a href="#1-2-异常规则" class="headerlink" title="1.2 异常规则"></a>1.2 异常规则</h4><ol>
+<li><p>可抛出任意的RuntimeException</p>
+</li>
+<li><p>对于强制性异常，儿子抛出的异常小于父亲的异常、(儿子抛出子异常)。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">a</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">t</span><span class="params">()</span> <span class="keyword">throws</span> Exception</span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">b</span> <span class="keyword">extends</span> <span class="title">a</span></span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">t</span><span class="params">()</span> <span class="keyword">throws</span> SQLClientInfoException</span>&#123;</span><br><span class="line">        System.out.println();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h4 id="1-3返回值规则"><a href="#1-3返回值规则" class="headerlink" title="1.3返回值规则"></a>1.3返回值规则</h4><p>​    返回值必须返回 ? &gt; Object (规则同异常)</p>
+<h4 id="1-4-权限规则"><a href="#1-4-权限规则" class="headerlink" title="1.4 权限规则"></a>1.4 权限规则</h4><p>​    只有父类和子类在同一个包中，才能重写default方法，否则被重写的最低权限是protected、并且访问权限&gt;父亲</p>
+<h4 id="1-5-其他规则"><a href="#1-5-其他规则" class="headerlink" title="1.5 其他规则"></a>1.5 其他规则</h4><ol>
+<li>final、static、构造方法不能被重写</li>
+<li>写@override注解的优点<ol>
+<li>可以当注释用,方便阅读</li>
+<li>编译器可以验证@Override下面的方法名是否是你父类中所有的，如果没有则报错</li>
+</ol>
+</li>
+</ol>
+<h3 id="二、重载"><a href="#二、重载" class="headerlink" title="二、重载"></a>二、重载</h3><blockquote>
+<p>原则：本质上是两个方法，基于参数列表区分</p>
 </blockquote>
-<ul>
-<li>颜色：’b’ 蓝色</li>
-<li>字符风格：默认’-‘折线段</li>
-<li>节点标记：默认没有 可选.^</li>
-</ul>
-<h4 id="2-2-2-kwargs"><a href="#2-2-2-kwargs" class="headerlink" title="2.2.2 kwargs:"></a>2.2.2 kwargs:</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">color : 控制颜色, color=<span class="string">&#x27;green&#x27;</span></span><br><span class="line">linestyle : 线条风格, linestyle=<span class="string">&#x27;dashed&#x27;</span></span><br><span class="line">marker : 标记风格, marker=<span class="string">&#x27;o&#x27;</span></span><br><span class="line">markerfacecolor: 标记颜色, markerfacecolor=<span class="string">&#x27;blue&#x27;</span></span><br><span class="line">markersize: 标记尺寸, markersize=<span class="number">20</span></span><br></pre></td></tr></table></figure>
-
-<h4 id="2-2-3-plt-多线"><a href="#2-2-3-plt-多线" class="headerlink" title="2.2.3 plt.多线"></a>2.2.3 plt.多线</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">plt.plot(t1,<span class="string">&#x27;b--&#x27;</span>,t2,<span class="string">&#x27;r--&#x27;</span>)</span><br><span class="line"><span class="comment">#或</span></span><br><span class="line">x1=[<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>],y1=[<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>]</span><br><span class="line">x2=[<span class="number">2</span>,<span class="number">4</span>,<span class="number">6</span>,<span class="number">8</span>],y2=[<span class="number">4</span>,<span class="number">8</span>,<span class="number">12</span>,<span class="number">16</span>]</span><br><span class="line">plt.plot(x1,y1,<span class="string">&#x27;r-&#x27;</span>,x2,y2,<span class="string">&#x27;g--&#x27;</span>)</span><br></pre></td></tr></table></figure>
-
-<h4 id="2-2-4-函数表示y"><a href="#2-2-4-函数表示y" class="headerlink" title="2.2.4 函数表示y"></a>2.2.4 函数表示y</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">x = np.arange(<span class="number">0</span>, <span class="number">20</span>, <span class="number">0.01</span>)</span><br><span class="line">plt.plot(x, np.sin(x), <span class="string">&#x27;r-&#x27;</span>, x, np.cos(x), <span class="string">&#x27;b--&#x27;</span>)</span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="2-3-plt-axis"><a href="#2-3-plt-axis" class="headerlink" title="2.3 plt.axis"></a>2.3 plt.axis</h3><ol>
-<li><p>plt.axis([1, 2, 3, 4])</p>
-<p>设置x范围 1-2 y范围3-4</p>
-</li>
-<li><p>plt.axis(<code>option</code>=‘equal’) </p>
-<ol>
-<li>equal：x-y坐标等长</li>
-<li>off： 关闭</li>
-<li>auto：自动</li>
-<li>square：正方形</li>
-</ol>
-</li>
-</ol>
-<h3 id="2-4-plt-explain-说明文字参数"><a href="#2-4-plt-explain-说明文字参数" class="headerlink" title="2.4 plt.explain 说明文字参数"></a>2.4 plt.explain 说明文字参数</h3><ol>
-<li>color : 颜色</li>
-<li>size：大小</li>
-<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/xHibiki/article/details/84866887">其他</a>：字体系列，对其方式，行距，粗细，样式，字体名</li>
-</ol>
-<h3 id="2-5-plt-subplots-子图"><a href="#2-5-plt-subplots-子图" class="headerlink" title="2.5 plt.subplots 子图"></a>2.5 plt.subplots 子图</h3><blockquote>
-<p>返回一个包含figure和axes对象的元组</p>
-<p>figure: 拿到整张图</p>
-<p>ax： np.array[axe 对象]</p>
-</blockquote>
-<h4 id="subplots-和subplot-区别"><a href="#subplots-和subplot-区别" class="headerlink" title="subplots 和subplot 区别"></a>subplots 和subplot 区别</h4><ul>
-<li><p>subplots 一次性创建并返回所有的子图和其 axe 对象</p>
-</li>
-<li><p>subplot分开子图并拿到指定位置的子图plt.subplot(2, 1, 2) 分成2行1类并拿到第二个ax对象</p>
-</li>
-</ul>
-<h2 id="三、对象"><a href="#三、对象" class="headerlink" title="三、对象"></a>三、对象</h2><h3 id="3-2-AxesSubplot-子图对象"><a href="#3-2-AxesSubplot-子图对象" class="headerlink" title="3.2 AxesSubplot 子图对象"></a>3.2 AxesSubplot 子图对象</h3><h4 id="1-ax-plot"><a href="#1-ax-plot" class="headerlink" title="1 ax.plot()"></a>1 ax.plot()</h4><h4 id="2-ax-axis"><a href="#2-ax-axis" class="headerlink" title="2 ax.axis"></a>2 ax.axis</h4><h4 id="3-set-title"><a href="#3-set-title" class="headerlink" title="3 set_title"></a>3 set_title</h4><p>​    </p>
+<h4 id="2-1-参数规则"><a href="#2-1-参数规则" class="headerlink" title="2.1 参数规则"></a>2.1 参数规则</h4><p><strong>必须</strong>改变参数列表(参数个数或类型不一样)</p>
 
       
     </div>
@@ -867,7 +648,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/27/utils/vuepress/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/06/linux/shell/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -881,7 +662,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/04/27/utils/vuepress/" class="post-title-link" itemprop="url">vuepress</a>
+            <a href="/2022/04/06/linux/shell/" class="post-title-link" itemprop="url">shell</a>
         </h2>
 
         <div class="post-meta">
@@ -891,22 +672,15 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-04-27 03:09:54" itemprop="dateCreated datePublished" datetime="2022-04-27T03:09:54+08:00">2022-04-27</time>
+              <time title="创建时间：2022-04-06 12:01:32" itemprop="dateCreated datePublished" datetime="2022-04-06T12:01:32+08:00">2022-04-06</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-12-13 20:49:15" itemprop="dateModified" datetime="2021-12-13T20:49:15+08:00">2021-12-13</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/util/" itemprop="url" rel="index"><span itemprop="name">util</span></a>
+                  <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
                 </span>
             </span>
 
@@ -920,8 +694,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/04/27/utils/vuepress/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/27/utils/vuepress/" class="cy_cmt_count" data-xid="2022/04/27/utils/vuepress/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/04/06/linux/shell/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/06/linux/shell/" class="cy_cmt_count" data-xid="2022/04/06/linux/shell/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -932,14 +706,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>3.2k</span>
+              <span>1.3k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>3 分钟</span>
+              <span>1 分钟</span>
             </span>
 
         </div>
@@ -951,192 +725,75 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="一、基本使用"><a href="#一、基本使用" class="headerlink" title="一、基本使用"></a>一、基本使用</h2><ol>
-<li><p>.vuepress文件夹，所有 VuePress 相关的文件都将会被放在这里</p>
+          <h2 id="一、变量"><a href="#一、变量" class="headerlink" title="一、变量"></a>一、变量</h2><blockquote>
+<p><strong>赋值</strong>，定义不用$</p>
+<p><strong>获取</strong>需要$或者${}</p>
+</blockquote>
+<h3 id="1-1-定义"><a href="#1-1-定义" class="headerlink" title="1.1 定义"></a>1.1 定义</h3><ol>
+<li><p>普通定义：your_name=”runoob.com”</p>
 <ol>
-<li><p>一个 VuePress 网站必要的配置文件是 <code>.vuepress/config.js</code>，它应该导出一个 JavaScript 对象：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="attr">title</span>: <span class="string">&#x27;Hello VuePress&#x27;</span>,</span><br><span class="line">  <span class="attr">description</span>: <span class="string">&#x27;Just playing around&#x27;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-</ol>
+<li><p>不需要加$</p>
+</li>
+<li><p>变量名和等号之间不能有空格</p>
 </li>
 </ol>
-<h2 id="二、md文件内配置"><a href="#二、md文件内配置" class="headerlink" title="二、md文件内配置"></a>二、md文件内配置</h2><p>默认主题提供了一些选项，让你可以去自定义导航栏（navbar）、 侧边栏（sidebar）和 首页（homepage） </p>
-<h3 id="2-1-Header"><a href="#2-1-Header" class="headerlink" title="2.1 Header"></a>2.1 Header</h3><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">home:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">heroImage:</span> <span class="string">/hero.png</span></span><br><span class="line"><span class="attr">heroText:</span> <span class="string">Hero</span> <span class="string">标题</span></span><br><span class="line"><span class="attr">tagline:</span> <span class="string">Hero</span> <span class="string">副标题</span></span><br><span class="line"><span class="comment"># navbar: false 禁用导航栏</span></span><br><span class="line"><span class="attr">actionText:</span> <span class="string">快速上手</span> <span class="string">→</span></span><br><span class="line"><span class="attr">actionLink:</span> <span class="string">/zh/guide/</span></span><br><span class="line"><span class="attr">features:</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">title:</span> <span class="string">简洁至上</span></span><br><span class="line">  <span class="attr">details:</span> <span class="string">以</span> <span class="string">Markdown</span> <span class="string">为中心的项目结构，以最少的配置帮助你专注于写作。</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">title:</span> <span class="string">Vue驱动</span></span><br><span class="line">  <span class="attr">details:</span> <span class="string">享受</span> <span class="string">Vue</span> <span class="string">+</span> <span class="string">webpack</span> <span class="string">的开发体验，在</span> <span class="string">Markdown</span> <span class="string">中使用</span> <span class="string">Vue</span> <span class="string">组件，同时可以使用</span> <span class="string">Vue</span> <span class="string">来开发自定义主题。</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">title:</span> <span class="string">高性能</span></span><br><span class="line">  <span class="attr">details:</span> <span class="string">VuePress</span> <span class="string">为每个页面预渲染生成静态的</span> <span class="string">HTML，同时在页面被加载的时候，将作为</span> <span class="string">SPA</span> <span class="string">运行。</span></span><br><span class="line"><span class="attr">footer:</span> <span class="string">MIT</span> <span class="string">Licensed</span> <span class="string">|</span> <span class="string">Copyright</span> <span class="string">©</span> <span class="number">2018</span><span class="string">-present</span> <span class="string">Evan</span> <span class="string">You</span></span><br><span class="line"><span class="meta">---</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="2-2-Frontmatter"><a href="#2-2-Frontmatter" class="headerlink" title="2.2 Frontmatter"></a>2.2 Frontmatter</h3><h4 id="2-2-1-首页"><a href="#2-2-1-首页" class="headerlink" title="2.2.1 首页"></a>2.2.1 首页</h4><table>
-<thead>
-<tr>
-<th>关键字</th>
-<th>功能</th>
-<th>用例</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>home</td>
-<td>是否首页</td>
-<td>home: true</td>
-</tr>
-<tr>
-<td>heroImage</td>
-<td>首页图片的 URL</td>
-<td># Public 文件路径 heroImage: /images/hero.png</td>
-</tr>
-<tr>
-<td>heroText</td>
-<td>首页标题</td>
-<td></td>
-</tr>
-<tr>
-<td>tagline</td>
-<td>首页标语,则默认使用站点 <a target="_blank" rel="noopener" href="https://v2.vuepress.vuejs.org/zh/reference/config.html#description">description</a></td>
-<td></td>
-</tr>
-<tr>
-<td>actions</td>
-<td>首页按钮</td>
-<td>actions:   - text: 快速上手     link: /zh/guide/getting-started.html     type: primary</td>
-</tr>
-<tr>
-<td>features</td>
-<td>首页下三件简述</td>
-<td></td>
-</tr>
-<tr>
-<td>footer</td>
-<td>首页页脚</td>
-<td></td>
-</tr>
-<tr>
-<td>footerHtml</td>
-<td>是否允许页脚中使用 HTML</td>
-<td></td>
-</tr>
-</tbody></table>
-<h4 id="2-2-2-普通页面"><a href="#2-2-2-普通页面" class="headerlink" title="2.2.2 普通页面"></a>2.2.2 普通页面</h4><table>
-<thead>
-<tr>
-<th>关键字</th>
-<th>功能</th>
-<th>用例</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>editLink</td>
-<td>编辑此页</td>
-<td></td>
-</tr>
-<tr>
-<td>editLinkPattern</td>
-<td>本页面中 <em>编辑此页</em> 链接的 Pattern</td>
-<td><a target="_blank" rel="noopener" href="https://v2.vuepress.vuejs.org/zh/reference/default-theme/config.html#editlinkpattern">三项</a></td>
-</tr>
-<tr>
-<td>sidebar</td>
-<td>配置侧边栏</td>
-<td></td>
-</tr>
-<tr>
-<td>navbar</td>
-<td>导航栏配置</td>
-<td></td>
-</tr>
-<tr>
-<td>contributors</td>
-<td>贡献者列表</td>
-<td></td>
-</tr>
-</tbody></table>
-<h3 id="2-3-搜索框"><a href="#2-3-搜索框" class="headerlink" title="2.3 搜索框"></a>2.3 搜索框</h3><h4 id="1-内置搜索"><a href="#1-内置搜索" class="headerlink" title="1. 内置搜索"></a>1. 内置搜索</h4><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// .vuepress/config.js</span></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="attr">themeConfig</span>: &#123;</span><br><span class="line">    <span class="attr">search</span>: <span class="literal">false</span>,</span><br><span class="line">    <span class="attr">searchMaxSuggestions</span>: <span class="number">10</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="页面滚动"><a href="#页面滚动" class="headerlink" title="页面滚动"></a>页面滚动</h3><h3 id="自定义页面类"><a href="#自定义页面类" class="headerlink" title="自定义页面类"></a>自定义页面类</h3><h3 id="特定页面的自定义布局"><a href="#特定页面的自定义布局" class="headerlink" title="特定页面的自定义布局"></a>特定页面的自定义布局</h3><h2 id="三、配置"><a href="#三、配置" class="headerlink" title="三、配置"></a>三、配置</h2><h3 id="3-1-基本项"><a href="#3-1-基本项" class="headerlink" title="3.1 基本项"></a>3.1 基本项</h3><table>
-<thead>
-<tr>
-<th>关键字</th>
-<th>功能</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>lang</td>
-<td>语言</td>
-</tr>
-<tr>
-<td>title</td>
-<td>标题</td>
-</tr>
-<tr>
-<td>description</td>
-<td>描述</td>
-</tr>
-<tr>
-<td>base</td>
-<td>git-page相对地址</td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-</tr>
-</tbody></table>
-<h3 id="3-2主题配置"><a href="#3-2主题配置" class="headerlink" title="3.2主题配置"></a>3.2主题配置</h3><ol>
-<li> logo logo地址</li>
-<li>navbar 导航栏</li>
-<li>sidebar 侧边栏</li>
+</li>
+<li><p>特殊定义</p>
+<figure class="highlight mel"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> <span class="keyword">file</span> <span class="keyword">in</span> <span class="string">`ls /etc`</span></span><br><span class="line">或</span><br><span class="line"><span class="keyword">for</span> <span class="keyword">file</span> <span class="keyword">in</span> $(<span class="keyword">ls</span> /etc)</span><br></pre></td></tr></table></figure></li>
 </ol>
-<h4 id="3-2-1-导航栏"><a href="#3-2-1-导航栏" class="headerlink" title="3.2.1 导航栏"></a>3.2.1 导航栏</h4><ol>
-<li><p>logo</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">   </span><br></pre></td></tr></table></figure></li>
-<li><p>导航栏连接</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// .vuepress/config.js</span></span><br><span class="line"><span class="keyword">module</span>.<span class="keyword">exports</span> = &#123;</span><br><span class="line">  themeConfig: &#123;</span><br><span class="line">    nav: [</span><br><span class="line">      &#123; text: <span class="string">&#x27;Home&#x27;</span>, link: <span class="string">&#x27;/&#x27;</span> &#125;,</span><br><span class="line">      &#123; text: <span class="string">&#x27;Guide&#x27;</span>, link: <span class="string">&#x27;/guide/&#x27;</span> &#125;,</span><br><span class="line">      &#123; text: <span class="string">&#x27;External&#x27;</span>, link: <span class="string">&#x27;https://google.com&#x27;</span> &#125;,</span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p>当你提供了一个 <code>items</code> 数组而不是一个单一的 <code>link</code> 时，它将显示为一个 <code>下拉列表</code> </p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// .vuepress/config.js</span></span><br><span class="line"><span class="keyword">module</span>.<span class="keyword">exports</span> = &#123;</span><br><span class="line">  themeConfig: &#123;</span><br><span class="line">    nav: [</span><br><span class="line">      &#123;</span><br><span class="line">        text: <span class="string">&#x27;Languages&#x27;</span>,</span><br><span class="line">        ariaLabel: <span class="string">&#x27;Language Menu&#x27;</span>,</span><br><span class="line">        items: [</span><br><span class="line">          &#123; text: <span class="string">&#x27;Chinese&#x27;</span>, link: <span class="string">&#x27;/language/chinese/&#x27;</span> &#125;,</span><br><span class="line">          &#123; text: <span class="string">&#x27;Japanese&#x27;</span>, link: <span class="string">&#x27;/language/japanese/&#x27;</span> &#125;</span><br><span class="line">        ]</span><br><span class="line">      &#125;</span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p>此外，你还可以通过嵌套的 <code>items</code> 来在 <code>下拉列表</code> 中设置分组：</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// .vuepress/config.js</span></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="attr">themeConfig</span>: &#123;</span><br><span class="line">    <span class="attr">nav</span>: [</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="attr">text</span>: <span class="string">&#x27;Languages&#x27;</span>,</span><br><span class="line">        <span class="attr">items</span>: [</span><br><span class="line">          &#123; <span class="attr">text</span>: <span class="string">&#x27;Group1&#x27;</span>, <span class="attr">items</span>: [<span class="comment">/*  */</span>] &#125;,</span><br><span class="line">          &#123; <span class="attr">text</span>: <span class="string">&#x27;Group2&#x27;</span>, <span class="attr">items</span>: [<span class="comment">/*  */</span>] &#125;</span><br><span class="line">        ]</span><br><span class="line">      &#125;</span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p>禁用</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">themeConfig: &#123;</span><br><span class="line">  navbar: <span class="keyword">false</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h4 id="3-2-2-侧边栏"><a href="#3-2-2-侧边栏" class="headerlink" title="3.2.2 侧边栏"></a>3.2.2 侧边栏</h4><h5 id="3-2-2-1-基本配置"><a href="#3-2-2-1-基本配置" class="headerlink" title="3.2.2.1 基本配置"></a>3.2.2.1 基本配置</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">sidebar: [</span><br><span class="line">     &#123;</span><br><span class="line">       text: <span class="string">&#x27;Guide&#x27;</span>,</span><br><span class="line">       link: <span class="string">&#x27;/guide/&#x27;</span>,</span><br><span class="line">       children: [</span><br><span class="line">         &#123;</span><br><span class="line">           text: <span class="string">&#x27;github&#x27;</span>,</span><br><span class="line">           link: <span class="string">&#x27;https://github.com&#x27;</span>,</span><br><span class="line">           children: [],</span><br><span class="line">         &#125;,</span><br><span class="line">         <span class="string">&#x27;/guide/a.md&#x27;</span>,</span><br><span class="line">         <span class="string">&#x27;/guide/b.md&#x27;</span>,</span><br><span class="line">         <span class="string">&#x27;/guide/c.md&#x27;</span></span><br><span class="line">       ],</span><br><span class="line">     &#125;,</span><br><span class="line">     <span class="string">&#x27;/bar/README.md&#x27;</span>,</span><br><span class="line">   ],</span><br></pre></td></tr></table></figure>
+<h3 id="1-2-使用"><a href="#1-2-使用" class="headerlink" title="1.2 使用"></a>1.2 使用</h3><blockquote>
+<p>需要$</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">your_name=&quot;qinjx&quot;</span><br><span class="line">echo $your_name</span><br><span class="line">echo $&#123;your_name&#125;</span><br><span class="line">echo &quot;I am good at $&#123;your_name&#125;Script&quot;</span><br></pre></td></tr></table></figure>
 
-<h5 id="3-2-2-2-注意"><a href="#3-2-2-2-注意" class="headerlink" title="3.2.2.2 注意"></a>3.2.2.2 注意</h5><p>‘/bar/README.md’ 像这种直接写路径的一定要写title</p>
-<h5 id="3-2-2-3-侧边栏分组"><a href="#3-2-2-3-侧边栏分组" class="headerlink" title="3.2.2.3 侧边栏分组"></a>3.2.2.3 侧边栏分组</h5><h5 id="3-2-2-4-自动生成侧栏"><a href="#3-2-2-4-自动生成侧栏" class="headerlink" title="3.2.2.4 自动生成侧栏"></a>3.2.2.4 自动生成侧栏</h5><h5 id="3-2-2-5-禁用侧边栏"><a href="#3-2-2-5-禁用侧边栏" class="headerlink" title="3.2.2.5 禁用侧边栏"></a>3.2.2.5 禁用侧边栏</h5><h2 id="四、新增Md渲染"><a href="#四、新增Md渲染" class="headerlink" title="四、新增Md渲染"></a>四、新增Md渲染</h2><h3 id="4-1-内置组件"><a href="#4-1-内置组件" class="headerlink" title="4.1 内置组件"></a>4.1 内置组件</h3><h4 id="4-1-1-Badge-标识"><a href="#4-1-1-Badge-标识" class="headerlink" title="4.1.1 Badge 标识"></a>4.1.1 Badge 标识</h4><ol>
-<li><p>语法</p>
-<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">-</span> VuePress - <span class="xml"><span class="tag">&lt;<span class="name">Badge</span> <span class="attr">type</span>=<span class="string">&quot;warning&quot;</span> <span class="attr">text</span>=<span class="string">&quot;v2&quot;</span> <span class="attr">vertical</span>=<span class="string">&quot;middle&quot;</span> /&gt;</span></span></span><br></pre></td></tr></table></figure></li>
-<li><p>属性</p>
-<ol>
-<li>type 类型：’tip’ | ‘warning’ | ‘danger’</li>
-<li>vertical 位置：’top’ | ‘middle’ | ‘bottom’ | undefined</li>
-</ol>
+<h2 id="二、运算符"><a href="#二、运算符" class="headerlink" title="二、运算符"></a>二、运算符</h2><h2 id="三、数据结构"><a href="#三、数据结构" class="headerlink" title="三、数据结构"></a>三、数据结构</h2><h3 id="2-1-字符串"><a href="#2-1-字符串" class="headerlink" title="2.1 字符串"></a>2.1 字符串</h3><h4 id="单引号"><a href="#单引号" class="headerlink" title="单引号"></a>单引号</h4><ul>
+<li>单引号里的任何字符都会原样输出，单引号字符串中的变量无效</li>
+<li>单引号字串中不能出现单独一个的单引号（对单引号使用转义符后也不行），但可成对出现，作为字符串拼接使用。</li>
+</ul>
+<h4 id="双引号"><a href="#双引号" class="headerlink" title="双引号"></a>双引号</h4><ul>
+<li>双引号里可以有变量</li>
+<li>双引号里可以出现转义字符</li>
+</ul>
+<h4 id="字符串拼接"><a href="#字符串拼接" class="headerlink" title="字符串拼接"></a>字符串拼接</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">greeting=&quot;hello, &quot;$your_name&quot; !&quot;</span><br><span class="line">greeting_1=&quot;hello, $&#123;your_name&#125; !&quot;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight dust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="xml">1. 字符串长度:  $</span><span class="template-tag">&#123;#<span class="name">str</span>&#125;</span><span class="xml"> </span></span><br><span class="line"><span class="xml">2. 子串：$</span><span class="template-variable">&#123;str:1:4&#125;</span><span class="xml"> </span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="2-2-数组"><a href="#2-2-数组" class="headerlink" title="2.2 数组"></a>2.2 数组</h3><figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">array_name</span>=(value<span class="number">0</span> value<span class="number">1</span> value<span class="number">2</span> value<span class="number">3</span>)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span>. 单个赋值：array_name<span class="selector-attr">[0]</span>=value0</span><br><span class="line"><span class="number">2</span>. 获取：valuen=$&#123;array_name<span class="selector-attr">[0]</span>&#125;</span><br><span class="line"><span class="number">3</span>. 长度：length=$&#123;<span class="selector-id">#array_name</span><span class="selector-attr">[@]</span>&#125;、$&#123;<span class="selector-id">#array_name</span><span class="selector-attr">[*]</span>&#125;</span><br><span class="line"><span class="number">4</span>. 元素长度：length=$&#123;<span class="selector-id">#array_name</span><span class="selector-attr">[n]</span>&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="四、函数"><a href="#四、函数" class="headerlink" title="四、函数"></a>四、函数</h2><h3 id="3-1-自定义函数"><a href="#3-1-自定义函数" class="headerlink" title="3.1 自定义函数"></a>3.1 自定义函数</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">demoFun()&#123;</span><br><span class="line">	echo &quot;第一个参数为 $1 !&quot;</span><br><span class="line">    echo &quot;第二个参数为 $2 !&quot;</span><br><span class="line">    echo &quot;这是我的第一个 shell 函数!&quot;</span><br><span class="line">    return &quot;aaa&quot;</span><br><span class="line">&#125;</span><br><span class="line">echo &quot;-----函数开始执行-----&quot;</span><br><span class="line">demoFun 1 2 </span><br></pre></td></tr></table></figure>
+
+<h4 id="3-12-返回值"><a href="#3-12-返回值" class="headerlink" title="3.12 返回值"></a>3.12 返回值</h4><p> 获得上个返回值 $?</p>
+<h4 id="3-11-参数"><a href="#3-11-参数" class="headerlink" title="3.11 参数"></a>3.11 参数</h4><ol>
+<li><p>取参：$n  当n&gt;=10时，需要使用${n}来获取参数</p>
+</li>
+<li><p>参数个数：$#</p>
+</li>
+<li><p>拿到所有参数</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span>. <span class="variable">$*</span>  <span class="string">&quot;1 2 3&quot;</span></span><br><span class="line"><span class="number">2</span>. <span class="variable">$@</span>   <span class="string">&quot;1&quot;</span> ,<span class="string">&quot;2&quot;</span>, <span class="string">&quot;3&quot;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>当前进程号：$$</p>
 </li>
 </ol>
-<h4 id="4-1-2-CodeGroup-多类型代码"><a href="#4-1-2-CodeGroup-多类型代码" class="headerlink" title="4.1.2 CodeGroup 多类型代码"></a>4.1.2 CodeGroup 多类型代码</h4><h4 id="4-1-3-自定义容器"><a href="#4-1-3-自定义容器" class="headerlink" title="4.1.3 自定义容器"></a>4.1.3 自定义容器</h4><ol>
-<li><p>语法</p>
-<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">::: <span class="xml"><span class="tag">&lt;<span class="name">type</span>&gt;</span></span> [title]</span><br><span class="line">[content]</span><br><span class="line">:::</span><br></pre></td></tr></table></figure></li>
-<li><p>属性</p>
-<ol>
-<li>type 类型：tip、warning、danger、details</li>
-<li>title 标题  容器提示语</li>
-<li>content 内容</li>
-</ol>
-</li>
-</ol>
-<h4 id="4-2-渲染"><a href="#4-2-渲染" class="headerlink" title="4.2 渲染"></a>4.2 渲染</h4><h4 id="4-2-1-链接"><a href="#4-2-1-链接" class="headerlink" title="4.2.1 链接"></a>4.2.1 链接</h4><ol>
-<li>绝对路径链接 带外链接符号 </li>
-<li>相对路径链接 不带</li>
-</ol>
-<h4 id="4-2-2-标题锚点"><a href="#4-2-2-标题锚点" class="headerlink" title="4.2.2 标题锚点"></a>4.2.2 标题锚点</h4><h4 id="4-2-3-Emoji"><a href="#4-2-3-Emoji" class="headerlink" title="4.2.3 Emoji"></a>4.2.3 <a target="_blank" rel="noopener" href="https://github.com/ikatyang/emoji-cheat-sheet">Emoji</a></h4><h4 id="4-2-4-目录"><a href="#4-2-4-目录" class="headerlink" title="4.2.4 目录"></a>4.2.4 目录</h4><h4 id="4-2-5-代码块"><a href="#4-2-5-代码块" class="headerlink" title="4.2.5 代码块"></a>4.2.5 代码块</h4><ol>
-<li>行高亮</li>
-<li>可编译</li>
-</ol>
-<h2 id="五、插件"><a href="#五、插件" class="headerlink" title="五、插件"></a>五、插件</h2><h3 id="5-1-google-analytics-网络流量分析"><a href="#5-1-google-analytics-网络流量分析" class="headerlink" title="5.1  google-analytics 网络流量分析"></a>5.1  google-analytics 网络流量分析</h3><h3 id="5-2-search-搜索"><a href="#5-2-search-搜索" class="headerlink" title="5.2 search 搜索"></a>5.2 search 搜索</h3><ol>
-<li><p>下载</p>
-<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install vuepress-<span class="keyword">plugin</span>-fulltext-<span class="keyword">search</span></span><br></pre></td></tr></table></figure></li>
-<li><p> vi docs/.vuepress/config.js</p>
-</li>
-</ol>
-   <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">module</span>.<span class="keyword">exports</span> = &#123;</span><br><span class="line"><span class="comment">// .</span></span><br><span class="line">plugins: [<span class="string">&#x27;fulltext-search&#x27;</span>],</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="3-2-函数参数"><a href="#3-2-函数参数" class="headerlink" title="3.2 函数参数"></a>3.2 函数参数</h3><h2 id="五、shell脚本"><a href="#五、shell脚本" class="headerlink" title="五、shell脚本"></a>五、shell脚本</h2><h3 id="4-1-脚本传参"><a href="#4-1-脚本传参" class="headerlink" title="4.1 脚本传参"></a>4.1 脚本传参</h3><p>和shell的函数传参相同，用$n 获取</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">echo &quot;执行的文件名：$0&quot;;</span><br><span class="line">echo &quot;第一个参数为：$1&quot;;</span><br><span class="line">echo &quot;第二个参数为：$2&quot;;</span><br><span class="line">echo &quot;第三个参数为：$3&quot;;</span><br></pre></td></tr></table></figure>
 
-<h3 id="5-3-pwa-渐进式web"><a href="#5-3-pwa-渐进式web" class="headerlink" title="5.3  pwa 渐进式web"></a>5.3  pwa 渐进式web</h3><h2 id="六、主题"><a href="#六、主题" class="headerlink" title="六、主题"></a>六、主题</h2>
+<h2 id="内置函数"><a href="#内置函数" class="headerlink" title="内置函数"></a>内置函数</h2><ol>
+<li><p>scanf   read</p>
+</li>
+<li><p>print    echo  </p>
+</li>
+<li><p>获取当前时间 date</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo $(date &quot;+%Y-%m-%d %H:%M:%S&quot;) &gt;&gt; a.txt</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h3><ol>
+<li>sh脚本中不能用alias</li>
+</ol>
+
       
     </div>
 
@@ -1155,7 +812,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/27/utils/git/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/05/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -1169,7 +826,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/04/27/utils/git/" class="post-title-link" itemprop="url">Git的使用</a>
+            <a href="/2022/04/05/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95/" class="post-title-link" itemprop="url">单点登录</a>
         </h2>
 
         <div class="post-meta">
@@ -1179,22 +836,15 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-04-27 03:09:54" itemprop="dateCreated datePublished" datetime="2022-04-27T03:09:54+08:00">2022-04-27</time>
+              <time title="创建时间：2022-04-05 18:58:05" itemprop="dateCreated datePublished" datetime="2022-04-05T18:58:05+08:00">2022-04-05</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-04-24 09:45:20" itemprop="dateModified" datetime="2022-04-24T09:45:20+08:00">2022-04-24</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/utils/" itemprop="url" rel="index"><span itemprop="name">utils</span></a>
+                  <a href="/categories/%E7%BB%84%E4%BB%B6/" itemprop="url" rel="index"><span itemprop="name">组件</span></a>
                 </span>
             </span>
 
@@ -1208,8 +858,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/04/27/utils/git/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/27/utils/git/" class="cy_cmt_count" data-xid="2022/04/27/utils/git/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/04/05/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/05/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95/" class="cy_cmt_count" data-xid="2022/04/05/组件/登录/单点登录/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -1220,14 +870,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>3.5k</span>
+              <span>2.6k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>3 分钟</span>
+              <span>2 分钟</span>
             </span>
 
         </div>
@@ -1240,35 +890,216 @@
 
       
           <p>[toc]</p>
-<h2 id="一、Git概念"><a href="#一、Git概念" class="headerlink" title="一、Git概念"></a>一、Git概念</h2><ol>
-<li><p>手工式版本控制</p>
+<h2 id="一、授权登录"><a href="#一、授权登录" class="headerlink" title="一、授权登录"></a>一、授权登录</h2><ol>
+<li>单点登录，自系统登录，SSO， Singal Sign on</li>
+<li>只需要登陆一次就能无需登录访问其他模块</li>
+</ol>
+<h2 id="二、SSO三种方法"><a href="#二、SSO三种方法" class="headerlink" title="二、SSO三种方法"></a>二、SSO三种方法</h2><blockquote>
+<p> 在百度浏览器登录后，打开百度贴吧就自动登录了，不需要二次登录。这就是单点登录</p>
+</blockquote>
+<h3 id="2-1-session广播"><a href="#2-1-session广播" class="headerlink" title="2.1 session广播"></a>2.1 session广播</h3><ol>
+<li><p>把session复制到其他模块</p>
+</li>
+<li><p>缺点：复制太浪费资源（时间+内存）</p>
+</li>
+<li><p>cookie+redis</p>
 <ol>
-<li>特点<ol>
-<li>每改一次备份一次</li>
-<li>协同更改需要同时U盘copy</li>
+<li>redis  放置  k:生成随即唯一值（用户ip,id）,v:用户信息</li>
+<li>cookie  将k放入cookie中</li>
+<li>访问其他模块时，带着cookie，取出k,查询redis,如果查到并正确</li>
+<li>也就是只需要验证签名，就能放心的取出的信息安全有效</li>
 </ol>
 </li>
-<li>问题<ol>
-<li><p>备份</p>
+<li><p>token(令牌)</p>
+<ol>
+<li><p>token是按照一定规则生成的并加密的字符串</p>
 </li>
-<li><p>代码还原</p>
+<li><p>用户登录–&gt;生成随机字符串–&gt;拼接用户信息</p>
 </li>
-<li><p>协同开发</p>
+<li><p>每次访问其他模块，带着这个字符串，其他模块会解码取出用户信息并验证</p>
 </li>
-<li><p>代码追溯(追责)</p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211102012109951.png" alt="image-20211102012109951"></p>
-</li>
-</ol>
-</li>
-</ol>
+<li><p>也就是没到一个模块都要通过User数据库验证token才能确保信息安全有效</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2022/04/27/utils/git/#more" rel="contents">
+              <a class="btn" href="/2022/04/05/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
           <!--/noindex-->
         
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/05/spring/spring%E4%BA%8B%E5%8A%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/04/05/spring/spring%E4%BA%8B%E5%8A%A1/" class="post-title-link" itemprop="url">spring事务</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-04-05 00:01:51" itemprop="dateCreated datePublished" datetime="2022-04-05T00:01:51+08:00">2022-04-05</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/04/05/spring/spring%E4%BA%8B%E5%8A%A1/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/05/spring/spring%E4%BA%8B%E5%8A%A1/" class="cy_cmt_count" data-xid="2022/04/05/spring/spring事务/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>775</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>1</p>
+<blockquote>
+<p>开启事务的实质–&gt;</p>
+<ol>
+<li><p>事务创建一个conn</p>
+</li>
+<li><p>conn.setAutoCommit(false)</p>
+</li>
+<li><p>target.method</p>
+</li>
+<li><p>try{</p>
+</li>
+<li><p>conn.commit</p>
+<p>}catch{ conn.rollback}</p>
+</li>
+<li></li>
+</ol>
+</blockquote>
+<h3 id="传播机制Propagation"><a href="#传播机制Propagation" class="headerlink" title="传播机制Propagation"></a>传播机制Propagation</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>PROPAGATION_REQUIRED</td>
+<td>如果当前存在事务，则加入该事务；如果当前没有事务，则创建一个新的事务。这是<strong>默认值</strong>。</td>
+<td>可重入</td>
+</tr>
+<tr>
+<td>PROPAGATION_REQUIRES_NEW</td>
+<td>建一个<strong>新的事务</strong>，如果当前存在事务，则把当前事务<strong>挂起</strong>。</td>
+<td>new</td>
+</tr>
+<tr>
+<td>PROPAGATION_SUPPORTS</td>
+<td>如果当前存在事务，则加入该事务；如果当前没有事务，则以非事务的方式继续运行</td>
+<td>继承</td>
+</tr>
+<tr>
+<td>PROPAGATION_NEVER</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>PROPAGATION_NOT_SUPPORTED</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>PROPAGATION_MANDATORY</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>PROPAGATION_NESTED</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id="事务失效原因"><a href="#事务失效原因" class="headerlink" title="事务失效原因"></a>事务失效原因</h3><ol>
+<li>类不是@component</li>
+<li>方法public</li>
+<li>方法调用了this.方法</li>
+<li>方法启动了新的线程</li>
+<li><strong>异常被try cache</strong></li>
+<li>抛出了受检异常</li>
+<li>数据库自身不支持事务</li>
+</ol>
+<h4 id="回滚机制"><a href="#回滚机制" class="headerlink" title="回滚机制"></a>回滚机制</h4><ol>
+<li>抛出了runtimeExcept或者error</li>
+</ol>
+<h4 id="编程式事务"><a href="#编程式事务" class="headerlink" title="编程式事务"></a>编程式事务</h4><blockquote>
+<ul>
+<li><strong>编程式事务</strong>使用TransactionTemplate或者直接使用底层的PlatformTransactionManager。对于编程式事务管理，spring推荐使用TransactionTemplate。</li>
+</ul>
+</blockquote>
+<h4 id="声明式事务"><a href="#声明式事务" class="headerlink" title="声明式事务"></a>声明式事务</h4><blockquote>
+<ul>
+<li><strong>声明式事务</strong>是建立在AOP之上的。其本质是对方法前后进行拦截，然后在目标方法开始之前创建或者加入一个事务，在执行完目标方法之后根据执行情况提交或者回滚事务。声明式事务最大的优点就是不需要通过编程的方式管理事务，这样就不需要在业务逻辑代码中掺杂事务管理的代码，只需在配置文件中做相关的事务规则声明(或通过基于@Transactional注解的方式)，便可以将事务规则应用到业务逻辑中。</li>
+</ul>
+</blockquote>
+
       
     </div>
 

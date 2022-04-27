@@ -187,7 +187,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/27/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%B0%83%E4%BC%982.0/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/redis/redis/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -201,7 +201,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/04/27/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%B0%83%E4%BC%982.0/" class="post-title-link" itemprop="url">数据库调优2</a>
+            <a href="/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/redis/redis/" class="post-title-link" itemprop="url">redis使用</a>
         </h2>
 
         <div class="post-meta">
@@ -211,15 +211,8 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-04-27 03:09:54" itemprop="dateCreated datePublished" datetime="2022-04-27T03:09:54+08:00">2022-04-27</time>
+              <time title="创建时间：2022-04-10 15:26:44" itemprop="dateCreated datePublished" datetime="2022-04-10T15:26:44+08:00">2022-04-10</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-04-10 14:52:29" itemprop="dateModified" datetime="2022-04-10T14:52:29+08:00">2022-04-10</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -240,8 +233,130 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/04/27/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%B0%83%E4%BC%982.0/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/27/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%B0%83%E4%BC%982.0/" class="cy_cmt_count" data-xid="2022/04/27/数据库/数据库概念2.0/数据库调优2.0/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/redis/redis/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/redis/redis/" class="cy_cmt_count" data-xid="2022/04/10/数据库/nosql/redis/redis/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>[toc]</p>
+<h2 id="一、介绍"><a href="#一、介绍" class="headerlink" title="一、介绍"></a>一、介绍</h2><h3 id="1-1-特点"><a href="#1-1-特点" class="headerlink" title="1.1 特点"></a>1.1 特点</h3><ol>
+<li>redis<ol>
+<li>特点<ol>
+<li><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/f42d5f5c495b">原子性</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/myseries/p/11733861.html">单线程</a>，避免了线程切换</li>
+<li>多路IO复用</li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/xlgen157387/article/details/79470556">为什么说Redis是单线程的以及Redis为什么这么快</a></li>
+</ol>
+</li>
+<li>支持分布式，内置各种数据类型，可持久化，基于内存，支持多种语言</li>
+</ol>
+</li>
+<li>技术分类<ol>
+<li><p>功能性: java jsp tomcat html jdbc linux</p>
+</li>
+<li><p>性能: nosql java线程 hadoop nginx mq elasticSearch</p>
+</li>
+<li><p>扩展 struts mybtis  spring springBoot </p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/redis/redis/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%B0%83%E4%BC%982.0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%B0%83%E4%BC%982.0/" class="post-title-link" itemprop="url">数据库调优2</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-04-10 14:52:29" itemprop="dateCreated datePublished" datetime="2022-04-10T14:52:29+08:00">2022-04-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%B0%83%E4%BC%982.0/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%B0%83%E4%BC%982.0/" class="cy_cmt_count" data-xid="2022/04/10/数据库/数据库概念2.0/数据库调优2.0/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -546,7 +661,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/27/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E4%BA%8B%E5%8A%A1-MVCC/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%97%A5%E5%BF%97/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -560,7 +675,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/04/27/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E4%BA%8B%E5%8A%A1-MVCC/" class="post-title-link" itemprop="url">事务-MVCC</a>
+            <a href="/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%97%A5%E5%BF%97/" class="post-title-link" itemprop="url">mysql-log</a>
         </h2>
 
         <div class="post-meta">
@@ -570,144 +685,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-04-27 03:09:54" itemprop="dateCreated datePublished" datetime="2022-04-27T03:09:54+08:00">2022-04-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-21 00:51:22" itemprop="dateModified" datetime="2022-03-21T00:51:22+08:00">2022-03-21</time>
-              </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/04/27/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E4%BA%8B%E5%8A%A1-MVCC/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/27/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E4%BA%8B%E5%8A%A1-MVCC/" class="cy_cmt_count" data-xid="2022/04/27/数据库/数据库概念2.0/事务-MVCC/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>2.7k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>`</p>
-<p>参考: <a target="_blank" rel="noopener" href="https://juejin.cn/post/7016165148020703246">掘金</a></p>
-<h2 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h2><blockquote>
-<p>C是事务的根本追求数据一致性的破坏主要来自两个方面</p>
-<ol>
-<li>事务的并发执行    —&gt;  并发控制技术MVCC(也可以用锁,但是锁性能太低)–&gt;undo</li>
-<li>事务故障或系统故障   —&gt; 日志恢复技 –&gt;redo</li>
-</ol>
-</blockquote>
-<h3 id="2-1-ACID"><a href="#2-1-ACID" class="headerlink" title="2.1 ACID"></a>2.1 ACID</h3><ol>
-<li><p>Atomicity 原子性</p>
-<ol>
-<li>begin</li>
-<li>sql1</li>
-<li>sql2</li>
-<li>commit</li>
-<li>构成逻辑整体的这些数据库操作,要么全部执行成功,要么全部不执行。基于以事务为单位执行</li>
-</ol>
-</li>
-</ol>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/04/27/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E4%BA%8B%E5%8A%A1-MVCC/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/27/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/%E5%A4%8D%E6%9D%82sql/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/04/27/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/%E5%A4%8D%E6%9D%82sql/" class="post-title-link" itemprop="url">复杂的sql</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-04-27 03:09:54" itemprop="dateCreated datePublished" datetime="2022-04-27T03:09:54+08:00">2022-04-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-04-10 17:45:04" itemprop="dateModified" datetime="2022-04-10T17:45:04+08:00">2022-04-10</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
-                </span>
+              <time title="创建时间：2022-04-10 14:43:32" itemprop="dateCreated datePublished" datetime="2022-04-10T14:43:32+08:00">2022-04-10</time>
             </span>
 
           
@@ -720,8 +698,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/04/27/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/%E5%A4%8D%E6%9D%82sql/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/27/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/%E5%A4%8D%E6%9D%82sql/" class="cy_cmt_count" data-xid="2022/04/27/数据库/sql/复杂sql/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%97%A5%E5%BF%97/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%97%A5%E5%BF%97/" class="cy_cmt_count" data-xid="2022/04/10/数据库/日志/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -732,14 +710,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>2.5k</span>
+              <span>4k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
+              <span>4 分钟</span>
             </span>
 
         </div>
@@ -751,189 +729,83 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <ol>
-<li><p>查询这个entity=PPmoney的前十的关键字</p>
+          <p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/cswiki/p/15816371.html">转载</a></p>
+<h2 id="binlog-持久化"><a href="#binlog-持久化" class="headerlink" title="binlog 持久化"></a>binlog 持久化</h2><p>这里引入了一个新的概念：binlog cache</p>
+<p>从名字就能看出来，binlog cache 其实就是一片内存区域，充当缓存的作用。</p>
+<p>每个线程都有自己 binlog cache 区域，<strong>在事务运行的过程中，MySQL 会先把日志写到 binlog cache 中，等到事务真正提交的时候，再统一把 binlog cache 中的数据写到 binlog 文件中</strong>。（binlog cache 有很多个，binlog 文件只有一个！）</p>
+<p>事实上，这个从 binlog cache 写到 binlog 文件中的操作，并<strong>不</strong>就是落盘操作了，这里仅仅是把 binlog 写到了文件系统的 page cache 上（这一步对应下图中的 <code>write</code> 操作）。</p>
 <blockquote>
-<p>sort + limit </p>
+<p>简单解释下文件系统的 page cache：</p>
+<p>CPU 如果要访问外部磁盘上的文件，需要首先将这些文件的内容拷贝到内存中，由于硬件的限制，从磁盘到内存的数据传输速度是很慢的，如果现在物理内存有空余，干嘛不用这些空闲内存来缓存一些磁盘的文件内容呢，<strong>这部分用作缓存磁盘文件的内存就叫做 page cache</strong>。</p>
+<p>很多同学看到这里可能觉得特别特别熟悉，是的，和 CPU 里的高速缓存是不是很像？两者其实都是利用的局部性原理，只不过<strong>高速缓存是 CPU 缓存内存的数据，而 page cache 是内存缓存磁盘的数据</strong>，这也体现了操作系统内存层次结构分级的思想。</p>
 </blockquote>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">count</span>(<span class="operator">*</span>) b, keyword <span class="keyword">FROM</span> article_kw <span class="keyword">where</span> article_id <span class="keyword">in</span>  (<span class="keyword">SELECT</span> article_id <span class="keyword">FROM</span> article_entity <span class="keyword">where</span> entity<span class="operator">=</span><span class="string">&#x27;PPmoney&#x27;</span> ) <span class="keyword">GROUP</span> <span class="keyword">BY</span> keyword <span class="keyword">ORDER</span> <span class="keyword">BY</span> b <span class="keyword">desc</span> LIMIT <span class="number">10</span>; </span><br></pre></td></tr></table></figure></li>
-<li><p>再选出上面的名字</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> keyword <span class="keyword">FROM</span>(<span class="keyword">SELECT</span> <span class="built_in">count</span>(<span class="operator">*</span>) b, keyword <span class="keyword">FROM</span> article_kw <span class="keyword">where</span> article_id <span class="keyword">in</span>  (<span class="keyword">SELECT</span> article_id <span class="keyword">FROM</span> article_entity <span class="keyword">where</span> entity<span class="operator">=</span><span class="string">&#x27;PPmoney&#x27;</span> ) <span class="keyword">GROUP</span> <span class="keyword">BY</span> keyword <span class="keyword">ORDER</span> <span class="keyword">BY</span> b <span class="keyword">desc</span> LIMIT <span class="number">10</span>) c; </span><br></pre></td></tr></table></figure></li>
-</ol>
-<h2 id="一、统计"><a href="#一、统计" class="headerlink" title="一、统计"></a>一、统计</h2><ol>
-<li><p>按月统计</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> DATE_FORMAT(<span class="type">date</span>,<span class="string">&#x27;%Y-%m&#x27;</span>) <span class="keyword">as</span> <span class="keyword">month</span>,<span class="built_in">sum</span>(money) <span class="keyword">as</span> money</span><br><span class="line"><span class="keyword">from</span> finance</span><br><span class="line"><span class="keyword">where</span> DATE_FORMAT(<span class="type">date</span>,<span class="string">&#x27;%Y&#x27;</span>)<span class="operator">=</span><span class="number">2010</span> <span class="keyword">group</span> <span class="keyword">by</span> <span class="keyword">month</span></span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span> <span class="keyword">month</span></span><br></pre></td></tr></table></figure></li>
-<li><p>按周统计</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> DATE_FORMAT(<span class="type">date</span>,<span class="string">&#x27;%x年-第%v周&#x27;</span>) <span class="keyword">as</span> week,<span class="built_in">sum</span>(money) <span class="keyword">as</span> money <span class="keyword">from</span> finance_base <span class="keyword">where</span> DATE_FORMAT(<span class="type">date</span>,<span class="string">&#x27;%Y&#x27;</span>)<span class="operator">=</span><span class="number">2010</span> <span class="keyword">group</span> <span class="keyword">by</span> week</span><br></pre></td></tr></table></figure></li>
-<li><!-- 按日查询 -->  
-<p>SELECT DATE_FORMAT(created_date,’%Y-%m-%d’) as time,sum(money) money FROM o_finance_detail where org_id = 1000  GROUP BY  time  </p>
-<!-- 按月查询 -->  
-<p>SELECT DATE_FORMAT(created_date,’%Y-%m’) as time,sum(money)  money FROM o_finance_detail where org_id = 1000  GROUP BY  time  </p>
-<!-- 按年查询 -->  
-<p>SELECT DATE_FORMAT(created_date,’%Y’) as time,sum(money)  money FROM o_finance_detail where org_id = 1000  GROUP BY  time   </p>
-<!-- 按周查询 -->  
-<p>SELECT DATE_FORMAT(created_date,’%Y-%u’) as time,sum(money)  money FROM o_finance_detail where org_id = 1000  GROUP BY  time</p>
-</li>
-</ol>
-<h2 id="二、重复数据"><a href="#二、重复数据" class="headerlink" title="二、重复数据"></a>二、重复数据</h2><h3 id="2-1-统计重复数据"><a href="#2-1-统计重复数据" class="headerlink" title="2.1 统计重复数据"></a>2.1 统计重复数据</h3><p>以下我们将统计表中 first_name 和 last_name的重复记录数：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mysql<span class="operator">&gt;</span> <span class="keyword">SELECT</span> <span class="built_in">COUNT</span>(<span class="operator">*</span>) <span class="keyword">as</span> repetitions, last_name, first_name</span><br><span class="line">    <span class="operator">-</span><span class="operator">&gt;</span> <span class="keyword">FROM</span> person_tbl</span><br><span class="line">    <span class="operator">-</span><span class="operator">&gt;</span> <span class="keyword">GROUP</span> <span class="keyword">BY</span> last_name, first_name</span><br><span class="line">    <span class="operator">-</span><span class="operator">&gt;</span> <span class="keyword">HAVING</span> repetitions <span class="operator">&gt;</span> <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+<p>所以，最后需要把 page cache 中的数据同步到磁盘上，才算真正完成了 binlog 的持久化（这一步对应下图中的 <code>fsync</code> 操作）。一般情况下，我们认为 <code>fsync</code> 才占磁盘的 IOPS (Input/Output Operations Per Second)</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220410143626228.png" alt="image-20220410143626228"></p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">write 和 fsync 的时机，是由参数 sync_binlog 控制的：</span><br><span class="line"></span><br><span class="line">sync_binlog = <span class="number">0</span>，每次提交事务的时候，只进行 write，不进行 fsync</span><br><span class="line">sync_binlog = <span class="number">1</span>候，每次提交事务的时候，执行 write 和 fsync</span><br><span class="line">sync_binlog = N(N&gt;<span class="number">1</span>)，每次提交事务的时候，执行 write，累积 N 个事务后再执行 fsync</span><br><span class="line">可以看出来，如果业务场景涉及到的 IO 操作很多的话，可以适当增大 sync_binlog 的值，提高性能。但是也存在一定的风险，比如你设置成 <span class="number">100</span>，万一在第 <span class="number">80</span> 个事务提交的时候数据库宕机了，那这些事务的 binlog 日志由于没有执行 fsync，也就丢失了。</span><br></pre></td></tr></table></figure>
 
-<h3 id="2-2-去重"><a href="#2-2-去重" class="headerlink" title="2.2 去重"></a>2.2 去重</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 去重保留最小的</span></span><br><span class="line"><span class="comment">-- 步骤</span></span><br><span class="line"><span class="comment">-- 前提：选出每个id最大的value</span></span><br><span class="line"><span class="comment">-- 选出count&gt;1 and not in (最大的value&amp;&amp;count&gt;1)</span></span><br><span class="line"><span class="keyword">DELETE</span></span><br><span class="line"><span class="keyword">FROM</span> testdelete</span><br><span class="line"><span class="keyword">WHERE</span> <span class="keyword">ONE</span> <span class="keyword">IN</span>(<span class="keyword">SELECT</span></span><br><span class="line">               <span class="keyword">ONE</span></span><br><span class="line">             <span class="keyword">FROM</span> (<span class="keyword">SELECT</span></span><br><span class="line">                     <span class="keyword">ONE</span></span><br><span class="line">                   <span class="keyword">FROM</span> testdelete</span><br><span class="line">                   <span class="keyword">GROUP</span> <span class="keyword">BY</span> <span class="keyword">ONE</span></span><br><span class="line">                   <span class="keyword">HAVING</span> <span class="built_in">COUNT</span>(<span class="keyword">ONE</span>) <span class="operator">&gt;</span> <span class="number">1</span>) a)</span><br><span class="line">    <span class="keyword">AND</span> id <span class="keyword">NOT</span> <span class="keyword">IN</span>(<span class="keyword">SELECT</span></span><br><span class="line">                    <span class="operator">*</span></span><br><span class="line">                  <span class="keyword">FROM</span> (<span class="keyword">SELECT</span></span><br><span class="line">                          <span class="built_in">MIN</span>(id)</span><br><span class="line">                        <span class="keyword">FROM</span> testdelete</span><br><span class="line">                        <span class="keyword">GROUP</span> <span class="keyword">BY</span> <span class="keyword">ONE</span></span><br><span class="line">                        <span class="keyword">HAVING</span> <span class="built_in">COUNT</span>(<span class="keyword">ONE</span>) <span class="operator">&gt;</span> <span class="number">1</span>) b)</span><br></pre></td></tr></table></figure>
+<h2 id="redolog-持久化"><a href="#redolog-持久化" class="headerlink" title="redolog 持久化"></a>redolog 持久化</h2><p>类比 binlog，在事务执行过程中，binlog 都是存在 binlog cache 中，redolog 也有这样一块内存区域，叫作 <strong>redolog buffer</strong>。</p>
+<p><strong>在事务运行的过程中，MySQL 会先把日志写到 redolog buffer 中，等到事务真正提交的时候，再统一把 redolog buffer 中的数据写到 redolog 文件中</strong>。和 binlog 的落盘操作一样，这个从 redolog buffer 写到 redolog 文件中的操作，并<strong>不</strong>就是落盘操作了，这里仅仅是把 redolog 写到了文件系统的 page cache 上，最后还需要执行 <code>fsync</code> 才能够实现真正的落盘。</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220410143800256.png" alt="image-20220410143800256"></p>
+<p>解释下 redo log buffer？</p>
+<p>在一个事务的更新过程中，日志是要写多次的。比如下面这个事务：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">begin</span>;</span><br><span class="line">	<span class="keyword">insert</span> <span class="keyword">into</span> table1 ...</span><br><span class="line">	<span class="keyword">insert</span> <span class="keyword">into</span> table2 ...</span><br><span class="line"><span class="keyword">commit</span>;</span><br></pre></td></tr></table></figure>
 
-<h4 id="方式2-新建表"><a href="#方式2-新建表" class="headerlink" title="方式2 新建表"></a>方式2 新建表</h4><blockquote>
-<p>主要用于实时删除</p>
-</blockquote>
+<p>这个事务要往两个表 table1 和 table2 中插入记录，为了确保这个事务不被拆开，一次性的完整写入日志文件中，在插入数据的过程中，我们需要把生成的日志都先保存起来。redolog buffer 就是这么一个用来先存 redo 日志的地方。</p>
+<p>也就是说，在执行第一条 insert 语句的时候，redolog buffer 也就写入了这条记录的日志。</p>
+<p>不同于 binlog cache 每个线程都有一个，<strong>redolog buffer 只有那么一个</strong>。</p>
+<p>事实上，日志写到 redolog buffer 是很快的，wirte 到 page cache 也差不多，但是 fsync 持久化到磁盘的速度就慢多了，为了控制 redo log 的写入策略，InnoDB 提供了 <code>innodb_flush_log_at_trx_commit</code> 参数，它有三种可能取值：</p>
+<ul>
+<li><code>innodb_flush_log_at_trx_commit = 0</code>，每次事务提交的时候，都只是把 redolog 留在 redolog buffer 中</li>
+<li><code>innodb_flush_log_at_trx_commit = 1</code>，每次事务提交的时候，都执行 fsync 将 redolog 直接持久化到磁盘</li>
+<li><code>innodb_flush_log_at_trx_commit = 2</code>，每次事务提交的时候，都只执行 write 将 redolog 写到文件系统的 page cache 中</li>
+</ul>
+<p>说了这么多，各位小伙伴们对 binlog 和 redolog 的持久化机制想必都有所了解了，我们来看文题：<strong>事务还没提交的时候，redolog 能不能被持久化到磁盘呢</strong>？</p>
+<p>先说答案，答案就是<strong>有可能</strong>。</p>
+<p>分析下 redolog 可能存在的三种状态（binlog 也差不多）：</p>
+<ul>
+<li>事务执行过程中，存在 MySQL 的进程内存中的 redolog buffer 中</li>
+<li>事务提交，执行 write 操作存在文件系统的 page cache 中，但是没有执行 fsync 操作持久化到磁盘</li>
+<li>事务提交，执行 fsync 操作持久化到磁盘</li>
+</ul>
+<p>至于为什么说事务还没提交的时候，redolog 也有可能被持久化到磁盘呢？</p>
+<p>InnoDB 有一个后台线程，每隔 1 秒轮询一次，具体的操作是这样的：</p>
 <ol>
-<li><p>新建一个表进行迁移</p>
+<li>调用 write 将 redolog buffer 中的日志写到文件系统的 page cache，</li>
+<li>然后调用 fsync 持久化到磁盘。而在事务执行中间过程的 redolog 都是直接写在 redolog buffer 中的，也就是说，一个没有提交的事务的 redolog，也是有可能会被后台线程一起持久化到磁盘的。</li>
+</ol>
+<p>另外，除了后台线程每秒一次的轮询操作外，还有两种场景会让一个没有提交的事务的 redolog 写盘：</p>
+<ol>
+<li><p>innodb_flush_log_at_trx_commit 设置是 1，这样并行的某个事务提交的时候，就会顺带将这个事务的 redolog buffer 持久化到磁盘</p>
+<p>举个例子，假设事务 A 执行到一半，已经写了一些 redolog 到 redolog buffer 中，这时候有另外一个事务 B 提交，按照 innodb_flush_log_at_trx_commit = 1 的逻辑，事务 B 要把 redolog buffer 里的日志全部持久化到磁盘，这时候，就会带上事务 A 在 redolog buffer 里的日志一起持久化到磁盘</p>
 </li>
-<li><p>代码解决</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> <span class="keyword">delete</span>  <span class="keyword">from</span> student <span class="keyword">where</span> id <span class="keyword">not</span> <span class="keyword">in</span> (selete id,<span class="built_in">max</span>(age) <span class="keyword">from</span> student <span class="keyword">group</span> <span class="keyword">by</span> (name) <span class="keyword">as</span> a)</span><br><span class="line"></span><br><span class="line"><span class="number">2.</span> <span class="keyword">DELETE</span> <span class="keyword">from</span> el_paper <span class="keyword">where</span> id <span class="keyword">not</span> <span class="keyword">in</span> (<span class="keyword">SELECT</span> id <span class="keyword">from</span> (<span class="keyword">SELECT</span> id,user_score <span class="keyword">FROM</span> el_paper <span class="keyword">GROUP</span> <span class="keyword">BY</span>(user_id)) <span class="keyword">as</span> a )</span><br></pre></td></tr></table></figure></li>
-<li><p>实时删除：先找到重复的数据，复制到新表，对新表逻辑去重，然后根据新表的is_delete字段删除旧表重复数据</p>
+<li><p>redo log buffer 占用的空间达到 redolo buffer 大小（由参数 <code>innodb_log_buffer_size</code> 控制，默认是 8MB）一半的时候，后台线程会主动写盘。不过由于这个事务并没有提交，所以这个写盘动作只是 write 到了文件系统的 page cache，仍然是在内存中，并没有调用 fsync 真正落盘</p>
 </li>
 </ol>
-<h4 id="方式3-建立主键"><a href="#方式3-建立主键" class="headerlink" title="方式3 建立主键"></a>方式3 建立主键</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> IGNORE <span class="keyword">TABLE</span> person_tbl <span class="keyword">ADD</span> <span class="keyword">PRIMARY</span> KEY (last_name, first_name);</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="三、聚合"><a href="#三、聚合" class="headerlink" title="三、聚合"></a>三、聚合</h2><h3 id="group-by"><a href="#group-by" class="headerlink" title="group by"></a>group by</h3><ol>
-<li><p>聚集user，exam选出用户每场考试的最高分和其他详细信息。</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> user_id,exam_id,depart_id,title,<span class="built_in">max</span>(qualify_score) <span class="keyword">from</span> el_paper <span class="keyword">group</span> <span class="keyword">by</span> user_id,exam_id;</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h2 id="四、子查询"><a href="#四、子查询" class="headerlink" title="四、子查询"></a>四、子查询</h2><h3 id="select-后面"><a href="#select-后面" class="headerlink" title="select 后面"></a>select 后面</h3><ol>
-<li><p>带外表的聚合数据， a.name,a.age, b. count(a.name)</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">a.dept_name,(<span class="keyword">SELECT</span> <span class="built_in">count</span>(<span class="operator">*</span>) <span class="keyword">FROM</span> dept_emp b <span class="keyword">WHERE</span> b.dept_no <span class="operator">=</span> a.dept_no) <span class="keyword">AS</span> 员工个数</span><br><span class="line"><span class="keyword">FROM</span> departments a;</span><br></pre></td></tr></table></figure></li>
-<li><p>普通的 类似于连接</p>
+<hr>
+<p>最后放上这道题的背诵版：</p>
 <blockquote>
-<p>测试结果没有连接快</p>
-</blockquote>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> a.<span class="operator">*</span> ,(<span class="keyword">SELECT</span> b.dept_name <span class="keyword">from</span> departments b <span class="keyword">where</span> a.dept_no<span class="operator">=</span>b.dept_no) name <span class="keyword">FROM</span> dept_emp a LIMIT <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--  测试二</span></span><br><span class="line"><span class="comment">-- 大表 left join 小表   时间 0.6s </span></span><br><span class="line"><span class="keyword">SELECT</span> a.<span class="operator">*</span>,b.dept_name <span class="keyword">FROM</span> dept_emp a   <span class="keyword">LEFT</span> <span class="keyword">JOIN</span> departments  b <span class="keyword">on</span> a.dept_no<span class="operator">=</span>b.dept_no;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 大表 right join 小表   时间 0.7s </span></span><br><span class="line"><span class="keyword">SELECT</span> a.<span class="operator">*</span>,b.dept_name <span class="keyword">FROM</span> dept_emp a   R <span class="keyword">JOIN</span> departments  b <span class="keyword">on</span> a.dept_no<span class="operator">=</span>b.dept_no;</span><br></pre></td></tr></table></figure></li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/27/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/sql%E5%87%BD%E6%95%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/04/27/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/sql%E5%87%BD%E6%95%B0/" class="post-title-link" itemprop="url">sql函数</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-04-27 03:09:54" itemprop="dateCreated datePublished" datetime="2022-04-27T03:09:54+08:00">2022-04-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-04-10 17:50:57" itemprop="dateModified" datetime="2022-04-10T17:50:57+08:00">2022-04-10</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/sql%E8%AF%AD%E5%8F%A5/" itemprop="url" rel="index"><span itemprop="name">sql语句</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/04/27/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/sql%E5%87%BD%E6%95%B0/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/27/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/sql%E5%87%BD%E6%95%B0/" class="cy_cmt_count" data-xid="2022/04/27/数据库/sql/sql函数/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.7k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <ol>
-<li><p>replace</p>
+<p>🥸 <strong>面试官</strong>：</p>
+<ul>
+<li>问题：事务还没提交的时候，redo log 能不能被持久化到磁盘呢？</li>
+<li>相关问题：MySQL 是如何保证数据不丢失的呢？</li>
+</ul>
+<p>😎 <strong>小牛肉</strong>：事务还没有提交的时候，redo log 是有可能被持久化到磁盘的。</p>
+<p>redolog 的具体落盘操作是这样的：在事务运行的过程中，MySQL 会先把日志写到 redolog buffer 中，等到事务真正提交的时候，再统一把 redolog buffer 中的数据写到 redolog 文件中。不过这个从 redolog buffer 写到 redolog 文件中的操作也就是 write 并不就是落盘操作了，这里仅仅是把 redolog 写到了文件系统的 page cache 上，最后还需要执行 fsync 才能够实现真正的落盘。</p>
+<p>也就是说，redolog 其实存在三种状态：</p>
+<ul>
+<li>事务执行过程中，存在 MySQL 的进程内存中的 redolog buffer 中</li>
+<li>事务提交，执行 write 操作存在文件系统的 page cache 中，但是没有执行 fsync 操作持久化到磁盘</li>
+<li>事务提交，执行 fsync 操作持久化到磁盘</li>
+</ul>
+<p>额为什么说事务还没提交的时候，redolog 也有可能被持久化到磁盘呢？</p>
+<p>主要有三种可能的原因：</p>
 <ol>
-<li><p>查询替换  select *,replace(address,’区’,’呕’)  from test_tb</p>
-</li>
-<li><p>更新替换  update set address=replace(address,’区’,’呕’) from test_tb</p>
-</li>
-<li><p>插入替换 (类似于saveOrUpdate)  replace into test_tb VALUES(6,’wokou’,’新九州岛’,’日本’)</p>
-<p>向表中“替换插入”一条数据，如果原表中没有id=6这条数据就作为新数据插入(相当于insert into作用)；如果原表中有id=6这条数据就做替换(相当于update作用)。对于没有指定的字段以默认值插入。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/04/27/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/sql%E5%87%BD%E6%95%B0/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
+<li>第一种情况：InnoDB 有一个后台线程，每隔 1 秒轮询一次，具体的操作是这样的：调用 write 将 redolog buffer 中的日志写到文件系统的 page cache，然后调用 fsync 持久化到磁盘。而在事务执行中间过程的 redolog 都是直接写在 redolog buffer 中的，也就是说，一个没有提交的事务的 redolog，也是有可能会被后台线程一起持久化到磁盘的。</li>
+<li>第二种情况：innodb_flush_log_at_trx_commit 设置是 1，这个参数的意思就是，每次事务提交的时候，都执行 fsync 将 redolog 直接持久化到磁盘（还有 0 和 2 的选择，0 表示每次事务提交的时候，都只是把 redolog 留在 redolog buffer 中；2 表示每次事务提交的时候，都只执行 write 将 redolog 写到文件系统的 page cache 中）。举个例子，假设事务 A 执行到一半，已经写了一些 redolog 到 redolog buffer 中，这时候有另外一个事务 B 提交，按照 innodb_flush_log_at_trx_commit = 1 的逻辑，事务 B 要把 redolog buffer 里的日志全部持久化到磁盘，这时候，就会带上事务 A 在 redolog buffer 里的日志一起持久化到磁盘</li>
+<li>第二种情况：redo log buffer 占用的空间达到 redolog buffer 大小（由参数 <code>innodb_log_buffer_size</code> 控制，默认是 8MB）一半的时候，后台线程会主动写盘。不过由于这个事务并没有提交，所以这个写盘动作只是 write 到了文件系统的 page cache，仍然是在内存中，并没有调用 fsync 真正落盘</li>
+</ol>
+</blockquote>
+
       
     </div>
 
@@ -952,7 +824,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/27/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DML/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/mysql%E4%B8%80%E6%9D%A1%E8%AF%AD%E5%8F%A5/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -966,7 +838,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/04/27/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DML/" class="post-title-link" itemprop="url">DML数据库，操纵语言</a>
+            <a href="/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/mysql%E4%B8%80%E6%9D%A1%E8%AF%AD%E5%8F%A5/" class="post-title-link" itemprop="url">mysql分析</a>
         </h2>
 
         <div class="post-meta">
@@ -976,27 +848,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-04-27 03:09:54" itemprop="dateCreated datePublished" datetime="2022-04-27T03:09:54+08:00">2022-04-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-04-08 03:20:27" itemprop="dateModified" datetime="2022-04-08T03:20:27+08:00">2022-04-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/sql%E8%AF%AD%E5%8F%A5/" itemprop="url" rel="index"><span itemprop="name">sql语句</span></a>
-                </span>
+              <time title="创建时间：2022-04-10 14:35:22" itemprop="dateCreated datePublished" datetime="2022-04-10T14:35:22+08:00">2022-04-10</time>
             </span>
 
           
@@ -1009,8 +861,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/04/27/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DML/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/27/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DML/" class="cy_cmt_count" data-xid="2022/04/27/数据库/sql/DML/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/mysql%E4%B8%80%E6%9D%A1%E8%AF%AD%E5%8F%A5/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/mysql%E4%B8%80%E6%9D%A1%E8%AF%AD%E5%8F%A5/" class="cy_cmt_count" data-xid="2022/04/10/数据库/nosql/mysql一条语句/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -1021,7 +873,138 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>2.1k</span>
+              <span>1.3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="Buffer-pool"><a href="#Buffer-pool" class="headerlink" title="Buffer pool"></a>Buffer pool</h3><p>第一次在查询的时候会将查询的结果存到  Buffer Pool 中，这样后面再有请求的时候就会先从缓冲池中去查询，如果没有再去磁盘中查找，然后在放到  Buffer Pool 中</p>
+<h3 id="执行顺序"><a href="#执行顺序" class="headerlink" title="执行顺序"></a>执行顺序</h3><p>undo</p>
+<p>磁盘——–&gt;buffer Pool———&gt;在buffer中完成运算—&gt;结果写入到redo log buffer —-&gt;写入redo log —&gt;</p>
+<p>​      ——-&gt;将更新语句反句加载到undo</p>
+<ul>
+<li>准备更新一条 SQL 语句</li>
+<li>MySQL（innodb）会先去缓冲池（BufferPool）中去查找这条数据，没找到就会去磁盘中查找，如果查找到就会将这条数据加载到缓冲池（BufferPool）中</li>
+<li>在加载到 Buffer Pool 的同时，会将这条数据的原始记录保存到 undo 日志文件中</li>
+<li>innodb 会在 Buffer Pool 中执行更新操作</li>
+<li>更新后的数据会记录在 redo log buffer 中</li>
+<li>MySQL 提交事务的时候，会将 redo log buffer 中的数据写入到 redo 日志文件中 刷磁盘可以通过 innodb_flush_log_at_trx_commit 参数来设置<ul>
+<li>值为 0 表示不刷入磁盘</li>
+<li>值为 1 表示立即刷入磁盘</li>
+<li>值为 2 表示先刷到 os cache</li>
+</ul>
+</li>
+<li>myslq 重启的时候会将 redo 日志恢复到缓冲池中</li>
+</ul>
+<h4 id="当前读"><a href="#当前读" class="headerlink" title="当前读"></a>当前读</h4><blockquote>
+<p>当前读, 读取的是最新版本, 并且<strong>对读取的记录加锁, 阻塞其他事务同时改动相同</strong>记录，避免出现安全问题</p>
+</blockquote>
+<p>当前读的实现方式：next-key锁(行记录锁+Gap间隙锁)</p>
+<ol>
+<li>对主键或唯一索引，如果当前读时，where条件全部精确命中(=或者in)，这种场景本身就不会出现幻读，所以只会加行记录锁。</li>
+<li>没有索引的列，当前读操作时，会加全表gap锁，生产环境要注意。</li>
+<li>非唯一索引列，如果where条件部分命中(&gt;、&lt;、like等)或者全未命中，则会加附近Gap间隙锁。例如，某表数据如下，非唯一索引2,6,9,9,11,15。如下语句要操作非唯一索引列9的数据，gap锁将会锁定的列是(6,11]，该区间内无法插入数据。</li>
+</ol>
+<h4 id="快照读"><a href="#快照读" class="headerlink" title="快照读"></a>快照读</h4><blockquote>
+<p>readView  [未提交事务数组]、max_id</p>
+<p>执行DML才会给事务id</p>
+</blockquote>
+<blockquote>
+<p>版本链上适合自己的一个版本快照</p>
+<p>通过 </p>
+<p>生成时机：begin<strong>之后第一条</strong>语句</p>
+<p>作用范围：库的所有表，每个表都对应一个版本链，</p>
+</blockquote>
+<p>只读事务不分配trx_id（会分配一个假trx_id），只有涉及到数据更新才会分配事务ID。</p>
+<ul>
+<li>在事务隔离级别为<code>RR</code>时，在第一次进行<code>select</code>查询时生成<code>read view</code>;</li>
+<li>在事务隔离级别为<code>RC</code>时，每一次<code>select</code>查询都会生成<code>read view</code>;</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/lmlzww/article/details/119087426?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-0.pc_relevant_default&amp;spm=1001.2101.3001.4242.1&amp;utm_relevant_index=2">https://blog.csdn.net/lmlzww/article/details/119087426?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-0.pc_relevant_default&amp;spm=1001.2101.3001.4242.1&amp;utm_relevant_index=2</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_44823898/article/details/115718622">https://blog.csdn.net/qq_44823898/article/details/115718622</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/10/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/%E5%9F%BA%E4%BA%8E%E6%8B%A6%E6%88%AA%E5%99%A8%E7%9A%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/04/10/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/%E5%9F%BA%E4%BA%8E%E6%8B%A6%E6%88%AA%E5%99%A8%E7%9A%84/" class="post-title-link" itemprop="url">基于拦截器的</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-04-10 14:06:31" itemprop="dateCreated datePublished" datetime="2022-04-10T14:06:31+08:00">2022-04-10</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/04/10/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/%E5%9F%BA%E4%BA%8E%E6%8B%A6%E6%88%AA%E5%99%A8%E7%9A%84/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/10/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/%E5%9F%BA%E4%BA%8E%E6%8B%A6%E6%88%AA%E5%99%A8%E7%9A%84/" class="cy_cmt_count" data-xid="2022/04/10/组件/登录/基于拦截器的/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.3k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -1040,25 +1023,13 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>[toc]</p>
-<h3 id="一、Select"><a href="#一、Select" class="headerlink" title="一、Select"></a>一、Select</h3><h4 id="1-1-where-like-and-or-between-in"><a href="#1-1-where-like-and-or-between-in" class="headerlink" title="1.1 where  like  and  or  between  in"></a>1.1 where  like  and  or  between  in</h4><ol>
-<li><p>select * from name where  age &lt;&gt; 18; 查询年龄不等于18的人</p>
-</li>
-<li><p>select * from name where age&gt;18 and sex=’男’ </p>
-</li>
-<li><p>update name set age =18 where not id =10;  按条件修改</p>
-</li>
-<li><p>select * from name where age between 4 and 10; 查询4-10岁  前闭后开</p>
-</li>
-<li><p>select * from name where age in (3,4,10)  查询3，4，10 岁数据</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/04/27/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DML/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
+          <h4 id="配置类"><a href="#配置类" class="headerlink" title="配置类"></a>配置类</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MvcConfig</span> <span class="keyword">implements</span> <span class="title">WebMvcConfigurer</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Resource</span></span><br><span class="line">    <span class="keyword">private</span> StringRedisTemplate stringRedisTemplate;</span><br><span class="line">	<span class="comment">//注册拦截器</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addInterceptors</span><span class="params">(InterceptorRegistry registry)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 登录拦截器</span></span><br><span class="line">        registry.addInterceptor(<span class="keyword">new</span> LoginInterceptor())</span><br><span class="line">                .excludePathPatterns(</span><br><span class="line">                        <span class="string">&quot;/shop/**&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;/voucher/**&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;/shop-type/**&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;/upload/**&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;/blog/hot&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;/user/code&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;/user/login&quot;</span></span><br><span class="line">                ).order(<span class="number">1</span>);</span><br><span class="line">        <span class="comment">// token刷新的拦截器</span></span><br><span class="line">        registry.addInterceptor(<span class="keyword">new</span> RefreshTokenInterceptor(stringRedisTemplate)).addPathPatterns(<span class="string">&quot;/**&quot;</span>).order(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="自制拦截器"><a href="#自制拦截器" class="headerlink" title="自制拦截器"></a>自制拦截器</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//r</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LoginInterceptor</span> <span class="keyword">implements</span> <span class="title">HandlerInterceptor</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">preHandle</span><span class="params">(HttpServletRequest request, HttpServletResponse response, Object handler)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">// 1.判断是否需要拦截（ThreadLocal中是否有用户）</span></span><br><span class="line">        <span class="keyword">if</span> (UserHolder.getUser() == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">// 没有，需要拦截，设置状态码</span></span><br><span class="line">            response.setStatus(<span class="number">401</span>);</span><br><span class="line">            <span class="comment">// 拦截</span></span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 有用户，则放行</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//①根据token保存User到ThreadLocal</span></span><br><span class="line"><span class="comment">//②刷新token时间  </span></span><br><span class="line"><span class="keyword">import</span> <span class="keyword">static</span> com.hmdp.utils.RedisConstants.LOGIN_USER_KEY;</span><br><span class="line"><span class="keyword">import</span> <span class="keyword">static</span> com.hmdp.utils.RedisConstants.LOGIN_USER_TTL;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RefreshTokenInterceptor</span> <span class="keyword">implements</span> <span class="title">HandlerInterceptor</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> StringRedisTemplate stringRedisTemplate;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">RefreshTokenInterceptor</span><span class="params">(StringRedisTemplate stringRedisTemplate)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.stringRedisTemplate = stringRedisTemplate;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">preHandle</span><span class="params">(HttpServletRequest request, HttpServletResponse response, Object handler)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">// 1.获取请求头中的token</span></span><br><span class="line">        String token = request.getHeader(<span class="string">&quot;authorization&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (StrUtil.isBlank(token)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 2.基于TOKEN获取redis中的用户</span></span><br><span class="line">        String key  = LOGIN_USER_KEY + token;</span><br><span class="line">        Map&lt;Object, Object&gt; userMap = stringRedisTemplate.opsForHash().entries(key);</span><br><span class="line">        <span class="comment">// 3.判断用户是否存在</span></span><br><span class="line">        <span class="keyword">if</span> (userMap.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 5.将查询到的hash数据转为UserDTO</span></span><br><span class="line">        UserDTO userDTO = BeanUtil.fillBeanWithMap(userMap, <span class="keyword">new</span> UserDTO(), <span class="keyword">false</span>);</span><br><span class="line">        <span class="comment">// 6.存在，保存用户信息到 ThreadLocal</span></span><br><span class="line">        UserHolder.saveUser(userDTO);</span><br><span class="line">        <span class="comment">// 7.刷新token有效期</span></span><br><span class="line">        stringRedisTemplate.expire(key, LOGIN_USER_TTL, TimeUnit.MINUTES);</span><br><span class="line">        <span class="comment">// 8.放行</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">afterCompletion</span><span class="params">(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">// 移除用户</span></span><br><span class="line">        UserHolder.removeUser();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
       
     </div>
 
