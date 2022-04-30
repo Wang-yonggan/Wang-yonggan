@@ -187,6 +187,568 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/02/21/spring/spring%E5%AE%B6%E6%97%8F/springMVC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/02/21/spring/spring%E5%AE%B6%E6%97%8F/springMVC/" class="post-title-link" itemprop="url">springMVC</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-02-21 22:17:02" itemprop="dateCreated datePublished" datetime="2022-02-21T22:17:02+08:00">2022-02-21</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/02/21/spring/spring%E5%AE%B6%E6%97%8F/springMVC/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/02/21/spring/spring%E5%AE%B6%E6%97%8F/springMVC/" class="cy_cmt_count" data-xid="2022/02/21/spring/spring家族/springMVC/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.6k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>[toc]</p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/bsjl/p/7723440.html">优秀文章</a></p>
+<h2 id="一、MVC的理解"><a href="#一、MVC的理解" class="headerlink" title="一、MVC的理解"></a>一、MVC的理解</h2><blockquote>
+<p>MVC包括MVC、MVP、MVVM</p>
+</blockquote>
+<h3 id="1-1-侠义MVC"><a href="#1-1-侠义MVC" class="headerlink" title="1.1 侠义MVC"></a>1.1 侠义MVC</h3><blockquote>
+<p>mvc是前后端不分离的model view controller 对应springmvc的</p>
+</blockquote>
+<h4 id="1-1-1-mvc含义"><a href="#1-1-1-mvc含义" class="headerlink" title="1.1.1 mvc含义"></a>1.1.1 mvc含义</h4><ol>
+<li>model=pojo    数据模型，核心</li>
+<li>view=jsp/html+modelAndView 渲染数据</li>
+<li>controller=controller，接收用户请求<ol>
+<li>前端控制器 dispatch</li>
+<li>后端控制器 controller</li>
+</ol>
+</li>
+</ol>
+<h4 id="1-1-2-ModelAndView"><a href="#1-1-2-ModelAndView" class="headerlink" title="1.1.2 ModelAndView"></a>1.1.2 ModelAndView</h4><ol>
+<li>model 响应数据（map结构）/ javaBean    <ol>
+<li>请求的最后阶段 框架会把数据加入到request作用域</li>
+</ol>
+</li>
+<li>view jsp地址<ol>
+<li>框架对视图执行forward重定向操作</li>
+</ol>
+</li>
+</ol>
+<h4 id="1-1-3-model-返回的数据"><a href="#1-1-3-model-返回的数据" class="headerlink" title="1.1.3 model  返回的数据"></a>1.1.3 model  返回的数据</h4><ol>
+<li>modelAndView.addObject(“name”,”王勇敢”);其实和request.serAttribute(“name”,”王勇敢”)</li>
+<li>四种数据<ol>
+<li>obj<ol>
+<li>json的转换   和    返回设置格式 context:json是固定重复代码</li>
+<li>除去重复代码：基于消息转换器.jackon<ol>
+<li>加入依赖  jackson-core  jackson-databind  注意版本</li>
+<li>加入注解驱动 注意是mvc的driven</li>
+<li>加@ResponseBody</li>
+</ol>
+</li>
+<li>返回json原理<ol>
+<li>注解驱动的接口httpMessageConverter定义很多obj转换方法，如xml,json,txt</li>
+<li>spring注入这个接口的是是实现类。</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>string(视图路径)</li>
+<li>string,int 数据</li>
+<li>void使用response.WriteStream响应（只有数据，没有视图）</li>
+</ol>
+</li>
+</ol>
+<h3 id="1-2-MVVM"><a href="#1-2-MVVM" class="headerlink" title="1.2 MVVM"></a>1.2 MVVM</h3><blockquote>
+<p>MVVM是流行的前后端分离model view modelAndView，这个更多的体现在前端</p>
+</blockquote>
+<ol>
+<li>model=controller+pojo</li>
+<li>view=html(model)</li>
+<li>modelAndView=model-view转换器</li>
+</ol>
+<h3 id="1-3-mvc优缺点"><a href="#1-3-mvc优缺点" class="headerlink" title="1.3 mvc优缺点"></a>1.3 mvc优缺点</h3><h4 id="1-3-1-优点"><a href="#1-3-1-优点" class="headerlink" title="1.3.1 优点"></a>1.3.1 优点</h4><ol>
+<li>耦合度低：表改了，只需修改model</li>
+<li>复用性高：model可以在不同的视图中使用</li>
+<li>可维护性高</li>
+<li>分层，结构清晰，开发快</li>
+</ol>
+<h4 id="1-3-2-缺点："><a href="#1-3-2-缺点：" class="headerlink" title="1.3.2 缺点："></a>1.3.2 缺点：</h4><ol>
+<li>适合大型项目，但是现在的小型项目也在使用这种模式，就有点得不偿失</li>
+<li>增加了系统的复杂性，降低了运行效率</li>
+</ol>
+<h2 id="二、SpringMVC"><a href="#二、SpringMVC" class="headerlink" title="二、SpringMVC"></a>二、SpringMVC</h2><h3 id="2-1-概念"><a href="#2-1-概念" class="headerlink" title="2.1 概念"></a>2.1 概念</h3><ol>
+<li><p>spring web mvc   spring&gt;3.0</p>
+</li>
+<li><p>支持restful</p>
+</li>
+<li><p>单例 每个servlet只有一个。所以说ssm是基于方法的，struts2是基于类的。</p>
+</li>
+<li><p>模块化，各个组件一次进行</p>
+<ol>
+<li>dispatch前端控制器</li>
+<li>controller后端配置器</li>
+<li>handler请求映射器</li>
+<li>handlerAdapter处理适配器</li>
+<li>ViewRelover视图解析器</li>
+<li>验证器viliader Jsr303</li>
+</ol>
+</li>
+<li><p>springmvc  spring、IOC是容器，ioc管理对象  </p>
+<ol>
+<li>&lt;bean&gt; @controller @respository @ mapper</li>
+<li>@controller是控制器对象  不是servlet</li>
+</ol>
+</li>
+</ol>
+<h3 id="2-2-dispatcherservlet"><a href="#2-2-dispatcherservlet" class="headerlink" title="2.2 dispatcherservlet"></a>2.2 dispatcherservlet</h3><ol>
+<li><p>springmvc 内置的<strong>超级servlet</strong> 用于接受所有请求 ，然后把请求分发给controller</p>
+</li>
+<li><p>dispatcherservlet别名</p>
+<ol>
+<li>超级servlet  继承自httpserlvet</li>
+<li>中央调度器</li>
+<li>前端控制器</li>
+</ol>
+</li>
+<li><p>dispatcherservlet作用</p>
+<ol>
+<li>接受所有请求 调用控制器对象</li>
+<li>把请求响应返还个用户</li>
+<li>核心方法 doDispatch(req,resp)</li>
+</ol>
+</li>
+</ol>
+<h3 id="2-3-mvc启动过程"><a href="#2-3-mvc启动过程" class="headerlink" title="2.3 mvc启动过程"></a>2.3 mvc启动过程</h3><ol>
+<li><p>tomcat启动  </p>
+</li>
+<li><p>创建dispatcher</p>
+</li>
+<li><p>执行servlet.inti() 创建sprig容器webapplicationContext</p>
+</li>
+<li><p>把spring容器放进serlevtContext</p>
+<p>getServletContext().setAttribute(name,webapplicationContext)</p>
+<p>这个servlet就是dispatcher</p>
+</li>
+<li><p>把对象注入spring容器</p>
+</li>
+</ol>
+<h2 id="三、创建springmvc项目"><a href="#三、创建springmvc项目" class="headerlink" title="三、创建springmvc项目"></a>三、创建springmvc项目</h2><ol>
+<li><p>创建</p>
+<ol>
+<li><p>maven -&gt;maven-archetype-webapp模板</p>
+</li>
+<li><p>加入依赖</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">groupId</span>&gt;</span>javax.servlet<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>javax.servlet-api<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-webmvc<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>wel.xml 全局serlvet配置</p>
+</li>
+<li><p>创建springmvc配置</p>
+</li>
+<li><p>创建控制器@Controller 加入@requetMapping</p>
+</li>
+<li><p>创建jsp</p>
+</li>
+</ol>
+</li>
+<li><p>idea配置</p>
+<ol>
+<li>项目结构–模块–删除部署描述  添加部署描述为web1.xml </li>
+<li>更改web1.xml 为web.xml</li>
+</ol>
+</li>
+<li><p>web.xml配置</p>
+<ol>
+<li>servlet<ol>
+<li>name </li>
+<li>url-partter</li>
+</ol>
+</li>
+<li>过滤器 ：处理请求乱码</li>
+</ol>
+</li>
+<li><p>st.xml配置</p>
+<ol>
+<li>控制器扫描器</li>
+<li>视图解析器</li>
+</ol>
+</li>
+<li><p>tomcat配置</p>
+</li>
+</ol>
+<h3 id="注入mybatis的-mapper"><a href="#注入mybatis的-mapper" class="headerlink" title="注入mybatis的@mapper"></a>注入mybatis的@mapper</h3><h3 id="访问html"><a href="#访问html" class="headerlink" title="访问html"></a>访问html</h3><p>servlet-01.xml</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">mvc:resources</span> <span class="attr">mapping</span>=<span class="string">&quot;/html/**&quot;</span> <span class="attr">location</span>=<span class="string">&quot;classpath:html/&quot;</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="四、其他"><a href="#四、其他" class="headerlink" title="四、其他"></a>四、其他</h2><ol>
+<li>@requestMapper{“a”,”b”} 访问两个路径都可以</li>
+<li>url-parrten 为接受所有请求 且表示优先级最高 一般用于过滤器</li>
+<li>访问资源<ol>
+<li>动态资源.html/jsp的路径tomcat</li>
+<li>静态资源  tomcat      因为tomcat内置一个dafaultServlet(在tomcat.conf)    启动的时候自动创建 ,<ol>
+<li>处理为映射到controller.Mapping的路径</li>
+<li>对所有的静态资源 </li>
+<li>当某个servlet的url-patter为/或者/* 那么这个servlet就会接手这个内置servlet的工作</li>
+</ol>
+</li>
+<li>url(controller)  有mvc内置的servlet    dispatchServlet处理</li>
+</ol>
+</li>
+</ol>
+<h2 id="五、SpringMVC问题"><a href="#五、SpringMVC问题" class="headerlink" title="五、SpringMVC问题"></a>五、SpringMVC问题</h2><ol>
+<li>静态资源访问失败<ol>
+<li>原因可能是servlet的partten接手了//资源，而静态资源默认是//路径</li>
+<li>处理：加配置</li>
+</ol>
+</li>
+</ol>
+<h3 id="springmvc处理请求流程"><a href="#springmvc处理请求流程" class="headerlink" title="springmvc处理请求流程"></a>springmvc处理请求流程</h3><ol>
+<li>tomcat–&gt;url-partter匹配—&gt;dispatcher—&gt;st.servlet—&gt;wyg.controller–&gt;TestController</li>
+</ol>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211019003549650.png" alt="image-20211019003549650"></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/02/21/%E7%BB%84%E4%BB%B6/ORM/mybatis/mybatis-%E5%8A%A8%E6%80%81sql/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/02/21/%E7%BB%84%E4%BB%B6/ORM/mybatis/mybatis-%E5%8A%A8%E6%80%81sql/" class="post-title-link" itemprop="url">mybatis之动态sql</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-02-21 12:55:14" itemprop="dateCreated datePublished" datetime="2022-02-21T12:55:14+08:00">2022-02-21</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%BB%84%E4%BB%B6/" itemprop="url" rel="index"><span itemprop="name">组件</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/02/21/%E7%BB%84%E4%BB%B6/ORM/mybatis/mybatis-%E5%8A%A8%E6%80%81sql/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/02/21/%E7%BB%84%E4%BB%B6/ORM/mybatis/mybatis-%E5%8A%A8%E6%80%81sql/" class="cy_cmt_count" data-xid="2022/02/21/组件/ORM/mybatis/mybatis-动态sql/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="mybatis之动态sql"><a href="#mybatis之动态sql" class="headerlink" title="mybatis之动态sql"></a>mybatis之动态sql</h1><p>动态sql是Mybatis增加mapper.xml的sql语句的灵活性而设计的。</p>
+<p>[toc]</p>
+<h3 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h3><ol>
+<li><p>date-string转换函数</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">update</span> <span class="attr">id</span>=<span class="string">&quot;updateInventory&quot;</span> <span class="attr">parameterType</span>=<span class="string">&quot;com.docc.model.Inventory&quot;</span>&gt;</span></span><br><span class="line">update BUS_INVENTORY</span><br><span class="line">set orgcode = #&#123;orgcode,jdbcType=VARCHAR&#125;,</span><br><span class="line">    reportdate = #&#123;reportdate,jdbcType=CHAR&#125;,</span><br><span class="line">    checkname = &#x27;$&#123;checkname&#125;&#x27;,</span><br><span class="line">    archivetime = to_date(#&#123;archivetime,jdbcType=DATE&#125;,&#x27;yyyy-mm-dd&#x27;)      </span><br><span class="line">where id = #&#123;id,jdbcType=DECIMAL&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">update</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="条件"><a href="#条件" class="headerlink" title="条件"></a>条件</h3><ol>
+<li><p>条件if</p>
+<p> 一定要注意多if于单if下where,and所在位置，但条件的话where就要在if里面，且不需要and，下面用trim解决</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;findActiveBlogWithTitleLike&quot;</span> <span class="attr">resultType</span>=<span class="string">&quot;Blog&quot;</span>&gt;</span></span><br><span class="line">  SELECT * FROM BLOG</span><br><span class="line">  WHERE state = ‘ACTIVE’</span><br><span class="line">  <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">&quot;title != null&quot;</span>&gt;</span></span><br><span class="line">    AND title like #&#123;title&#125;</span><br><span class="line">  <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>优先条件 choose-when-otherwise</p>
+<p>优先条件查询：繁杂的when&lt;—-&gt;繁杂的if-else</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;findActiveBlogLike&quot;</span> <span class="attr">resultType</span>=<span class="string">&quot;Blog&quot;</span>&gt;</span></span><br><span class="line">  SELECT * FROM BLOG WHERE state = ‘ACTIVE’</span><br><span class="line">  <span class="tag">&lt;<span class="name">choose</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">when</span> <span class="attr">test</span>=<span class="string">&quot;title != null&quot;</span>&gt;</span></span><br><span class="line">      AND title like #&#123;title&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">when</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">when</span> <span class="attr">test</span>=<span class="string">&quot;author != null and author.name != null&quot;</span>&gt;</span></span><br><span class="line">      AND author_name like #&#123;author.name&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">when</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">otherwise</span>&gt;</span></span><br><span class="line">      AND featured = 1</span><br><span class="line">    <span class="tag">&lt;/<span class="name">otherwise</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">choose</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>为null条件trim-where-set</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;findActiveBlogLike&quot;</span> <span class="attr">resultType</span>=<span class="string">&quot;Blog&quot;</span>&gt;</span></span><br><span class="line">  SELECT * FROM BLOG WHERE</span><br><span class="line">  <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">&quot;state != null&quot;</span>&gt;</span></span><br><span class="line">    state = #&#123;state&#125;</span><br><span class="line">  <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">&quot;title != null&quot;</span>&gt;</span></span><br><span class="line">    AND title like #&#123;title&#125;</span><br><span class="line">  <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">&quot;author != null and author.name != null&quot;</span>&gt;</span></span><br><span class="line">    AND author_name like #&#123;author.name&#125;</span><br><span class="line">  <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>集合遍历—foreach  (in)</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;selectPostIn&quot;</span> <span class="attr">resultType</span>=<span class="string">&quot;domain.blog.Post&quot;</span>&gt;</span></span><br><span class="line">  SELECT * FROM POST P</span><br><span class="line">  WHERE ID in</span><br><span class="line">  <span class="tag">&lt;<span class="name">foreach</span> <span class="attr">item</span>=<span class="string">&quot;item&quot;</span> <span class="attr">index</span>=<span class="string">&quot;index&quot;</span> <span class="attr">collection</span>=<span class="string">&quot;list&quot;</span></span></span><br><span class="line"><span class="tag">      <span class="attr">open</span>=<span class="string">&quot;(&quot;</span> <span class="attr">separator</span>=<span class="string">&quot;,&quot;</span> <span class="attr">close</span>=<span class="string">&quot;)&quot;</span>&gt;</span></span><br><span class="line">        #&#123;item&#125;</span><br><span class="line">  <span class="tag">&lt;/<span class="name">foreach</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li></li>
+</ol>
+<h3 id=""><a href="#" class="headerlink" title=""></a></h3><h3 id="传参"><a href="#传参" class="headerlink" title="传参"></a>传参</h3><h2 id="映射"><a href="#映射" class="headerlink" title="映射"></a>映射</h2><blockquote>
+<p>找到小明的学校信息</p>
+</blockquote>
+<h3 id="一对一"><a href="#一对一" class="headerlink" title="一对一"></a>一对一</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">resultMap</span> <span class="attr">type</span>=<span class="string">&quot;com.wyg.entity.Student&quot;</span> <span class="attr">id</span>=<span class="string">&quot;resMap&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">id</span> <span class="attr">property</span>=<span class="string">&quot;id&quot;</span> <span class="attr">column</span>=<span class="string">&quot;id&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">property</span>=<span class="string">&quot;name&quot;</span> <span class="attr">column</span>=<span class="string">&quot;name&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">association</span> <span class="attr">property</span>=<span class="string">&quot;school&quot;</span> <span class="attr">column</span>=<span class="string">&quot;id&quot;</span> </span></span><br><span class="line"><span class="tag">                 <span class="attr">select</span>=<span class="string">&quot;com.wyg.mapper.SchoolMapper.getSchoolById&quot;</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">resultMap</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>property：java类属性</p>
+<p>column：mysql字段</p>
+<p>association：联系</p>
+<p>select：get—sql方法</p>
+<h3 id="一对多"><a href="#一对多" class="headerlink" title="一对多"></a>一对多</h3><blockquote>
+<p>找到小明的老师们的信息</p>
+</blockquote>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">resultMap</span> <span class="attr">type</span>=<span class="string">&quot;com.wyg.entity.Student&quot;</span> <span class="attr">id</span>=<span class="string">&quot;resMap&quot;</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">id</span> <span class="attr">property</span>=<span class="string">&quot;id&quot;</span> <span class="attr">column</span>=<span class="string">&quot;id&quot;</span>/&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">result</span> <span class="attr">property</span>=<span class="string">&quot;name&quot;</span> <span class="attr">column</span>=<span class="string">&quot;name&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">collection</span> <span class="attr">property</span>=<span class="string">&quot;teachers&quot;</span> <span class="attr">javaType</span>=<span class="string">&quot;ArrayList&quot;</span> <span class="attr">column</span>=<span class="string">&quot;id&quot;</span></span></span><br><span class="line"><span class="tag">                <span class="attr">ofType</span>=<span class="string">&quot;com.wyg.entity.teacher&quot;</span></span></span><br><span class="line"><span class="tag">                <span class="attr">select</span>=<span class="string">&quot;com.wyg.mapper.TeacherMapper.getTeacherById&quot;</span></span></span><br><span class="line"><span class="tag">                <span class="attr">fetchType</span>=<span class="string">&quot;lazy&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">id</span> <span class="attr">property</span>=<span class="string">&quot;tId&quot;</span> <span class="attr">column</span>=<span class="string">&quot;t_id&quot;</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">property</span>=<span class="string">&quot;tName&quot;</span> <span class="attr">column</span>=<span class="string">&quot;t_name&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">collection</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">resultMap</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="多对多"><a href="#多对多" class="headerlink" title="多对多"></a>多对多</h3><h3 id="注入攻击"><a href="#注入攻击" class="headerlink" title="注入攻击"></a>注入攻击</h3>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/02/08/linux/linux--%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/02/08/linux/linux--%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/" class="post-title-link" itemprop="url">未命名</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-02-08 18:34:25" itemprop="dateCreated datePublished" datetime="2022-02-08T18:34:25+08:00">2022-02-08</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/02/08/linux/linux--%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/02/08/linux/linux--%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/" class="cy_cmt_count" data-xid="2022/02/08/linux/linux--定时任务/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <ol>
+<li><p>nohup(no hang up) 挂起运行  </p>
+</li>
+<li><p>crontab </p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">crontab</span> -e  <span class="comment">#进入当前用户b</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">*    *    *    *    *</span><br><span class="line">-    -    -    -    -</span><br><span class="line">|    |    |    |    |</span><br><span class="line">|    |    |    |    +----- 星期中星期几 (<span class="number">0</span> - <span class="number">6</span>) (星期天 为<span class="number">0</span>)</span><br><span class="line">|    |    |    +---------- 月份 (<span class="number">1</span> - <span class="number">12</span>) </span><br><span class="line">|    |    +--------------- 一个月中的第几天 (<span class="number">1</span> - <span class="number">31</span>)</span><br><span class="line">|    +-------------------- 小时 (<span class="number">0</span> - <span class="number">23</span>)</span><br><span class="line">+------------------------- 分钟 (<span class="number">0</span> - <span class="number">59</span>)</span><br></pre></td></tr></table></figure>
+
+<p>例如：</p>
+<ol>
+<li><p>每一分钟执行一次 /bin/ls：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">*</span> <span class="emphasis">* *</span> <span class="emphasis">* *</span> /bin/ls</span><br></pre></td></tr></table></figure></li>
+<li><p>在 12 月内, 每天的早上 6 点到 12 点，每隔 3 个小时 0 分钟执行一次 /usr/bin/backup：</p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">0 </span><span class="number">6</span>-<span class="number">12</span>/<span class="number">3</span> * <span class="number">12</span> * /<span class="keyword">usr</span>/bin/backup</span><br></pre></td></tr></table></figure></li>
+<li><p>周一到周五每天下午 5:00 寄一封信给 <a href="mailto:&#97;&#108;&#x65;&#120;&#x40;&#100;&#x6f;&#109;&#x61;&#x69;&#110;&#x2e;&#x6e;&#97;&#x6d;&#x65;">&#97;&#108;&#x65;&#120;&#x40;&#100;&#x6f;&#109;&#x61;&#x69;&#110;&#x2e;&#x6e;&#97;&#x6d;&#x65;</a>：</p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">0 </span><span class="number">17</span> * * <span class="number">1</span>-<span class="number">5</span> mail -s <span class="string">&quot;hi&quot;</span> alex@domain.<span class="keyword">name</span> &lt; /tmp/maildata</span><br></pre></td></tr></table></figure></li>
+<li><p>每月每天的午夜 0 点 20 分, 2 点 20 分, 4 点 20 分….执行 echo “haha”：</p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">20 </span><span class="number">0</span>-<span class="number">23</span>/<span class="number">2</span> * * * echo <span class="string">&quot;haha&quot;</span></span><br></pre></td></tr></table></figure></li>
+<li><pre><code>0 */2 * * * /sbin/service httpd restart  意思是每两个小时重启一次apache 
+
+50 7 * * * /sbin/service sshd start  意思是每天7：50开启ssh服务 
+
+50 22 * * * /sbin/service sshd stop  意思是每天22：50关闭ssh服务 
+
+0 0 1,15 * * fsck /home  每月1号和15号检查/home 磁盘 
+
+1 * * * * /home/bruce/backup  每小时的第一分执行 /home/bruce/backup这个文件 
+
+00 03 * * 1-5 find /home &quot;*.xxx&quot; -mtime +4 -exec rm &#123;&#125; \;  每周一至周五3点钟，在目录/home中，查找文件名为*.xxx的文件，并删除4天前的文件。
+
+30 6 */10 * * ls  意思是每月的1、11、21、31日是的6：30执行一次ls命令
+</code></pre>
+</li>
+<li><p>ping baidu.com -c  3 请求三次baidu </p>
+</li>
+<li><p>ssh-keygen -t rsa 生成rsa型密钥默认在 ~/.ssh中，有两个文件，一个私钥，一个pub公钥</p>
+</li>
+<li><p>yum 类似于Pip</p>
+</li>
+<li><p>定时同步时间：0 1 * * * /usr/sbin/ntpdate cn.pool.ntp.org</p>
+</li>
+<li><p>防火墙</p>
+<ol>
+<li>systemctl status firewalld.service  查看防火墙状态</li>
+<li>systemctl stop firewalld.service 关闭防护墙</li>
+<li>systemctl disable firewalld.service 开启</li>
+</ol>
+</li>
+<li></li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/01/23/%E5%BC%80%E5%8F%91/%E8%B7%A8%E5%9F%9F/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -420,395 +982,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/12/30/utils/python/matplotlib/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/12/30/utils/python/matplotlib/" class="post-title-link" itemprop="url">matplotlib基本用法</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-12-30 16:47:56" itemprop="dateCreated datePublished" datetime="2021-12-30T16:47:56+08:00">2021-12-30</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2021/12/30/utils/python/matplotlib/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2021/12/30/utils/python/matplotlib/" class="cy_cmt_count" data-xid="2021/12/30/utils/python/matplotlib/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.4k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="一、介绍"><a href="#一、介绍" class="headerlink" title="一、介绍"></a>一、介绍</h2><h3 id="1-1-简单使用"><a href="#1-1-简单使用" class="headerlink" title="1.1 简单使用"></a>1.1 简单使用</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line">x=[<span class="number">0</span>,<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>]</span><br><span class="line">y=[<span class="number">0</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">3</span>]</span><br><span class="line">plt.plot(x,y)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="二、API"><a href="#二、API" class="headerlink" title="二、API"></a>二、API</h2><h3 id="2-1-常见API"><a href="#2-1-常见API" class="headerlink" title="2.1 常见API"></a>2.1 常见API</h3><ol>
-<li><p>plt.plot 画图</p>
-</li>
-<li><p>plt.axis 修改坐标</p>
-</li>
-<li><p>plt.show 显示</p>
-</li>
-<li><p>plt.grid(True) 设置网格</p>
-</li>
-<li><p>添加说明：explain</p>
-<ol>
-<li><p>xy轴标注：plt.xlabel(“Money Earned”)  plt.ylabel(“Consume Level”)</p>
-</li>
-<li><p>标题：plt.title(“Figure.1”)</p>
-</li>
-<li><p>添加图内文字：plt.text(2,3,”text”)  ：在坐标(2,3)处显示”text”</p>
-</li>
-<li><p>添加箭头</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">plt.annotate(<span class="string">&#x27;箭头说明文字&#x27;</span>, xy=(<span class="number">20</span>, <span class="number">400</span>), xytext=(<span class="number">12.5</span>, <span class="number">400</span>),</span><br><span class="line">             arrowprops=<span class="built_in">dict</span>(facecolor=<span class="string">&#x27;black&#x27;</span>, shrink=<span class="number">0.05</span>),)</span><br></pre></td></tr></table></figure></li>
-</ol>
-</li>
-</ol>
-<h3 id="2-2-plt-plot"><a href="#2-2-plt-plot" class="headerlink" title="2.2 plt.plot()"></a>2.2 plt.plot()</h3><blockquote>
-<p>plt.plot(x, y, format_string, **kwargs) ,返回Line2D 对象</p>
-</blockquote>
-<h4 id="2-2-1-format-string"><a href="#2-2-1-format-string" class="headerlink" title="2.2.1 format_string"></a>2.2.1 format_string</h4><blockquote>
-<p>控制颜色字符、风格字符、标记字</p>
-</blockquote>
-<ul>
-<li>颜色：’b’ 蓝色</li>
-<li>字符风格：默认’-‘折线段</li>
-<li>节点标记：默认没有 可选.^</li>
-</ul>
-<h4 id="2-2-2-kwargs"><a href="#2-2-2-kwargs" class="headerlink" title="2.2.2 kwargs:"></a>2.2.2 kwargs:</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">color : 控制颜色, color=<span class="string">&#x27;green&#x27;</span></span><br><span class="line">linestyle : 线条风格, linestyle=<span class="string">&#x27;dashed&#x27;</span></span><br><span class="line">marker : 标记风格, marker=<span class="string">&#x27;o&#x27;</span></span><br><span class="line">markerfacecolor: 标记颜色, markerfacecolor=<span class="string">&#x27;blue&#x27;</span></span><br><span class="line">markersize: 标记尺寸, markersize=<span class="number">20</span></span><br></pre></td></tr></table></figure>
-
-<h4 id="2-2-3-plt-多线"><a href="#2-2-3-plt-多线" class="headerlink" title="2.2.3 plt.多线"></a>2.2.3 plt.多线</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">plt.plot(t1,<span class="string">&#x27;b--&#x27;</span>,t2,<span class="string">&#x27;r--&#x27;</span>)</span><br><span class="line"><span class="comment">#或</span></span><br><span class="line">x1=[<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>],y1=[<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>]</span><br><span class="line">x2=[<span class="number">2</span>,<span class="number">4</span>,<span class="number">6</span>,<span class="number">8</span>],y2=[<span class="number">4</span>,<span class="number">8</span>,<span class="number">12</span>,<span class="number">16</span>]</span><br><span class="line">plt.plot(x1,y1,<span class="string">&#x27;r-&#x27;</span>,x2,y2,<span class="string">&#x27;g--&#x27;</span>)</span><br></pre></td></tr></table></figure>
-
-<h4 id="2-2-4-函数表示y"><a href="#2-2-4-函数表示y" class="headerlink" title="2.2.4 函数表示y"></a>2.2.4 函数表示y</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">x = np.arange(<span class="number">0</span>, <span class="number">20</span>, <span class="number">0.01</span>)</span><br><span class="line">plt.plot(x, np.sin(x), <span class="string">&#x27;r-&#x27;</span>, x, np.cos(x), <span class="string">&#x27;b--&#x27;</span>)</span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="2-3-plt-axis"><a href="#2-3-plt-axis" class="headerlink" title="2.3 plt.axis"></a>2.3 plt.axis</h3><ol>
-<li><p>plt.axis([1, 2, 3, 4])</p>
-<p>设置x范围 1-2 y范围3-4</p>
-</li>
-<li><p>plt.axis(<code>option</code>=‘equal’) </p>
-<ol>
-<li>equal：x-y坐标等长</li>
-<li>off： 关闭</li>
-<li>auto：自动</li>
-<li>square：正方形</li>
-</ol>
-</li>
-</ol>
-<h3 id="2-4-plt-explain-说明文字参数"><a href="#2-4-plt-explain-说明文字参数" class="headerlink" title="2.4 plt.explain 说明文字参数"></a>2.4 plt.explain 说明文字参数</h3><ol>
-<li>color : 颜色</li>
-<li>size：大小</li>
-<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/xHibiki/article/details/84866887">其他</a>：字体系列，对其方式，行距，粗细，样式，字体名</li>
-</ol>
-<h3 id="2-5-plt-subplots-子图"><a href="#2-5-plt-subplots-子图" class="headerlink" title="2.5 plt.subplots 子图"></a>2.5 plt.subplots 子图</h3><blockquote>
-<p>返回一个包含figure和axes对象的元组</p>
-<p>figure: 拿到整张图</p>
-<p>ax： np.array[axe 对象]</p>
-</blockquote>
-<h4 id="subplots-和subplot-区别"><a href="#subplots-和subplot-区别" class="headerlink" title="subplots 和subplot 区别"></a>subplots 和subplot 区别</h4><ul>
-<li><p>subplots 一次性创建并返回所有的子图和其 axe 对象</p>
-</li>
-<li><p>subplot分开子图并拿到指定位置的子图plt.subplot(2, 1, 2) 分成2行1类并拿到第二个ax对象</p>
-</li>
-</ul>
-<h2 id="三、对象"><a href="#三、对象" class="headerlink" title="三、对象"></a>三、对象</h2><h3 id="3-2-AxesSubplot-子图对象"><a href="#3-2-AxesSubplot-子图对象" class="headerlink" title="3.2 AxesSubplot 子图对象"></a>3.2 AxesSubplot 子图对象</h3><h4 id="1-ax-plot"><a href="#1-ax-plot" class="headerlink" title="1 ax.plot()"></a>1 ax.plot()</h4><h4 id="2-ax-axis"><a href="#2-ax-axis" class="headerlink" title="2 ax.axis"></a>2 ax.axis</h4><h4 id="3-set-title"><a href="#3-set-title" class="headerlink" title="3 set_title"></a>3 set_title</h4><p>​    </p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/12/24/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JUtil/%E9%9B%86%E5%90%88/Arrays/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/12/24/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JUtil/%E9%9B%86%E5%90%88/Arrays/" class="post-title-link" itemprop="url">Arrays</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-12-24 12:44:45" itemprop="dateCreated datePublished" datetime="2021-12-24T12:44:45+08:00">2021-12-24</time>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2021/12/24/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JUtil/%E9%9B%86%E5%90%88/Arrays/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2021/12/24/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JUtil/%E9%9B%86%E5%90%88/Arrays/" class="cy_cmt_count" data-xid="2021/12/24/java/java源码解读/JUtil/集合/Arrays/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.8k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id=""><a href="#" class="headerlink" title=""></a></h2><h2 id="-1"><a href="#-1" class="headerlink" title=""></a></h2><h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><h3 id="内置对象ArrayList"><a href="#内置对象ArrayList" class="headerlink" title="内置对象ArrayList"></a>内置对象ArrayList</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ArrayList</span>&lt;<span class="title">E</span>&gt; <span class="keyword">extends</span> <span class="title">AbstractList</span>&lt;<span class="title">E</span>&gt;</span></span><br><span class="line"><span class="class">        <span class="keyword">implements</span> <span class="title">RandomAccess</span>, <span class="title">java</span>.<span class="title">io</span>.<span class="title">Serializable</span></span></span><br><span class="line"><span class="class">    </span>&#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = -<span class="number">2764017481108945198L</span>;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">final</span> E[] a;</span><br><span class="line"></span><br><span class="line">        ArrayList(E[] array) &#123;</span><br><span class="line">            a = Objects.requireNonNull(array);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">size</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> a.length;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> Object[] toArray() &#123;</span><br><span class="line">            <span class="keyword">return</span> a.clone();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="meta">@SuppressWarnings(&quot;unchecked&quot;)</span></span><br><span class="line">        <span class="keyword">public</span> &lt;T&gt; T[] toArray(T[] a) &#123;</span><br><span class="line">            <span class="keyword">int</span> size = size();</span><br><span class="line">            <span class="keyword">if</span> (a.length &lt; size)</span><br><span class="line">                <span class="keyword">return</span> Arrays.copyOf(<span class="keyword">this</span>.a, size,</span><br><span class="line">                                     (Class&lt;? extends T[]&gt;) a.getClass());</span><br><span class="line">            System.arraycopy(<span class="keyword">this</span>.a, <span class="number">0</span>, a, <span class="number">0</span>, size);</span><br><span class="line">            <span class="keyword">if</span> (a.length &gt; size)</span><br><span class="line">                a[size] = <span class="keyword">null</span>;</span><br><span class="line">            <span class="keyword">return</span> a;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> E <span class="title">get</span><span class="params">(<span class="keyword">int</span> index)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> a[index];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> E <span class="title">set</span><span class="params">(<span class="keyword">int</span> index, E element)</span> </span>&#123;</span><br><span class="line">            E oldValue = a[index];</span><br><span class="line">            a[index] = element;</span><br><span class="line">            <span class="keyword">return</span> oldValue;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">indexOf</span><span class="params">(Object o)</span> </span>&#123;</span><br><span class="line">            E[] a = <span class="keyword">this</span>.a;</span><br><span class="line">            <span class="keyword">if</span> (o == <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; a.length; i++)</span><br><span class="line">                    <span class="keyword">if</span> (a[i] == <span class="keyword">null</span>)</span><br><span class="line">                        <span class="keyword">return</span> i;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; a.length; i++)</span><br><span class="line">                    <span class="keyword">if</span> (o.equals(a[i]))</span><br><span class="line">                        <span class="keyword">return</span> i;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">contains</span><span class="params">(Object o)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> indexOf(o) != -<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> Spliterator&lt;E&gt; <span class="title">spliterator</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> Spliterators.spliterator(a, Spliterator.ORDERED);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">forEach</span><span class="params">(Consumer&lt;? <span class="keyword">super</span> E&gt; action)</span> </span>&#123;</span><br><span class="line">            Objects.requireNonNull(action);</span><br><span class="line">            <span class="keyword">for</span> (E e : a) &#123;</span><br><span class="line">                action.accept(e);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">replaceAll</span><span class="params">(UnaryOperator&lt;E&gt; operator)</span> </span>&#123;</span><br><span class="line">            Objects.requireNonNull(operator);</span><br><span class="line">            E[] a = <span class="keyword">this</span>.a;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; a.length; i++) &#123;</span><br><span class="line">                a[i] = operator.apply(a[i]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sort</span><span class="params">(Comparator&lt;? <span class="keyword">super</span> E&gt; c)</span> </span>&#123;</span><br><span class="line">            Arrays.sort(a, c);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-
-
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/12/23/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/Java%E5%85%B3%E9%94%AE%E5%AD%97/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/12/23/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/Java%E5%85%B3%E9%94%AE%E5%AD%97/" class="post-title-link" itemprop="url">java多线程关键字理解</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-12-23 00:02:56" itemprop="dateCreated datePublished" datetime="2021-12-23T00:02:56+08:00">2021-12-23</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/JUC/" itemprop="url" rel="index"><span itemprop="name">JUC</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2021/12/23/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/Java%E5%85%B3%E9%94%AE%E5%AD%97/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2021/12/23/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/Java%E5%85%B3%E9%94%AE%E5%AD%97/" class="cy_cmt_count" data-xid="2021/12/23/java/java源码解读/Java关键字/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.1k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>[toc]</p>
-<h2 id="一、synchronized"><a href="#一、synchronized" class="headerlink" title="一、synchronized"></a>一、synchronized</h2><p><a href="(http://hollischuang.gitee.io/tobetopjavaer/#/basics/concurrent-coding/synchronized?id=synchronized%E7%9A%84%E7%94%A8%E6%B3%95)">参考</a></p>
-<blockquote>
-<p> 当我们想要保证一个共享资源在同一时间只会被一个线程访问到时，我们可以在代码中使用<code>synchronized</code>关键字对类或者对象加锁/同步。</p>
-</blockquote>
-<blockquote>
-<p><code>synchronized</code>关键字在需要原子性、可见性和有序性这三种特性的时候都可以作为其中一种解决方案，看起来是“万能”的。的确，大部分并发控制操作都能使用synchronized来完成。</p>
-</blockquote>
-<h3 id="1-1-用法"><a href="#1-1-用法" class="headerlink" title="1.1 用法"></a>1.1 用法</h3><h3 id="1-2-原理"><a href="#1-2-原理" class="headerlink" title="1.2 原理"></a>1.2 原理</h3><h3 id="1-3-CSA"><a href="#1-3-CSA" class="headerlink" title="1.3 CSA"></a>1.3 CSA</h3><h3 id="可见性"><a href="#可见性" class="headerlink" title="可见性"></a>可见性</h3><blockquote>
-<p>可见性是指当多个线程访问同一个变量时，一个线程修改了这个变量的值，其他线程能够立即看得到修改的值。</p>
-</blockquote>
-<h2 id="二、volatile"><a href="#二、volatile" class="headerlink" title="二、volatile"></a>二、volatile</h2><h3 id="锁机制缺点"><a href="#锁机制缺点" class="headerlink" title="锁机制缺点"></a>锁机制缺点</h3><p>（1）在多线程竞争下，加锁、释放锁会导致比较多的上下文切换和调度延时，引起性能问题。</p>
-<p>（2）一个线程持有锁会导致其它所有需要此锁的线程挂起。</p>
-<p>（3）如果一个优先级高的线程等待一个优先级低的线程释放锁会导致优先级倒置，引起性能风险。</p>
-<p>volatile是不错的机制，但是volatile不能保证原子性。因此对于同步最终还是要回到锁机制上来。</p>
-<p>独占锁是一种悲观锁，synchronized就是一种独占锁，会导致其它所有需要锁的线程挂起，等待持有锁的线程释放锁。而另一个更加有效的锁就是乐观锁。所谓乐观锁就是，每次不加锁而是假设没有冲突而去完成某项操作，如果因为冲突失败就重试，直到成功为止。乐观锁用到的机制就是CAS，Compare and Swap。</p>
-<h3 id="三、"><a href="#三、" class="headerlink" title="三、= ="></a>三、= =</h3><blockquote>
-<p>双等号</p>
-</blockquote>
-<p>java中的数据类型，可分为两类：</p>
-<ol>
-<li>基本数据类型：比较的是他们的值。</li>
-<li>引用类型<br>比较的是他们在内存中的存放地址，所以，除非是同一个new出来的对象，他们的比较后的结果为true，否则比较后结果为false。 JAVA当中所有的类都是继承于Object这个基类的，在Object中的基类中定义了一个equals的方法，这个方法的初始行为是比较对象的内存地 址，但在一些类库当中这个方法被覆盖掉了，如String,Integer,Date在这些类当中equals有其自身的实现，而不再是比较类在堆内存中的存放地址了。<br> 对于复合数据类型之间进行equals比较，在没有覆写equals方法的情况下，他们之间的比较还是基于他们在内存中的存放位置的地址值的，因为Object的equals方法也是用双等号（==）进行比较的，所以比较后的结果跟双等号（==）的结果相同。</li>
-</ol>
-<h2 id="三、transient"><a href="#三、transient" class="headerlink" title="三、transient"></a>三、<a target="_blank" rel="noopener" href="http://hollischuang.gitee.io/tobetopjavaer/#/basics/java-basic/transient-in-java?id=transient">transient</a></h2><blockquote>
-<p>​    transient修饰的成员变量，在序列化的时候其值会被忽略，在被反序列化后， transient 变量的值被设为初始值， 如 int 型的是 0，对象型的是 null。</p>
-</blockquote>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -880,7 +1053,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">113</span>
+          <span class="site-state-item-count">115</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -931,12 +1104,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">312k</span>
+    <span title="站点总字数">316k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">4:44</span>
+    <span title="站点阅读时长">4:47</span>
 </div>
 
         
