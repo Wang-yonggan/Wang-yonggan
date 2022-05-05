@@ -187,7 +187,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/26/javaWeb/web%E6%A0%B8%E5%BF%83%E7%BB%84%E4%BB%B6/%E8%BF%87%E6%BB%A4%E5%99%A8/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/05/06/java/java%E7%BB%84%E4%BB%B6/%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -201,7 +201,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/04/26/javaWeb/web%E6%A0%B8%E5%BF%83%E7%BB%84%E4%BB%B6/%E8%BF%87%E6%BB%A4%E5%99%A8/" class="post-title-link" itemprop="url">过滤器</a>
+            <a href="/2022/05/06/java/java%E7%BB%84%E4%BB%B6/%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82/" class="post-title-link" itemprop="url">java网络请求</a>
         </h2>
 
         <div class="post-meta">
@@ -211,15 +211,22 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-04-26 21:37:07" itemprop="dateCreated datePublished" datetime="2022-04-26T21:37:07+08:00">2022-04-26</time>
+              <time title="创建时间：2022-05-06 02:14:46" itemprop="dateCreated datePublished" datetime="2022-05-06T02:14:46+08:00">2022-05-06</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-12 21:25:11" itemprop="dateModified" datetime="2022-03-12T21:25:11+08:00">2022-03-12</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/javaWeb/" itemprop="url" rel="index"><span itemprop="name">javaWeb</span></a>
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
                 </span>
             </span>
 
@@ -233,8 +240,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/04/26/javaWeb/web%E6%A0%B8%E5%BF%83%E7%BB%84%E4%BB%B6/%E8%BF%87%E6%BB%A4%E5%99%A8/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/26/javaWeb/web%E6%A0%B8%E5%BF%83%E7%BB%84%E4%BB%B6/%E8%BF%87%E6%BB%A4%E5%99%A8/" class="cy_cmt_count" data-xid="2022/04/26/javaWeb/web核心组件/过滤器/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/05/06/java/java%E7%BB%84%E4%BB%B6/%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/05/06/java/java%E7%BB%84%E4%BB%B6/%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82/" class="cy_cmt_count" data-xid="2022/05/06/java/java组件/网络请求/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -264,23 +271,20 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>[toc]</p>
-<p><a target="_blank" rel="noopener" href="https://mrbird.cc/Servlet-Jsp-note.html">参考</a></p>
-<h3 id="1-编写过滤器遵循下列步骤："><a href="#1-编写过滤器遵循下列步骤：" class="headerlink" title="1. 编写过滤器遵循下列步骤："></a>1. 编写过滤器遵循下列步骤：</h3><ol>
-<li>编写一个实现了Filter接口的类。</li>
-<li>实现Filter接口的三个方法，过滤逻辑在doFilter方法中实现。</li>
-<li>在Web程序中注册过滤器。</li>
-<li>把过滤器和Web应用一起打包部署。</li>
-</ol>
-<p>当有多个过滤器的时候，过滤的先后按照xml文件中mapping的先后顺序执行，具体过程如下图所示：</p>
-<p><img src="https://mrbird.cc/img/6c6a2aadb04e81a2528758b88c26ed30.png" alt="x"></p>
-<p>​    上图展示了多个过滤器的执行流程，过滤器1的doFilter的code1 →过滤器2的doFilter的code1 →service()方法→过滤器2的doFilter的code2 →过滤器1的doFilter的code2 →返回给客户端。在这个动作的传递过程中一定要写chain.doFilter()。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpSession;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LoginFilter</span> <span class="keyword">implements</span> <span class="title">Filter</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String[] paths;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">destroy</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doFilter</span><span class="params">(ServletRequest request, ServletResponse response,</span></span></span><br><span class="line"><span class="params"><span class="function">                         FilterChain chain)</span> <span class="keyword">throws</span> IOException, ServletException </span>&#123;</span><br><span class="line">        HttpServletRequest req = (HttpServletRequest) request;</span><br><span class="line">        HttpServletResponse res = (HttpServletResponse) response;</span><br><span class="line">        String uri = req.getRequestURI();</span><br><span class="line">        <span class="keyword">for</span> (String path : paths) &#123;</span><br><span class="line">            <span class="keyword">if</span> (uri.contains(path)) &#123;</span><br><span class="line">                chain.doFilter(req, res);</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//判断session中是否存在登录数据</span></span><br><span class="line">        HttpSession session = req.getSession();</span><br><span class="line">        <span class="comment">//模拟一个叫admin的账号</span></span><br><span class="line">        String admin = (String) session.getAttribute(<span class="string">&quot;admin&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (admin == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">//没有登录，强制跳转到登录页</span></span><br><span class="line">            res.sendRedirect(req.getContextPath() + <span class="string">&quot;/login/toLogin.do&quot;</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">//已登录，继续执行</span></span><br><span class="line">            chain.doFilter(req, res);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">(FilterConfig filterConfig)</span> <span class="keyword">throws</span> ServletException </span>&#123;</span><br><span class="line">        String excludePath = filterConfig.getInitParameter(<span class="string">&quot;excludePath&quot;</span>);</span><br><span class="line">        paths = excludePath.split(<span class="string">&quot;,&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ol start="3">
-<li><p>web.xml中配置Filter：</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">filter</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">filter-name</span>&gt;</span>loginFilter<span class="tag">&lt;/<span class="name">filter-name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">filter-class</span>&gt;</span>com.postar.servlet.LoginFilter<span class="tag">&lt;/<span class="name">filter-class</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 设置要排除过滤的路径 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">init-param</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">param-name</span>&gt;</span>excludePath<span class="tag">&lt;/<span class="name">param-name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">param-value</span>&gt;</span>login/toLogin,login/login,login/createImage<span class="tag">&lt;/<span class="name">param-value</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">init-param</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">filter</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">filter-mapping</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">filter-name</span>&gt;</span>loginFilter<span class="tag">&lt;/<span class="name">filter-name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>*.do<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">filter-mapping</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-</ol>
-<h3 id=""><a href="#" class="headerlink" title=""></a></h3>
+          <h3 id="org-apache-httpcomponents"><a href="#org-apache-httpcomponents" class="headerlink" title="org.apache.httpcomponents"></a>org.apache.httpcomponents</h3><ol>
+<li><p>依赖</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;org.apache.httpcomponents&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;httpclient&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;<span class="number">4.5</span><span class="number">.13</span>&lt;/version&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure></li>
+<li><p>get请求</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title">sendGet</span><span class="params">(String url, Map&lt;String, String&gt; params)</span> </span>&#123;</span><br><span class="line">       CloseableHttpClient client = HttpClients.createDefault();</span><br><span class="line">       HttpGet httpGet = <span class="keyword">new</span> HttpGet(url);</span><br><span class="line">       CloseableHttpResponse response = client.execute(httpGet);</span><br><span class="line">       InputStream respInputStream = response.getEntity().getContent();</span><br><span class="line">       response.close();</span><br><span class="line">       <span class="keyword">return</span> respInputStream;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>post请求</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/05/06/java/java%E7%BB%84%E4%BB%B6/%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -299,7 +303,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/26/%E7%BB%84%E4%BB%B6/nginx/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/05/06/java/java%E7%BB%84%E4%BB%B6/%E6%97%B6%E9%97%B4%E7%B1%BB/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -313,7 +317,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/04/26/%E7%BB%84%E4%BB%B6/nginx/" class="post-title-link" itemprop="url">nginx</a>
+            <a href="/2022/05/06/java/java%E7%BB%84%E4%BB%B6/%E6%97%B6%E9%97%B4%E7%B1%BB/" class="post-title-link" itemprop="url">时间组件</a>
         </h2>
 
         <div class="post-meta">
@@ -323,15 +327,22 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-04-26 13:26:35" itemprop="dateCreated datePublished" datetime="2022-04-26T13:26:35+08:00">2022-04-26</time>
+              <time title="创建时间：2022-05-06 02:14:46" itemprop="dateCreated datePublished" datetime="2022-05-06T02:14:46+08:00">2022-05-06</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-04-09 20:49:26" itemprop="dateModified" datetime="2022-04-09T20:49:26+08:00">2022-04-09</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%BB%84%E4%BB%B6/" itemprop="url" rel="index"><span itemprop="name">组件</span></a>
+                  <a href="/categories/javautils/" itemprop="url" rel="index"><span itemprop="name">javautils</span></a>
                 </span>
             </span>
 
@@ -345,8 +356,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/04/26/%E7%BB%84%E4%BB%B6/nginx/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/26/%E7%BB%84%E4%BB%B6/nginx/" class="cy_cmt_count" data-xid="2022/04/26/组件/nginx/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/05/06/java/java%E7%BB%84%E4%BB%B6/%E6%97%B6%E9%97%B4%E7%B1%BB/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/05/06/java/java%E7%BB%84%E4%BB%B6/%E6%97%B6%E9%97%B4%E7%B1%BB/" class="cy_cmt_count" data-xid="2022/05/06/java/java组件/时间类/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -357,14 +368,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>9.5k</span>
+              <span>1.7k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>9 分钟</span>
+              <span>2 分钟</span>
             </span>
 
         </div>
@@ -377,249 +388,44 @@
 
       
           <p>[toc]</p>
-<h2 id="一、概述"><a href="#一、概述" class="headerlink" title="一、概述"></a>一、概述</h2><ol>
-<li><p>nginxweb反向代理服务器</p>
-<ul>
-<li>开源</li>
-<li>高性能</li>
-<li>支持热部署</li>
-<li>24小数无间断</li>
-<li>支持高并发(5w)</li>
-</ul>
-</li>
-<li><p>用途</p>
-<ol>
-<li>静态资源服务器</li>
-<li>反向代理服务器</li>
-<li>正向代理服务器</li>
-<li>动静分离</li>
-<li>负载均衡</li>
-</ol>
-</li>
-<li><p>代理</p>
-<ol>
-<li><p>正向代理</p>
-<ol>
-<li><p>代理服务器：：访问国外网站，使用中间人服务器，</p>
-<p>中间人可以访问外国网站</p>
-<p>我可以访问中间人网站</p>
-</li>
-</ol>
-</li>
-<li><p>反向代理</p>
-<p>1. </p>
-</li>
-<li></li>
-</ol>
-</li>
-</ol>
-<h2 id="二、安装"><a href="#二、安装" class="headerlink" title="二、安装"></a>二、安装</h2><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">yum <span class="keyword">install</span> gcc-c++</span><br><span class="line">yum <span class="keyword">install</span> -y pcre pcre-devel</span><br><span class="line">yum <span class="keyword">install</span> -y zlib zlib-devel</span><br><span class="line">yum <span class="keyword">install</span> -y openssl openssl-devel</span><br></pre></td></tr></table></figure>
-
-<p><a target="_blank" rel="noopener" href="https://nginx.org/en/download.html">下载官网</a></p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220308211818104.png" alt="image-20220308211818104"></p>
-<p>复制链接  <a target="_blank" rel="noopener" href="https://nginx.org/download/nginx-1.6.3.tar.gz">https://nginx.org/download/nginx-1.6.3.tar.gz</a></p>
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">方式一 wget自己安装</span><br><span class="line">wget https:<span class="regexp">//</span>nginx.org<span class="regexp">/download/</span>nginx-<span class="number">1.6</span>.<span class="number">3</span>.tar.gz</span><br><span class="line">tar -zxvf nginx-<span class="number">1.6</span>.<span class="number">3</span>.tar.gz</span><br><span class="line">方式二 yum 一步安装</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cd</span> nginx-<span class="number">1.6</span>.<span class="number">3</span>.tar.gz</span><br><span class="line">./configure  编译配置环境</span><br><span class="line"><span class="keyword">make</span></span><br><span class="line"><span class="keyword">make</span> install</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">whereis</span> nginx 找到nginx执行文件</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-1-nginx文件结构"><a href="#2-1-nginx文件结构" class="headerlink" title="2.1 nginx文件结构"></a>2.1 nginx文件结构</h3><ol>
-<li>配置文件：/usr/local/nginx/conf/nginx.conf</li>
-<li>启动脚本 ：/usr/local/nginx/sbin/nginx</li>
-<li>log文件：/usr/local/nginx/logs/*.log</li>
-<li>pid文件: /usr/local/nginx/logs/nginx.pid</li>
-</ol>
-<h3 id="2-2-常用命令"><a href="#2-2-常用命令" class="headerlink" title="2.2 常用命令"></a>2.2 常用命令</h3><ol>
-<li><p>指定配置文件</p>
-<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">nginx -h</span><br><span class="line">nginx -c <span class="keyword">a</span>.conf 指定配置文件</span><br><span class="line"><span class="built_in">kill</span> -quid pid  平和的结束，信号量机制</span><br><span class="line"><span class="built_in">kill</span> -term pid 立即停止</span><br><span class="line"><span class="built_in">kill</span> <span class="number">-9</span> pid 强制结束，子进程可能不会被<span class="built_in">kill</span>掉</span><br></pre></td></tr></table></figure></li>
-<li><p>启动、暂停，重新加载</p>
-<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cd</span> <span class="string">/usr/local/nginx/sbin/</span></span><br><span class="line"><span class="string">./nginx</span> </span><br><span class="line"><span class="string">./nginx</span> -s stop</span><br><span class="line"><span class="string">./nginx</span> -s <span class="keyword">quit</span></span><br><span class="line"><span class="string">./nginx</span> -s <span class="keyword">reload</span></span><br><span class="line">-s 表示signal 发送一个信号</span><br></pre></td></tr></table></figure></li>
-<li><p>windows下杀死</p>
-<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">taskkill <span class="string">/fi</span> <span class="string">&quot;imagename eq nginx.EXE&quot;</span> <span class="string">/f</span></span><br></pre></td></tr></table></figure></li>
-</ol>
-<h2 id="三、nginx配置文件"><a href="#三、nginx配置文件" class="headerlink" title="三、nginx配置文件"></a>三、nginx配置文件</h2><h3 id="3-1-原始配置"><a href="#3-1-原始配置" class="headerlink" title="3.1 原始配置"></a>3.1 原始配置</h3><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#user  nobody;</span></span><br><span class="line"><span class="attribute">worker_processes</span>  <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">#error_log  logs/error.log;</span></span><br><span class="line"><span class="comment">#error_log  logs/error.log  notice;</span></span><br><span class="line"><span class="comment">#error_log  logs/error.log  info;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#pid        logs/nginx.pid;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="section">events</span> &#123;</span><br><span class="line">    <span class="attribute">worker_connections</span>  <span class="number">1024</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="section">http</span> &#123;</span><br><span class="line">    <span class="attribute">include</span>       mime.types;</span><br><span class="line">    <span class="attribute">default_type</span>  application/octet-stream;</span><br><span class="line"></span><br><span class="line">    <span class="comment">#log_format  main  &#x27;$remote_addr - $remote_user [$time_local] &quot;$request&quot; &#x27;</span></span><br><span class="line">    <span class="comment">#                  &#x27;$status $body_bytes_sent &quot;$http_referer&quot; &#x27;</span></span><br><span class="line">    <span class="comment">#                  &#x27;&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;&#x27;;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#access_log  logs/access.log  main;</span></span><br><span class="line"></span><br><span class="line">    <span class="attribute">sendfile</span>        <span class="literal">on</span>;</span><br><span class="line">    <span class="comment">#tcp_nopush     on;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#keepalive_timeout  0;</span></span><br><span class="line">    <span class="attribute">keepalive_timeout</span>  <span class="number">65</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">#gzip  on;</span></span><br><span class="line"></span><br><span class="line">    <span class="section">server</span> &#123;</span><br><span class="line">        <span class="attribute">listen</span>       <span class="number">80</span>;</span><br><span class="line">        <span class="attribute">server_name</span>  localhost;</span><br><span class="line"></span><br><span class="line">        <span class="comment">#charset koi8-r;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">#access_log  logs/host.access.log  main;</span></span><br><span class="line"></span><br><span class="line">        <span class="attribute">location</span> / &#123;</span><br><span class="line">            <span class="attribute">root</span>   html;</span><br><span class="line">            <span class="attribute">index</span>  index.html index.htm;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">#error_page  404              /404.html;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># redirect server error pages to the static page /50x.html</span></span><br><span class="line">        <span class="comment">#</span></span><br><span class="line">        <span class="attribute">error_page</span>   <span class="number">500</span> <span class="number">502</span> <span class="number">503</span> <span class="number">504</span>  /50x.html;</span><br><span class="line">        <span class="attribute">location</span> = /50x.html &#123;</span><br><span class="line">            <span class="attribute">root</span>   html;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment"># proxy the PHP scripts to Apache listening on 127.0.0.1:80</span></span><br><span class="line">        <span class="comment">#</span></span><br><span class="line">        <span class="comment">#location ~ \.php$ &#123;</span></span><br><span class="line">        <span class="comment">#    proxy_pass   http://127.0.0.1;</span></span><br><span class="line">        <span class="comment">#&#125;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000</span></span><br><span class="line">        <span class="comment">#</span></span><br><span class="line">        <span class="comment">#location ~ \.php$ &#123;</span></span><br><span class="line">        <span class="comment">#    root           html;</span></span><br><span class="line">        <span class="comment">#    fastcgi_pass   127.0.0.1:9000;</span></span><br><span class="line">        <span class="comment">#    fastcgi_index  index.php;</span></span><br><span class="line">        <span class="comment">#    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;</span></span><br><span class="line">        <span class="comment">#    include        fastcgi_params;</span></span><br><span class="line">        <span class="comment">#&#125;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># deny access to .htaccess files, if Apache&#x27;s document root</span></span><br><span class="line">        <span class="comment"># concurs with nginx&#x27;s one</span></span><br><span class="line">        <span class="comment">#</span></span><br><span class="line">        <span class="comment">#location ~ /\.ht &#123;</span></span><br><span class="line">        <span class="comment">#    deny  all;</span></span><br><span class="line">        <span class="comment">#&#125;</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment"># another virtual host using mix of IP-, name-, and port-based configuration</span></span><br><span class="line">    <span class="comment">#</span></span><br><span class="line">    <span class="comment">#server &#123;</span></span><br><span class="line">    <span class="comment">#    listen       8000;</span></span><br><span class="line">    <span class="comment">#    listen       somename:8080;</span></span><br><span class="line">    <span class="comment">#    server_name  somename  alias  another.alias;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#    location / &#123;</span></span><br><span class="line">    <span class="comment">#        root   html;</span></span><br><span class="line">    <span class="comment">#        index  index.html index.htm;</span></span><br><span class="line">    <span class="comment">#    &#125;</span></span><br><span class="line">    <span class="comment">#&#125;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment"># HTTPS server</span></span><br><span class="line">    <span class="comment">#</span></span><br><span class="line">    <span class="comment">#server &#123;</span></span><br><span class="line">    <span class="comment">#    listen       443 ssl;</span></span><br><span class="line">    <span class="comment">#    server_name  localhost;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#    ssl_certificate      cert.pem;</span></span><br><span class="line">    <span class="comment">#    ssl_certificate_key  cert.key;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#    ssl_session_cache    shared:SSL:1m;</span></span><br><span class="line">    <span class="comment">#    ssl_session_timeout  5m;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#    ssl_ciphers  HIGH:!aNULL:!MD5;</span></span><br><span class="line">    <span class="comment">#    ssl_prefer_server_ciphers  on;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#    location / &#123;</span></span><br><span class="line">    <span class="comment">#        root   html;</span></span><br><span class="line">    <span class="comment">#        index  index.html index.htm;</span></span><br><span class="line">    <span class="comment">#    &#125;</span></span><br><span class="line">    <span class="comment">#&#125;</span></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="3-2-文件结构"><a href="#3-2-文件结构" class="headerlink" title="3.2 文件结构"></a>3.2 文件结构</h3><figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">...</span>              <span class="comment">#1.全局块</span></span><br><span class="line"></span><br><span class="line">events &#123;         <span class="comment">#events块</span></span><br><span class="line">   <span class="string">...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">http      <span class="comment">#2.http块</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">...</span>   <span class="comment">#http全局块 </span></span><br><span class="line">    server        <span class="comment">#server块</span></span><br><span class="line">    &#123; </span><br><span class="line">        <span class="string">...</span>       <span class="comment">#server全局块</span></span><br><span class="line">        location [PATTERN]   <span class="comment">#location块</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="string">...</span></span><br><span class="line">        &#125;</span><br><span class="line">        location [PATTERN] </span><br><span class="line">        &#123;</span><br><span class="line">            <span class="string">...</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    server</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="string">...</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="string">...</span>     <span class="comment">#http全局块</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="3-3-结构说明"><a href="#3-3-结构说明" class="headerlink" title="3.3 结构说明"></a>3.3 结构说明</h3><ol>
-<li>全局块：配置影响nginx全局的指令<ol>
-<li>运行nginx服务器的用户组</li>
-<li>nginx进程pid存放路径</li>
-<li>日志存放路径</li>
-<li>配置文件引入</li>
-<li>允许生成worker process数等。</li>
-</ol>
-</li>
-<li>events块：配置影响nginx服务器或与用户的网络连接。<ol>
-<li>每个进程的最大连接数</li>
-<li>选取哪种事件驱动模型处理连接请求</li>
-<li>是否允许同时接受多个网路连接</li>
-<li>开启多个网络连接序列化等。</li>
-</ol>
-</li>
-<li>http块：可以嵌套多个server，配置代理，缓存，日志定义等绝大多数功能和第三方模块的配置。如文件引入，mime-type定义，日志自定义，是否使用sendfile传输文件，连接超时时间，单连接请求数等。</li>
-<li>server块：配置虚拟主机的相关参数，一个http中可以有多个server。</li>
-<li>location块：配置请求的路由，以及各种页面的处理情况。</li>
-<li>upstream块：配置集群，内网服务</li>
-</ol>
-<h3 id="3-4-配置参考"><a href="#3-4-配置参考" class="headerlink" title="3.4 配置参考"></a>3.4 配置参考</h3><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">########### 每个指令必须有分号结束。#################</span></span><br><span class="line"><span class="comment">#user administrator administrators;  #设置worker进程的用户,默认为nobody nobody。</span></span><br><span class="line"><span class="comment">#worker_processes 2;  #指定woker进程的数量，默认为1，一般=核数*cpu个数</span></span><br><span class="line"><span class="comment">#pid /nginx/pid/nginx.pid;   #指定nginx进程id文件运行文件存放地址</span></span><br><span class="line"><span class="attribute">error_log</span> log/error.log <span class="literal">debug</span>;  <span class="comment">#制定日志路径，级别。这个设置可以放入全局块，http块，server块，级别以此为：debug|info|notice|warn|error|crit|alert|emerg</span></span><br><span class="line"><span class="section">events</span> &#123;</span><br><span class="line">    <span class="attribute">accept_mutex</span> <span class="literal">on</span>;   <span class="comment">#设置网路连接序列化，防止惊群现象发生，默认为on</span></span><br><span class="line">    <span class="attribute">multi_accept</span> <span class="literal">on</span>;  <span class="comment">#设置一个进程是否同时接受多个网络连接，默认为off</span></span><br><span class="line">    <span class="comment">#use epoll;      #事件驱动模型，select|poll|kqueue|epoll|resig|/dev/poll|eventport</span></span><br><span class="line">    <span class="attribute">worker_connections</span>  <span class="number">1024</span>;    <span class="comment">#单个进程的最大连接数，默认为512</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="section">http</span> &#123;</span><br><span class="line">    <span class="attribute">include</span>       mime.types;   <span class="comment">#文件扩展名与文件类型映射表</span></span><br><span class="line">    <span class="attribute">default_type</span>  application/octet-stream; <span class="comment">#默认文件类型，默认为text/plain</span></span><br><span class="line">    <span class="comment">#access_log off; #取消服务日志    </span></span><br><span class="line">    <span class="attribute">log_format</span> myFormat <span class="string">&#x27;$remote_addr–$remote_user [$time_local] $request $status $body_bytes_sent $http_referer $http_user_agent $http_x_forwarded_for&#x27;</span>; <span class="comment">#自定义格式</span></span><br><span class="line">    <span class="attribute">access_log</span> log/access.log myFormat;  <span class="comment">#combined为日志格式的默认值</span></span><br><span class="line">    <span class="attribute">sendfile</span> <span class="literal">on</span>;   <span class="comment">#允许sendfile方式传输文件，默认为off，可以在http块，server块，location块。</span></span><br><span class="line">    <span class="attribute">sendfile_max_chunk</span> <span class="number">100k</span>;  <span class="comment">#每个进程每次调用传输数量不能大于设定的值，默认为0，即不设上限。</span></span><br><span class="line">    <span class="attribute">keepalive_timeout</span> <span class="number">65</span>;  <span class="comment">#连接超时时间，默认为75s，可以在http，server，location块。</span></span><br><span class="line"></span><br><span class="line">    <span class="attribute">upstream</span> mysvr &#123;   </span><br><span class="line">      <span class="attribute">server</span> <span class="number">127.0.0.1:7878</span>;</span><br><span class="line">      <span class="attribute">server</span> <span class="number">192.168.10.121:3333</span> backup;  <span class="comment">#热备</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="attribute">error_page</span> <span class="number">404</span> https://www.baidu.com; <span class="comment">#错误页</span></span><br><span class="line">    <span class="section">server</span> &#123; <span class="comment">#一个server就是一个服务</span></span><br><span class="line">        <span class="attribute">keepalive_requests</span> <span class="number">120</span>; <span class="comment">#单连接请求上限次数。</span></span><br><span class="line">        <span class="attribute">listen</span>       <span class="number">4545</span>;   <span class="comment">#监听端口</span></span><br><span class="line">        <span class="attribute">server_name</span>  <span class="number">127.0.0.1</span>;   <span class="comment">#服务名称，监听地址，域名 server_name:listen/root/uri       </span></span><br><span class="line">        <span class="attribute">location</span>  ~*^.+$ &#123;       <span class="comment">#请求的url过滤，正则匹配，~为区分大小写，~*为不区分大小写。</span></span><br><span class="line">           <span class="comment">#root path;  #资源目录</span></span><br><span class="line">           <span class="comment">#index index.html;  #设置默认页</span></span><br><span class="line">           <span class="attribute">proxy_pass</span>  http://mysvr;  <span class="comment">#请求转向mysvr 定义的服务器列表</span></span><br><span class="line">           <span class="attribute">deny</span> <span class="number">127.0.0.1</span>;  <span class="comment">#拒绝的ip</span></span><br><span class="line">           <span class="attribute">allow</span> <span class="number">172.18.5.54</span>; <span class="comment">#允许的ip           </span></span><br><span class="line">        &#125; </span><br><span class="line">        <span class="comment">#error_page 404		/404.html;</span></span><br><span class="line">        <span class="comment">#error_page 500 502 503  /50.html</span></span><br><span class="line">     &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="3-4-简易配置"><a href="#3-4-简易配置" class="headerlink" title="3.4_简易配置"></a>3.4_简易配置</h3><figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">worker_processes auto<span class="comment">;</span></span><br><span class="line"></span><br><span class="line">events &#123;</span><br><span class="line">    worker_connections <span class="number">1024</span><span class="comment">;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">http &#123;</span><br><span class="line">    sendfile            on<span class="comment">;</span></span><br><span class="line">    tcp_nopush          on<span class="comment">;</span></span><br><span class="line">    tcp_nodelay         on<span class="comment">;</span></span><br><span class="line">    keepalive_timeout   <span class="number">65</span><span class="comment">;</span></span><br><span class="line">    types_hash_max_size <span class="number">2048</span><span class="comment">;</span></span><br><span class="line">    server&#123;</span><br><span class="line">        listen <span class="number">80</span><span class="comment">;</span></span><br><span class="line">        location / &#123;</span><br><span class="line">            root html<span class="comment">;</span></span><br><span class="line">            index index.html index.htm<span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-<h3 id="3-5-结构参数"><a href="#3-5-结构参数" class="headerlink" title="3.5 结构参数"></a>3.5 结构参数</h3><h4 id="3-5-0-全局块"><a href="#3-5-0-全局块" class="headerlink" title="3.5.0 全局块"></a>3.5.0 全局块</h4><blockquote>
-<p>线程数，pid存放位置，用户组，配置文件引入</p>
+<h2 id="一、java-util-Date"><a href="#一、java-util-Date" class="headerlink" title="一、java.util.Date"></a>一、java.util.Date</h2><h2 id="二、java-util-calendar"><a href="#二、java-util-calendar" class="headerlink" title="二、java.util.calendar"></a>二、java.util.calendar</h2><h2 id="三、java-time"><a href="#三、java-time" class="headerlink" title="三、java.time"></a>三、java.time</h2><blockquote>
+<p>jdk8的新类，</p>
 </blockquote>
-<h4 id="3-5-1-event块"><a href="#3-5-1-event块" class="headerlink" title="3.5.1 event块"></a>3.5.1 event块</h4><blockquote>
-<p>连接配置，影响性能的主要地方</p>
-<p>最连接数，驱动模型、惊群串行排队</p>
-</blockquote>
-<h4 id="3-5-2-http块"><a href="#3-5-2-http块" class="headerlink" title="3.5.2 http块"></a>3.5.2 http块</h4><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">代理、缓存、日志</span><br><span class="line">sendfile on; 开启静态资源快速传输，传送过程 磁盘-&gt;核心内存-&gt;用户内存-&gt;核心内存-&gt;tcp，省略了<span class="number">3</span>,<span class="number">4</span>步</span><br><span class="line">keepalive_timeout; 处理长连接，一般tcp连接经过三次挥手，浪费极大，而开启长连接就能复用上一次的连接</span><br><span class="line">keepalive_requests <span class="number">20</span>; 长连接次数  <span class="number">20</span>次连接后，就需要重新建立连接 </span><br><span class="line">listen <span class="number">80</span> <span class="selector-attr">[defalut_server]</span>; 监听的端口</span><br><span class="line">server_name localhost;虚拟主机的名称,值：localhost,ip,域名，正则，通配符星号</span><br></pre></td></tr></table></figure>
-
-<h5 id="3-5-2-1-defalut-server"><a href="#3-5-2-1-defalut-server" class="headerlink" title="3.5.2.1 defalut_server"></a>3.5.2.1 defalut_server</h5><figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">server</span>&#123;</span><br><span class="line">	<span class="keyword">listen</span> <span class="number">888</span>;</span><br><span class="line">	server_name abc.com;</span><br><span class="line">	<span class="keyword">location</span>&#123;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">server</span>&#123;</span><br><span class="line">	<span class="keyword">listen</span> <span class="number">888</span>;</span><br><span class="line">	server_name xxxx.com;</span><br><span class="line">	<span class="keyword">location</span>&#123;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">第一个<span class="keyword">server</span>:abc.com就是默认<span class="keyword">server</span>,对于访问<span class="number">888</span>端口如果没有匹配到，就是转到abc.c</span><br></pre></td></tr></table></figure>
-
-<h5 id="3-5-2-2-server-name"><a href="#3-5-2-2-server-name" class="headerlink" title="3.5.2.2 server_name"></a>3.5.2.2 server_name</h5><ol>
-<li>通配符：*.wyg.com  *只能在首尾 *</li>
-<li>正则：server_name ~^www.\w+.com     <code>www.*.com</code>  其中.是防转义字符</li>
-<li>server_name匹配顺序<ol>
-<li>精确匹配</li>
-<li>通配符在首部的   <code>*.abc.com</code></li>
-<li>通配符*在结尾的  <code>www.wyg.*</code></li>
-<li>正则匹配</li>
-<li>default_server</li>
-</ol>
+<h3 id="新类出现的原因"><a href="#新类出现的原因" class="headerlink" title="新类出现的原因"></a>新类出现的原因</h3><ol>
+<li><p>原始的Date的toString显示的是Tue Sep 10 09:34:04 CST 2019，</p>
 </li>
+<li><p>可以用sdf格式化，但是sdf线程不安全，而且格式化类和本类不在一起，影响性能</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> StringBuffer <span class="title">format</span><span class="params">(Date)</span></span>&#123;</span><br><span class="line">	calendar.setTime(date);</span><br><span class="line">&#125;<span class="comment">//sdf的格式默认为year-month-day pm hour:mounth</span></span><br></pre></td></tr></table></figure></li>
 </ol>
-<h4 id="3-5-3-server块"><a href="#3-5-3-server块" class="headerlink" title="3.5.3 server块"></a>3.5.3 server块</h4><blockquote>
-<p>虚拟主机、对外好像是一台提供http、ftp、email网络服务的主机</p>
-</blockquote>
-<h4 id="3-5-4-location块"><a href="#3-5-4-location块" class="headerlink" title="3.5.4 location块"></a>3.5.4 location块</h4><ol>
-<li>路由转发，缓存，指定文件地址</li>
+<h3 id="三、Calendar"><a href="#三、Calendar" class="headerlink" title="三、Calendar"></a>三、Calendar</h3><h4 id="3-1-创建"><a href="#3-1-创建" class="headerlink" title="3.1 创建"></a>3.1 创建</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Calendar c = Calendar.getInstance();</span><br><span class="line">System.out.println(c.getTime());</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-2-获得部分日期"><a href="#3-2-获得部分日期" class="headerlink" title="3.2 获得部分日期"></a>3.2 获得部分日期</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Calendar c = Calendar.getInstance();</span><br><span class="line">System.out.println(c.get(Calendar.YEAR)); 输出：<span class="number">2021</span></span><br><span class="line">System.out.println(c.get(Calendar.MONTH)); 输出：<span class="number">7</span></span><br><span class="line">System.out.println(c.get(Calendar.DAY_OF_MONTH)); 输出：<span class="number">26</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="3-3-赋值"><a href="#3-3-赋值" class="headerlink" title="3.3 赋值"></a>3.3 赋值</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Calendar ca = Calendar.getInstance();</span><br><span class="line">ca.set(Calendar.YEAR, <span class="number">2019</span>);</span><br><span class="line">ca.set(Calendar.MONTH, <span class="number">0</span>);</span><br><span class="line">ca.set(Calendar.DATE, <span class="number">1</span>);</span><br><span class="line">ca.set(Calendar.HOUR_OF_DAY, <span class="number">0</span>);</span><br><span class="line">ca.set(Calendar.MINUTE, <span class="number">0</span>);</span><br><span class="line">ca.set(Calendar.SECOND, <span class="number">0</span>);</span><br><span class="line">SimpleDateFormat sdf = <span class="keyword">new</span> SimpleDateFormat(<span class="string">&quot;yyyy-MM-dd HH:mm:ss&quot;</span>);</span><br><span class="line">System.out.println(sdf.format(ca.getTime())); 输出：<span class="number">2019</span>-<span class="number">01</span>-<span class="number">01</span> <span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="3-4-转换"><a href="#3-4-转换" class="headerlink" title="3.4 转换"></a>3.4 转换</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Cal.setTime(<span class="keyword">new</span> Date());</span><br><span class="line">Date date = cal.getTime;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h3 id="LocalDate"><a href="#LocalDate" class="headerlink" title="LocalDate"></a>LocalDate</h3><h3 id="LocalTime"><a href="#LocalTime" class="headerlink" title="LocalTime"></a>LocalTime</h3><h3 id="LocalDateTime"><a href="#LocalDateTime" class="headerlink" title="LocalDateTime"></a>LocalDateTime</h3><h3 id="自定义"><a href="#自定义" class="headerlink" title="自定义"></a>自定义</h3><ol>
+<li><p>sql—util转换</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">java.sql.Date sqlDate = <span class="keyword">new</span> java.sql.Date(utilDate.getTime());</span><br><span class="line">Date date = <span class="keyword">new</span> Date(sqlDate.getTime());<span class="comment">//sql.Date转util.Date        </span></span><br></pre></td></tr></table></figure></li>
 </ol>
-<h3 id="3-6-特殊"><a href="#3-6-特殊" class="headerlink" title="3.6 特殊"></a>3.6 特殊</h3><h4 id="3-6-1-多种块都存在的参数"><a href="#3-6-1-多种块都存在的参数" class="headerlink" title="3.6.1 多种块都存在的参数"></a>3.6.1 多种块都存在的参数</h4><p>例如: access.log</p>
-<p><strong>就近原则</strong></p>
-<ol>
-<li><p>在http中</p>
-</li>
-<li><p>在server中</p>
-</li>
-<li><p>在location中</p>
-</li>
-</ol>
-<h2 id="二、使用"><a href="#二、使用" class="headerlink" title="二、使用"></a>二、使用</h2><h3 id="4-1-nginx虚拟主机配置"><a href="#4-1-nginx虚拟主机配置" class="headerlink" title="4.1 nginx虚拟主机配置"></a>4.1 nginx虚拟主机配置</h3><h4 id="4-1-1-步骤"><a href="#4-1-1-步骤" class="headerlink" title="4.1.1 步骤"></a>4.1.1 步骤</h4><ol>
-<li><p>创建三个文件夹</p>
-<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">mkdir</span> aa bb <span class="keyword">cc</span></span><br></pre></td></tr></table></figure></li>
-<li><p>将index.html放进aa bb cc</p>
-<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">vim</span> <span class="built_in">index</span>.html</span><br><span class="line"><span class="keyword">cp</span> <span class="built_in">index</span>.html aa</span><br><span class="line"><span class="keyword">cp</span> <span class="built_in">index</span>.html bb</span><br><span class="line"><span class="keyword">cp</span> <span class="built_in">index</span>.html <span class="keyword">cc</span></span><br></pre></td></tr></table></figure></li>
-<li><p>修改nginx.conf</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">   </span><br></pre></td></tr></table></figure></li>
-<li><p>更改hosts文件或者购买域名</p>
-<figure class="highlight accesslog"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">114.55.253.244</span> aa bb cc</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h3 id="4-2-反向代理"><a href="#4-2-反向代理" class="headerlink" title="4.2 反向代理"></a>4.2 反向代理</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">server &#123; #一个server就是一个服务</span><br><span class="line">    keepalive_requests <span class="number">120</span>; #单连接请求上限次数。</span><br><span class="line">    listen       <span class="number">80</span>;   #监听端口</span><br><span class="line">    server_name  wyg.aa.com;   #监听地址</span><br><span class="line">    root /usr/local/nginx/test/aa;  #资源目录</span><br><span class="line">    location  / &#123;       #请求的url过滤，正则匹配，~为区分大小写，~*为不区分大小写。</span><br><span class="line">        proxy_pass http:<span class="comment">//127.0.0.1:8003;d</span></span><br><span class="line">        index index.html;  #设置默认页</span><br><span class="line">    &#125;</span><br><span class="line">    #error_page <span class="number">404</span>         /<span class="number">404.</span>html;</span><br><span class="line">    #error_page <span class="number">500</span> <span class="number">502</span> <span class="number">503</span>  /<span class="number">50.</span>html</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//关键</span></span><br><span class="line"><span class="comment">//  location / 用于代理前端html,直接转发</span></span><br><span class="line"><span class="comment">//   location /api  用于代理后端,rewrite后转发</span></span><br><span class="line">server &#123; #一个server就是一个服务</span><br><span class="line">        keepalive_requests <span class="number">120</span>; #单连接请求上限次数。</span><br><span class="line">        listen       <span class="number">80</span>;   #监听端口</span><br><span class="line">        server_name  localhost;   #监听地址</span><br><span class="line">        location  / &#123;        # 代理</span><br><span class="line">           proxy_pass http:<span class="comment">//127.0.0.1:8888;</span></span><br><span class="line">         #  root     /home/admin/html;  #资源目录</span><br><span class="line">          # index a.html;  #设置默认页</span><br><span class="line">        &#125;</span><br><span class="line">        location /api &#123;</span><br><span class="line">                proxy_pass http:<span class="comment">//abc.com;</span></span><br><span class="line">                rewrite ^/api/(.*)$ /$<span class="number">1</span> <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line"><span class="comment">// 原理</span></span><br><span class="line"><span class="comment">// 访问 /api/a   转发到   http://abc.com/a</span></span><br></pre></td></tr></table></figure>
-
-
-
-
-
-<h3 id="4-3-静态资源"><a href="#4-3-静态资源" class="headerlink" title="4.3 静态资源"></a>4.3 静态资源</h3><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">location /uri &#123;  </span><br><span class="line">    root <span class="regexp">/data/</span>w3;</span><br><span class="line">&#125;</span><br><span class="line">访问   server:port<span class="regexp">/uri/</span>a.png</span><br><span class="line">真实路径  root+uri+a.png</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">location /uri &#123;  </span><br><span class="line">    alias <span class="regexp">/data/</span>w3;</span><br><span class="line">&#125;</span><br><span class="line">访问   server:port<span class="regexp">/uri/</span>a.png</span><br><span class="line">真实路径  alias+uri</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">location</span>  /&#123;<span class="attribute">undefined</span></span><br><span class="line">            alias /usr/local/download/;</span><br><span class="line">            <span class="comment">#Nginx日志目录</span></span><br><span class="line">            <span class="attribute">autoindex</span> <span class="literal">on</span>;<span class="comment">#注意。不能有Index，如果有，请加入一句话 index abc123.html</span></span><br><span class="line">            <span class="comment">#打开目录浏览功能</span></span><br><span class="line">            <span class="attribute">autoindex_exact_size</span> <span class="literal">off</span>;</span><br><span class="line">            <span class="comment">#默认为on，显示出文件的确切大小，单位是bytes</span></span><br><span class="line">            <span class="comment">#显示出文件的大概大小，单位是kB或者MB或者GB</span></span><br><span class="line">            <span class="attribute">autoindex_localtime</span> <span class="literal">on</span>;</span><br><span class="line">            <span class="comment">#默认为off，显示的文件时间为GMT时间。</span></span><br><span class="line">            <span class="comment">#改为on后，显示的文件时间为文件的服务器时间</span></span><br><span class="line">            <span class="attribute">add_header</span> Cache-Control <span class="literal">no</span>-store;</span><br><span class="line">           &#125;</span><br></pre></td></tr></table></figure>
-
-<p>关键字：</p>
-<ol>
-<li>location </li>
-<li>root  有点像根前缀</li>
-<li>alias  前缀+中缀</li>
-<li>uri  有点像中缀</li>
-<li>path</li>
-<li>img.png  是真是资源后缀</li>
-<li>autoindex 打开目录</li>
-</ol>
-<h3 id="4-4-负载均衡"><a href="#4-4-负载均衡" class="headerlink" title="4.4 负载均衡"></a>4.4 负载均衡</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 负载均衡池</span></span><br><span class="line">upstream backend  &#123;</span><br><span class="line">  server backend1.example.com weight=<span class="number">5</span>;</span><br><span class="line">  server backend2.example.com:<span class="number">8080</span>;</span><br><span class="line">  server unix:/tmp/backend3;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">  location / &#123;</span><br><span class="line">    proxy_pass  http://backend;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h4 id="系统扩展的方式"><a href="#系统扩展的方式" class="headerlink" title="系统扩展的方式"></a>系统扩展的方式</h4><ul>
-<li>横向扩展：增加机器数量，负载均衡</li>
-<li>纵向扩展：提高硬件性能</li>
-</ul>
-<h4 id="负载均衡算法"><a href="#负载均衡算法" class="headerlink" title="负载均衡算法"></a>负载均衡算法</h4><ol>
-<li>ip  hash  <ol>
-<li>这种不需要做session共享</li>
-</ol>
-</li>
-</ol>
-<h4 id="负载均衡作用"><a href="#负载均衡作用" class="headerlink" title="负载均衡作用"></a>负载均衡作用</h4><ol>
-<li>提高高并发能力</li>
-<li>在负载均衡上过滤，提高系统安全性</li>
-<li>故障转移，实现高可用</li>
-</ol>
-<h4 id="负载均衡方式"><a href="#负载均衡方式" class="headerlink" title="负载均衡方式"></a>负载均衡方式</h4><ul>
-<li><p>用户手动下载</p>
-<p>比如：联通下载，电信下载</p>
-</li>
-<li><p>DNS轮询：DNS服务商可以让一个域名对应不同的ip</p>
-</li>
-<li><p>四层、七层负载均衡</p>
-</li>
-</ul>
-<h3 id="4-5-跨域"><a href="#4-5-跨域" class="headerlink" title="4.5 跨域"></a>4.5 跨域</h3><h4 id="nginx-conf"><a href="#nginx-conf" class="headerlink" title="nginx.conf"></a>nginx.conf</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">server &#123; <span class="comment">#一个server就是一个服务</span></span><br><span class="line">      keepalive_requests 120; <span class="comment">#单连接请求上限次数。</span></span><br><span class="line">      listen       80;   <span class="comment">#监听端口</span></span><br><span class="line">      server_name  localhost;   <span class="comment">#监听地址</span></span><br><span class="line">      location  / &#123;        <span class="comment">#请求的url过滤，正则匹配，~为区分大小写，~*为不区分大小写。</span></span><br><span class="line">         proxy_pass http://127.0.0.1:8080;</span><br><span class="line">       <span class="comment">#  root     /home/admin/html;  #资源目录</span></span><br><span class="line">        <span class="comment"># index a.html;  #设置默认页</span></span><br><span class="line">      &#125;</span><br><span class="line">      location /api &#123;</span><br><span class="line">              proxy_pass http://localhost:8001;</span><br><span class="line">              rewrite ^/api/(.*)$ /<span class="variable">$1</span> <span class="built_in">break</span>;</span><br><span class="line"></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-
-<h4 id="前端"><a href="#前端" class="headerlink" title="前端"></a>前端</h4><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">bp=<span class="string">&quot;/api/&quot;</span></span><br><span class="line"><span class="function"><span class="title">login</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">    that=<span class="built_in">this</span></span><br><span class="line">    axios.post(bp+<span class="string">&quot;user/login&quot;</span>, <span class="built_in">this</span>.user).then(<span class="function"><span class="params">res</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(res);</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure>
-
-
-
-<h4 id="rewrite"><a href="#rewrite" class="headerlink" title="rewrite"></a>rewrite</h4><blockquote>
-<p>重定向，支持正则表达式</p>
-</blockquote>
-<p>rewrite regex to</p>
-<h3 id="4-6-访问控制"><a href="#4-6-访问控制" class="headerlink" title="4.6 访问控制"></a>4.6 访问控制</h3><figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">location</span> <span class="title">/ &#123;</span></span><br><span class="line"><span class="title">  deny</span> <span class="number">192.168</span>.<span class="number">1.1</span>;   <span class="comment"># 禁止Ip</span></span><br><span class="line">  allow   <span class="number">192.168</span>.<span class="number">1.0</span>/<span class="number">24</span>; <span class="comment"># 允许ip</span></span><br><span class="line">  allow   <span class="number">10.1</span>.<span class="number">1.0</span>/<span class="number">16</span>;</span><br><span class="line">  denyall; <span class="comment"># 禁止所有ip</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h4 id="认证模块http-auth-basic-module"><a href="#认证模块http-auth-basic-module" class="headerlink" title="认证模块http_auth_basic_module"></a>认证模块<strong>http_auth_basic_module</strong></h4><h2 id="五、其他"><a href="#五、其他" class="headerlink" title="五、其他"></a>五、其他</h2><h3 id="5-0-nginx正则匹配"><a href="#5-0-nginx正则匹配" class="headerlink" title="5.0 nginx正则匹配"></a>5.0 nginx正则匹配</h3><h3 id="5-1-注意"><a href="#5-1-注意" class="headerlink" title="5.1 注意"></a>5.1 注意</h3><ol>
-<li><p>尽量不写结尾的”/“符号，不然很难匹配</p>
-<p>​    有以下规则</p>
-<ol>
-<li>如果在配置路径写了结尾”/“，那么在浏览器也必须写结尾的”/“</li>
-<li>如果配置路径没写结尾”/“，那么在浏览器可写可不写”/ “</li>
-<li>所以，**配置里面不要写结尾的/  **</li>
-</ol>
-</li>
-<li><p>更新资源不需要reload，更新配置文件才需要reload</p>
-</li>
-</ol>
-<h4 id="5-1-2-目录权限问题-403错误"><a href="#5-1-2-目录权限问题-403错误" class="headerlink" title="5.1.2 目录权限问题 403错误"></a>5.1.2 目录权限问题 403错误</h4><ol>
-<li><p>如果是root的启动，那么nginx不能代理其他用户权限的文件夹，获取权限方式</p>
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chown -R wyg <span class="regexp">/home/</span>testUser</span><br></pre></td></tr></table></figure></li>
-<li><p>不能访问 /root下的文件问题</p>
-<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">配置文件第一行指定用户</span><br><span class="line"><span class="keyword">user</span> <span class="title">root</span>;</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h3 id="5-2-高级配置"><a href="#5-2-高级配置" class="headerlink" title="5.2 高级配置"></a>5.2 高级配置</h3><blockquote>
-<p>nginx keepalive</p>
-</blockquote>
-<h2 id="六、linux相关"><a href="#六、linux相关" class="headerlink" title="六、linux相关"></a>六、linux相关</h2><h3 id="6-1-做成操作系统服务"><a href="#6-1-做成操作系统服务" class="headerlink" title="6.1 做成操作系统服务"></a>6.1 做成操作系统服务</h3><ol>
-<li><p>linux服务默认位置：/usr/lib/systemd/system</p>
-</li>
-<li><p>在该文件夹下创建nginx.service</p>
-</li>
-<li><p>添加内容</p>
-<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">....</span>百度查询nginx.servie</span><br></pre></td></tr></table></figure></li>
-<li><p>修改权限</p>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">chmod</span> <span class="number">755</span> nginx.service</span><br></pre></td></tr></table></figure></li>
-<li><p>启动</p>
-<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl <span class="literal">start</span> nginx</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h2 id="六、原理-暂无"><a href="#六、原理-暂无" class="headerlink" title="六、原理-暂无"></a>六、原理-暂无</h2><p>下载tomcat</p>
-<p>wget <a target="_blank" rel="noopener" href="https://archive.apache.org/dist/tomcat/tomcat-8/v8.0.23/bin/apache-tomcat-8.0.23.tar.gz">https://archive.apache.org/dist/tomcat/tomcat-8/v8.0.23/bin/apache-tomcat-8.0.23.tar.gz</a></p>
-<p>tar -zxvf …</p>
-<p>./tomcat/bin/startup.sh</p>
-
+<h3 id="jar包–joda"><a href="#jar包–joda" class="headerlink" title="jar包–joda"></a>jar包–joda</h3><ol>
+<li><p>joda</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>joda-time<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>joda-time<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>主要获取当前时间 好看字符串</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">DateTime dt = <span class="keyword">new</span> DateTime();</span><br><span class="line">DateTime dt1 = DateTime.now();<span class="comment">//2021-10-21T13:59:41.040+08:00</span></span><br><span class="line">DateTime dt2 = <span class="keyword">new</span> DateTime(<span class="keyword">new</span> Date());<span class="comment">//2021-10-21T13:59:41.132+08:00</span></span><br><span class="line"><span class="comment">// 指定年月日点分秒生成(参数依次是：年,月,日,时,分,秒,毫秒)</span></span><br><span class="line">DateTime dt3 = <span class="keyword">new</span> DateTime(<span class="number">2012</span>, <span class="number">5</span>, <span class="number">20</span>, <span class="number">13</span>, <span class="number">14</span>, <span class="number">0</span>, <span class="number">0</span>);        <span class="comment">// 制定ISO8601生成</span></span><br><span class="line">DateTime dt4 = <span class="keyword">new</span> DateTime(<span class="string">&quot;2014-08-01T12:32:3&quot;</span>);</span><br><span class="line">DateTime dt5 = <span class="keyword">new</span> DateTime(<span class="string">&quot;2014-08-01&quot;</span>);</span><br><span class="line">DateTime dt6 = <span class="keyword">new</span> DateTime(Calendar.getInstance())</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/05/06/java/java%E7%BB%84%E4%BB%B6/%E6%97%B6%E9%97%B4%E7%B1%BB/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -638,7 +444,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/26/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/auto2/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/05/06/java/java%E7%BB%84%E4%BB%B6/%E6%96%87%E4%BB%B6/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -652,7 +458,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/04/26/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/auto2/" class="post-title-link" itemprop="url">auth2.0</a>
+            <a href="/2022/05/06/java/java%E7%BB%84%E4%BB%B6/%E6%96%87%E4%BB%B6/" class="post-title-link" itemprop="url">文件组件</a>
         </h2>
 
         <div class="post-meta">
@@ -662,7 +468,23 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-04-26 01:59:12" itemprop="dateCreated datePublished" datetime="2022-04-26T01:59:12+08:00">2022-04-26</time>
+              <time title="创建时间：2022-05-06 02:14:46" itemprop="dateCreated datePublished" datetime="2022-05-06T02:14:46+08:00">2022-05-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-12-15 16:53:10" itemprop="dateModified" datetime="2021-12-15T16:53:10+08:00">2021-12-15</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+                </span>
             </span>
 
           
@@ -675,8 +497,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/04/26/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/auto2/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/26/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/auto2/" class="cy_cmt_count" data-xid="2022/04/26/组件/登录/auto2/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/05/06/java/java%E7%BB%84%E4%BB%B6/%E6%96%87%E4%BB%B6/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/05/06/java/java%E7%BB%84%E4%BB%B6/%E6%96%87%E4%BB%B6/" class="cy_cmt_count" data-xid="2022/05/06/java/java组件/文件/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -687,7 +509,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>3.6k</span>
+              <span>2.8k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -706,84 +528,22 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><p>OAuth2 协议一共支持 4 种不同的授权模式：</p>
-<h4 id="授权码模式"><a href="#授权码模式" class="headerlink" title="授权码模式"></a>授权码模式</h4><p>常见的第三方平台登录功能基本都是使用这种模式。</p>
-<h4 id="简化模式"><a href="#简化模式" class="headerlink" title="简化模式"></a>简化模式</h4><p>简化模式是不需要客户端服务器参与，直接在浏览器中向授权服务器申请令牌（token），一般如果网站是纯静态页面则可以采用这种方式。</p>
-<h4 id="密码模式"><a href="#密码模式" class="headerlink" title="密码模式"></a>密码模式</h4><p>密码模式是用户把用户名密码直接告诉客户端，客户端使用说这些信息向授权服务器申请令牌（token）。这需要用户对客户端高度信任，例如客户端应用和服务提供商就是同一家公司，我们自己做前后端分离登录就可以采用这种模式。</p>
-<h4 id="客户端模式"><a href="#客户端模式" class="headerlink" title="客户端模式"></a>客户端模式</h4><p>客户端模式是指客户端使用自己的名义而不是用户的名义向服务提供者申请授权，严格来说，客户端模式并不能算作 OAuth 协议要解决的问题的一种解决方案，但是，对于开发者而言，在一些前后端分离应用或者为移动端提供的认证授权服务器上使用这种模式还是非常方便的。</p>
-<h3 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h3><blockquote>
-<p>base 申请应用认证的 client_id  client_secret</p>
-<p><a target="_blank" rel="noopener" href="https://justauth.wiki/guide/oauth/gitee/#_2-4-%E4%BB%A5%E4%B8%8A%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81%E5%A6%82%E4%B8%8B">justauth</a></p>
-</blockquote>
+          <h2 id="File-api"><a href="#File-api" class="headerlink" title="File  api"></a>File  api</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/m0_37989184/article/details/93025734">参考</a></p>
+<p>File类的常见方法（参考一位大牛的，不小心把链接关了）</p>
 <ol>
-<li><p><strong>用户</strong>请求gitee登录  <a target="_blank" rel="noopener" href="http://127.0.0.1:8443/oauth/render/gitee">http://127.0.0.1:8443/oauth/render/gitee</a></p>
-</li>
-<li><p>后端根据  <code>client_id</code>  +<code> callback</code> + 随机<code>state</code>      生成特殊<strong>Url</strong></p>
-<p>并把state    保存到redis</p>
-<p>让<strong>用户</strong> <strong>转到</strong>特殊 第一个gitee <strong>url</strong></p>
-<blockquote>
-<p><a target="_blank" rel="noopener" href="https://gitee.com/oauth/authorize">https://gitee.com/oauth/authorize</a>?<br><code>response_type</code>=code&amp;<br><code>client_id</code>=34c61d6a54926886f004&amp;<br><code>redirect_uri</code>=<a target="_blank" rel="noopener" href="http://127.0.0.1:8443/oauth/callback/gitee&amp;">http://127.0.0.1:8443/oauth/callback/gitee&amp;</a><br><code>state</code>=8a924&amp;<br><code>scope</code>=user_info</p>
-</blockquote>
-</li>
-<li><p>gitee这边</p>
-<blockquote>
-<p>有人用特殊<strong>url</strong> 访问我了，反正是自己的地盘，先让用户登陆了再说。</p>
-<p>然后就拿出他的<code>client_id</code>，再随机生成一个<code>code</code>，带上<code>state</code></p>
-<p>让<strong>用户</strong> <strong>转到</strong><code>redirect_uri</code></p>
-<p>并且在我的hashMap里面存一个<code>&#123;code: client_id，userInfo&#125;</code></p>
-</blockquote>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">code: gitee 提供的认证code  <span class="comment">//这个code是gitee通过client_id的，验证真伪需要用</span></span><br><span class="line">state: 之前随机生成的值</span><br></pre></td></tr></table></figure></li>
-<li><p>后端callback路径 认证code</p>
-<blockquote>
-<p>有人造访我我的callback，并且他给了我一个<code>code</code>，一个<code>state</code>，咦，</p>
-<p>我查下这个state是不是我发的，不是的话这就是恶意请求，想攻击我。</p>
-<p>redis中存在，那就对了。</p>
-<p>现在我需要根据code拿到用户的信息，</p>
-<p>我把 <code>code</code>，<code>client_id</code>，<code>client_secret</code>  一组和，gitee <code>第二个url</code>就出现了</p>
-<p>我拿着第二个url请求gitee 让他给我userinfo</p>
-</blockquote>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#第二个gitee  url</span></span><br><span class="line">https://gitee.com/oauth/token?code=18848b9a2e151f79ed94bdcf38f89e206b08a87a966ebc6f38decb4383d0&amp;</span><br><span class="line">client_id=3e9bf70483cccc65147eded006a80c3d8a511f5a965b61d4c61d6a54926886f0&amp;   client_secret=9698c0445da7a8f599b6b02b26897a2e6ea22243639ed22ffc3e8b7e7b50e4bc&amp;</span><br><span class="line">grant_type=authorization_code&amp;</span><br><span class="line">redirect_uri=http://<span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">8443</span>/oauth/callback/gitee</span><br></pre></td></tr></table></figure></li>
-<li><p>gitee的回应</p>
-<blockquote>
-<p><code>gitee的老板</code> 收到请求后，经过一系列认证，从hashmap中取到了userInfo，然后响应给我 </p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#x27;response&#x27;:&#123;</span><br><span class="line"> &#x27;code&#x27;:<span class="number">2000</span>,</span><br><span class="line"> &#x27;msg&#x27;:&#x27;没有消息&#x27;,</span><br><span class="line"> &#x27;data&#x27;:&#123;</span><br><span class="line">     &#x27;uuid&#x27;:&#x27;aaa&#x27;,</span><br><span class="line">     &#x27;username&#x27;:&#x27;wyg&#x27;,</span><br><span class="line">     &#x27;nickname&#x27;:&#x27;wyg&#x27;,</span><br><span class="line">     &#x27;avatar&#x27;:&#x27;头像地址&#x27;</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></blockquote>
-</li>
-<li><p>至此我拿到了gitee背书的userInfo，剩下的就是我和用户的事情了。</p>
-</li>
-<li><p>拿到username后（这个Username是不会变的，gitee虽然可以改nickname，无法修改username）</p>
-<p>我就去数据库查找有这个gitee_username的user，ok，就你了，大明，我就把</p>
-</li>
-<li><p>如果没找到，就是临时用户</p>
-</li>
+<li><p>创建</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">createNewFile</span><span class="params">()</span></span>; <span class="comment">//创建文件</span></span><br><span class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">mkdir</span><span class="params">()</span></span>;创建文件夹</span><br><span class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">mkdirs</span><span class="params">()</span></span>;创建多级文件夹。	</span><br></pre></td></tr></table></figure></li>
+<li><p>删除</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">delete</span><span class="params">()</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">deleteOnExit</span><span class="params">()</span></span>;在程序退出时删除文件。</span><br></pre></td></tr></table></figure></li>
 </ol>
-<h3 id="简化讲述"><a href="#简化讲述" class="headerlink" title="简化讲述"></a>简化讲述</h3><ol>
-<li><p>用户访问–&gt;服务器随机生成state，然后根据 p1 : {state，cilent_id，redirect_uri，<a target="_blank" rel="noopener" href="http://gitee.com/login">http://gitee.com/login</a> }等信息生成一个url1，并用response让用户浏览器转发到这个url1，用户输入信息p2{username,password}</p>
-</li>
-<li><p>gitee 官方接收到用户浏览器的请求后，保存请求信息p1，p2 ，随机生成一个code，保存p3{code: userInfo}</p>
-<p>带着p4{ code , state} 访问 p1.redirect_uri，</p>
-</li>
-<li><p>服务器根据p5{code，cilent_id，client_secret，redirect_uri，，<a target="_blank" rel="noopener" href="http://gitee.com/auth/token%7D">http://gitee.com/auth/token}</a> 生成url2，访问url2等到authToken</p>
-</li>
-<li><p>服务器根据authToken生成url3 访问url3得到userInfo</p>
-</li>
-</ol>
-<h4 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h4><ol>
-<li><p>url1</p>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">https</span>://gitee.com/oauth/authorize?response_type=code&amp;client_id=<span class="number">3</span>e<span class="number">9</span>bf<span class="number">70483</span>cccc<span class="number">65147</span>eded<span class="number">006</span>a<span class="number">80</span>c<span class="number">3</span>d<span class="number">8</span>a<span class="number">5</span>f<span class="number">5</span>a<span class="number">965</span>b<span class="number">661</span>d<span class="number">6</span>a<span class="number">54926886</span>f<span class="number">004</span>&amp;redirect_uri=http://<span class="number">127.0.0.1:8443</span>/oauth/callback/gitee&amp;state=<span class="number">32</span>ca<span class="number">6594</span>d<span class="number">002</span>e<span class="number">6</span>f<span class="number">2</span>f<span class="number">7</span>d<span class="number">9</span>ee<span class="number">1</span>a<span class="number">12</span>b<span class="number">6</span>f<span class="number">5</span>a<span class="number">5</span>&amp;scope=user_info</span><br></pre></td></tr></table></figure></li>
-<li><p>p4</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="attr">&quot;code&quot;</span>:<span class="string">&quot;53732710f7337894000f5f3ff9a453d99b88daca8267162c2b92a75fe6e726aa&quot;</span>,<span class="attr">&quot;state&quot;</span>:<span class="string">&quot;32ca6594d002e6f2f7d9ee1a12b6f5a5&quot;</span>&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p>url2</p>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">https</span>://gitee.com/oauth/token?code=<span class="number">1488557</span>e<span class="number">82</span>c<span class="number">1</span>bf<span class="number">1</span>fdd<span class="number">8</span>c<span class="number">29</span>c<span class="number">6</span>b<span class="number">653</span>c<span class="number">62</span>e<span class="number">511</span>be<span class="number">2</span>c<span class="number">7</span>fc<span class="number">3</span>e<span class="number">7</span>d<span class="number">78013</span>b<span class="number">4</span>f<span class="number">32</span>d<span class="number">0157</span>d<span class="number">8</span>d&amp;client_id=<span class="number">3</span>e<span class="number">9</span>bf<span class="number">70483</span>cccc<span class="number">65147</span>eded<span class="number">006</span>a<span class="number">80</span>c<span class="number">3</span>d<span class="number">8</span>a<span class="number">5</span>f<span class="number">5</span>a<span class="number">965</span>b<span class="number">61</span>d<span class="number">4</span>c<span class="number">61</span>d<span class="number">6</span>a<span class="number">54886</span>f&amp;client_secret=<span class="number">96</span>c<span class="number">045</span>da<span class="number">7</span>a<span class="number">8</span>f<span class="number">599</span>b<span class="number">6</span>b<span class="number">02</span>b<span class="number">26897</span>a<span class="number">2</span>e<span class="number">6</span>ea<span class="number">43639</span>ed<span class="number">22</span>ffc<span class="number">3</span>e<span class="number">8</span>b<span class="number">7</span>e<span class="number">7</span>b<span class="number">5</span>f<span class="number">1</span>c<span class="number">0</span>e<span class="number">4</span>&amp;grant_type=authorization_code&amp;redirect_uri=http://<span class="number">127.0.0.1:8443</span>/oauth/callback/gitee</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">https</span>://gitee.com/oauth/token?code=eb<span class="number">5181</span>da<span class="number">1</span>f<span class="number">225000</span>d<span class="number">0</span>fa<span class="number">220</span>a<span class="number">896</span>a<span class="number">8</span>eda<span class="number">81</span>d<span class="number">8</span>d<span class="number">0385</span>fe<span class="number">269</span>ee<span class="number">5</span>fa<span class="number">2</span>aa<span class="number">19</span>d<span class="number">0054</span>d<span class="number">7</span>e&amp;client_id=e<span class="number">2</span>c<span class="number">295</span>ef<span class="number">1</span>c<span class="number">1</span>aa<span class="number">096</span>e<span class="number">4</span>f<span class="number">0</span>d<span class="number">2</span>a<span class="number">30590</span>ef<span class="number">91</span>e<span class="number">35</span>d<span class="number">3</span>a<span class="number">7</span>e<span class="number">2971</span>acdf<span class="number">82</span>fc<span class="number">837</span>b<span class="number">55439</span>fb<span class="number">1</span>&amp;client_secret=<span class="number">4</span>cda<span class="number">46</span>d<span class="number">4432</span>bf<span class="number">77</span>dd<span class="number">865002</span>c<span class="number">91</span>eb<span class="number">8232756607</span>f<span class="number">60</span>fb<span class="number">8</span>bfb<span class="number">2</span>f<span class="number">46</span>cf<span class="number">0</span>f<span class="number">92</span>d<span class="number">4339</span>ac&amp;grant_type=authorization_code&amp;redirect_uri=http://<span class="number">127.0.0.1:8001</span>/auth/gitee</span><br></pre></td></tr></table></figure></li>
-<li><p>url3</p>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">https</span>://gitee.com/api/v<span class="number">5</span>/user?access_token=f<span class="number">8119934124</span>cb<span class="number">931</span>bd<span class="number">8</span>de<span class="number">62</span>e<span class="number">838</span>d<span class="number">6</span>ef<span class="number">2</span>f</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h2 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h2><ol>
-<li><p>url</p>
-<figure class="highlight isbl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">utils.HttpUtils</span> <span class="number">35</span>行 <span class="function"><span class="title">post</span>(<span class="variable">url</span>)</span></span><br></pre></td></tr></table></figure></li>
-</ol>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/05/06/java/java%E7%BB%84%E4%BB%B6/%E6%96%87%E4%BB%B6/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -802,7 +562,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/25/%E7%BB%84%E4%BB%B6/http%E8%AF%B7%E6%B1%82/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/05/06/java/java%E7%BB%84%E4%BB%B6/NIO/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -816,7 +576,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/04/25/%E7%BB%84%E4%BB%B6/http%E8%AF%B7%E6%B1%82/" class="post-title-link" itemprop="url">http请求</a>
+            <a href="/2022/05/06/java/java%E7%BB%84%E4%BB%B6/NIO/" class="post-title-link" itemprop="url">NIO</a>
         </h2>
 
         <div class="post-meta">
@@ -826,7 +586,23 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-04-25 18:34:24" itemprop="dateCreated datePublished" datetime="2022-04-25T18:34:24+08:00">2022-04-25</time>
+              <time title="创建时间：2022-05-06 02:14:46" itemprop="dateCreated datePublished" datetime="2022-05-06T02:14:46+08:00">2022-05-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-29 02:49:21" itemprop="dateModified" datetime="2022-03-29T02:49:21+08:00">2022-03-29</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java%E9%AB%98%E7%BA%A7/" itemprop="url" rel="index"><span itemprop="name">java高级</span></a>
+                </span>
             </span>
 
           
@@ -839,8 +615,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/04/25/%E7%BB%84%E4%BB%B6/http%E8%AF%B7%E6%B1%82/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/25/%E7%BB%84%E4%BB%B6/http%E8%AF%B7%E6%B1%82/" class="cy_cmt_count" data-xid="2022/04/25/组件/http请求/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/05/06/java/java%E7%BB%84%E4%BB%B6/NIO/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/05/06/java/java%E7%BB%84%E4%BB%B6/NIO/" class="cy_cmt_count" data-xid="2022/05/06/java/java组件/NIO/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -870,18 +646,151 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="HttpClient"><a href="#HttpClient" class="headerlink" title="HttpClient"></a>HttpClient</h2><h4 id="get请求"><a href="#get请求" class="headerlink" title="get请求"></a>get请求</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//创建cilent对象</span></span><br><span class="line">CloseableHttpClient httpClient = HttpClientBuilder.create().build();</span><br><span class="line"><span class="comment">//创建一个get对象</span></span><br><span class="line">HttpGet request = <span class="keyword">new</span> HttpGet(uri);</span><br><span class="line"><span class="comment">//execute 得到 response</span></span><br><span class="line">CloseableHttpResponse response = httpClient.execute(request, HttpClientContext.create());</span><br><span class="line"><span class="comment">///取得响应结果并处理</span></span><br><span class="line">service(response);</span><br><span class="line"><span class="comment">//关闭HttpClient</span></span><br><span class="line">response.close();</span><br><span class="line">client.close();</span><br></pre></td></tr></table></figure>
+          <p>[toc]</p>
+<h2 id="一、IO概述"><a href="#一、IO概述" class="headerlink" title="一、IO概述"></a>一、IO概述</h2><ol>
+<li>同步阻塞IO-面向流-BIO<ol>
+<li>一个请求连接一个线程，</li>
+<li>问题：需要创建很多的线程，所有的线程还是同步的</li>
+<li>解决：线程池，但是线程池数量有上限</li>
+<li>适合请求少的场景，程序简单</li>
+</ol>
+</li>
+<li>同步非阻塞IO-多路复用器-NIO<ol>
+<li>一个线程可以处理多个请求</li>
+<li>selector 选择器(复用器)</li>
+<li>适合请求多，请求时间短：聊天，弹幕</li>
+</ol>
+</li>
+<li>异步非阻塞IO–AIO(NIO2.0)<ol>
+<li>一个请求一个线程</li>
+<li>适合请求较多，且请求时间长场景</li>
+</ol>
+</li>
+</ol>
+<h2 id="二、BIO"><a href="#二、BIO" class="headerlink" title="二、BIO"></a>二、BIO</h2><ol>
+<li>java.io</li>
+</ol>
+<h3 id="2-1-一对一"><a href="#2-1-一对一" class="headerlink" title="2.1 一对一"></a>2.1 一对一</h3><blockquote>
+<p>服务端只有一个线程，只能处理唯一一个请求</p>
+</blockquote>
+<h4 id="2-1-1-服务端"><a href="#2-1-1-服务端" class="headerlink" title="2.1.1 服务端"></a>2.1.1 服务端</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">ServerSocket serverSocket=<span class="keyword">new</span> ServerSocket(<span class="number">8888</span>);</span><br><span class="line"><span class="comment">//开启监听</span></span><br><span class="line">Socket accept = serverSocket.accept();</span><br><span class="line"><span class="comment">//从socket获得流</span></span><br><span class="line">InputStream inputStream = accept.getInputStream();</span><br><span class="line"><span class="comment">//包装缓冲区</span></span><br><span class="line">String msg= FileUtil.readFile(inputStream);</span><br><span class="line">System.out.println(msg);</span><br></pre></td></tr></table></figure>
 
-<h4 id="post请求"><a href="#post请求" class="headerlink" title="post请求"></a>post请求</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//创建httpclient对象</span></span><br><span class="line">CloseableHttpClient client = HttpClients.createDefault();</span><br><span class="line"><span class="comment">//创建post方式请求对象</span></span><br><span class="line">HttpPost httpPost = <span class="keyword">new</span> HttpPost(url);</span><br><span class="line"><span class="comment">//装填参数</span></span><br><span class="line">StringEntity postBody = <span class="keyword">new</span> StringEntity(<span class="string">&quot;[&quot;</span> + jsonObject.toString() + <span class="string">&quot;]&quot;</span>, <span class="string">&quot;UTF-8&quot;</span>);</span><br><span class="line">postBody.setContentType(<span class="keyword">new</span> BasicHeader(HTTP.CONTENT_TYPE,<span class="string">&quot;application/json;charset=utf-8&quot;</span>));</span><br><span class="line"><span class="comment">//设置参数到请求对象中</span></span><br><span class="line">httpPost.setEntity(postBody);</span><br><span class="line"><span class="comment">//设置header信息</span></span><br><span class="line"><span class="comment">//指定报文头【Content-type】、【User-Agent】</span></span><br><span class="line">httpPost.setHeader(<span class="string">&quot;Content-type&quot;</span>, <span class="string">&quot;application/json;charset=utf-8&quot;</span>);</span><br><span class="line"><span class="comment">//执行请求操作，并拿到结果（同步阻塞）</span></span><br><span class="line">CloseableHttpResponse response = <span class="keyword">null</span>;</span><br><span class="line"><span class="comment">//关闭</span></span><br></pre></td></tr></table></figure>
+<h4 id="2-1-2-客户端"><a href="#2-1-2-客户端" class="headerlink" title="2.1.2 客户端"></a>2.1.2 客户端</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">Socket socket=<span class="keyword">new</span> Socket(<span class="string">&quot;127.0.0.1&quot;</span>,<span class="number">8888</span>);</span><br><span class="line"><span class="comment">//获得输出流</span></span><br><span class="line">OutputStream outputStream = socket.getOutputStream();</span><br><span class="line">PrintWriter printWriter=<span class="keyword">new</span> PrintWriter(outputStream);</span><br><span class="line">Scanner scanner=<span class="keyword">new</span> Scanner(System.in);</span><br><span class="line"><span class="keyword">while</span> (<span class="keyword">true</span>)&#123;</span><br><span class="line">    System.out.print(<span class="string">&quot;发送:&quot;</span>);</span><br><span class="line">    String s = scanner.nextLine();</span><br><span class="line">    <span class="keyword">if</span>(s.equals(<span class="string">&quot;-1&quot;</span>))</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    printWriter.println(s);</span><br><span class="line">    printWriter.flush();</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h4 id="依赖"><a href="#依赖" class="headerlink" title="依赖"></a>依赖</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.httpcomponents<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>httpclient<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>4.5.3<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="Spring-RestTemplate"><a href="#Spring-RestTemplate" class="headerlink" title="Spring RestTemplate"></a>Spring RestTemplate</h2><h3 id="get"><a href="#get" class="headerlink" title="get"></a>get</h3><h3 id="post"><a href="#post" class="headerlink" title="post"></a>post</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"> String uri=<span class="string">&quot;http://114.55.253.244:8001/user/login&quot;</span>;</span><br><span class="line">Map&lt;String,String&gt;params=<span class="keyword">new</span> HashMap&lt;&gt;();<span class="comment">//也可以用fastjson</span></span><br><span class="line">params.put(<span class="string">&quot;username&quot;</span>,<span class="string">&quot;test1&quot;</span>);</span><br><span class="line">params.put(<span class="string">&quot;password&quot;</span>,<span class="string">&quot;test2&quot;</span>);</span><br><span class="line"><span class="keyword">final</span> String s = restTemplate.postForObject(uri, params, String.class);</span><br><span class="line"><span class="keyword">final</span> ResponseEntity&lt;String&gt; entity = restTemplate.postForEntity(uri, params, String.class);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//</span></span><br><span class="line">restTemplate.postForObject(uri, params, String.class);</span><br><span class="line"><span class="comment">//进入  RestTemplate</span></span><br><span class="line">RequestCallback requestCallback = httpEntityCallback(request, responseType);<span class="comment">//封装requst(对应params)</span></span><br><span class="line"><span class="comment">//这里 Object的parms被封装成了HttpEntity--&gt;requestEntity = new HttpEntity&lt;&gt;(requestBody);</span></span><br><span class="line"><span class="keyword">return</span> execute(url, HttpMethod.POST, requestCallback, responseExtractor, uriVariables);</span><br><span class="line"><span class="comment">//进入 RestTemplate</span></span><br><span class="line">URI expanded = getUriTemplateHandler().expand(url, uriVariables);</span><br><span class="line"><span class="keyword">return</span> doExecute(expanded, method, requestCallback, responseExtractor);</span><br><span class="line"><span class="comment">//进入 RestTemplate</span></span><br><span class="line">ClientHttpRequest request = createRequest(url, method);</span><br><span class="line">requestCallback.doWithRequest(request)<span class="comment">// ::核心</span></span><br><span class="line">	<span class="comment">//进入RestTemplate.HttpEntityRequestCallback</span></span><br><span class="line">    -&gt;</span><br><span class="line">response = request.execute();<span class="comment">//拿到结果</span></span><br><span class="line">handleResponse(url, method, response);<span class="comment">//封装，处理结果</span></span><br><span class="line"><span class="comment">//进入</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//进入</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//进入</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//进入</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//进入</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//进入</span></span><br></pre></td></tr></table></figure>
-
+<h3 id="2-2-多对多"><a href="#2-2-多对多" class="headerlink" title="2.2 多对多"></a>2.2 多对多</h3><blockquote>
+<p>每个请求创建一个线程去处理请求</p>
+</blockquote>
+<h4 id="2-2-1-服务端"><a href="#2-2-1-服务端" class="headerlink" title="2.2.1 服务端"></a>2.2.1 服务端</h4><h4 id="2-2-2-客户端"><a href="#2-2-2-客户端" class="headerlink" title="2.2.2 客户端"></a>2.2.2 客户端</h4><h4 id="2-2-3-缺陷"><a href="#2-2-3-缺陷" class="headerlink" title="2.2.3 缺陷"></a>2.2.3 缺陷</h4><ol>
+<li>每个请求都创建线程，线程的切换、竞争会浪费资源</li>
+<li>线程本身也占用cpu资源</li>
+<li>并不是每个请求线程</li>
+</ol>
+<h3 id="2-3-伪异步"><a href="#2-3-伪异步" class="headerlink" title="2.3 伪异步"></a>2.3 伪异步</h3><ul>
+<li>优：创建线程池，能避免创建线程的资源消耗问题</li>
+<li>缺：底层还是阻塞的，如果请求处理较慢，那么新的请求就会长时间的再请求队列中，产生大量超时</li>
+<li>适应：小批量，请求处理快速的场景</li>
+</ul>
+<h3 id="BIO总结"><a href="#BIO总结" class="headerlink" title="BIO总结"></a>BIO总结</h3><ol>
+<li><p>发送</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dataOutputStream.flush();</span><br></pre></td></tr></table></figure></li>
+<li><p>发送结束声明</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socket.shutdownOutput();</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="三、NIO"><a href="#三、NIO" class="headerlink" title="三、NIO"></a>三、NIO</h2><h3 id="3-1-NIO概述"><a href="#3-1-NIO概述" class="headerlink" title="3.1 NIO概述"></a>3.1 NIO概述</h3><h4 id="3-1-1-基本概念"><a href="#3-1-1-基本概念" class="headerlink" title="3.1.1 基本概念"></a>3.1.1 基本概念</h4><ol>
+<li>since JDK1.4</li>
+<li>基于通道的非阻塞IO，IO复用</li>
+<li>支持面向缓冲区</li>
+</ol>
+<h4 id="3-1-2-三大核心组件"><a href="#3-1-2-三大核心组件" class="headerlink" title="3.1.2 三大核心组件"></a>3.1.2 三大核心组件</h4><ol>
+<li>Channel 通道</li>
+<li>Buffer 缓冲区</li>
+<li>Selector 选择器(多路复用器)<ol>
+<li>轮询每个通道</li>
+</ol>
+</li>
+</ol>
+<h4 id="3-1-3-非阻塞模式"><a href="#3-1-3-非阻塞模式" class="headerlink" title="3.1.3 非阻塞模式"></a>3.1.3 非阻塞模式</h4><p>一个线程可以同时处理很多请求，基于监听器</p>
+<h4 id="3-1-4-NIO模型图"><a href="#3-1-4-NIO模型图" class="headerlink" title="3.1.4 NIO模型图"></a>3.1.4 NIO模型图</h4><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211207225509511.png" alt="image-20211207225509511"></p>
+<h4 id="3-1-5-NIO-vs-BIO"><a href="#3-1-5-NIO-vs-BIO" class="headerlink" title="3.1.5 NIO  vs  BIO"></a>3.1.5 NIO  vs  BIO</h4><table>
+<thead>
+<tr>
+<th>BIO</th>
+<th>NIO</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>数据流(字节，字符)</td>
+<td>数据块(缓冲区，通道)</td>
+</tr>
+<tr>
+<td>流：单向</td>
+<td>通道：双向</td>
+</tr>
+<tr>
+<td>阻塞</td>
+<td>非阻塞</td>
+</tr>
+<tr>
+<td>一个请求需要一个线程</td>
+<td>一个线程处理处理多个请求(选择器监听)</td>
+</tr>
+</tbody></table>
+<h3 id="3-2-Buffer"><a href="#3-2-Buffer" class="headerlink" title="3.2 Buffer"></a>3.2 Buffer</h3><h4 id="3-2-2-Buffer属性"><a href="#3-2-2-Buffer属性" class="headerlink" title="3.2.2 Buffer属性"></a>3.2.2 Buffer属性</h4><ol>
+<li>容量：数组大小,不可更改<ol>
+<li>通过allocate分配</li>
+</ol>
+</li>
+<li>限制：可操作的最后位置<ol>
+<li>读：表示有数据的最后位置</li>
+<li>写：表示容量</li>
+</ol>
+</li>
+<li>位置：写入、读取的当前位置索引<ol>
+<li>标记：mark该位置</li>
+<li>重置：重置到mark位置</li>
+</ol>
+</li>
+</ol>
+<h4 id="3-2-3-Buffer-Api"><a href="#3-2-3-Buffer-Api" class="headerlink" title="3.2.3 Buffer Api"></a>3.2.3 Buffer Api</h4><ol>
+<li>clear 清空缓存区</li>
+<li>flip：转换成可读模式</li>
+<li>Remaining：获得缓冲区长度</li>
+<li>hasRemaining：是否有数据</li>
+<li>rewind：将位置置0清除mark</li>
+</ol>
+<h4 id="3-2-4-缓冲区分类"><a href="#3-2-4-缓冲区分类" class="headerlink" title="3.2.4 缓冲区分类"></a>3.2.4 缓冲区分类</h4><h5 id="3-2-4-1-直接缓冲区"><a href="#3-2-4-1-直接缓冲区" class="headerlink" title="3.2.4.1 直接缓冲区"></a>3.2.4.1 直接缓冲区</h5><blockquote>
+<p>写入到直接内存，高并发场景</p>
+</blockquote>
+<h5 id="3-2-4-2-非直接缓冲区"><a href="#3-2-4-2-非直接缓冲区" class="headerlink" title="3.2.4.2 非直接缓冲区"></a>3.2.4.2 非直接缓冲区</h5><blockquote>
+<p>写入堆内存</p>
+</blockquote>
+<h3 id="3-3-Channel"><a href="#3-3-Channel" class="headerlink" title="3.3 Channel"></a>3.3 Channel</h3><blockquote>
+<p>Channel代表这一个网络连接通道，当Channel注册到Selector后会返回一个SelectionKey对象，该SelectionKey对象则代表这这个Channel和它注册的Selector间的关系。并且SelectionKey中维护着两个很重要的属性：interestOps、readyOps。</p>
+<p>interestOps是我们希望Selector监听Channel的哪些事件。我们将我们感兴趣的事件设置到该字段，这样在selection操作时，当发现该Channel有我们所<strong>感兴趣的事件</strong>发生时，就会将我们感兴趣的事件再设置到readyOps中，这样我们就能得知是哪些事件发生了以做相应处理。 </p>
+</blockquote>
+<h4 id="3-3-1-特点"><a href="#3-3-1-特点" class="headerlink" title="3.3.1 特点"></a>3.3.1 特点</h4><ol>
+<li>双向的</li>
+<li>不能直接数据交互，需借助buffer</li>
+<li>异步读写</li>
+</ol>
+<h4 id="3-3-2-Channel实现"><a href="#3-3-2-Channel实现" class="headerlink" title="3.3.2 Channel实现"></a>3.3.2 Channel实现</h4><ol>
+<li>FileChannel 文件</li>
+<li>DatagramChannel  UDP</li>
+<li>SocketChannel  TCP</li>
+<li>ServerSockeChannel  监听Web的TCP连接，每一个连接创建一个Channel</li>
+</ol>
+<h3 id="3-4-Selector"><a href="#3-4-Selector" class="headerlink" title="3.4 Selector"></a>3.4 Selector</h3><blockquote>
+<p>选择器，Selector是NIO中实现I/O多路复用的关键类。Selector实现了通过一个线程管理多个Channel，从而管理多个网络连接的目的，</p>
+</blockquote>
+<h4 id="3-4-1-工作方式"><a href="#3-4-1-工作方式" class="headerlink" title="3.4.1 工作方式"></a>3.4.1 工作方式</h4><blockquote>
+<p>多个 Channel 以事件的方式可以注册到同一个Selector，如果有事件发生，便获取事件然后针对每个事件进行相应的处理。这样就可以只用<strong>一个单线程</strong>去管理<strong>多个通道</strong>，也就是管理多个连接和请求。避免了多线程之间的上下文切换导致的开销</p>
+</blockquote>
+<h4 id="3-4-2-选择器作用"><a href="#3-4-2-选择器作用" class="headerlink" title="3.4.2 选择器作用"></a>3.4.2 选择器作用</h4><ol>
+<li>轮询Channel选出可用的Channel</li>
+</ol>
+<h3 id="3-5-Reactor模式"><a href="#3-5-Reactor模式" class="headerlink" title="3.5 Reactor模式"></a>3.5 Reactor模式</h3><ol>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/93612337">参考</a></li>
+</ol>
 
       
     </div>
@@ -901,7 +810,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/24/java/javaSE/%E5%8F%8D%E5%B0%84%E5%92%8C%E6%B3%A8%E8%A7%A3/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/05/06/java/java%E7%BB%84%E4%BB%B6/file-content-type/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -915,7 +824,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/04/24/java/javaSE/%E5%8F%8D%E5%B0%84%E5%92%8C%E6%B3%A8%E8%A7%A3/" class="post-title-link" itemprop="url">反射</a>
+            <a href="/2022/05/06/java/java%E7%BB%84%E4%BB%B6/file-content-type/" class="post-title-link" itemprop="url">contentType</a>
         </h2>
 
         <div class="post-meta">
@@ -925,17 +834,15 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-04-24 15:50:29" itemprop="dateCreated datePublished" datetime="2022-04-24T15:50:29+08:00">2022-04-24</time>
+              <time title="创建时间：2022-05-06 02:14:46" itemprop="dateCreated datePublished" datetime="2022-05-06T02:14:46+08:00">2022-05-06</time>
             </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
                 </span>
-            </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-04-27 10:48:16" itemprop="dateModified" datetime="2022-04-27T10:48:16+08:00">2022-04-27</time>
+              </span>
 
           
   
@@ -947,8 +854,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/04/24/java/javaSE/%E5%8F%8D%E5%B0%84%E5%92%8C%E6%B3%A8%E8%A7%A3/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/24/java/javaSE/%E5%8F%8D%E5%B0%84%E5%92%8C%E6%B3%A8%E8%A7%A3/" class="cy_cmt_count" data-xid="2022/04/24/java/javaSE/反射和注解/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/05/06/java/java%E7%BB%84%E4%BB%B6/file-content-type/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/05/06/java/java%E7%BB%84%E4%BB%B6/file-content-type/" class="cy_cmt_count" data-xid="2022/05/06/java/java组件/file-content-type/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -959,14 +866,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>2.1k</span>
+              <span>9.3k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
+              <span>8 分钟</span>
             </span>
 
         </div>
@@ -979,24 +886,11 @@
 
       
           <p>[toc]</p>
-<p>参考<a target="_blank" rel="noopener" href="https://www.cnblogs.com/tech-bird/p/3525336.html">狂神</a></p>
-<h2 id="一、Class"><a href="#一、Class" class="headerlink" title="一、Class"></a>一、Class</h2><h3 id="1-创建类方式"><a href="#1-创建类方式" class="headerlink" title="1. 创建类方式"></a>1. 创建类方式</h3><ol>
-<li>new</li>
-<li>clone</li>
-<li>反射<ol>
-<li>newInstance</li>
-<li>Constructor.newInstance</li>
-</ol>
-</li>
-<li>反序列化</li>
-</ol>
-<h3 id="2-谁拥有class"><a href="#2-谁拥有class" class="headerlink" title="2. 谁拥有class"></a>2. 谁拥有class</h3><ol>
-<li><p>class</p>
-</li>
-<li><p>interface</p>
+<h3 id="一、比较全面的contentType的类型值"><a href="#一、比较全面的contentType的类型值" class="headerlink" title="一、比较全面的contentType的类型值"></a>一、比较全面的contentType的类型值</h3><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_37651267/article/details/91380351">参考</a></p>
+<p>文件扩展名    Content-Type(Mime-Type)    文件扩展名    Content-Type(Mime-Type)</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2022/04/24/java/javaSE/%E5%8F%8D%E5%B0%84%E5%92%8C%E6%B3%A8%E8%A7%A3/#more" rel="contents">
+              <a class="btn" href="/2022/05/06/java/java%E7%BB%84%E4%BB%B6/file-content-type/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -1087,7 +981,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">114</span>
+          <span class="site-state-item-count">115</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1138,12 +1032,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">323k</span>
+    <span title="站点总字数">335k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">4:54</span>
+    <span title="站点阅读时长">5:04</span>
 </div>
 
         

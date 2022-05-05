@@ -187,7 +187,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/30/408/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E8%BF%9B%E7%A8%8B/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/08/java/javaSE/JUC/%E9%94%81/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -201,7 +201,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/03/30/408/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E8%BF%9B%E7%A8%8B/" class="post-title-link" itemprop="url">进程</a>
+            <a href="/2022/04/08/java/javaSE/JUC/%E9%94%81/" class="post-title-link" itemprop="url">锁</a>
         </h2>
 
         <div class="post-meta">
@@ -211,16 +211,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-03-30 00:14:46" itemprop="dateCreated datePublished" datetime="2022-03-30T00:14:46+08:00">2022-03-30</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">操作系统</span></a>
-                </span>
+              <time title="创建时间：2022-04-08 04:05:01" itemprop="dateCreated datePublished" datetime="2022-04-08T04:05:01+08:00">2022-04-08</time>
             </span>
 
           
@@ -233,8 +224,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/03/30/408/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E8%BF%9B%E7%A8%8B/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/30/408/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E8%BF%9B%E7%A8%8B/" class="cy_cmt_count" data-xid="2022/03/30/408/操作系统/进程/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/04/08/java/javaSE/JUC/%E9%94%81/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/08/java/javaSE/JUC/%E9%94%81/" class="cy_cmt_count" data-xid="2022/04/08/java/javaSE/JUC/锁/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -245,176 +236,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>1.7k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>`</p>
-<h2 id="一、同步、异步与阻塞、非阻塞"><a href="#一、同步、异步与阻塞、非阻塞" class="headerlink" title="一、同步、异步与阻塞、非阻塞"></a>一、同步、异步与阻塞、非阻塞</h2><p><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/19732473">参考</a></p>
-<h3 id="同步、异步"><a href="#同步、异步" class="headerlink" title="同步、异步"></a>同步、异步</h3><ul>
-<li><p>所谓同步，就是在发出一个<em>调用</em>时，在没有得到结果之前，该<em>调用</em>就不返回。但是一旦调用返回，就得到返回值，<br>换句话说，就是由调用者主动等待这个<em>调用</em>的结果。</p>
-</li>
-<li><p>而异步则是相反，调用在发出之后，这个调用就直接返回了，所以没有返回结果。换句话说，当一个异步过程调用发出后，调用者不会立刻得到结果。而是在<em>调用</em>发出后，<em>被调用者</em>通过状态、通知来通知调用者，或通过回调函数处理这个调用。</p>
-</li>
-<li><p>同步</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">  </span><br></pre></td></tr></table></figure></li>
-<li><p>异步: 雇一个新的线程callBack</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Response res;</span><br><span class="line"><span class="keyword">new</span> Thread(()-&gt;&#123;</span><br><span class="line">    res=requset();</span><br><span class="line">	callBack();</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h3 id="阻塞、非阻塞"><a href="#阻塞、非阻塞" class="headerlink" title="阻塞、非阻塞"></a>阻塞、非阻塞</h3><ul>
-<li><p>阻塞就是</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Object result=doAndwaitResult();</span><br><span class="line"><span class="function">Object <span class="title">doAndwaitResult</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.wait();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p>非阻塞就是</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span>(<span class="keyword">true</span>)&#123;</span><br><span class="line">    Object result=<span class="keyword">new</span> Object();</span><br><span class="line">    getResource(result);</span><br><span class="line">    <span class="keyword">while</span>((result=testResult())!=<span class="keyword">null</span>)&#123;</span><br><span class="line">        doOther();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-</ul>
-<h2 id="二、进程"><a href="#二、进程" class="headerlink" title="二、进程"></a>二、进程</h2><h3 id="2-1-进程状态"><a href="#2-1-进程状态" class="headerlink" title="2.1 进程状态"></a>2.1 进程状态</h3><h4 id="2-1-1-五状态"><a href="#2-1-1-五状态" class="headerlink" title="2.1.1 五状态"></a>2.1.1 五状态</h4><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220325232538100.png" alt="image-20220325232538100"></p>
-<h4 id="2-1-2-挂起状态"><a href="#2-1-2-挂起状态" class="headerlink" title="2.1.2 挂起状态"></a>2.1.2 挂起状态</h4><blockquote>
-<p>​    被阻塞状态的进程占用着物理内存就一种浪费物理内存的行为，在虚拟内存管理的操作系统中，通常会把阻塞状态的进程的物理内存空间换出到硬盘，等需要再次运行的时候，再从硬盘换入到物理内存</p>
-</blockquote>
-<p><strong>描述进程没有占用实际的物理内存空间的情况，这个状态就是挂起状态</strong></p>
-<ul>
-<li>阻塞挂起状态：进程在外存（硬盘）并等待某个事件的出现；</li>
-<li>就绪挂起状态：进程在外存（硬盘），但只要进入内存，即刻立刻运行；</li>
-<li>通过 sleep 让进程间歇性挂起，其工作原理是设置一个定时器，到期后唤醒进程</li>
-<li>处于挂起的进程进入<strong>等待队列</strong>，等待某个事件发生</li>
-</ul>
-<h4 id="2-1-3-七状态"><a href="#2-1-3-七状态" class="headerlink" title="2.1.3 七状态"></a>2.1.3 七状态</h4><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220325232849106.png" alt="image-20220325232849106"></p>
-<h3 id="2-2-进程控制"><a href="#2-2-进程控制" class="headerlink" title="2.2 进程控制"></a>2.2 进程控制</h3><blockquote>
-<p>用进程控制块（process control block，PCB）数据结构来描述进程，是进程存在的唯一标识</p>
-</blockquote>
-<h4 id="2-2-1-PCB-信息"><a href="#2-2-1-PCB-信息" class="headerlink" title="2.2.1 PCB 信息"></a>2.2.1 PCB 信息</h4><ul>
-<li>进程标识符：标识各个进程，每个进程都有一个并且唯一的标识符；</li>
-<li>用户标识符：进程归属的用户，用户标识符主要为共享和保护服务；</li>
-<li>进程当前状态，如 new、ready、running、waiting 或 blocked 等；</li>
-<li>有关内存地址空间或虚拟地址空间的信息，所打开文件的列表和所使用的 I/O 设备信息。</li>
-<li>CPU 中各个寄存器的值，当进程被切换时，CPU 的状态信息都会被保存在相应的 PCB 中，以便进程<br>重新执行时，能从断点处继续执行</li>
-</ul>
-<h4 id="2-2-2-PCB-连接"><a href="#2-2-2-PCB-连接" class="headerlink" title="2.2.2 PCB 连接"></a>2.2.2 PCB 连接</h4><blockquote>
-<p>通常是通过链表的方式进行组织，把具有相同状态的进程链在一起，组成各种队列。</p>
-</blockquote>
-<ul>
-<li>将所有处于就绪状态的进程链在一起，称为就绪队列</li>
-<li>把所有因等待某事件而处于等待状态的进程链在一起就组成各种阻塞队列</li>
-</ul>
-<h4 id="2-2-3-进程阻塞"><a href="#2-2-3-进程阻塞" class="headerlink" title="2.2.3 进程阻塞"></a>2.2.3 进程阻塞</h4><p>阻塞状态的进程是绝对不可能叫醒自己的</p>
-<h4 id="2-2-4-进程唤醒"><a href="#2-2-4-进程唤醒" class="headerlink" title="2.2.4 进程唤醒"></a>2.2.4 进程唤醒</h4><blockquote>
-<p>​    如某进程正在等待 I/O 事件，需由别的进程发消息给它，则只有当该进程所期待的事件出现时，才由发<br>现者进程用唤醒语句叫醒它</p>
-</blockquote>
-<h4 id="2-2-5-进程终止"><a href="#2-2-5-进程终止" class="headerlink" title="2.2.5 进程终止"></a>2.2.5 进程终止</h4><p>进程可以有 3 种终止方式：正常结束、异常结束以及外界干预（信号 kill 掉）。</p>
-<h2 id="三、线程"><a href="#三、线程" class="headerlink" title="三、线程"></a>三、线程</h2><h4 id="3-1-原因"><a href="#3-1-原因" class="headerlink" title="3.1 原因"></a>3.1 原因</h4><ol>
-<li>开销问题</li>
-<li>内存共享问题(进程间通信，线程间通信)</li>
-</ol>
-<h4 id="3-2-三种线程"><a href="#3-2-三种线程" class="headerlink" title="3.2 三种线程"></a>3.2 三种线程</h4><ol>
-<li>用户线程</li>
-<li>内核线程</li>
-<li>轻量级</li>
-</ol>
-<h4 id="3-3-线程切换"><a href="#3-3-线程切换" class="headerlink" title="3.3 线程切换"></a>3.3 线程切换</h4><p>线程切换时，虚拟内存这些共享的资源就保持不变，只需要切换线程的私有数据、寄存器等不共享的数据；</p>
-<h4 id="3-4-线程与进程对比"><a href="#3-4-线程与进程对比" class="headerlink" title="3.4 线程与进程对比"></a>3.4 线程与进程对比</h4><p>线程相比进程能减少开销，体现在：</p>
-<ul>
-<li>线程的<code>创建快</code>，因为进程在创建的过程中，还需要资源管理信息，比如内存管理信息、文<br>件管理信息，而线程在创建的过程中，不会涉及这些资源管理信息，而是共享它们；</li>
-<li>线程的<code>终止快</code>，因为线程释放的资源相比进程少很多；</li>
-<li>同一个进程内的线程切换比进程<code>切换快</code>，因为线程具有相同的地址空间（虚拟内存共享），这意味着<br>同一个进程的线程都具有同一个⻚表，那么在切换的时候不需要切换⻚表。而对于进程之间的切换，<br>切换的时候要把⻚表给切换掉，而⻚表的切换过程开销是比较大的；</li>
-<li>由于同一进程的各线程间<code>共享内存</code>和文件资源，那么在线程之间数据传递的时候，就不需要经过内核<br>了，这就使得线程之间的数据交互效率更高了；</li>
-</ul>
-<h3 id=""><a href="#" class="headerlink" title=""></a></h3>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/30/java/javaSE/JUC/java%E9%98%BB%E5%A1%9E/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/30/java/javaSE/JUC/java%E9%98%BB%E5%A1%9E/" class="post-title-link" itemprop="url">java阻塞</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-30 00:08:43" itemprop="dateCreated datePublished" datetime="2022-03-30T00:08:43+08:00">2022-03-30</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/JUC/" itemprop="url" rel="index"><span itemprop="name">JUC</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/30/java/javaSE/JUC/java%E9%98%BB%E5%A1%9E/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/30/java/javaSE/JUC/java%E9%98%BB%E5%A1%9E/" class="cy_cmt_count" data-xid="2022/03/30/java/javaSE/JUC/java阻塞/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>840</span>
+              <span>1.4k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -434,43 +256,59 @@
 
       
           <p>·</p>
-<p>挂起：一般是主动的，由系统或程序发出，甚至于辅存中去。（不释放CPU，可能释放内存，放在外存）</p>
-<p>阻塞：一般是被动的，在抢占资源中得不到资源，被动的挂起在内存，等待某种资源或信号量（即有了资源）将他唤醒。（释放CPU，不释放内存）</p>
-<h1 id="浅谈JAVA中的线程阻塞方法"><a href="#浅谈JAVA中的线程阻塞方法" class="headerlink" title="浅谈JAVA中的线程阻塞方法"></a>浅谈JAVA中的线程阻塞方法</h1><ol>
-<li><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/c5715fa91dd8">参考</a></li>
-</ol>
+<h2 id="一、Lock的使用"><a href="#一、Lock的使用" class="headerlink" title="一、Lock的使用"></a>一、Lock的使用</h2><blockquote>
+<p><code>ReentrantLock</code>的实现是基于其内部类<code>FairSync</code>(公平锁)和<code>NonFairSync</code>(非公平锁)实现的。 其可重入性是基于<code>Thread.currentThread()</code>实现的: 如果当前线程已经获得了执行序列中的锁， 那执行序列之后的所有方法都可以获得这个锁。</p>
+</blockquote>
 <blockquote>
-<p>如果线程是因为调用了wait()、sleep()或者join()方法而导致的阻塞，可以中断线程，并且通过抛出InterruptedException来唤醒它;如果线程遇到了IO阻塞，无能为力，因为IO是操作系统实现的，Java代码并没有办法直接接触到操作系统。以下是详细的唤醒方法：</p>
+<p>自增 lock上锁，condition 状态转换</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">Lock lock = <span class="keyword">new</span> ReentrantLock();<span class="comment">//可重入锁，lock.lock()上锁 unlock解锁</span></span><br><span class="line">Condition condition = lock.newCondition();<span class="comment">//状态监视-转换器 await 等待， signalAll 唤醒全部</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">int</span> num;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">increment</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    lock.lock();<span class="comment">//上锁</span></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">while</span> (num != <span class="number">0</span>) &#123;</span><br><span class="line">            condition.await();<span class="comment">//等待</span></span><br><span class="line">        &#125;</span><br><span class="line">        num++;</span><br><span class="line">        condition.signal();<span class="comment">//唤醒</span></span><br><span class="line">    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line"></span><br><span class="line">    &#125;<span class="keyword">finally</span>&#123;</span><br><span class="line">    	lock.unlock();<span class="comment">//解锁</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h4><blockquote>
+<p>基于AQS+CSA</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (compareAndSetState(<span class="number">0</span>, <span class="number">1</span>))</span><br><span class="line">    setExclusiveOwnerThread(Thread.currentThread());</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    acquire(<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="精准唤醒"><a href="#精准唤醒" class="headerlink" title="精准唤醒"></a>精准唤醒</h4><h2 id="synchonized"><a href="#synchonized" class="headerlink" title="synchonized"></a>synchonized</h2><h3 id="内存语义"><a href="#内存语义" class="headerlink" title="内存语义"></a>内存语义</h3><h3 id="synchonized和Lock区别"><a href="#synchonized和Lock区别" class="headerlink" title="synchonized和Lock区别"></a>synchonized和Lock区别</h3><ol>
+<li>synchonized是一个关键字，Lock是一个类</li>
+<li>synchonized是隐式锁，自动上锁解锁，Lock是显式锁，手动操作</li>
+<li>synchonized无法获得所得状态，Lock可以判断是否获得了锁，更灵活</li>
+<li>synchonized是<code>非公平锁</code>，Lock默认是<code>非公平锁</code>，可设置</li>
+<li>synchonized适合锁少量的代码，Lock是否大量代码<ol>
+<li>conditon可以精准唤醒，可以灵活调整获得锁的顺序</li>
+</ol>
+</li>
+</ol>
+<h3 id="乐观锁"><a href="#乐观锁" class="headerlink" title="乐观锁"></a>乐观锁</h3><blockquote>
+<p>基于版本</p>
 </blockquote>
 <ol>
-<li><p>sleep() 方法</p>
-<p>sleep(毫秒)，指定以毫秒为单位的时间，使线程在该时间内进入线程阻塞状态，期间得不到cpu的时间片，等到时间过去了，线程重新进入可执行状态。(暂停线程，不会释放锁)</p>
+<li><p>支持并发</p>
 </li>
-<li><p>suspend() 和 resume() 方法</p>
-<p>挂起和唤醒线程，suspend()使线程进入阻塞状态，只有对应的resume()被调用的时候，线程才会进入可执行状态。(不建议用，容易发生死锁)</p>
-</li>
-<li><p>yield() 方法</p>
-<p>会使的线程放弃当前分得的cpu时间片，进入<code>就绪</code>状态，接下来和平竞争，可能又直接进入<code>运行</code>状态。</p>
-</li>
-<li><p>wait() 和 notify() 方法</p>
-<ul>
-<li><p>wait()，线程进入<code>阻塞</code>状态</p>
-<p>notify()，线程进入<code>就绪</code>状态。</p>
-</li>
-<li><p>wait()内可加或不加参数，加参数时是以毫秒为单位，当到了指定时间或调用notify()方法时，进入就绪状态。</p>
-</li>
-</ul>
-</li>
-<li><p>join()方法</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">doSome();</span><br><span class="line">B.join();</span><br><span class="line">doSome();</span><br></pre></td></tr></table></figure>
-
-
-
-<p>是当前线程A调用另一个线程B的join()方法，当前线程转A入阻塞状态，直到线程B运行结束，线程A才由阻塞状态转为可执行状态。</p>
-</li>
-<li><p>以上是Java线程唤醒和阻塞的五种常用方法，不同的方法有不同的特点，其中wait() 和 notify()是其中功能最强大、使用最灵活的方法，但这也导致了它们效率较低、较容易出错的特性，因此，在实际应用中应灵活运用各种方法，以达到期望的目的与效果!</p>
-</li>
+<li><p>在提交任务之前比较版本号，不一致就放弃，再申请提交，知道提交完成</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">update t_goods </span><br><span class="line"><span class="keyword">set</span> status<span class="operator">=</span><span class="number">2</span>,version<span class="operator">=</span>version<span class="operator">+</span><span class="number">1</span></span><br><span class="line"><span class="keyword">where</span> id<span class="operator">=</span>#&#123;id&#125; <span class="keyword">and</span> version<span class="operator">=</span>#&#123;version&#125;;</span><br></pre></td></tr></table></figure></li>
 </ol>
+<h3 id="悲观锁"><a href="#悲观锁" class="headerlink" title="悲观锁"></a>悲观锁</h3><ol>
+<li>串行化</li>
+</ol>
+<h3 id="表锁"><a href="#表锁" class="headerlink" title="表锁"></a>表锁</h3><h3 id="行锁"><a href="#行锁" class="headerlink" title="行锁"></a>行锁</h3><h3 id="读锁、共享锁、S锁、"><a href="#读锁、共享锁、S锁、" class="headerlink" title="读锁、共享锁、S锁、"></a>读锁、共享锁、S锁、</h3><blockquote>
+<p>如果事务T对数据A加上共享锁后，则其他事务只能对A再加共享锁，不能加排他锁。获准共享锁的事务只能读数据，不能修改数据。</p>
+</blockquote>
+<h3 id="写锁、独占锁、排他锁、T锁"><a href="#写锁、独占锁、排他锁、T锁" class="headerlink" title="写锁、独占锁、排他锁、T锁"></a>写锁、独占锁、排他锁、T锁</h3><blockquote>
+<p>如果事务T对数据A加上排他锁后，则其他事务不能再对A加任任何类型的封锁。获准排他锁的事务既能读数据，又能修改数据。</p>
+</blockquote>
+<h3 id="公平锁，非公平锁"><a href="#公平锁，非公平锁" class="headerlink" title="公平锁，非公平锁"></a>公平锁，非公平锁</h3><blockquote>
+<p>最早请求的锁最早获得锁，需要队列实现，影响性能</p>
+</blockquote>
+<h3 id="对写锁"><a href="#对写锁" class="headerlink" title="对写锁"></a>对写锁</h3><blockquote>
+<p>有独占锁，也有共享锁</p>
+</blockquote>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">Book</span>&#123;</span><br><span class="line">	<span class="keyword">private</span> Lock=<span class="keyword">new</span> ReetranWriteReadLock();</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">read</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">		<span class="keyword">lock</span>.writeLock().<span class="keyword">lock</span>();</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">wirte</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">		<span class="keyword">lock</span>.rLock().<span class="keyword">lock</span>();</span><br><span class="line">	</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 
       
     </div>
@@ -490,7 +328,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/29/java/java%E7%BB%84%E4%BB%B6/NIO/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/08/java/javaSE/JUC/JUC/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -504,7 +342,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/03/29/java/java%E7%BB%84%E4%BB%B6/NIO/" class="post-title-link" itemprop="url">NIO</a>
+            <a href="/2022/04/08/java/javaSE/JUC/JUC/" class="post-title-link" itemprop="url">JUC</a>
         </h2>
 
         <div class="post-meta">
@@ -514,477 +352,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-03-29 02:49:21" itemprop="dateCreated datePublished" datetime="2022-03-29T02:49:21+08:00">2022-03-29</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java%E9%AB%98%E7%BA%A7/" itemprop="url" rel="index"><span itemprop="name">java高级</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/29/java/java%E7%BB%84%E4%BB%B6/NIO/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/29/java/java%E7%BB%84%E4%BB%B6/NIO/" class="cy_cmt_count" data-xid="2022/03/29/java/java组件/NIO/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>2.3k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>[toc]</p>
-<h2 id="一、IO概述"><a href="#一、IO概述" class="headerlink" title="一、IO概述"></a>一、IO概述</h2><ol>
-<li>同步阻塞IO-面向流-BIO<ol>
-<li>一个请求连接一个线程，</li>
-<li>问题：需要创建很多的线程，所有的线程还是同步的</li>
-<li>解决：线程池，但是线程池数量有上限</li>
-<li>适合请求少的场景，程序简单</li>
-</ol>
-</li>
-<li>同步非阻塞IO-多路复用器-NIO<ol>
-<li>一个线程可以处理多个请求</li>
-<li>selector 选择器(复用器)</li>
-<li>适合请求多，请求时间短：聊天，弹幕</li>
-</ol>
-</li>
-<li>异步非阻塞IO–AIO(NIO2.0)<ol>
-<li>一个请求一个线程</li>
-<li>适合请求较多，且请求时间长场景</li>
-</ol>
-</li>
-</ol>
-<h2 id="二、BIO"><a href="#二、BIO" class="headerlink" title="二、BIO"></a>二、BIO</h2><ol>
-<li>java.io</li>
-</ol>
-<h3 id="2-1-一对一"><a href="#2-1-一对一" class="headerlink" title="2.1 一对一"></a>2.1 一对一</h3><blockquote>
-<p>服务端只有一个线程，只能处理唯一一个请求</p>
-</blockquote>
-<h4 id="2-1-1-服务端"><a href="#2-1-1-服务端" class="headerlink" title="2.1.1 服务端"></a>2.1.1 服务端</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">ServerSocket serverSocket=<span class="keyword">new</span> ServerSocket(<span class="number">8888</span>);</span><br><span class="line"><span class="comment">//开启监听</span></span><br><span class="line">Socket accept = serverSocket.accept();</span><br><span class="line"><span class="comment">//从socket获得流</span></span><br><span class="line">InputStream inputStream = accept.getInputStream();</span><br><span class="line"><span class="comment">//包装缓冲区</span></span><br><span class="line">String msg= FileUtil.readFile(inputStream);</span><br><span class="line">System.out.println(msg);</span><br></pre></td></tr></table></figure>
-
-<h4 id="2-1-2-客户端"><a href="#2-1-2-客户端" class="headerlink" title="2.1.2 客户端"></a>2.1.2 客户端</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">Socket socket=<span class="keyword">new</span> Socket(<span class="string">&quot;127.0.0.1&quot;</span>,<span class="number">8888</span>);</span><br><span class="line"><span class="comment">//获得输出流</span></span><br><span class="line">OutputStream outputStream = socket.getOutputStream();</span><br><span class="line">PrintWriter printWriter=<span class="keyword">new</span> PrintWriter(outputStream);</span><br><span class="line">Scanner scanner=<span class="keyword">new</span> Scanner(System.in);</span><br><span class="line"><span class="keyword">while</span> (<span class="keyword">true</span>)&#123;</span><br><span class="line">    System.out.print(<span class="string">&quot;发送:&quot;</span>);</span><br><span class="line">    String s = scanner.nextLine();</span><br><span class="line">    <span class="keyword">if</span>(s.equals(<span class="string">&quot;-1&quot;</span>))</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    printWriter.println(s);</span><br><span class="line">    printWriter.flush();</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-2-多对多"><a href="#2-2-多对多" class="headerlink" title="2.2 多对多"></a>2.2 多对多</h3><blockquote>
-<p>每个请求创建一个线程去处理请求</p>
-</blockquote>
-<h4 id="2-2-1-服务端"><a href="#2-2-1-服务端" class="headerlink" title="2.2.1 服务端"></a>2.2.1 服务端</h4><h4 id="2-2-2-客户端"><a href="#2-2-2-客户端" class="headerlink" title="2.2.2 客户端"></a>2.2.2 客户端</h4><h4 id="2-2-3-缺陷"><a href="#2-2-3-缺陷" class="headerlink" title="2.2.3 缺陷"></a>2.2.3 缺陷</h4><ol>
-<li>每个请求都创建线程，线程的切换、竞争会浪费资源</li>
-<li>线程本身也占用cpu资源</li>
-<li>并不是每个请求线程</li>
-</ol>
-<h3 id="2-3-伪异步"><a href="#2-3-伪异步" class="headerlink" title="2.3 伪异步"></a>2.3 伪异步</h3><ul>
-<li>优：创建线程池，能避免创建线程的资源消耗问题</li>
-<li>缺：底层还是阻塞的，如果请求处理较慢，那么新的请求就会长时间的再请求队列中，产生大量超时</li>
-<li>适应：小批量，请求处理快速的场景</li>
-</ul>
-<h3 id="BIO总结"><a href="#BIO总结" class="headerlink" title="BIO总结"></a>BIO总结</h3><ol>
-<li><p>发送</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dataOutputStream.flush();</span><br></pre></td></tr></table></figure></li>
-<li><p>发送结束声明</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socket.shutdownOutput();</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h2 id="三、NIO"><a href="#三、NIO" class="headerlink" title="三、NIO"></a>三、NIO</h2><h3 id="3-1-NIO概述"><a href="#3-1-NIO概述" class="headerlink" title="3.1 NIO概述"></a>3.1 NIO概述</h3><h4 id="3-1-1-基本概念"><a href="#3-1-1-基本概念" class="headerlink" title="3.1.1 基本概念"></a>3.1.1 基本概念</h4><ol>
-<li>since JDK1.4</li>
-<li>基于通道的非阻塞IO，IO复用</li>
-<li>支持面向缓冲区</li>
-</ol>
-<h4 id="3-1-2-三大核心组件"><a href="#3-1-2-三大核心组件" class="headerlink" title="3.1.2 三大核心组件"></a>3.1.2 三大核心组件</h4><ol>
-<li>Channel 通道</li>
-<li>Buffer 缓冲区</li>
-<li>Selector 选择器(多路复用器)<ol>
-<li>轮询每个通道</li>
-</ol>
-</li>
-</ol>
-<h4 id="3-1-3-非阻塞模式"><a href="#3-1-3-非阻塞模式" class="headerlink" title="3.1.3 非阻塞模式"></a>3.1.3 非阻塞模式</h4><p>一个线程可以同时处理很多请求，基于监听器</p>
-<h4 id="3-1-4-NIO模型图"><a href="#3-1-4-NIO模型图" class="headerlink" title="3.1.4 NIO模型图"></a>3.1.4 NIO模型图</h4><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211207225509511.png" alt="image-20211207225509511"></p>
-<h4 id="3-1-5-NIO-vs-BIO"><a href="#3-1-5-NIO-vs-BIO" class="headerlink" title="3.1.5 NIO  vs  BIO"></a>3.1.5 NIO  vs  BIO</h4><table>
-<thead>
-<tr>
-<th>BIO</th>
-<th>NIO</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>数据流(字节，字符)</td>
-<td>数据块(缓冲区，通道)</td>
-</tr>
-<tr>
-<td>流：单向</td>
-<td>通道：双向</td>
-</tr>
-<tr>
-<td>阻塞</td>
-<td>非阻塞</td>
-</tr>
-<tr>
-<td>一个请求需要一个线程</td>
-<td>一个线程处理处理多个请求(选择器监听)</td>
-</tr>
-</tbody></table>
-<h3 id="3-2-Buffer"><a href="#3-2-Buffer" class="headerlink" title="3.2 Buffer"></a>3.2 Buffer</h3><h4 id="3-2-2-Buffer属性"><a href="#3-2-2-Buffer属性" class="headerlink" title="3.2.2 Buffer属性"></a>3.2.2 Buffer属性</h4><ol>
-<li>容量：数组大小,不可更改<ol>
-<li>通过allocate分配</li>
-</ol>
-</li>
-<li>限制：可操作的最后位置<ol>
-<li>读：表示有数据的最后位置</li>
-<li>写：表示容量</li>
-</ol>
-</li>
-<li>位置：写入、读取的当前位置索引<ol>
-<li>标记：mark该位置</li>
-<li>重置：重置到mark位置</li>
-</ol>
-</li>
-</ol>
-<h4 id="3-2-3-Buffer-Api"><a href="#3-2-3-Buffer-Api" class="headerlink" title="3.2.3 Buffer Api"></a>3.2.3 Buffer Api</h4><ol>
-<li>clear 清空缓存区</li>
-<li>flip：转换成可读模式</li>
-<li>Remaining：获得缓冲区长度</li>
-<li>hasRemaining：是否有数据</li>
-<li>rewind：将位置置0清除mark</li>
-</ol>
-<h4 id="3-2-4-缓冲区分类"><a href="#3-2-4-缓冲区分类" class="headerlink" title="3.2.4 缓冲区分类"></a>3.2.4 缓冲区分类</h4><h5 id="3-2-4-1-直接缓冲区"><a href="#3-2-4-1-直接缓冲区" class="headerlink" title="3.2.4.1 直接缓冲区"></a>3.2.4.1 直接缓冲区</h5><blockquote>
-<p>写入到直接内存，高并发场景</p>
-</blockquote>
-<h5 id="3-2-4-2-非直接缓冲区"><a href="#3-2-4-2-非直接缓冲区" class="headerlink" title="3.2.4.2 非直接缓冲区"></a>3.2.4.2 非直接缓冲区</h5><blockquote>
-<p>写入堆内存</p>
-</blockquote>
-<h3 id="3-3-Channel"><a href="#3-3-Channel" class="headerlink" title="3.3 Channel"></a>3.3 Channel</h3><blockquote>
-<p>Channel代表这一个网络连接通道，当Channel注册到Selector后会返回一个SelectionKey对象，该SelectionKey对象则代表这这个Channel和它注册的Selector间的关系。并且SelectionKey中维护着两个很重要的属性：interestOps、readyOps。</p>
-<p>interestOps是我们希望Selector监听Channel的哪些事件。我们将我们感兴趣的事件设置到该字段，这样在selection操作时，当发现该Channel有我们所<strong>感兴趣的事件</strong>发生时，就会将我们感兴趣的事件再设置到readyOps中，这样我们就能得知是哪些事件发生了以做相应处理。 </p>
-</blockquote>
-<h4 id="3-3-1-特点"><a href="#3-3-1-特点" class="headerlink" title="3.3.1 特点"></a>3.3.1 特点</h4><ol>
-<li>双向的</li>
-<li>不能直接数据交互，需借助buffer</li>
-<li>异步读写</li>
-</ol>
-<h4 id="3-3-2-Channel实现"><a href="#3-3-2-Channel实现" class="headerlink" title="3.3.2 Channel实现"></a>3.3.2 Channel实现</h4><ol>
-<li>FileChannel 文件</li>
-<li>DatagramChannel  UDP</li>
-<li>SocketChannel  TCP</li>
-<li>ServerSockeChannel  监听Web的TCP连接，每一个连接创建一个Channel</li>
-</ol>
-<h3 id="3-4-Selector"><a href="#3-4-Selector" class="headerlink" title="3.4 Selector"></a>3.4 Selector</h3><blockquote>
-<p>选择器，Selector是NIO中实现I/O多路复用的关键类。Selector实现了通过一个线程管理多个Channel，从而管理多个网络连接的目的，</p>
-</blockquote>
-<h4 id="3-4-1-工作方式"><a href="#3-4-1-工作方式" class="headerlink" title="3.4.1 工作方式"></a>3.4.1 工作方式</h4><blockquote>
-<p>多个 Channel 以事件的方式可以注册到同一个Selector，如果有事件发生，便获取事件然后针对每个事件进行相应的处理。这样就可以只用<strong>一个单线程</strong>去管理<strong>多个通道</strong>，也就是管理多个连接和请求。避免了多线程之间的上下文切换导致的开销</p>
-</blockquote>
-<h4 id="3-4-2-选择器作用"><a href="#3-4-2-选择器作用" class="headerlink" title="3.4.2 选择器作用"></a>3.4.2 选择器作用</h4><ol>
-<li>轮询Channel选出可用的Channel</li>
-</ol>
-<h3 id="3-5-Reactor模式"><a href="#3-5-Reactor模式" class="headerlink" title="3.5 Reactor模式"></a>3.5 Reactor模式</h3><ol>
-<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/93612337">参考</a></li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/27/java/javaSE/JUC/%E7%BA%BF%E7%A8%8B%E6%B1%A0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/27/java/javaSE/JUC/%E7%BA%BF%E7%A8%8B%E6%B1%A0/" class="post-title-link" itemprop="url">线程池</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-27 14:46:58" itemprop="dateCreated datePublished" datetime="2022-03-27T14:46:58+08:00">2022-03-27</time>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/27/java/javaSE/JUC/%E7%BA%BF%E7%A8%8B%E6%B1%A0/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/27/java/javaSE/JUC/%E7%BA%BF%E7%A8%8B%E6%B1%A0/" class="cy_cmt_count" data-xid="2022/03/27/java/javaSE/JUC/线程池/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.8k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="线程池的作用"><a href="#线程池的作用" class="headerlink" title="线程池的作用"></a>线程池的作用</h3><p>1.减少了创建和销毁线程的次数，每个工作线程都可以被重复利用，可执行多个任务。</p>
-<p>2.可以根据系统的承受能力，调整线程池中工作线线程的数目，防止因为消耗过多的内存，而把服务器累趴下(每个线程需要大约1MB内存，线程开的越多，消耗的内存也就越大，最后死机)。</p>
-<h3 id="参数-ThreadPoolExecutor"><a href="#参数-ThreadPoolExecutor" class="headerlink" title="参数 ThreadPoolExecutor"></a>参数 ThreadPoolExecutor</h3><table>
-<thead>
-<tr>
-<th>参数</th>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody><tr>
-<td>int corePoolSize</td>
-<td>常驻线程数量</td>
-<td></td>
-</tr>
-<tr>
-<td>int maximumPoolSize</td>
-<td>表示最大线程数，如当前任务较多，将核心线程数都用完了，此时就会创建新的线程，但线程池内线程总数不会超过最大线程数</td>
-<td></td>
-</tr>
-<tr>
-<td>long keepAliveTime</td>
-<td>空闲线程存活时间(减少到常驻数量)</td>
-<td></td>
-</tr>
-<tr>
-<td>TimeUnit unit</td>
-<td>时间类型</td>
-<td></td>
-</tr>
-<tr>
-<td>BlockingQueue<Runnable> workQueue</td>
-<td>多的线程进入–&gt;阻塞队列</td>
-<td></td>
-</tr>
-<tr>
-<td>ThreadFactory threadFactory</td>
-<td>线程工厂</td>
-<td></td>
-</tr>
-<tr>
-<td>RejectedExecutionHandler handler</td>
-<td>当队列满的时候，拒绝策略</td>
-<td></td>
-</tr>
-</tbody></table>
-<h2 id="二、类型"><a href="#二、类型" class="headerlink" title="二、类型"></a>二、类型</h2><table>
-<thead>
-<tr>
-<th>名称</th>
-<th>参数</th>
-<th>含义</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>newFixedThreadPool</td>
-<td>(x,x)  0   LinkedBlockingQueue</td>
-<td>前x个能运行，其余进入队列</td>
-</tr>
-<tr>
-<td>newSingleThreadExecutor</td>
-<td>(1,1)  0  LinkedBlockingQueue</td>
-<td>只能一个运行，其余进入队列</td>
-</tr>
-<tr>
-<td>newCachedThreadPool</td>
-<td>(0,N) 60s  SynchronousQueue</td>
-<td>无限长变化池，来一个运行一个</td>
-</tr>
-<tr>
-<td>newScheduledThreadPool</td>
-<td>(x,N) 0  DelayedWorkQueue</td>
-<td>无限长变化池，延迟运行</td>
-</tr>
-</tbody></table>
-<h4 id="2-1-定长线程池"><a href="#2-1-定长线程池" class="headerlink" title="2.1 定长线程池"></a>2.1 定长线程池</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ExecutorService pools = Executors.newFixedThreadPool(<span class="number">5</span>);<span class="comment">//一池5线程</span></span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>多出的线程进入LinkedBlockingQueue，</p>
-</blockquote>
-<h4 id="2-2-一池一线程"><a href="#2-2-一池一线程" class="headerlink" title="2.2 一池一线程"></a>2.2 一池一线程</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> ExecutorService singleExecutor = Executors.newSingleThreadExecutor();</span><br></pre></td></tr></table></figure>
-
-<h4 id="2-3-可扩容池"><a href="#2-3-可扩容池" class="headerlink" title="2.3 可扩容池"></a>2.3 可扩容池</h4><ul>
-<li>它比较适合处理执行时间比较小的任务；</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> ExecutorService cachedThreadPool = Executors.newCachedThreadPool();</span><br></pre></td></tr></table></figure>
-
-<h4 id="2-4-定长延迟线程池"><a href="#2-4-定长延迟线程池" class="headerlink" title="2.4 定长延迟线程池"></a>2.4 定长延迟线程池</h4><blockquote>
-<p>可周期性，延迟性</p>
-</blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(<span class="number">2</span>);<span class="comment">//2个线程</span></span><br><span class="line">scheduledThreadPool.schedule(()-&gt;sout,<span class="number">3</span>,TimeUtil.SECONDS);<span class="comment">//延迟性，3秒后执行</span></span><br><span class="line">scheduledThreadPool.schedule(()-&gt;sout,<span class="number">1</span>,<span class="number">3</span>,TimeUtil.SECONDS);<span class="comment">//周期性，延迟性，1秒后执行，每三秒执行一次</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="三、queue类型"><a href="#三、queue类型" class="headerlink" title="三、queue类型"></a>三、queue类型</h2><h3 id="SynchronousQueue"><a href="#SynchronousQueue" class="headerlink" title="SynchronousQueue"></a>SynchronousQueue</h3><blockquote>
-<p>没有容量，直接提交。</p>
-<p>SynchronousQueue阻塞队列一般要求maximumPoolSizes为无界，避免线程拒绝执行操作。</p>
-</blockquote>
-<h3 id="LinkedBlockingQueue"><a href="#LinkedBlockingQueue" class="headerlink" title="LinkedBlockingQueue"></a>LinkedBlockingQueue</h3><blockquote>
-<p>无界队列，多于corePoolSize的线程被放进来等待，maximumPoolSizess变为无效参数</p>
-</blockquote>
-<h3 id="ArrayBlockingQueue"><a href="#ArrayBlockingQueue" class="headerlink" title="ArrayBlockingQueue"></a>ArrayBlockingQueue</h3><blockquote>
-<p>有界队列，可以指定缓存队列的大小，当线程数量大于corePoolSize时，多余的任务会缓存在ArrayBlockingQueue队列中等待有空闲的线程时继续执行；当ArrayBlockingQueue满时，则又会开启新的线程去执行，直到线程数量达到maximumPoolSize；当线程数已经达到最大的maximumPoolSize时，再有新的任务到达时会执行拒绝执行策略</p>
-</blockquote>
-<h4 id="DelayedWorkQueue"><a href="#DelayedWorkQueue" class="headerlink" title="DelayedWorkQueue"></a>DelayedWorkQueue</h4><blockquote>
-<p>无界阻塞延迟队列，根据剩余时间进行堆排序，最先过期的在最前面</p>
-</blockquote>
-<h2 id="四、其他"><a href="#四、其他" class="headerlink" title="四、其他"></a>四、其他</h2><h3 id="4-2-拒绝策略"><a href="#4-2-拒绝策略" class="headerlink" title="4.2 拒绝策略"></a>4.2 拒绝策略</h3><table>
-<thead>
-<tr>
-<th>名称</th>
-<th>作用</th>
-<th></th>
-</tr>
-</thead>
-<tbody><tr>
-<td>CallerRunsPolicy</td>
-<td>使用调用线程直接运行任务</td>
-<td></td>
-</tr>
-<tr>
-<td>AbortPolicy</td>
-<td>丢弃</td>
-<td></td>
-</tr>
-<tr>
-<td>DiscardPolicy</td>
-<td>丢弃，抛出异常</td>
-<td></td>
-</tr>
-<tr>
-<td>DiscardOldestPolicy</td>
-<td>丢弃阻塞队列 workQueue 中最老的一个任务，并将新任务加入</td>
-<td></td>
-</tr>
-</tbody></table>
-<h3 id="4-2-ThreadFactory"><a href="#4-2-ThreadFactory" class="headerlink" title="4.2 ThreadFactory"></a>4.2 ThreadFactory</h3><blockquote>
-<p>线程池可选参数，在线程放入线程池前处理线程</p>
-</blockquote>
-<ol>
-<li>设置名称</li>
-<li>设置是否为守护线程</li>
-<li>设置优先级</li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/27/java/javaSE/JUC/JUC%E7%9A%84%E5%9F%BA%E7%A1%80/CSA/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/27/java/javaSE/JUC/JUC%E7%9A%84%E5%9F%BA%E7%A1%80/CSA/" class="post-title-link" itemprop="url">多线程CSA</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-27 11:59:59" itemprop="dateCreated datePublished" datetime="2022-03-27T11:59:59+08:00">2022-03-27</time>
+              <time title="创建时间：2022-04-08 03:53:07" itemprop="dateCreated datePublished" datetime="2022-04-08T03:53:07+08:00">2022-04-08</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1010,8 +378,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/03/27/java/javaSE/JUC/JUC%E7%9A%84%E5%9F%BA%E7%A1%80/CSA/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/27/java/javaSE/JUC/JUC%E7%9A%84%E5%9F%BA%E7%A1%80/CSA/" class="cy_cmt_count" data-xid="2022/03/27/java/javaSE/JUC/JUC的基础/CSA/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/04/08/java/javaSE/JUC/JUC/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/08/java/javaSE/JUC/JUC/" class="cy_cmt_count" data-xid="2022/04/08/java/javaSE/JUC/JUC/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -1022,14 +390,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>8.1k</span>
+              <span>679</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>7 分钟</span>
+              <span>1 分钟</span>
             </span>
 
         </div>
@@ -1041,154 +409,466 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/upcwanghaibo/p/8626802.html">转载1-多线程之CSA</a></p>
-<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/fb6e91b013cc">转载2-深入浅出CSA</a></p>
-<p>一、什么是CAS</p>
-<p>CAS,compare and swap的缩写，比较后交换。</p>
-<p>我们都知道，在java语言之前，并发就已经广泛存在并在服务器领域得到了大量的应用。所以硬件厂商老早就在芯片中加入了大量直至并发操作的原语，从而在硬件层面提升效率。在intel的CPU中，使用cmpxchg指令。</p>
-<p>在Java发展初期，java语言是不能够利用硬件提供的这些便利来提升系统的性能的。而随着java不断的发展,Java本地方法(JNI)的出现，使得java程序越过JVM直接调用本地方法提供了一种便捷的方式，因而java在并发的手段上也多了起来。而在Doug Lea提供的cucurenct包中，CAS理论是它实现整个java包的基石。</p>
-<p>CAS 操作包含三个操作数 —— 内存位置（V）、预期原值（A）和新值(B)。 如果内存位置的值与预期原值相匹配，那么处理器会自动将该位置值更新为新值 。否则，处理器不做任何操作。无论哪种情况，它都会在 CAS 指令之前返回该 位置的值。（在 CAS 的一些特殊情况下将仅返回 CAS 是否成功，而不提取当前 值。）CAS 有效地说明了“我认为位置 V 应该包含值 A；如果包含该值，则将 B 放到这个位置；否则，不要更改该位置，只告诉我这个位置现在的值即可。”</p>
-<p>通常将 CAS 用于同步的方式是从地址 V 读取值 A，执行多步计算来获得新 值 B，然后使用 CAS 将 V 的值从 A 改为 B。如果 V 处的值尚未同时更改，则 CAS 操作成功。</p>
-<p>类似于 CAS 的指令允许算法执行读-修改-写操作，而无需害怕其他线程同时 修改变量，因为如果其他线程修改变量，那么 CAS 会检测它（并失败），算法 可以对该操作重新计算。</p>
-<p>二、CAS的目的</p>
-<p>利用CPU的CAS指令，同时借助JNI来完成Java的非阻塞算法。其它原子操作都是利用类似的特性完成的。而整个J.U.C都是建立在CAS之上的，因此对于synchronized阻塞算法，J.U.C在性能上有了很大的提升。</p>
-<p>三、CAS存在的问题</p>
-<p>CAS虽然很高效的解决原子操作，但是CAS仍然存在三大问题。ABA问题，循环时间长开销大和只能保证一个共享变量的原子操作</p>
-<p>\1.  ABA问题。因为CAS需要在操作值的时候检查下值有没有发生变化，如果没有发生变化则更新，但是如果一个值原来是A，变成了B，又变成了A，那么使用CAS进行检查时会发现它的值没有发生变化，但是实际上却变化了。ABA问题的解决思路就是使用版本号。在变量前面追加上版本号，每次变量更新的时候把版本号加一，那么A－B－A 就会变成1A-2B－3A。</p>
-<p>从Java1.5开始JDK的atomic包里提供了一个类AtomicStampedReference来解决ABA问题。这个类的compareAndSet方法作用是首先检查当前引用是否等于预期引用，并且当前标志是否等于预期标志，如果全部相等，则以原子方式将该引用和该标志的值设置为给定的更新值。</p>
-<p>关于ABA问题参考文档: <a target="_blank" rel="noopener" href="http://blog.hesey.net/2011/09/resolve-aba-by-atomicstampedreference.html">http://blog.hesey.net/2011/09/resolve-aba-by-atomicstampedreference.html</a></p>
-<p>\2. 循环时间长开销大。自旋CAS如果长时间不成功，会给CPU带来非常大的执行开销。如果JVM能支持处理器提供的pause指令那么效率会有一定的提升，pause指令有两个作用，第一它可以延迟流水线执行指令（de-pipeline）,使CPU不会消耗过多的执行资源，延迟的时间取决于具体实现的版本，在一些处理器上延迟时间是零。第二它可以避免在退出循环的时候因内存顺序冲突（memory order violation）而引起CPU流水线被清空（CPU pipeline flush），从而提高CPU的执行效率。</p>
-<p>\3. 只能保证一个共享变量的原子操作。当对一个共享变量执行操作时，我们可以使用循环CAS的方式来保证原子操作，但是对多个共享变量操作时，循环CAS就无法保证操作的原子性，这个时候就可以用锁，或者有一个取巧的办法，就是把多个共享变量合并成一个共享变量来操作。比如有两个共享变量i＝2,j=a，合并一下ij=2a，然后用CAS来操作ij。从Java1.5开始JDK提供了AtomicReference类来保证引用对象之间的原子性，你可以把多个变量放在一个对象里来进行CAS操作。</p>
-<p>四、concurrent包的实现</p>
-<p>由于java的CAS同时具有 volatile 读和volatile写的内存语义，因此Java线程之间的通信现在有了下面四种方式：</p>
-<ol>
-<li>A线程写volatile变量，随后B线程读这个volatile变量。</li>
-<li>A线程写volatile变量，随后B线程用CAS更新这个volatile变量。</li>
-<li>A线程用CAS更新一个volatile变量，随后B线程用CAS更新这个volatile变量。</li>
-<li>A线程用CAS更新一个volatile变量，随后B线程读这个volatile变量。</li>
+          <p>.</p>
+<h2 id="一、线程和进程概念"><a href="#一、线程和进程概念" class="headerlink" title="一、线程和进程概念"></a>一、线程和进程概念</h2><h3 id="1-1-进程与线程"><a href="#1-1-进程与线程" class="headerlink" title="1.1 进程与线程"></a>1.1 进程与线程</h3><ol>
+<li>进程是<strong>分配资源</strong>的基本单元，运行的一个程序</li>
+<li>线程是<strong>cpu调度</strong>的基本单元，程序执行的基本单位</li>
+<li>管程:<ol>
+<li>Monitor、监视器、锁</li>
+<li>同步机制，保证只有一个线程能访问资源</li>
 </ol>
-<p>Java的CAS会使用现代处理器上提供的高效机器级别原子指令，这些原子指令以原子方式对内存执行读-改-写操作，这是在多处理器中实现同步的关键（从本质上来说，能够支持原子性读-改-写指令的计算机器，是顺序计算图灵机的异步等价机器，因此任何现代的多处理器都会去支持某种能对内存执行原子性读-改-写操作的原子指令）。同时，volatile变量的读/写和CAS可以实现线程之间的通信。把这些特性整合在一起，就形成了整个concurrent包得以实现的基石。如果我们仔细分析concurrent包的源代码实现，会发现一个通用化的实现模式：</p>
-<ol>
-<li>首先，声明共享变量为volatile；</li>
-<li>然后，使用CAS的原子条件更新来实现线程之间的同步；</li>
-<li>同时，配合以volatile的读/写和CAS所具有的volatile读和写的内存语义来实现线程之间的通信。</li>
+</li>
+<li>用户线程和守护线程<ol>
+<li>用户线程：普通的线程，main结束了，用户线程还会继续运行</li>
+<li>守护线程：后台默默运行的线程 isDaemon，main结束，收回线程会结束</li>
 </ol>
-<p>AQS，非阻塞数据结构和原子变量类（java.util.concurrent.atomic包中的类），这些concurrent包中的基础类都是使用这种模式来实现的，而concurrent包中的高层类又是依赖于这些基础类来实现的。从整体来看，concurrent包的实现示意图如下：</p>
-<h2 id="二、"><a href="#二、" class="headerlink" title="二、"></a>二、</h2><h1 id="乐观锁和悲观锁？"><a href="#乐观锁和悲观锁？" class="headerlink" title="乐观锁和悲观锁？"></a>乐观锁和悲观锁？</h1><p>关于乐观锁和悲观锁的定义和使用场景，本质都是一样的，这里就不再赘述。</p>
-<p>关于悲观锁，下面再进行介绍，synchronized和Lock都属于悲观锁，下面我们来具体看看乐观锁。</p>
-<h1 id="乐观锁的实现-CAS"><a href="#乐观锁的实现-CAS" class="headerlink" title="乐观锁的实现-CAS"></a>乐观锁的实现-CAS</h1><p>乐观锁的核心就是CAS（Compare And Swap-比较与交换，是一种不抢占的同步方式），是一种无锁算法。CAS算法涉及三个操作数：</p>
-<ul>
-<li>需要读写的内存值V。</li>
-<li>进行比较的值A。</li>
-<li>要写入的新值B。</li>
-</ul>
-<p>当前仅当当前内存值V等于值A时，才进行写入新值B，有人会问我在比较相等后的同时更新了值V咋办？写入的新值B不是覆盖了别人刚写入的值吗？是的比较和写入需要保证是一个原子操作，这里通过CPU的cmpxchg指令，去比较寄存器中的A和内存中的值V，如果相等的话就写入B，如果不等的话就值V赋值给寄存器中的值A，如果想继续自旋就继续不想继续可以抛出相应错误。</p>
-<p>下面我们来看看常见的AtomicInteger是如何自旋的。</p>
-<h1 id="AtomicInteger"><a href="#AtomicInteger" class="headerlink" title="AtomicInteger"></a>AtomicInteger</h1><p>一个可以被原子更新的int值，关于原子变量属性描述具体可以参考{@link java.util.concurrent.automic}包。AutomicInteger用于原子递增计数器等应用程序中，不能被使用替代Integer。然而这个类扩展了Number允许被一些处理数值的工具或者公共代码统一访问。</p>
-<h1 id="字段和构造函数"><a href="#字段和构造函数" class="headerlink" title="字段和构造函数"></a>字段和构造函数</h1><figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">package java.util.concurrent.atomic;public class AtomicInteger extends Number implements java.io.Serializable &#123;   <span class="keyword"> private</span><span class="keyword"> static</span><span class="keyword"> final</span><span class="built_in"> long </span>serialVersionUID = 6214790243416807050<span class="class">L;</span>    // 设置使用Unsafe.compareAndSwapInt进行更新。   <span class="keyword"> private</span><span class="keyword"> static</span><span class="keyword"> final</span> Unsafe unsafe = Unsafe.getUnsafe();   <span class="keyword"> private</span><span class="keyword"> static</span><span class="keyword"> final</span><span class="built_in"> long </span>valueOffset;    // 获得value对象内存分布中的偏移量用于找到value   <span class="keyword"> static</span> &#123;        try &#123;            valueOffset = unsafe.objectFieldOffset                (AtomicInteger.class.getDeclaredField(<span class="string">&quot;value&quot;</span>));        &#125; catch (Exception ex) &#123;<span class="built_in"> throw </span>new Error(ex); &#125;    &#125;    // 保证内存可见效和禁止指令重排。   <span class="keyword"> private</span> volatile<span class="built_in"> int </span>value;   <span class="keyword"> public</span> AtomicInteger(int initialValue) &#123;        value = initialValue;    &#125;    /**     * 初始值为0     */   <span class="keyword"> public</span> AtomicInteger() &#123;    &#125;</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-<h1 id="incrementAndGet"><a href="#incrementAndGet" class="headerlink" title="incrementAndGet"></a>incrementAndGet</h1><figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**  * 以原子方式将当前值递增1  * @return 更新后的值  */</span><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">incrementAndGet</span><span class="params">()</span> </span>&#123;    <span class="keyword">return</span> unsafe.<span class="built_in">getAndAddInt</span>(<span class="keyword">this</span>, valueOffset, <span class="number">1</span>) + <span class="number">1</span>;&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-<p>var1：为AtomicInteger对象，用于unsafe结合valueOffset获得对象中的最新的value。<br>var2：value值在AtomicInteger对象中偏移量。<br>var4：增加的值为1。</p>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">package</span> sun.misc;public final int getAndAddInt(Object var<span class="number">1</span>, long var<span class="number">2</span>, int var<span class="number">4</span>) &#123;    int var<span class="number">5</span>;    do &#123;        //获得AutomicInteger的value值        var<span class="number">5</span> = this.getIntVolatile(var<span class="number">1</span>, var<span class="number">2</span>);    &#125; while(!this.compareAndSwapInt(var<span class="number">1</span>, var<span class="number">2</span>, var<span class="number">5</span>, var<span class="number">5</span> + var<span class="number">4</span>));    return var<span class="number">5</span>;&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-<h1 id="乐观锁的缺点"><a href="#乐观锁的缺点" class="headerlink" title="乐观锁的缺点"></a>乐观锁的缺点</h1><ul>
-<li>如果并发比较高，CAS一直比较自旋，将会一直占用CPU，如果自旋的线程多了CPU就会飙升。</li>
-<li>只能保证一个共享变量的原子操作。对一个共享变量执行操作时，CAS能保证原子操作，但是对多个共享变量操作时，CAS时无法保证操作的原子性的。 java从1.5开始JDK提供了AtomicReference类来保证引用之间的原子性，可以把多个变量放在一个对象中来进行CAS操作。</li>
-</ul>
-<h1 id="synchronized的底层是怎么实现的？"><a href="#synchronized的底层是怎么实现的？" class="headerlink" title="synchronized的底层是怎么实现的？"></a>synchronized的底层是怎么实现的？</h1><p>sychronized是通过对象头部的Mark Word中的锁标识+monitor实现的。</p>
-<h1 id="java对象头"><a href="#java对象头" class="headerlink" title="java对象头"></a>java对象头</h1><p><img src="https://pics2.baidu.com/feed/d0c8a786c9177f3e968abff920a73ecd9e3d567e.jpeg?token=a570314ffc55c706e4713b297fdabeed" alt="img"></p>
-<p>对象头由Mark Word和Klass组成，在没有压缩指针的时候都占8个字节。</p>
-<ul>
-<li><p>Mark Word：标记字段-运行时数据，如哈希码、GC信息以及锁信息。</p>
-<ul>
-<li><code>mark word</code>的位长度为JVM的一个Word大小，也就是说32位JVM的<code>Mark word</code>为32位，64位JVM为64位。   </li>
-</ul>
 </li>
-<li><p>Klass：对象锁代表的类的元数据指针。(32 bits) </p>
+</ol>
+<h3 id="1-2-线程的状态"><a href="#1-2-线程的状态" class="headerlink" title="1.2 线程的状态"></a>1.2 线程的状态</h3><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220325162011992.png" alt="image-20220325162011992"></p>
+<ol>
+<li>新建</li>
+<li>就绪</li>
+<li>等待</li>
+<li>运行</li>
+<li>死亡</li>
+</ol>
+<h3 id="1-3-wati和sleep"><a href="#1-3-wati和sleep" class="headerlink" title="1.3 wati和sleep"></a>1.3 wati和sleep</h3><ol>
+<li>Object.wait<ol>
+<li>释放锁</li>
+</ol>
 </li>
-</ul>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220327115958164.png" alt="image-20220327115958164"></p>
-<p>锁标志位+是否是偏向锁（biased_lock）共同表示对象的几种状态</p>
-<p><img src="https://pics7.baidu.com/feed/4bed2e738bd4b31c107584cad6be22759f2ff8ec.jpeg?token=a91c9763fdb54859f443d07d4f105a8d" alt="img"></p>
-<h1 id="monitor"><a href="#monitor" class="headerlink" title="monitor"></a>monitor</h1><p>synchronized通过Monitor来实现线程同步和协作。</p>
+<li>Thread.sleep<ol>
+<li>不释放当前锁</li>
+</ol>
+</li>
+</ol>
+<h3 id="1-4-并发和并行"><a href="#1-4-并发和并行" class="headerlink" title="1.4 并发和并行"></a>1.4 并发和并行</h3><ol>
+<li>串行：排队执行</li>
+<li>并行：一并执行</li>
+<li>并发：一个cpu表面上运行多个线程</li>
+<li>并行：多个cpu</li>
+</ol>
+<h3 id="1-5-Lock、synchronize"><a href="#1-5-Lock、synchronize" class="headerlink" title="1.5 Lock、synchronize"></a>1.5 Lock、synchronize</h3><h4 id="1-5-1-synchronize，同步锁"><a href="#1-5-1-synchronize，同步锁" class="headerlink" title="1.5.1 synchronize，同步锁"></a>1.5.1 synchronize，同步锁</h4><ol>
+<li>修饰代码块<ol>
+<li>作用于对象是调用这个代码块的对象</li>
+</ol>
+</li>
+<li>修饰方法<ol>
+<li>被修饰的方法称为同步方法，其</li>
+<li>作用的对象是调用这个方法的对象； </li>
+</ol>
+</li>
+<li>修饰静态方法<ol>
+<li>作用的对象是这个类的所有对象</li>
+</ol>
+</li>
+<li>修饰类<ol>
+<li>作用主的对象是这个类的所有对象</li>
+</ol>
+</li>
+</ol>
+<h4 id="1-5-2-lock和synchronized区别"><a href="#1-5-2-lock和synchronized区别" class="headerlink" title="1.5.2 lock和synchronized区别"></a>1.5.2 lock和synchronized区别</h4><ol>
+<li><p>lock可获得更广泛的锁</p>
+</li>
+<li><p>lock是类，不是java内置</p>
+</li>
+<li><p>lock是手动锁，synchronized是自动锁</p>
+</li>
+<li><p>synchronized发生异常或者结束会自动释放，而lock发生了异常会一直占用锁</p>
+</li>
+<li><p>lock可以判断是否得到了锁</p>
+</li>
+<li><p>lock可以在竞争激烈的情况下提高效率</p>
+</li>
+<li><p>1. </p>
+</li>
+</ol>
+<h3 id="多线程编程步骤"><a href="#多线程编程步骤" class="headerlink" title="多线程编程步骤"></a>多线程编程步骤</h3><ol>
+<li>创建资源类</li>
+<li>资源类的消费和供给方法<ol>
+<li>判断<ol>
+<li>否：wait等待其他线程的natify</li>
+<li>是：干活<ol>
+<li>通知</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>创建线程，调用消费、共给方法</li>
+</ol>
+<h2 id="线程间通信"><a href="#线程间通信" class="headerlink" title="线程间通信"></a>线程间通信</h2><h3 id="线程间定制化通信"><a href="#线程间定制化通信" class="headerlink" title="线程间定制化通信"></a>线程间定制化通信</h3><ol>
+<li>标志位</li>
+</ol>
+<h3 id="特殊"><a href="#特殊" class="headerlink" title="特殊"></a>特殊</h3><ol>
+<li>wait 需要用while循环放置虚假唤醒</li>
+</ol>
+<h3 id="疑惑"><a href="#疑惑" class="headerlink" title="疑惑"></a>疑惑</h3><ol>
+<li>lock原理</li>
+<li>wait</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/08/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DML/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/04/08/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DML/" class="post-title-link" itemprop="url">DML数据库，操纵语言</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-04-08 03:20:27" itemprop="dateCreated datePublished" datetime="2022-04-08T03:20:27+08:00">2022-04-08</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/sql%E8%AF%AD%E5%8F%A5/" itemprop="url" rel="index"><span itemprop="name">sql语句</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/04/08/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DML/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/08/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DML/" class="cy_cmt_count" data-xid="2022/04/08/数据库/sql/DML/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>[toc]</p>
+<h3 id="一、Select"><a href="#一、Select" class="headerlink" title="一、Select"></a>一、Select</h3><h4 id="1-1-where-like-and-or-between-in"><a href="#1-1-where-like-and-or-between-in" class="headerlink" title="1.1 where  like  and  or  between  in"></a>1.1 where  like  and  or  between  in</h4><ol>
+<li><p>select * from name where  age &lt;&gt; 18; 查询年龄不等于18的人</p>
+</li>
+<li><p>select * from name where age&gt;18 and sex=’男’ </p>
+</li>
+<li><p>update name set age =18 where not id =10;  按条件修改</p>
+</li>
+<li><p>select * from name where age between 4 and 10; 查询4-10岁  前闭后开</p>
+</li>
+<li><p>select * from name where age in (3,4,10)  查询3，4，10 岁数据</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/04/08/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DML/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/08/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DDL/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/04/08/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DDL/" class="post-title-link" itemprop="url">DDL数据库定义语言</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-04-08 01:45:00" itemprop="dateCreated datePublished" datetime="2022-04-08T01:45:00+08:00">2022-04-08</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/sql%E8%AF%AD%E5%8F%A5/" itemprop="url" rel="index"><span itemprop="name">sql语句</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/04/08/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DDL/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/08/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DDL/" class="cy_cmt_count" data-xid="2022/04/08/数据库/sql/DDL/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>[TOC]</p>
+<h2 id="一、创建"><a href="#一、创建" class="headerlink" title="一、创建"></a>一、创建</h2><h3 id="1-1-库"><a href="#1-1-库" class="headerlink" title="1.1 库"></a>1.1 库</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> database a <span class="keyword">default</span> <span class="type">character</span> <span class="keyword">set</span> utf8mb4 <span class="keyword">collate</span> utf8mb4_unicode_ci;</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-2-表"><a href="#1-2-表" class="headerlink" title="1.2 表"></a>1.2 表</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> Persons(</span><br><span class="line">    id <span class="type">int</span> <span class="keyword">NOT</span> <span class="keyword">NULL</span> AUTO_INCREMENT,</span><br><span class="line">	name <span class="type">varchar</span>(<span class="number">255</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">	city <span class="type">varchar</span>(<span class="number">255</span>),</span><br><span class="line">	<span class="keyword">PRIMARY</span> KEY (ID)	</span><br><span class="line">)ENGINE<span class="operator">=</span>INNODB  <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8 ;</span><br><span class="line"></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> test (name <span class="type">varchar</span>(<span class="number">20</span>),age <span class="type">int</span>(<span class="number">2</span>) <span class="keyword">PRIMARY</span> key auto_increment) auto_increment<span class="operator">=</span><span class="number">2</span> ;</span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> test (name <span class="type">varchar</span>(<span class="number">20</span>),age <span class="type">int</span>(<span class="number">2</span>)  auto_increment ,<span class="keyword">unique</span>(age) ,key(name));</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/04/08/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DDL/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/08/spring/springMaster/%E5%A4%9A%E6%95%B0%E6%8D%AE%E6%BA%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/04/08/spring/springMaster/%E5%A4%9A%E6%95%B0%E6%8D%AE%E6%BA%90/" class="post-title-link" itemprop="url">多数据源</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-04-08 00:30:59" itemprop="dateCreated datePublished" datetime="2022-04-08T00:30:59+08:00">2022-04-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-05-05 11:57:26" itemprop="dateModified" datetime="2022-05-05T11:57:26+08:00">2022-05-05</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/spring/springMaster/" itemprop="url" rel="index"><span itemprop="name">springMaster</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/04/08/spring/springMaster/%E5%A4%9A%E6%95%B0%E6%8D%AE%E6%BA%90/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/08/spring/springMaster/%E5%A4%9A%E6%95%B0%E6%8D%AE%E6%BA%90/" class="cy_cmt_count" data-xid="2022/04/08/spring/springMaster/多数据源/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>[toc]</p>
+<blockquote>
+<p><strong>关键：指定MapperScan的SqlSessionRef</strong></p>
+<p>这里提前注入了sqlsessionFactory</p>
+</blockquote>
+<h3 id="大致步骤"><a href="#大致步骤" class="headerlink" title="大致步骤"></a>大致步骤</h3><ol>
+<li>再yml中配置两个druid连接池的参数(type,url,password)</li>
+<li>在configruation中配置两个@Bean，每个bea注入不同的druid连接池参数</li>
+</ol>
+<h3 id="Mapper的对应关系"><a href="#Mapper的对应关系" class="headerlink" title="Mapper的对应关系"></a>Mapper的对应关系</h3><p>首先拥有两个文件/类</p>
 <ul>
-<li>同步依赖的是操作系统的Mutex（互斥锁量）只有拥有互斥量的线程才能进入临界区，不拥有的只能阻塞等待，会维护一个阻塞的队列。</li>
+<li><p>resources/mapper/mysql.mapper </p>
+</li>
+<li><p>resources/mapper/oracle.mapper</p>
+<p>这两个mapper文件的namespace对应不同的mapper.class</p>
+</li>
+<li><p>com.wyg.mapper.MysqlMapper.class</p>
+</li>
+<li><p>com.wyg.mapper.OracleMapper.class</p>
+</li>
+<li></li>
 </ul>
-<p><img src="https://pics1.baidu.com/feed/574e9258d109b3de207742529ed7698b810a4cb6.jpeg?token=6a0b50854d5ac5cb3751d6c976324a0e" alt="img"></p>
-<ul>
-<li>协作依赖的是synchronized持有的对象，对象可以让多个线程方便同步，还可以通过对象调用wait方法释放锁让线程进入等待队列，等其他线程调用对象的notify和notifyAll方法进行唤醒可以重新获取锁。</li>
-</ul>
-<p><img src="https://pics6.baidu.com/feed/8601a18b87d6277fedfb40a87f501a3ae824fc23.jpeg?token=9c5602cb9d020cf8db32c1a8502f4935" alt="img"></p>
-<p>Monitor用来进行监听锁的持有和调度锁的持有的。持有的对象可以理解为锁的一个媒介，可以使用它方便操作同步和协作。</p>
-<p>具体例子可以参考《Thread源码阅读及相关问题》中的例子。</p>
-<p>monitor这套监听锁和调度锁包括使用的互斥量其实都是比较消耗资源的，所以使用它的成为“重量级锁”。JDK 6中为了减少获得锁和释放锁带来的性能消耗，引入了“偏向锁”和“轻量级锁”，下面我们分别会进行分配介绍。</p>
-<h1 id="无锁"><a href="#无锁" class="headerlink" title="无锁"></a>无锁</h1><p>当对象头中锁标志位为01，是否偏向锁为0时表示使无锁的状态。想要在无锁的时候实现同步可以使用上面乐观锁中实现-CAS。</p>
-<h1 id="偏向锁"><a href="#偏向锁" class="headerlink" title="偏向锁"></a>偏向锁</h1><p>偏向锁是一个锁优化的产物，在对象头中进行标记，表示有线程进入了临界区，在只有一个线程访问的时候既不用使用CAS也不用引入较重的monitor。</p>
-<p>线程不会主动释放偏向锁，只有遇到其他线程进尝试竞争偏向锁时，需要等待全局安全点（在这个时间点上没有执行的字节码），它会首先暂停拥有偏向锁的的线程，判断它是否还活着，如果死亡了就恢复到无锁状态其他线程就可以占用，如果还在临界区就对锁进行升级成”轻量锁”。</p>
-<p><img src="https://pics5.baidu.com/feed/024f78f0f736afc3949dbe99e171eeceb645122f.jpeg?token=b9d61ce680a1c9d0babb6d04948013d0" alt="img"></p>
-<p>每个线程进入临界区的时候都会查看对象头锁标识是否是偏向锁，是偏向锁的话，会判断当前线程和对象头中的线程id是同一个线程则直接进入，如果不是则进行CAS看是不是能比较替换成功（防止马上就释放了），如果没成功就会暂停持有偏向锁的线程，看线程是否已经不再用锁了，如果没用就释放，给新进来的线程占用，如果在用就进行锁升级生成轻量锁”。</p>
-<p>可以通过JVM参数关闭偏向锁：-XX:-UseBiasedLocking=false，那么程序会默认进入轻量级锁状态。 <strong>笔者思考</strong></p>
-<p>可以发现在只有一个线程进入临界区的时候确实能避免使用互斥量带来的开销，但是可以发现线程不会主动释放偏向锁。为啥不当有偏向锁的时候离开临界区进行释放？还要等其他线程来的时候要等全局点的时候尝试对线程暂停之后再看该线程持有锁的状态？这些疑问我们考虑不全，可能是设计的问题，也可能是因为一些其他原因，我们对JVM源码不够熟悉的情况下会比较费解。或许后面迭代会进行优化。</p>
-<p><strong>所以我们只需要明白一点：偏量锁是一种锁的优化，它本质上不是锁，只是对象头中进行了标记，如果没有多线程并发访问临界区的时候可以减少开销，如果出现多并发的时候会进行升级。</strong></p>
-<h1 id="轻量级锁"><a href="#轻量级锁" class="headerlink" title="轻量级锁"></a>轻量级锁</h1><p>轻量锁发生在偏向锁升级或者-XX:-UseBiasedLocking=false的时候，线程在执行同步块之前，JVM会现在当前线程的栈帧中创建用于存储锁记录的空间，并将对象头中的Mark Word复制到锁记录中，官方称为Displaces Mark Word。然后线程尝试使用CAS将对头像中的Mark Word替换为之指向锁记录的指针。如果成功，当前线程获得锁，如果失败将通过自旋来进行同步。</p>
-<h1 id="重量级锁"><a href="#重量级锁" class="headerlink" title="重量级锁"></a>重量级锁</h1><p>重量锁的锁标志位为10，就是上面介绍的monitor机制，开销最大。</p>
-<p><img src="https://pics4.baidu.com/feed/32fa828ba61ea8d3bb69558dc4623544241f5865.jpeg?token=e752aa233669c05413dee5f9175f8174" alt="img"></p>
-<h1 id="synchronized锁升级？"><a href="#synchronized锁升级？" class="headerlink" title="synchronized锁升级？"></a>synchronized锁升级？</h1><p>如上面的synchronized的底层实现章节。</p>
-<h1 id="synchronized可重入是怎么实现的？"><a href="#synchronized可重入是怎么实现的？" class="headerlink" title="synchronized可重入是怎么实现的？"></a>synchronized可重入是怎么实现的？</h1><p>我们先用代码证明下：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SynchronizedReentrantTest</span> <span class="keyword">extends</span> <span class="title">Father</span> </span>&#123;    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">doSomeThing1</span><span class="params">()</span> </span>&#123;        System.out.println(<span class="string">&quot;doSomeThing1&quot;</span>);        doSomeThing2();    &#125;    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">doSomeThing2</span><span class="params">()</span> </span>&#123;        System.out.println(<span class="string">&quot;doSomeThing2&quot;</span>);        <span class="keyword">super</span>.fatherDoSomeThing();    &#125;    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;        SynchronizedReentrantTest synchronizedReentrantTest = <span class="keyword">new</span> SynchronizedReentrantTest();        synchronizedReentrantTest.doSomeThing1();    &#125;&#125;<span class="class"><span class="keyword">class</span> <span class="title">Father</span> </span>&#123;    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">fatherDoSomeThing</span><span class="params">()</span> </span>&#123;        System.out.println(<span class="string">&quot;fatherDoSomeThing&quot;</span>);    &#125;&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="application-yml"><a href="#application-yml" class="headerlink" title="application.yml"></a>application.yml</h3><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#spring.datasource.druid.</span></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">datasource:</span></span><br><span class="line">    <span class="attr">druid:</span></span><br><span class="line"></span><br><span class="line">      <span class="comment"># 数据库访问配置, 使用druid数据源</span></span><br><span class="line">      <span class="comment"># 数据源1 mysql</span></span><br><span class="line">      <span class="attr">mysql:</span></span><br><span class="line">        <span class="attr">type:</span> <span class="string">com.alibaba.druid.pool.DruidDataSource</span></span><br><span class="line">        <span class="attr">driver-class-name:</span> <span class="string">com.mysql.jdbc.Driver</span></span><br><span class="line">        <span class="attr">url:</span> <span class="string">jdbc:mysql://localhost:3306/test?useUnicode=true&amp;characterEncoding=UTF-8&amp;rewriteBatchedStatements=true&amp;autoReconnect=true&amp;failOverReadOnly=false&amp;zeroDateTimeBehavior=convertToNull</span></span><br><span class="line">        <span class="attr">username:</span> <span class="string">root</span></span><br><span class="line">        <span class="attr">password:</span> <span class="number">123456</span></span><br><span class="line">      <span class="comment"># 数据源2 oracle</span></span><br><span class="line">      <span class="attr">oracle:</span> </span><br><span class="line">        <span class="attr">type:</span> <span class="string">com.alibaba.druid.pool.DruidDataSource</span></span><br><span class="line">        <span class="attr">driver-class-name:</span> <span class="string">oracle.jdbc.driver.OracleDriver</span></span><br><span class="line">        <span class="attr">url:</span> <span class="string">jdbc:oracle:thin:@localhost:1521:ORCL</span></span><br><span class="line">        <span class="attr">username:</span> <span class="string">test</span></span><br><span class="line">        <span class="attr">password:</span> <span class="number">123456</span></span><br><span class="line">        </span><br><span class="line">      <span class="comment"># 连接池配置</span></span><br><span class="line">      <span class="attr">initial-size:</span> <span class="number">5</span></span><br><span class="line">      <span class="attr">min-idle:</span> <span class="number">5</span></span><br><span class="line">      <span class="attr">max-active:</span> <span class="number">20</span></span><br><span class="line">      <span class="comment"># 连接等待超时时间</span></span><br><span class="line">      <span class="attr">max-wait:</span> <span class="number">30000</span></span><br><span class="line">      <span class="comment"># 配置检测可以关闭的空闲连接间隔时间</span></span><br><span class="line">      <span class="attr">time-between-eviction-runs-millis:</span> <span class="number">60000</span></span><br><span class="line">      <span class="comment"># 配置连接在池中的最小生存时间</span></span><br><span class="line">      <span class="attr">min-evictable-idle-time-millis:</span> <span class="number">300000</span></span><br><span class="line">      <span class="attr">validation-query:</span> <span class="string">select</span> <span class="string">&#x27;1&#x27;</span> <span class="string">from</span> <span class="string">dual</span></span><br><span class="line">      <span class="attr">test-while-idle:</span> <span class="literal">true</span></span><br><span class="line">      <span class="attr">test-on-borrow:</span> <span class="literal">false</span></span><br><span class="line">      <span class="attr">test-on-return:</span> <span class="literal">false</span></span><br><span class="line">      <span class="comment"># 打开PSCache，并且指定每个连接上PSCache的大小</span></span><br><span class="line">      <span class="attr">pool-prepared-statements:</span> <span class="literal">true</span></span><br><span class="line">      <span class="attr">max-open-prepared-statements:</span> <span class="number">20</span></span><br><span class="line">      <span class="attr">max-pool-prepared-statement-per-connection-size:</span> <span class="number">20</span></span><br><span class="line">      <span class="comment"># 配置监控统计拦截的filters, 去掉后监控界面sql无法统计, &#x27;wall&#x27;用于防火墙</span></span><br><span class="line">      <span class="attr">filters:</span> <span class="string">stat,wall</span></span><br><span class="line">      <span class="comment"># Spring监控AOP切入点，如x.y.z.service.*,配置多个英文逗号分隔</span></span><br><span class="line">      <span class="attr">aop-patterns:</span> <span class="string">com.springboot.servie.*</span></span><br><span class="line">      </span><br><span class="line">    </span><br><span class="line">      <span class="comment"># WebStatFilter配置</span></span><br><span class="line">      <span class="attr">web-stat-filter:</span></span><br><span class="line">        <span class="attr">enabled:</span> <span class="literal">true</span></span><br><span class="line">        <span class="comment"># 添加过滤规则</span></span><br><span class="line">        <span class="attr">url-pattern:</span> <span class="string">/*</span></span><br><span class="line">        <span class="comment"># 忽略过滤的格式</span></span><br><span class="line">        <span class="attr">exclusions:</span> <span class="string">&#x27;*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*&#x27;</span></span><br><span class="line">      </span><br><span class="line">      <span class="comment"># StatViewServlet配置 </span></span><br><span class="line">      <span class="attr">stat-view-servlet:</span></span><br><span class="line">        <span class="attr">enabled:</span> <span class="literal">true</span></span><br><span class="line">        <span class="comment"># 访问路径为/druid时，跳转到StatViewServlet</span></span><br><span class="line">        <span class="attr">url-pattern:</span> <span class="string">/druid/*</span></span><br><span class="line">        <span class="comment"># 是否能够重置数据</span></span><br><span class="line">        <span class="attr">reset-enable:</span> <span class="literal">false</span></span><br><span class="line">        <span class="comment"># 需要账号密码才能访问控制台</span></span><br><span class="line">        <span class="attr">login-username:</span> <span class="string">druid</span></span><br><span class="line">        <span class="attr">login-password:</span> <span class="string">druid123</span></span><br><span class="line">        <span class="comment"># IP白名单</span></span><br><span class="line">        <span class="comment"># allow: 127.0.0.1</span></span><br><span class="line">        <span class="comment">#　IP黑名单（共同存在时，deny优先于allow）</span></span><br><span class="line">        <span class="comment"># deny: 192.168.1.218</span></span><br><span class="line">      </span><br><span class="line">      <span class="comment"># 配置StatFilter</span></span><br><span class="line">      <span class="attr">filter:</span> </span><br><span class="line">        <span class="attr">stat:</span> </span><br><span class="line">          <span class="attr">log-slow-sql:</span> <span class="literal">true</span> </span><br></pre></td></tr></table></figure>
 
-
-
-
-
-<p>输出：</p>
-<figure class="highlight gcode"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">doSomeThi<span class="symbol">ng1</span>doSomeThi<span class="symbol">ng2</span>fatherDoSomeThi<span class="symbol">ng</span></span><br></pre></td></tr></table></figure>
-
-
-
-
-
-<p>说明synchronized是可重入的。</p>
-<p>重量级锁使用的是monitor对象中的计数字段来实现的，偏向锁应该没有只有表示当前被那个线程持有，轻量锁在每次进入的时候都会添加一个Lock Record来表示锁的重入次数。</p>
-<p><strong>笔者思考</strong></p>
-<p>为啥偏向锁不记录重入次数，重入的时候只需要看是否是当前线程，对象头中没有地方存放次数，所以偏向锁不会主动释放（应该是判断嵌套临界区比较麻烦），需要另外一个线程来判断当前线程是否活跃死亡了才释放还会尝试暂停持有的线程。这点其实不如轻量级锁和重量级锁。</p>
-<h1 id="synchronized是公平锁还是非公平锁？"><a href="#synchronized是公平锁还是非公平锁？" class="headerlink" title="synchronized是公平锁还是非公平锁？"></a>synchronized是公平锁还是非公平锁？</h1><p>非公平的，直接下面打饭的例子：</p>
-<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> lombok.SneakyThrows;<span class="built_in">public</span> <span class="keyword">class</span> SyncUnFairLockTest &#123;    //食堂    private static <span class="keyword">class</span> DiningRoom &#123;        //获取食物        @SneakyThrows        <span class="built_in">public</span> <span class="type">void</span> getFood() &#123;            <span class="keyword">System</span>.<span class="keyword">out</span>.println(Thread.currentThread().getName() + &quot;:排队中&quot;);            synchronized (this) &#123;                <span class="keyword">System</span>.<span class="keyword">out</span>.println(Thread.currentThread().getName() + &quot;:@@@@@@打饭中@@@@@@@&quot;);                Thread.sleep(<span class="number">200</span>);            &#125;        &#125;    &#125;    <span class="built_in">public</span> static <span class="type">void</span> main(String[] args) &#123;        DiningRoom diningRoom = <span class="built_in">new</span> DiningRoom();        //让<span class="number">5</span>个同学去打饭        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;            <span class="built_in">new</span> Thread(() -&gt; &#123;                diningRoom.getFood();            &#125;, &quot;同学编号:00&quot; + (i + <span class="number">1</span>)).<span class="keyword">start</span>();        &#125;    &#125;&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-<p>输出：</p>
-<figure class="highlight mel"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">同学编号:<span class="number">001</span>:排队中同学编号:<span class="number">001</span>:@@@@@@打饭中@@@@@@@同学编号:<span class="number">005</span>:排队中同学编号:<span class="number">003</span>:排队中同学编号:<span class="number">004</span>:排队中同学编号:<span class="number">002</span>:排队中同学编号:<span class="number">002</span>:@@@@@@打饭中@@@@@@@同学编号:<span class="number">004</span>:@@@@@@打饭中@@@@@@@同学编号:<span class="number">003</span>:@@@@@@打饭中@@@@@@@同学编号:<span class="number">005</span>:@@@@@@打饭中@@@@@@@</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-<p>注意到这里我加了sleep，因为对于公平锁来说无所谓，先来的肯定先执行，但是非公平锁时后面来的线程会先进行尝试获得锁，获取不到再进入队列，这样就能避免同一进入队列再被CPU唤醒，能提高效率，但是非公平锁会出现饿死的情况。</p>
-<h1 id="synchronized和volatile对比有什么区别？"><a href="#synchronized和volatile对比有什么区别？" class="headerlink" title="synchronized和volatile对比有什么区别？"></a>synchronized和volatile对比有什么区别？</h1><p>都能保证可见效，synchronized因为是锁所以能保证原子性。</p>
-<p>可见效主要指的是线程共享时工作内存和主内存能否及时同步。</p>
-<p><img src="https://pics1.baidu.com/feed/4d086e061d950a7b16bac8cf5fb967d3f3d3c9a4.jpeg?token=2e23c7e19378ed5bd70778eb0c6f866f" alt="img"></p>
-<p>JMM关于synchronized的两个规定：</p>
-<ul>
-<li>线程解锁前，必须把共享变量的最新值刷新到主内存中。</li>
-<li>线程加锁时，将清空工作内存中共享变量的值，从而使变量共享时，需要从主内存中重新读取最新的值。</li>
-</ul>
-
+<h3 id="stat-view"><a href="#stat-view" class="headerlink" title="stat-view"></a>stat-view</h3><h3 id="servlet的作用"><a href="#servlet的作用" class="headerlink" title="-servlet的作用"></a>-servlet的作用</h3>
       
     </div>
 
@@ -1274,7 +954,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">114</span>
+          <span class="site-state-item-count">115</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1325,12 +1005,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">323k</span>
+    <span title="站点总字数">335k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">4:54</span>
+    <span title="站点阅读时长">5:04</span>
 </div>
 
         

@@ -187,7 +187,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/05/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/10/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JUtil/%E9%9B%86%E5%90%88/HashMap/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -201,7 +201,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/04/05/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95/" class="post-title-link" itemprop="url">单点登录</a>
+            <a href="/2022/04/10/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JUtil/%E9%9B%86%E5%90%88/HashMap/" class="post-title-link" itemprop="url">hashmap</a>
         </h2>
 
         <div class="post-meta">
@@ -211,7 +211,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-04-05 18:58:05" itemprop="dateCreated datePublished" datetime="2022-04-05T18:58:05+08:00">2022-04-05</time>
+              <time title="创建时间：2022-04-10 00:12:46" itemprop="dateCreated datePublished" datetime="2022-04-10T00:12:46+08:00">2022-04-10</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -219,7 +219,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%BB%84%E4%BB%B6/" itemprop="url" rel="index"><span itemprop="name">组件</span></a>
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
                 </span>
             </span>
 
@@ -233,8 +233,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/04/05/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/05/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95/" class="cy_cmt_count" data-xid="2022/04/05/组件/登录/单点登录/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/04/10/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JUtil/%E9%9B%86%E5%90%88/HashMap/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/10/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/JUtil/%E9%9B%86%E5%90%88/HashMap/" class="cy_cmt_count" data-xid="2022/04/10/java/java源码解读/JUtil/集合/HashMap/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -245,7 +245,386 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>2.6k</span>
+              <span>5.3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>5 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="一、原理"><a href="#一、原理" class="headerlink" title="一、原理"></a>一、原理</h2><p>基于哈希表的实现的<code>Map</code>接口。此实现提供了所有可选的map操作，并允许<code>null的</code>值和<code>null</code>键。（  <code>HashMap</code>类大致相当于<code>Hashtable</code> ，除了它是不同步的，并允许null）。这个类不能保证map的。</p>
+<p>假设哈希函数在这些存储桶之间正确分散元素，这个实现为基本操作（ <code>get</code>和<code>put</code>  ）提供了恒定的时间性能。 收集视图的迭代需要与<code>HashMap</code>实例（桶数）加上其大小（键值映射数）的“容量”  <code>成正比</code> 。 因此，如果迭代性能很重要，不要将初始容量设置得太高（或负载因子太低）是非常重要的。 </p>
+<p><code>HashMap的</code>一个实例有两个影响其性能的参数： <em>初始容量</em>和<em>负载因子</em> 。  <em>容量</em>是哈希表中的桶数，初始容量只是创建哈希表时的容量。  <em>负载因子</em>是在容量自动增加之前允许哈希表得到满足的度量。  当在散列表中的条目的数量超过了负载因数和电流容量的乘积，哈希表被<em>重新散列</em>  （即，内部数据结构被重建），使得哈希表具有桶的大约两倍。 </p>
+<p>作为一般规则，默认负载因子（.75）提供了时间和空间成本之间的良好折中。  更高的值会降低空间开销，但会增加查找成本（反映在<code>HashMap</code>类的大部分操作中，包括<code>get</code>和<code>put</code>  ）。 在设置其初始容量时，应考虑map中预期的条目数及其负载因子，以便最小化重新组播操作的数量。  如果初始容量大于最大条目数除以负载因子，则不会发生重新排列操作。 </p>
+<p>如果许多映射要存储在<code>HashMap</code>实例中，则以足够大的容量创建映射将允许映射的存储效率高于使其根据需要执行自动重新排序以增长表。  请注意，使用同一个<code>hashCode()</code>多个密钥是降低任何哈希表的<code>hashCode()</code>的一种方法。  为了改善影响，当按键是<a href="../../java/lang/Comparable.html"><code>Comparable</code></a>时，这个类可以使用键之间的比较顺序来帮助打破关系。 </p>
+<p>当链表大于 8 并且容量大于 64 时，链表结构会转换成红黑树结构，大体结构如下图：</p>
+<ol>
+<li>基于equals</li>
+</ol>
+<h2 id="二、属性"><a href="#二、属性" class="headerlink" title="二、属性"></a>二、属性</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> DEFAULT_INITIAL_CAPACITY = <span class="number">1</span> &lt;&lt; <span class="number">4</span>; <span class="comment">// 默认容量 16</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> MAXIMUM_CAPACITY = <span class="number">1</span> &lt;&lt; <span class="number">30</span>; <span class="comment">//最大容量</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">float</span> DEFAULT_LOAD_FACTOR = <span class="number">0.75f</span>;<span class="comment">//默认负载因子</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> TREEIFY_THRESHOLD = <span class="number">8</span>;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> UNTREEIFY_THRESHOLD = <span class="number">6</span>;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> MIN_TREEIFY_CAPACITY = <span class="number">64</span>;</span><br><span class="line"><span class="keyword">transient</span> Node&lt;K,V&gt;[] table;<span class="comment">//表.分配时，长度始终为2的幂。</span></span><br><span class="line"><span class="keyword">transient</span> Set&lt;Map.Entry&lt;K,V&gt;&gt; entrySet;<span class="comment">//保存缓存的entrySet</span></span><br><span class="line"><span class="keyword">transient</span> <span class="keyword">int</span> size;<span class="comment">//现在容量</span></span><br><span class="line"><span class="keyword">transient</span> <span class="keyword">int</span> modCount;<span class="comment">//Fail-Fast机制</span></span><br><span class="line"><span class="keyword">int</span> threshold; <span class="comment">//要调整大小的下一个大小值（容量*负载系数）。</span></span><br><span class="line"><span class="keyword">final</span> <span class="keyword">float</span> loadFactor;<span class="comment">//f</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="三、-方法"><a href="#三、-方法" class="headerlink" title="三、 方法"></a>三、 方法</h2><h3 id="2-1-hash-key"><a href="#2-1-hash-key" class="headerlink" title="2.1 hash(key)"></a>2.1 hash(key)</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">hash</span><span class="params">(Object key)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">int</span> h;</span><br><span class="line">       <span class="keyword">return</span> (key == <span class="keyword">null</span>) ? <span class="number">0</span> : (h = key.hashCode()) ^ (h &gt;&gt;&gt; <span class="number">16</span>);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-put"><a href="#2-2-put" class="headerlink" title="2.2 put"></a>2.2 put</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> V <span class="title">put</span><span class="params">(K key, V value)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> putVal(hash(key), key, value, <span class="keyword">false</span>, <span class="keyword">true</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">final</span> V <span class="title">putVal</span><span class="params">(<span class="keyword">int</span> hash, K key, V value, <span class="keyword">boolean</span> onlyIfAbsent,</span></span></span><br><span class="line"><span class="params"><span class="function">               <span class="keyword">boolean</span> evict)</span> </span>&#123;</span><br><span class="line">    Node&lt;K,V&gt;[] tab; Node&lt;K,V&gt; p; <span class="keyword">int</span> n, i;</span><br><span class="line">   </span><br><span class="line">    <span class="keyword">if</span> ((tab = table) == <span class="keyword">null</span> || (n = tab.length) == <span class="number">0</span>)</span><br><span class="line">        n = (tab = resize()).length;</span><br><span class="line">   <span class="comment">//n 为长度</span></span><br><span class="line">    <span class="comment">// p 为这个位置的Node</span></span><br><span class="line">    <span class="keyword">if</span> ((p = tab[i = (n - <span class="number">1</span>) &amp; hash]) == <span class="keyword">null</span>)</span><br><span class="line">        <span class="comment">//如果这个位置为null，就newNode</span></span><br><span class="line">        tab[i] = newNode(hash, key, value, <span class="keyword">null</span>);</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        Node&lt;K,V&gt; e; K k;</span><br><span class="line">        <span class="keyword">if</span> (p.hash == hash &amp;&amp;</span><br><span class="line">            <span class="comment">//  p.key==key||p.key.equal(key)</span></span><br><span class="line">            ((k = p.key) == key || (key != <span class="keyword">null</span> &amp;&amp; key.equals(k))))</span><br><span class="line">            e = p;<span class="comment">//e 就是找到了这个key</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (p <span class="keyword">instanceof</span> TreeNode)</span><br><span class="line">            e = ((TreeNode&lt;K,V&gt;)p).putTreeVal(<span class="keyword">this</span>, tab, hash, key, value);</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">//对于链表形式，迭代，binCount是为了防止链表超过8</span></span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> binCount = <span class="number">0</span>; ; ++binCount) &#123;</span><br><span class="line">                <span class="comment">//第一种情况   e到链表结尾，那么直接尾插法  ① e==null</span></span><br><span class="line">                <span class="keyword">if</span> ((e = p.next) == <span class="keyword">null</span>) &#123;，</span><br><span class="line">                    p.next = newNode(hash, key, value, <span class="keyword">null</span>);</span><br><span class="line">                    <span class="keyword">if</span> (binCount &gt;= TREEIFY_THRESHOLD - <span class="number">1</span>) <span class="comment">// -1 for 1st</span></span><br><span class="line">                        treeifyBin(tab, hash);</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">//第二种 找到了Key 那么就赋值给p，等待后续操作. ②e!=null</span></span><br><span class="line">                <span class="keyword">if</span> (e.hash == hash &amp;&amp;</span><br><span class="line">                    ((k = e.key) == key || (key != <span class="keyword">null</span> &amp;&amp; key.equals(k))))</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                p = e;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 第②种情况，更新</span></span><br><span class="line">        <span class="keyword">if</span> (e != <span class="keyword">null</span>) &#123; <span class="comment">// existing mapping for key</span></span><br><span class="line">            V oldValue = e.value;</span><br><span class="line">            <span class="keyword">if</span> (!onlyIfAbsent || oldValue == <span class="keyword">null</span>)</span><br><span class="line">                e.value = value;</span><br><span class="line">            afterNodeAccess(e);</span><br><span class="line">            <span class="keyword">return</span> oldValue;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    ++modCount;</span><br><span class="line">    <span class="keyword">if</span> (++size &gt; threshold)</span><br><span class="line">        resize();</span><br><span class="line">    afterNodeInsertion(evict);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/b7b55fbaeb2948b5a50496d7a2f67c88.png" alt="b7b55fbaeb2948b5a50496d7a2f67c88"></p>
+<h3 id="2-3-resize"><a href="#2-3-resize" class="headerlink" title="2.3 resize"></a>2.3 resize</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> Node&lt;K,V&gt;[] resize() &#123;</span><br><span class="line">    Node&lt;K,V&gt;[] oldTab = table;</span><br><span class="line">    <span class="keyword">int</span> oldCap = (oldTab == <span class="keyword">null</span>) ? <span class="number">0</span> : oldTab.length;</span><br><span class="line">    <span class="keyword">int</span> oldThr = threshold;</span><br><span class="line">    <span class="keyword">int</span> newCap, newThr = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">if</span> (oldCap &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (oldCap &gt;= MAXIMUM_CAPACITY) &#123;</span><br><span class="line">            threshold = Integer.MAX_VALUE;</span><br><span class="line">            <span class="keyword">return</span> oldTab;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> ((newCap = oldCap &lt;&lt; <span class="number">1</span>) &lt; MAXIMUM_CAPACITY &amp;&amp;</span><br><span class="line">                 oldCap &gt;= DEFAULT_INITIAL_CAPACITY)</span><br><span class="line">            newThr = oldThr &lt;&lt; <span class="number">1</span>; <span class="comment">// double threshold</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (oldThr &gt; <span class="number">0</span>) <span class="comment">// initial capacity was placed in threshold</span></span><br><span class="line">        newCap = oldThr;</span><br><span class="line">    <span class="keyword">else</span> &#123;               <span class="comment">// zero initial threshold signifies using defaults</span></span><br><span class="line">        newCap = DEFAULT_INITIAL_CAPACITY;</span><br><span class="line">        newThr = (<span class="keyword">int</span>)(DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (newThr == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">float</span> ft = (<span class="keyword">float</span>)newCap * loadFactor;</span><br><span class="line">        newThr = (newCap &lt; MAXIMUM_CAPACITY &amp;&amp; ft &lt; (<span class="keyword">float</span>)MAXIMUM_CAPACITY ?</span><br><span class="line">                  (<span class="keyword">int</span>)ft : Integer.MAX_VALUE);</span><br><span class="line">    &#125;</span><br><span class="line">    threshold = newThr;</span><br><span class="line">    Node&lt;K,V&gt;[] newTab = (Node&lt;K,V&gt;[])<span class="keyword">new</span> Node[newCap];</span><br><span class="line">    table = newTab;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; oldCap; ++j) &#123;</span><br><span class="line">        Node&lt;K,V&gt; e;</span><br><span class="line">        <span class="keyword">if</span> ((e = oldTab[j]) != <span class="keyword">null</span>) &#123;</span><br><span class="line">            oldTab[j] = <span class="keyword">null</span>;</span><br><span class="line">            <span class="keyword">if</span> (e.next == <span class="keyword">null</span>)</span><br><span class="line">                newTab[e.hash &amp; (newCap - <span class="number">1</span>)] = e;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (e <span class="keyword">instanceof</span> TreeNode)</span><br><span class="line">                ((TreeNode&lt;K,V&gt;)e).split(<span class="keyword">this</span>, newTab, j, oldCap);</span><br><span class="line">            <span class="keyword">else</span> &#123; <span class="comment">// preserve order</span></span><br><span class="line">                Node&lt;K,V&gt; loHead = <span class="keyword">null</span>, loTail = <span class="keyword">null</span>;</span><br><span class="line">                Node&lt;K,V&gt; hiHead = <span class="keyword">null</span>, hiTail = <span class="keyword">null</span>;</span><br><span class="line">                Node&lt;K,V&gt; next;</span><br><span class="line">                <span class="keyword">do</span> &#123;</span><br><span class="line">                    next = e.next;</span><br><span class="line">                    <span class="keyword">if</span> ((e.hash &amp; oldCap) == <span class="number">0</span>) &#123;</span><br><span class="line">                        <span class="keyword">if</span> (loTail == <span class="keyword">null</span>)</span><br><span class="line">                            loHead = e;</span><br><span class="line">                        <span class="keyword">else</span></span><br><span class="line">                            loTail.next = e;</span><br><span class="line">                        loTail = e;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">else</span> &#123;</span><br><span class="line">                        <span class="keyword">if</span> (hiTail == <span class="keyword">null</span>)</span><br><span class="line">                            hiHead = e;</span><br><span class="line">                        <span class="keyword">else</span></span><br><span class="line">                            hiTail.next = e;</span><br><span class="line">                        hiTail = e;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; <span class="keyword">while</span> ((e = next) != <span class="keyword">null</span>);</span><br><span class="line">                <span class="keyword">if</span> (loTail != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    loTail.next = <span class="keyword">null</span>;</span><br><span class="line">                    newTab[j] = loHead;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (hiTail != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    hiTail.next = <span class="keyword">null</span>;</span><br><span class="line">                    newTab[j + oldCap] = hiHead;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> newTab;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、类"><a href="#四、类" class="headerlink" title="四、类"></a>四、类</h2><h3 id="4-1-Node"><a href="#4-1-Node" class="headerlink" title="4.1 Node"></a>4.1 Node</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//hash: 移位16的结果 </span></span><br><span class="line">tab[i] = newNode(hash, key, value, <span class="keyword">null</span>);</span><br><span class="line">Node(<span class="keyword">int</span> hash, K key, V value, Node&lt;K,V&gt; next) &#123;</span><br><span class="line">    <span class="keyword">this</span>.hash = hash;</span><br><span class="line">    <span class="keyword">this</span>.key = key;</span><br><span class="line">    <span class="keyword">this</span>.value = value;</span><br><span class="line">    <span class="keyword">this</span>.next = next;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="五、细节"><a href="#五、细节" class="headerlink" title="五、细节"></a>五、细节</h2><ol>
+<li>在散列表中的条目的数量超过了负载因数和电流容量的乘积，哈希表被<em>重新散列</em> （即，内部数据结构被重建），使得哈希表具有桶的大约两倍。</li>
+<li>如果许多映射要存储在<code>HashMap</code>实例中，则以足够大的容量创建映射将允许映射的存储效率高于使其根据需要执行自动重新排序以增长表。  请注意，使用同一个<code>hashCode()</code>多个密钥是降低任何哈希表的<code>hashCode()</code>的一种方法。  为了改善影响，当按键是<a href="../../java/lang/Comparable.html"><code>Comparable</code></a>时，这个类可以使用键之间的比较顺序来帮助打破关系</li>
+</ol>
+<h3 id="HashMap和HashTable区别"><a href="#HashMap和HashTable区别" class="headerlink" title="HashMap和HashTable区别"></a>HashMap和HashTable区别</h3><ol>
+<li>hashmap线程不安全</li>
+<li>hashmap的key可以为null</li>
+</ol>
+<h3 id="HashMap、LinkedHashMap、TreeMap-区别"><a href="#HashMap、LinkedHashMap、TreeMap-区别" class="headerlink" title="HashMap、LinkedHashMap、TreeMap 区别"></a>HashMap、LinkedHashMap、TreeMap 区别</h3><ol>
+<li>LinkedHashMap底层双向链表，有序</li>
+<li>TreeMap 可以用于排序</li>
+<li>HashMap</li>
+</ol>
+<h4 id="红黑树排序"><a href="#红黑树排序" class="headerlink" title="红黑树排序"></a>红黑树排序</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//首先判断是否能比较 comparableClassFor</span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span> <span class="title">tieBreakOrder</span><span class="params">(Object a, Object b)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> d;</span><br><span class="line">    <span class="keyword">if</span> (a == <span class="keyword">null</span> || b == <span class="keyword">null</span> ||</span><br><span class="line">        (d = a.getClass().getName().</span><br><span class="line">         compareTo(b.getClass().getName())) == <span class="number">0</span>)</span><br><span class="line">        d = (System.identityHashCode(a) &lt;= System.identityHashCode(b) ?</span><br><span class="line">             -<span class="number">1</span> : <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">return</span> d;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/09/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%B3%BB%E7%BB%9F%E8%A1%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/04/09/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%B3%BB%E7%BB%9F%E8%A1%A8/" class="post-title-link" itemprop="url">mysql系统表</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-04-09 23:37:59" itemprop="dateCreated datePublished" datetime="2022-04-09T23:37:59+08:00">2022-04-09</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/04/09/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%B3%BB%E7%BB%9F%E8%A1%A8/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/09/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%B3%BB%E7%BB%9F%E8%A1%A8/" class="cy_cmt_count" data-xid="2022/04/09/数据库/mysql系统表/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>738</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>·</p>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><table>
+<thead>
+<tr>
+<th>库名</th>
+<th>表数量</th>
+<th>视图数量</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>information_schema</td>
+<td>61</td>
+<td>0</td>
+</tr>
+<tr>
+<td>mysql</td>
+<td>32</td>
+<td>0</td>
+</tr>
+<tr>
+<td>performance_schema</td>
+<td>87</td>
+<td>0</td>
+</tr>
+<tr>
+<td>sys</td>
+<td>1</td>
+<td>100</td>
+</tr>
+</tbody></table>
+<h2 id="一、infomation-schema"><a href="#一、infomation-schema" class="headerlink" title="一、infomation_schema"></a>一、infomation_schema</h2><blockquote>
+<p>信息数据库，保存着关于MySQL其他数据库的信息。如数据库名，数据库的表，表栏的数据类型与访问权限等</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>表名</th>
+<th>作用</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>数据库-表-字段-索引你</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>SCHEMATA</td>
+<td>数据库信息(名称，字符类型)</td>
+<td>show database</td>
+</tr>
+<tr>
+<td>TABLES</td>
+<td>表信息(属于哪个数据库，自增id，创建时间，行数，数据大小，字符，引擎)</td>
+<td>show tables</td>
+</tr>
+<tr>
+<td>columns</td>
+<td>行信息</td>
+<td>desc</td>
+</tr>
+<tr>
+<td>user_privileges</td>
+<td>用户权限</td>
+<td></td>
+</tr>
+<tr>
+<td>key_columns_usage</td>
+<td>表的索引信息</td>
+<td>show key</td>
+</tr>
+<tr>
+<td><strong>锁信息</strong></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>innodb_trx</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>innodb_locks</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>innodb_lock_wait</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>其他</strong></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>files</td>
+<td>mysql用到的文件</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id="二、mysql"><a href="#二、mysql" class="headerlink" title="二、mysql"></a>二、mysql</h2><blockquote>
+<p>主要是权限的信息</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>user</td>
+<td>用户列、权限列、安全列、资源控制列</td>
+<td></td>
+</tr>
+<tr>
+<td>innodb_table_stas</td>
+<td>表信息， 更新时间，行数</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id="三、performance-scheme"><a href="#三、performance-scheme" class="headerlink" title="三、performance_scheme"></a>三、performance_scheme</h2><blockquote>
+<p>PERFORMANCE_SCHEMA这个功能默认是关闭的。需要设置参数： performance_schema 才可以启动该功能，这个参数是静态参数，只能写在my.cnf 中 不能动态修改。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>表名</th>
+<th>作用</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>users</td>
+<td>用户连接的次数，当前连接数</td>
+<td></td>
+</tr>
+<tr>
+<td>hosts</td>
+<td>类似于users表</td>
+<td></td>
+</tr>
+<tr>
+<td>accounts</td>
+<td>是users+hosts</td>
+<td></td>
+</tr>
+<tr>
+<td>threads</td>
+<td>当前存活线程(ip,username,状态)</td>
+<td></td>
+</tr>
+<tr>
+<td>gloable_variables</td>
+<td>全局变量</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id="四、sys"><a href="#四、sys" class="headerlink" title="四、sys"></a>四、sys</h2><p>配置更改表</p>
+<ul>
+<li>variable ： 配置选项名称</li>
+<li>value ： 配置选项值</li>
+<li>set_time ： 该行配置修改的时间</li>
+<li>set_by ： 该行配置信息修改者，如果从被安装没有修改过，那么这个数据应该为NULL</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/09/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/elasticSearch%E6%95%B0%E6%8D%AE%E5%BA%93/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/04/09/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/elasticSearch%E6%95%B0%E6%8D%AE%E5%BA%93/" class="post-title-link" itemprop="url">elasticSearch</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-04-09 18:32:00" itemprop="dateCreated datePublished" datetime="2022-04-09T18:32:00+08:00">2022-04-09</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/04/09/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/elasticSearch%E6%95%B0%E6%8D%AE%E5%BA%93/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/09/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/elasticSearch%E6%95%B0%E6%8D%AE%E5%BA%93/" class="cy_cmt_count" data-xid="2022/04/09/数据库/nosql/elasticSearch数据库/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.4k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -264,39 +643,219 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>[toc]</p>
-<h2 id="一、授权登录"><a href="#一、授权登录" class="headerlink" title="一、授权登录"></a>一、授权登录</h2><ol>
-<li>单点登录，自系统登录，SSO， Singal Sign on</li>
-<li>只需要登陆一次就能无需登录访问其他模块</li>
-</ol>
-<h2 id="二、SSO三种方法"><a href="#二、SSO三种方法" class="headerlink" title="二、SSO三种方法"></a>二、SSO三种方法</h2><blockquote>
-<p> 在百度浏览器登录后，打开百度贴吧就自动登录了，不需要二次登录。这就是单点登录</p>
+          <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><ol>
+<li><p>ELK</p>
+<blockquote>
+<p>常用于日志分析</p>
 </blockquote>
-<h3 id="2-1-session广播"><a href="#2-1-session广播" class="headerlink" title="2.1 session广播"></a>2.1 session广播</h3><ol>
-<li><p>把session复制到其他模块</p>
-</li>
-<li><p>缺点：复制太浪费资源（时间+内存）</p>
-</li>
-<li><p>cookie+redis</p>
 <ol>
-<li>redis  放置  k:生成随即唯一值（用户ip,id）,v:用户信息</li>
-<li>cookie  将k放入cookie中</li>
-<li>访问其他模块时，带着cookie，取出k,查询redis,如果查到并正确</li>
-<li>也就是只需要验证签名，就能放心的取出的信息安全有效</li>
+<li>elasticSearch(数据库，搜索引擎)</li>
+<li>logstach(数据采集，出来)</li>
+<li>kibana(可视化展现)</li>
+<li>Beats(数据采集)</li>
+<li>elasticSearch Cloud</li>
+<li>X-pack</li>
 </ol>
 </li>
-<li><p>token(令牌)</p>
+<li><p>流程</p>
 <ol>
-<li><p>token是按照一定规则生成的并加密的字符串</p>
+<li><p>beats 数据采集(cpu使用情况，日志，网络流量)</p>
+<p><em>&gt; es</em></p>
+<p><em>&gt;</em> logstash–&gt;es</p>
 </li>
-<li><p>用户登录–&gt;生成随机字符串–&gt;拼接用户信息</p>
+</ol>
 </li>
-<li><p>每次访问其他模块，带着这个字符串，其他模块会解码取出用户信息并验证</p>
+<li><p>es特点</p>
+<ol>
+<li>分布式</li>
+<li>基于java</li>
+<li>配置简单</li>
+<li>索引自动切分</li>
+<li>restful风格</li>
+</ol>
 </li>
-<li><p>也就是没到一个模块都要通过User数据库验证token才能确保信息安全有效</p>
+</ol>
+<h2 id="学习"><a href="#学习" class="headerlink" title="学习"></a>学习</h2><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220324155918088.png" alt="image-20220324155918088"></p>
+<h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><ol>
+<li>数据分为几种<ol>
+<li>索引：表，可以有多个副本，多个分片</li>
+<li>文档：一条记录</li>
+</ol>
+</li>
+</ol>
+<h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><ol>
+<li><p>网络配置yml</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">network</span>:<span class="number">0.0.0.0</span></span><br></pre></td></tr></table></figure></li>
+<li><p>jvm配置yml</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">xms128m</span>  测试环境下内存占用</span><br></pre></td></tr></table></figure></li>
+<li><p>跨域配置</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">   </span><br></pre></td></tr></table></figure></li>
+<li><p>linux配置</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="regexp">/etc/</span>sysctl.conf</span><br><span class="line">追加</span><br><span class="line">vm.max_map_count=<span class="number">655360</span></span><br><span class="line">sysctl -p</span><br></pre></td></tr></table></figure></li>
+<li><p>master配置用户名  yml</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cluster<span class="selector-class">.initial_master_nodes</span>: <span class="selector-attr">[<span class="string">&quot;web1&quot;</span>]</span></span><br></pre></td></tr></table></figure></li>
+<li><p>启动</p>
+<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">./elasearch</span>  启动   -d g  -d表示h</span><br></pre></td></tr></table></figure></li>
+<li><p>停止</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">kill</span> -sigterm pid</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="设置密码登录"><a href="#设置密码登录" class="headerlink" title="设置密码登录"></a>设置密码登录</h3><ol>
+<li><p>开启xpack验证，追加内容到yml</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">xpack<span class="selector-class">.security</span><span class="selector-class">.enabled</span>: true</span><br><span class="line">xpack<span class="selector-class">.license</span><span class="selector-class">.self_generated</span><span class="selector-class">.type</span>: basic</span><br><span class="line">xpack<span class="selector-class">.security</span><span class="selector-class">.transport</span><span class="selector-class">.ssl</span><span class="selector-class">.enabled</span>: true</span><br></pre></td></tr></table></figure></li>
+<li><p>设置密码</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./elasticsearch-keystore <span class="builtin-name">add</span> <span class="string">&quot;bootstrap.password&quot;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>重启</p>
+</li>
+<li><p>访问</p>
+<ol>
+<li>curl <a target="_blank" rel="noopener" href="http://elastic:wyg123@114.55.253.244:9200/">http://elastic:wyg123@114.55.253.244:9200/</a></li>
+<li></li>
+</ol>
+</li>
+<li><p>其他</p>
+<p>linux开启9200端口</p>
+<p>阿里云开启9200端口</p>
+</li>
+</ol>
+<h2 id="集群"><a href="#集群" class="headerlink" title="集群"></a>集群</h2><ol>
+<li>分片，每个节点一个主分片</li>
+<li>故障处理，每个节点多个备份分片(副分片)</li>
+</ol>
+<h2 id="Ik分词器"><a href="#Ik分词器" class="headerlink" title="Ik分词器"></a>Ik分词器</h2><h3 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h3><h3 id="配置禁用词和自定义词"><a href="#配置禁用词和自定义词" class="headerlink" title="配置禁用词和自定义词"></a>配置禁用词和自定义词</h3><h2 id="logstash"><a href="#logstash" class="headerlink" title="logstash"></a>logstash</h2><h3 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h3><p>bin/logstatsh -f aa.conf</p>
+<h3 id="三大插件"><a href="#三大插件" class="headerlink" title="三大插件"></a>三大插件</h3><ol>
+<li>input 采集数据来源：github,jdbc,es</li>
+<li>output:保存地点</li>
+<li>filter: 数据处理</li>
+</ol>
+<h3 id="配置文件"><a href="#配置文件" class="headerlink" title="配置文件"></a>配置文件</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">input &#123;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">filter &#123;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">output &#123;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="jdbc导入"><a href="#jdbc导入" class="headerlink" title="jdbc导入"></a>jdbc导入</h3><ol>
+<li>基本格式</li>
+</ol>
+<figure class="highlight puppet"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">input</span> &#123;</span><br><span class="line">  jdbc &#123;</span><br><span class="line">    <span class="attr">jdbc_driver_library</span> =&gt; <span class="string">&quot;mysql-connector-java-5.1.36-bin.jar&quot;</span></span><br><span class="line">    <span class="attr">jdbc_driver_class</span> =&gt; <span class="string">&quot;com.mysql.jdbc.Driver&quot;</span></span><br><span class="line">    <span class="attr">jdbc_connection_string</span> =&gt; <span class="string">&quot;jdbc:mysql://localhost:3306/mydb&quot;</span></span><br><span class="line">    <span class="attr">jdbc_user</span> =&gt; <span class="string">&quot;mysql&quot;</span></span><br><span class="line">    <span class="attr">parameters</span> =&gt; &#123; <span class="string">&quot;favorite_artist&quot;</span> =&gt; <span class="string">&quot;Beethoven&quot;</span> &#125;</span><br><span class="line">    <span class="keyword">schedule</span> =&gt; <span class="string">&quot;* * * * *&quot;</span></span><br><span class="line">    statement =&gt; <span class="string">&quot;SELECT * from songs where artist = :favorite_artist&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li><p>实时更新性原理</p>
+<ol>
+<li>sql_last_value关键字 用于表示上一条sql记录</li>
+<li>当use_column_value=true时，表示用自增行</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">input &#123;</span><br><span class="line">  stdin&#123;&#125;</span><br><span class="line">  jdbc &#123;</span><br><span class="line">    jdbc_driver_library <span class="operator">=</span><span class="operator">&gt;</span> &quot;D:\mysql-connector-java-5.1.48-bin.jar&quot;</span><br><span class="line">    jdbc_driver_class <span class="operator">=</span><span class="operator">&gt;</span> &quot;com.mysql.jdbc.Driver&quot;</span><br><span class="line">    jdbc_connection_string <span class="operator">=</span><span class="operator">&gt;</span> &quot;jdbc:mysql://localhost:3306/es&quot;</span><br><span class="line">    jdbc_user <span class="operator">=</span><span class="operator">&gt;</span> &quot;root&quot;</span><br><span class="line">    jdbc_password <span class="operator">=</span><span class="operator">&gt;</span> &quot;root&quot;</span><br><span class="line">	use_column_value <span class="operator">=</span><span class="operator">&gt;</span> <span class="literal">true</span></span><br><span class="line">    tracking_column <span class="operator">=</span><span class="operator">&gt;</span> id</span><br><span class="line">	record_last_run <span class="operator">=</span><span class="operator">&gt;</span> <span class="literal">true</span></span><br><span class="line">  	last_run_metadata_path <span class="operator">=</span><span class="operator">&gt;</span> &quot;D:\ChromeDown\logstash-8.0.1\liblogstash_metadata&quot;</span><br><span class="line">    statement <span class="operator">=</span><span class="operator">&gt;</span> &quot;select * from data_result where id &gt; :sql_last_value&quot;</span><br><span class="line">    schedule <span class="operator">=</span><span class="operator">&gt;</span>&quot;* * * * *&quot;</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">filter</span> &#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">output &#123;</span><br><span class="line">  stdout &#123;</span><br><span class="line">    codec <span class="operator">=</span><span class="operator">&gt;</span> rubydebug</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  elasticsearch &#123;</span><br><span class="line">    hosts <span class="operator">=</span><span class="operator">&gt;</span> [&quot;114.55.253.244:9200&quot;]</span><br><span class="line">	index <span class="operator">=</span><span class="operator">&gt;</span> &quot;es_index&quot;</span><br><span class="line">	document_id <span class="operator">=</span><span class="operator">&gt;</span> &quot;%&#123;id&#125;&quot;</span><br><span class="line">	<span class="keyword">user</span> <span class="operator">=</span><span class="operator">&gt;</span> &quot;elastic&quot;</span><br><span class="line">   	password <span class="operator">=</span><span class="operator">&gt;</span> &quot;wyg123&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/08/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%9F%A5%E8%AF%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/04/08/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%9F%A5%E8%AF%86/" class="post-title-link" itemprop="url">mysql知识</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-04-08 16:34:48" itemprop="dateCreated datePublished" datetime="2022-04-08T16:34:48+08:00">2022-04-08</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/04/08/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%9F%A5%E8%AF%86/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/08/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%9F%A5%E8%AF%86/" class="cy_cmt_count" data-xid="2022/04/08/数据库/mysql知识/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.9k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>[toc]</p>
+<h2 id="一、字符类型"><a href="#一、字符类型" class="headerlink" title="一、字符类型"></a>一、字符类型</h2><h4 id="1-1-utf8mb4-utf8-区别"><a href="#1-1-utf8mb4-utf8-区别" class="headerlink" title="1.1 utf8mb4 utf8 区别"></a>1.1 utf8mb4 utf8 区别</h4><blockquote>
+<p>unicode是打算用两个字节保留所有字体，但由于设计问题没有推广出来。utf8是对unicode的改进，中文的utf8占3个字节，部分占4个字节 </p>
+</blockquote>
+<ul>
+<li>MySQL在5.5.3之后增加了这个utf8mb4的编码，mb4就是most bytes 4的意思，专门用来兼容四字节的unicode。</li>
+<li>好在utf8mb4是utf8的超集，除了将编码改为utf8mb4外不需要做其他转换。当然，为了节省空间，一般情况下使用utf8也就够了。</li>
+</ul>
+<h3 id="1-2-GBK和GB2312"><a href="#1-2-GBK和GB2312" class="headerlink" title="1.2 GBK和GB2312"></a>1.2 GBK和GB2312</h3><blockquote>
+<p>是中国人编写的对ASCLL的中文扩展，GBK包括了GB2312 的所有内容，是升级版。</p>
+</blockquote>
+<p>​    最初的 UTF-8 格式使用一至六个字节，最大能编码 31 位字符。最新的 UTF-8 规范只使用一到四个字节，最大能编码21位，正好能够表示所有的 17个 Unicode 平面。utf8 是 Mysql 中的一种字符集，只支持最长三个字节的 UTF-8字符，也就是 Unicode 中的基本多文本平面。Mysql 中的 utf8 为什么只支持持最长三个字节的 UTF-8字符呢？可能是因为 Mysql 刚开始开发那会，Unicode 还没有辅助平面这一说呢。</p>
+<p>​    那时候，Unicode 委员会还做着 “65535 个字符足够全世界用了”的美梦。Mysql 中的字符串长度算的是字符数而非字节数，对于 CHAR 数据类型来说，需要为字符串保留足够的长。当使用 utf8 字符集时，需要保留的长度就是 utf8 最长字符长度乘以字符串长度，所以这里理所当然的限制了 utf8 最大长度为 3，比如 CHAR(100) Mysql 会保留 300字节长度。</p>
+<p>​    至于后续的版本为什么不对 4 字节长度的 UTF-8 字符提供支持，我想一个是为了向后兼容性的考虑，还有就是基本多文种平面之外的字符确实很少用到。要在 Mysql 中保存 4 字节长度的 UTF-8 字符，需要使用 utf8mb4 字符集，但只有 5.5.3 版本以后的才支持（查看版本： select version();）。</p>
+<p>​    为了获取更好的兼容性，应该总是使用 utf8mb4 而非 utf8. 对于 CHAR 类型数据，utf8mb4 会多消耗一些空间，根据 Mysql 官方建议，使用 VARCHAR 替代 CHAR。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2022/04/05/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95/#more" rel="contents">
+              <a class="btn" href="/2022/04/08/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%9F%A5%E8%AF%86/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -320,7 +879,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/03/408/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/tcpip/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/08/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/shiro/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -334,7 +893,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/04/03/408/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/tcpip/" class="post-title-link" itemprop="url">TCP/IP</a>
+            <a href="/2022/04/08/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/shiro/" class="post-title-link" itemprop="url">shiro</a>
         </h2>
 
         <div class="post-meta">
@@ -344,246 +903,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-04-03 12:27:47" itemprop="dateCreated datePublished" datetime="2022-04-03T12:27:47+08:00">2022-04-03</time>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/04/03/408/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/tcpip/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/03/408/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/tcpip/" class="cy_cmt_count" data-xid="2022/04/03/408/计算机网络/tcpip/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>910</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="三次握手、四次挥手"><a href="#三次握手、四次挥手" class="headerlink" title="三次握手、四次挥手"></a>三次握手、四次挥手</h2><h4 id="为什么是三次握手"><a href="#为什么是三次握手" class="headerlink" title="为什么是三次握手"></a>为什么是三次握手</h4><p>“三次握手”的目的是</p>
-<ul>
-<li>为了防止已失效的连接请求报文段突然又传送到了服务端，因而产生错误</li>
-<li>网络中存在延迟的重复分组</li>
-</ul>
-<p>​    已失效的连接请求报文段”的产生在这样一种情况下：client发出的第一个连接请求报文段并没有丢失，而是在某个网络结点长时间的<strong>滞留</strong>了，以致延误到连接释放以后的某个时间才到达server。本来这是一个早已失效的报文段。但server收到此失效的连接请求报文段后，就<strong>误认为是client再次发出的一个新的连接请求</strong>。于是就向client发出确认报文段，同意建立连接。假设不采用“三次握手”，那么只要server发出确认，新的连接就建立了。由于现在client并没有发出建立连接的请求，因此不会理睬server的确认，也不会向server发送数据。<strong>但server却以为新的运输连接已经建立</strong>，并一直等待client发来数据。这样，server的很多资源就白白浪费掉了</p>
-<h4 id="为什么是四次挥手"><a href="#为什么是四次挥手" class="headerlink" title="为什么是四次挥手"></a>为什么是四次挥手</h4><p>A：我说完了<br>B：我知道了，等一下，我可能还没说完</p>
-<blockquote>
-<p>被动方此时有可能还有相应的数据报文需要发送，因此需要先发送ACK报文，告知主动方“我知道你想断开连接的请求了”。这样主动方便不会因为没有收到应答而继续发送断开连接的请求（即FIN报文）。</p>
-</blockquote>
-<p>B：我也说完了<br>A：我知道了，结束吧</p>
-<h4 id="SYN和ACK"><a href="#SYN和ACK" class="headerlink" title="SYN和ACK"></a>SYN和ACK</h4><p>ACK 英文缩写: ACK (ACKnowledge Character） 中文译名: 确认字符  </p>
-<p>SYN 包(synchronize 使同步)  SYN=1 表示 SYN 报文</p>
-<p>序列号：    </p>
-<p>确认应答号：</p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220403122738600.png" alt="image-20220403122738600"></p>
-<p>第一次握手：主机A发送位码为SYN=1，随机产生seq number=1234567的数据包到服务器，主机B由SYN=1知道，A要求建立联机；</p>
-<p>第二次握手，主机B收到请求后要确认联机信息，向A发送ack number=(主机A的seq+1)，SYN=1,ACK=1，随机产生seq number=7654321的包；</p>
-<p>第三次握手：主机A收到后检查ack number是否正确，即第一次发送的seq number+1，以及位码ACK是否为1，若正确，主机A会再发送ack number=（主机B的seq+1）,ACK=1，主机B收到后确认seq值与ACK=1则连接建立成功。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/02/java/javaSE/JUC/%E8%BE%85%E5%8A%A9%E7%B1%BB/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/04/02/java/javaSE/JUC/%E8%BE%85%E5%8A%A9%E7%B1%BB/" class="post-title-link" itemprop="url">CountDownLatch</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-04-02 00:34:13" itemprop="dateCreated datePublished" datetime="2022-04-02T00:34:13+08:00">2022-04-02</time>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/04/02/java/javaSE/JUC/%E8%BE%85%E5%8A%A9%E7%B1%BB/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/02/java/javaSE/JUC/%E8%BE%85%E5%8A%A9%E7%B1%BB/" class="cy_cmt_count" data-xid="2022/04/02/java/javaSE/JUC/辅助类/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.8k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="CountDownLatch"><a href="#CountDownLatch" class="headerlink" title="CountDownLatch"></a>CountDownLatch</h3><blockquote>
-<p>组线程 任务完成记录 技术</p>
-<p>用于主线程汇总子线程</p>
-<p>以前用join方法完成，现在用优美的CountDownLatch完成</p>
-</blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> n=<span class="number">30</span>;</span><br><span class="line">    CountDownLatch latch=<span class="keyword">new</span> CountDownLatch(n);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">        <span class="keyword">new</span> Thread(() -&gt; &#123;</span><br><span class="line">            System.out.println(Thread.currentThread().getName() + <span class="string">&quot;号离开&quot;</span>);<span class="comment">//任务</span></span><br><span class="line">            latch.countDown();<span class="comment">//每个线程完成就减少一次</span></span><br><span class="line">                         &#125;, String.valueOf(i)<span class="comment">//线程名称</span></span><br><span class="line"></span><br><span class="line">                  ).start();</span><br><span class="line">    &#125;</span><br><span class="line">    latch.await();<span class="comment">//还没减少到0，等待</span></span><br><span class="line">    System.out.println(Thread.currentThread().getName()+<span class="string">&quot;锁门&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="CyclicBarrier循环屏障"><a href="#CyclicBarrier循环屏障" class="headerlink" title="CyclicBarrier循环屏障"></a>CyclicBarrier循环屏障</h3><blockquote>
-<p>循环栅栏</p>
-<p>可以重复利用</p>
-<p>收集到7个后就会运行run方法，然后可以再收集7个</p>
-<p>原理：index = 7   index–;  if(index==0)  breakBarrier()    ;</p>
-</blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//设置固定值</span></span><br><span class="line"> <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> NUM=<span class="number">10</span>;</span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">     CyclicBarrier cyclicBarrier=<span class="keyword">new</span> CyclicBarrier(NUM,()-&gt; System.out.println(<span class="string">&quot;收集完成&quot;</span>));<span class="comment">//</span></span><br><span class="line">     <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;NUM;i++)&#123;</span><br><span class="line">         <span class="keyword">int</span> finalI = i;</span><br><span class="line">         <span class="keyword">new</span> Thread(()-&gt;&#123;</span><br><span class="line">             System.out.println(Thread.currentThread().getName()+<span class="string">&quot;被收集&quot;</span>);</span><br><span class="line">             <span class="keyword">try</span> &#123;</span><br><span class="line">                 cyclicBarrier.await();</span><br><span class="line">             &#125; <span class="keyword">catch</span> (InterruptedException | BrokenBarrierException e) &#123;</span><br><span class="line">                 e.printStackTrace();</span><br><span class="line">             &#125;</span><br><span class="line">             System.out.println(<span class="string">&quot;结束&quot;</span>+finalI);<span class="comment">//都完成后</span></span><br><span class="line">         &#125;,String.valueOf(i)).start();</span><br><span class="line">     &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="Semaphore信号灯"><a href="#Semaphore信号灯" class="headerlink" title="Semaphore信号灯"></a>Semaphore信号灯</h3><blockquote>
-<p>限流，最多三个能同时进行</p>
-<p>原理：资源抢占</p>
-</blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">Semaphore semaphore=<span class="keyword">new</span> Semaphore(<span class="number">3</span>);<span class="comment">//创建资源</span></span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;<span class="number">6</span>;i++)&#123;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">int</span> x=i;</span><br><span class="line">    <span class="keyword">new</span> Thread(()-&gt;&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            semaphore.acquire();<span class="comment">//抢占资源</span></span><br><span class="line">            System.out.println(x+<span class="string">&quot;抢到资源&quot;</span>);</span><br><span class="line">            TimeUnit.SECONDS.sleep(<span class="number">2</span>);<span class="comment">//占用资源</span></span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;<span class="keyword">finally</span> &#123;</span><br><span class="line">            semaphore.release();<span class="comment">//释放资源</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;).start();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="区别"><a href="#区别" class="headerlink" title="区别"></a>区别</h3><ul>
-<li><p>CountdownLatch执行流程</p>
-<ul>
-<li>执行一组线程</li>
-<li>CountdownLatch.awite()  阻塞主线程等待。知道全部完成</li>
-<li>没有总结线程，他的main线程可以近似总结线程</li>
-</ul>
-</li>
-<li><p>Syslicbarrier的执行流程是</p>
-<ul>
-<li><p>任务定义</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">work&#123;</span><br><span class="line">	beforeWork();</span><br><span class="line">	cyclicBarrier.await();</span><br><span class="line">	afterWork();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p>执行一组任务的beforeWork</p>
-</li>
-<li><p>全部完成后执行cyclicBarrier的<code>总结</code>线程</p>
-</li>
-<li><p>执行这组任务的afterWork()</p>
-</li>
-</ul>
-</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/30/java/javaSE/jvm/JMM-java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/30/java/javaSE/jvm/JMM-java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/" class="post-title-link" itemprop="url">java内存模型</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-30 14:09:51" itemprop="dateCreated datePublished" datetime="2022-03-30T14:09:51+08:00">2022-03-30</time>
+              <time title="创建时间：2022-04-08 14:14:18" itemprop="dateCreated datePublished" datetime="2022-04-08T14:14:18+08:00">2022-04-08</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -591,11 +911,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/JVM/" itemprop="url" rel="index"><span itemprop="name">JVM</span></a>
+                  <a href="/categories/%E4%B8%AD%E9%97%B4%E4%BB%B6/" itemprop="url" rel="index"><span itemprop="name">中间件</span></a>
                 </span>
             </span>
 
@@ -609,8 +925,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/03/30/java/javaSE/jvm/JMM-java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/30/java/javaSE/jvm/JMM-java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/" class="cy_cmt_count" data-xid="2022/03/30/java/javaSE/jvm/JMM-java内存模型/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/04/08/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/shiro/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/08/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/shiro/" class="cy_cmt_count" data-xid="2022/04/08/组件/登录/shiro/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -621,14 +937,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>991</span>
+              <span>2.4k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
+              <span>2 分钟</span>
             </span>
 
         </div>
@@ -641,284 +957,113 @@
 
       
           <p>[toc]</p>
-<h2 id="痛点-转载"><a href="#痛点-转载" class="headerlink" title="痛点-转载"></a><a target="_blank" rel="noopener" href="https://www.hollischuang.com/archives/2550">痛点-转载</a></h2><p>​    但是随着CPU技术的发展，CPU的执行速度越来越快。而由于内存的技术并没有太大的变化，所以从内存中读取和写入数据的过程和CPU的执行速度比起来差距就会越来越大,这就导致CPU每次操作内存都要耗费很多等待时间。</p>
-<ul>
-<li>所以，人们想出来了一个好的办法，就是在CPU和内存之间增加高速缓存。缓存的概念大家都知道，就是保存一份数据拷贝。他的特点是速度快，内存小，并且昂贵。</li>
-<li><strong>当程序在运行过程中，会将运算需要的数据从主存复制一份到CPU的高速缓存当中，那么CPU进行计算时就可以直接从它的高速缓存读取数据和向其中写入数据，当运算结束之后，再将高速缓存中的数据刷新到主存当中。</strong></li>
-<li>随着CPU能力的不断提升，一层缓存就慢慢的无法满足要求了，就逐渐的衍生出多级缓存。按照数据读取顺序和与CPU结合的紧密程度，CPU缓存可以分为一级缓存（L1），二级缓存（L3），部分高端CPU还具有三级缓存（L3），每一级缓存中所储存的全部数据都是下一级缓存的一部分</li>
-<li>当CPU要读取一个数据时，首先从一级缓存中查找，如果没有找到再从二级缓存中查找，如果还是没有就从三级缓存或内存中查找。</li>
-<li>单核CPU只含有一套L1，L2，L3缓存；如果CPU含有多个核心，即多核CPU，则每个核心都含有一套L1（甚至和L2）缓存，而共享L3（或者和L2）缓存。</li>
-</ul>
-<h4 id="计算机内存模型"><a href="#计算机内存模型" class="headerlink" title="计算机内存模型"></a>计算机内存模型</h4><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211214014833316.png" alt="image-20211214014833316"></p>
-<h4 id="JMM"><a href="#JMM" class="headerlink" title="JMM"></a>JMM</h4><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220330140949648.png" alt="image-20220330140949648"></p>
-<h2 id="二、并发编程的三个问题"><a href="#二、并发编程的三个问题" class="headerlink" title="二、并发编程的三个问题"></a>二、并发编程的三个问题</h2><h3 id="2-1-原子性"><a href="#2-1-原子性" class="headerlink" title="2.1 原子性"></a>2.1 原子性</h3><blockquote>
-<p>和数据库的原子性一样，要么全成功，要么全失败</p>
-</blockquote>
-<p>jvm只保证了对8大基本类型(除了double,long)读、取操作时原子的</p>
-<h3 id="2-2-有序性"><a href="#2-2-有序性" class="headerlink" title="2.2 有序性"></a>2.2 有序性</h3><blockquote>
-<p>由于变量的读取经过 工作内存–&gt;缓存–&gt;主存 </p>
-<p>各个存储点存储变量的地址不一样，可能变量a，b的地址会近一些，所以操作完a会优先操作b</p>
-</blockquote>
+<h2 id="一、功能"><a href="#一、功能" class="headerlink" title="一、功能"></a>一、功能</h2><ol>
+<li>认证</li>
+<li>授权</li>
+<li>方法加权</li>
+<li>自定义过滤</li>
+<li>会话管理：Session Manager  一次登录，所有信息保存在session中</li>
+<li>加密</li>
+</ol>
+<h3 id="1-1-Authentication-用户密码认证"><a href="#1-1-Authentication-用户密码认证" class="headerlink" title="1.1 Authentication 用户密码认证"></a>1.1 Authentication 用户密码认证</h3><h3 id="1-2-Authorization-验证是否有权限访问该方法"><a href="#1-2-Authorization-验证是否有权限访问该方法" class="headerlink" title="1.2 Authorization 验证是否有权限访问该方法"></a>1.2 Authorization 验证是否有权限访问该方法</h3><ol>
+<li><p>MyRealm extends AuthorizingRealm</p>
 <blockquote>
-<p>指令重排不会影响单个线程的结果，但在多线程下就会变得不安全。</p>
-</blockquote>
-<p>例如</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//线程a:</span></span><br><span class="line">student = <span class="keyword">new</span> Student();   <span class="comment">//语句1</span></span><br><span class="line">inited = <span class="keyword">true</span>;             <span class="comment">//语句2</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//线程b:</span></span><br><span class="line"><span class="keyword">while</span>(!inited )&#123;</span><br><span class="line">  sleep()</span><br><span class="line">&#125;</span><br><span class="line">student.doWork();</span><br></pre></td></tr></table></figure>
-
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span><span class="comment">//授权</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> AuthorizationInfo <span class="title">doGetAuthorizationInfo</span><span class="params">(PrincipalCollection principalCollection)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//获得令牌/用户</span></span><br><span class="line">    User user=(User)principalCollection.asList().get(<span class="number">0</span>);</span><br><span class="line">    SimpleAuthorizationInfo authorizationInfo=<span class="keyword">new</span> SimpleAuthorizationInfo();</span><br><span class="line">    authorizationInfo.addRoles(user.getUserRoles());<span class="comment">//添加用户-授权</span></span><br><span class="line">    authorizationInfo.addStringPermissions(user.getUserPerms());<span class="comment">//添加权限-授权</span></span><br><span class="line">    <span class="keyword">return</span> authorizationInfo;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></blockquote>
+</li>
+</ol>
+<h3 id="1-3-其他功能"><a href="#1-3-其他功能" class="headerlink" title="1.3 其他功能"></a>1.3 其他功能</h3><h4 id="1-3-1-方法加权"><a href="#1-3-1-方法加权" class="headerlink" title="1.3.1 方法加权"></a>1.3.1 方法加权</h4><ol>
+<li><p>硬编码</p>
+<p>在每个方法体里面进行手动获取当前用户权限，然后和该方法的权限进行对比。</p>
+</li>
+<li><p>ShiroConfig添加路径</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">filterFactoryBean.setUnauthorizedUrl(<span class="string">&quot;/wq.html&quot;</span>);<span class="comment">//无权限跳到指定路径</span></span><br></pre></td></tr></table></figure></li>
+<li><p>注解</p>
+<ol>
+<li>@RequiresAuthentication 需要登录</li>
+<li>@RequiresUser 需要reamberMe</li>
+<li>@RequiresPermissions 需要权限</li>
+</ol>
 <ul>
-<li>如果线程a按照1、2顺序执行，那么线程b将永远不会在student初始化之前就doWork</li>
+<li>没权限会直接报500错误</li>
+<li>需要异常处理机制</li>
 </ul>
-<h3 id="2-3-可见性"><a href="#2-3-可见性" class="headerlink" title="2.3 可见性"></a>2.3 可见性</h3><blockquote>
-<p>该特性可以理解为值时直接访问主存的到的，大家看到的都一样</p>
-</blockquote>
-<h2 id="三、关键字"><a href="#三、关键字" class="headerlink" title="三、关键字"></a>三、关键字</h2><h3 id="3-1-关键字volatile"><a href="#3-1-关键字volatile" class="headerlink" title="3.1 关键字volatile"></a>3.1 关键字volatile</h3><blockquote>
-<p>易见的，易变的</p>
-</blockquote>
-<h4 id="解决两个问题"><a href="#解决两个问题" class="headerlink" title="解决两个问题"></a>解决两个问题</h4><ol>
-<li><p>可见性</p>
-<p>原理：面向主存读写</p>
-</li>
-<li><p>有序性</p>
 </li>
 </ol>
+<h4 id="1-3-2-自定义过滤"><a href="#1-3-2-自定义过滤" class="headerlink" title="1.3.2 自定义过滤"></a>1.3.2 自定义过滤</h4><ol>
+<li><p>@Componet注册过滤器</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">F1</span> <span class="keyword">implements</span> <span class="title">Filter</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doFilter</span><span class="params">(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)</span> <span class="keyword">throws</span> IOException, ServletException </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;自定义过滤开始&quot;</span>);</span><br><span class="line">        filterChain.doFilter(servletRequest,servletResponse);</span><br><span class="line">        System.out.println(<span class="string">&quot;自定义过滤结束&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>加入到请求过滤器</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">filters.put(<span class="string">&quot;oauth2&quot;</span>, <span class="keyword">new</span> F1());</span><br><span class="line">filterFactoryBean.setFilters(filters);</span><br></pre></td></tr></table></figure></li>
+<li></li>
+</ol>
+<h4 id="1-3-3-获取当前线程用户"><a href="#1-3-3-获取当前线程用户" class="headerlink" title="1.3.3 获取当前线程用户"></a>1.3.3 获取当前线程用户</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Subject subject = SecurityUtils.getSubject();</span><br></pre></td></tr></table></figure>
 
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/30/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/redis/reids%E5%91%BD%E4%BB%A4/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/30/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/redis/reids%E5%91%BD%E4%BB%A4/" class="post-title-link" itemprop="url">redis命令</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-30 00:41:11" itemprop="dateCreated datePublished" datetime="2022-03-30T00:41:11+08:00">2022-03-30</time>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/30/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/redis/reids%E5%91%BD%E4%BB%A4/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/30/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/redis/reids%E5%91%BD%E4%BB%A4/" class="cy_cmt_count" data-xid="2022/03/30/数据库/nosql/redis/reids命令/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.7k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <blockquote>
-<p>1.基于内存的key-value数据库<br>2.基于c语言编写的，可以支持多种语言的api //set每秒11万次，取get 81000次<br>3.支持数据持久化<br>4.value可以是string，hash， list， set, sorted set</p>
-<p>使用场景</p>
 <ol>
-<li>去最新n个数据的操作</li>
-<li>排行榜，取top n个数据 //最佳人气前10条</li>
-<li>精确的设置过期时间</li>
-<li>计数器</li>
-<li>实时系统， 反垃圾系统</li>
-<li>pub， sub发布订阅构建实时消息系统</li>
-<li>构建消息队列</li>
-<li>缓存</li>
+<li><p>认证</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">UsernamePasswordToken token = <span class="keyword">new</span> UsernamePasswordToken(user.getUsername(), user.getPassword());</span><br><span class="line">subject.login(token);</span><br></pre></td></tr></table></figure></li>
+<li><p>登录设置令牌</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">subject.getSession().setAttribute(<span class="string">&quot;currentUser&quot;</span>, subject.getPrincipal());</span><br></pre></td></tr></table></figure></li>
+<li><p>登出</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">subject.logout();<span class="comment">//或者在过滤器中配置   filterMap.put(&quot;/aaa&quot;,&quot;logout&quot;);</span></span><br></pre></td></tr></table></figure></li>
 </ol>
-</blockquote>
-<h2 id="一、命令"><a href="#一、命令" class="headerlink" title="一、命令"></a>一、命令</h2><h3 id="1-1-启动-连接-停止"><a href="#1-1-启动-连接-停止" class="headerlink" title="1.1      启动 连接 停止"></a>1.1      启动 连接 停止</h3><p>启动</p>
-<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cd</span> src</span><br><span class="line"><span class="string">./redis-servie</span></span><br></pre></td></tr></table></figure>
-
-<p>连接客户端</p>
-<figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./redis-<span class="keyword">cli</span></span><br><span class="line">./redis-<span class="keyword">cli</span> -h <span class="built_in">ip</span>地址 -p 端口</span><br></pre></td></tr></table></figure>
-
-<p>停止/kill</p>
-<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">./redis-cli</span> <span class="keyword">shutdown</span></span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="二、操作"><a href="#二、操作" class="headerlink" title="二、操作"></a>二、操作</h2><h3 id="2-0-配置命令"><a href="#2-0-配置命令" class="headerlink" title="2.0 配置命令"></a>2.0 配置命令</h3><ol>
-<li><p>获得配置信息</p>
-<p>config get key</p>
+<h2 id="二、组件"><a href="#二、组件" class="headerlink" title="二、组件"></a>二、组件</h2><h3 id="2-1-核心组件"><a href="#2-1-核心组件" class="headerlink" title="2.1 核心组件"></a>2.1 核心组件</h3><ol>
+<li>Subjetc： 当前进程obj</li>
+<li>Shiro SecurityManager</li>
+<li>Realm ：安全中心，提供认证授权服务</li>
+<li>ShiroFilterFactoryBean：请求过滤器<ol>
+<li>设置Map&lt;路径，权限&gt;的过滤器Map</li>
+<li>设置自定义过滤器</li>
+<li>设置无权路径</li>
+</ol>
 </li>
 </ol>
-<h3 id="2-1-全局"><a href="#2-1-全局" class="headerlink" title="2.1 全局"></a>2.1 全局</h3><h4 id="2-1-1-库操作"><a href="#2-1-1-库操作" class="headerlink" title="2.1.1  库操作"></a>2.1.1  库操作</h4><ol>
-<li>切换库 select 1</li>
-<li>dbsize数据库大小</li>
-<li>flushdb 清空库</li>
-</ol>
-<h4 id="2-1-2-key操作"><a href="#2-1-2-key操作" class="headerlink" title="2.1.2 key操作"></a>2.1.2 key操作</h4><blockquote>
-<p>注意每个单词要有空格分开</p>
+<h3 id="2-2-注解模式"><a href="#2-2-注解模式" class="headerlink" title="2.2 注解模式"></a>2.2 注解模式</h3><blockquote>
+<p>对于Map&lt;路径，权限&gt;</p>
 </blockquote>
 <ol>
-<li>查看所有 keys *   keys nam*  查看所有 nam开头的* </li>
-<li> 赋值 set k v </li>
-<li> 多赋值 mset k1 k2 v1 v2</li>
-<li> 获取值  get k</li>
-<li> 多取值 mget k1 k2</li>
-<li>检查是否存在  exists key</li>
-<li>key类型 type key </li>
-<li>删除key del key</li>
-<li>删除所有key flushdb</li>
-<li>设置过期时间秒 expire key  10  </li>
-<li>persist key 删除过期时间</li>
-<li>ttl  key 查看多少秒过期  -2 已经过期   -1 永不过期</li>
+<li>@RequiresAuthentication 需登录</li>
+<li>@RequiresPermissions(“b”)  需b权限</li>
+<li>@RequiresRoles(“admin”)  需admin角色</li>
 </ol>
-<h3 id="2-2-string"><a href="#2-2-string" class="headerlink" title="2.2 string"></a>2.2 string</h3><ol>
-<li>set k str  get k</li>
-<li>append k 追加</li>
-<li>strlen k</li>
-<li>setnx  不存在则设置   返回0表示已经存在</li>
-<li>incr/decr k  增加/减少1 </li>
-<li>incrby/decrby k n  增加/减少n   原子性操作</li>
-<li>mset mget msetnx(都不存在才成功)</li>
-<li>getrange k begin end    —-&gt;substring</li>
-<li>setrange k begin  str       —-&gt;替换覆盖</li>
-<li>setex k 100 v  同时设置</li>
-<li>getset 取了就换 </li>
+<h3 id="2-3-user"><a href="#2-3-user" class="headerlink" title="2.3 user"></a>2.3 user</h3><ol>
+<li>user<ol>
+<li>userName</li>
+<li>pasword</li>
+<li>List&lt;String&gt;roles</li>
+<li>List&lt;String&gt;perms</li>
 </ol>
-<h4 id="2-3-list"><a href="#2-3-list" class="headerlink" title="2.3 list"></a>2.3 list</h4><ol>
-<li>push k v1 v2  左是头-头插法  v2 v1</li>
-<li>rpush k v1 v2 右是头头插法 v1 v2</li>
-<li>lrange k begin end 从左开始取</li>
-<li>lpop/rpop  从左/右吐出一个</li>
-<li>rpoplpush  右边吐一个放在左边 </li>
-<li>index k 0  按下标取</li>
-<li>llen</li>
-<li>linsert k before/after “str3”  “strn” 在str3 前面插入strn</li>
-<li>lrem k before/after “str3”  …</li>
-<li>lset k 0 “wang” 把第一个设置为”wang”</li>
+</li>
 </ol>
-<h3 id="2-4-hash"><a href="#2-4-hash" class="headerlink" title="2.4 hash"></a>2.4 hash</h3><table>
-<thead>
-<tr>
-<th>1</th>
-<th>hdel hs key field1 [field2]        删除一个或多个哈希表字段</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>2</td>
-<td>hexisit hs key field 查看哈希表 key 中，指定的字段是否存在。</td>
-</tr>
-<tr>
-<td>3</td>
-<td>hget key field 获取存储在哈希表中指定字段的值。</td>
-</tr>
-<tr>
-<td>4</td>
-<td>hgetall hs  key 获取在哈希表中指定 key 的所有字段和值</td>
-</tr>
-<tr>
-<td>5</td>
-<td><a target="_blank" rel="noopener" href="https://www.runoob.com/redis/hashes-hincrby.html">HINCRBY key field increment</a> 为哈希表 key 中的指定字段的整数值加上增量 increment 。</td>
-</tr>
-<tr>
-<td>6</td>
-<td><a target="_blank" rel="noopener" href="https://www.runoob.com/redis/hashes-hincrbyfloat.html">HINCRBYFLOAT key field increment</a> 为哈希表 key 中的指定字段的浮点数值加上增量 increment 。</td>
-</tr>
-<tr>
-<td>7</td>
-<td><a target="_blank" rel="noopener" href="https://www.runoob.com/redis/hashes-hkeys.html">HKEYS key</a> 获取所有哈希表中的字段</td>
-</tr>
-<tr>
-<td>8</td>
-<td><a target="_blank" rel="noopener" href="https://www.runoob.com/redis/hashes-hlen.html">HLEN key</a> 获取哈希表中字段的数量</td>
-</tr>
-<tr>
-<td>9</td>
-<td>[HMGET key field1 <a target="_blank" rel="noopener" href="https://www.runoob.com/redis/hashes-hmget.html">field2]</a> 获取所有给定字段的值</td>
-</tr>
-<tr>
-<td>10</td>
-<td>[HMSET key field1 value1 <a target="_blank" rel="noopener" href="https://www.runoob.com/redis/hashes-hmset.html">field2 value2 ]</a> 同时将多个 field-value (域-值)对设置到哈希表 key 中。</td>
-</tr>
-<tr>
-<td>11</td>
-<td><a target="_blank" rel="noopener" href="https://www.runoob.com/redis/hashes-hset.html">HSET key field value</a> 将哈希表 key 中的字段 field 的值设为 value 。</td>
-</tr>
-<tr>
-<td>12</td>
-<td><a target="_blank" rel="noopener" href="https://www.runoob.com/redis/hashes-hsetnx.html">HSETNX key field value</a> 只有在字段 field 不存在时，设置哈希表字段的值。</td>
-</tr>
-<tr>
-<td>13</td>
-<td><a target="_blank" rel="noopener" href="https://www.runoob.com/redis/hashes-hvals.html">HVALS key</a> 获取哈希表中所有值。</td>
-</tr>
-<tr>
-<td>14</td>
-<td>[HSCAN key cursor <a target="_blank" rel="noopener" href="https://www.runoob.com/redis/hashes-hscan.html">MATCH pattern] [COUNT count]</a> 迭代哈希表中的键值对。</td>
-</tr>
-</tbody></table>
-<h3 id="2-5-set"><a href="#2-5-set" class="headerlink" title="2.5 set"></a>2.5 set</h3><ol>
-<li>sadd k v1 v2</li>
-<li>smembers k</li>
-<li>sismember k v v是否存在 1true</li>
-<li>scard k   返回个数</li>
-<li>spop 随机吐出一个</li>
-<li>srandmenber k  n随机取出n个</li>
-<li>smove k v k2   迁移</li>
-<li>交集</li>
-<li>并集</li>
+<h2 id="三、原理"><a href="#三、原理" class="headerlink" title="三、原理"></a>三、原理</h2><h3 id="3-1-基于token"><a href="#3-1-基于token" class="headerlink" title="3.1 基于token"></a>3.1 基于token</h3><h3 id="3-2-安全中心-MyRealm"><a href="#3-2-安全中心-MyRealm" class="headerlink" title="3.2 安全中心 MyRealm"></a>3.2 安全中心 MyRealm</h3><ul>
+<li><p>认证中心  AuthenticationInfo(username,password)</p>
+<ul>
+<li>登录的时候会用有一次</li>
+<li>传入账号信息，通过数据库获得用户信息，返回token(user，passwod，Nmae)</li>
+</ul>
+</li>
+<li><p>权限中心  AuthorizationInfo(user)</p>
+<ul>
+<li><p>每次访问需要权限的地方会用到</p>
+</li>
+<li><p>格式化user的权限</p>
+</li>
+<li><p>然后根据user权限对比[需要访问的方法]的权限，如果有权限，就退回到对应界面</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">filterFactoryBean.setLoginUrl(<span class="string">&quot;/login.html&quot;</span>);<span class="comment">//登录页面</span></span><br><span class="line">filterFactoryBean.setUnauthorizedUrl(<span class="string">&quot;/wq.html&quot;</span>);<span class="comment">//无权限</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<h2 id="四、集成-改进"><a href="#四、集成-改进" class="headerlink" title="四、集成-改进"></a>四、集成-改进</h2><h3 id="5-1-shiro-redis集成"><a href="#5-1-shiro-redis集成" class="headerlink" title="5.1 shiro+redis集成"></a>5.1 shiro+redis集成</h3><h2 id="五、其他"><a href="#五、其他" class="headerlink" title="五、其他"></a>五、其他</h2><ol>
+<li><p>过滤顺序问题</p>
+<blockquote>
+<p>过滤设置规则是从上到下，详细的规则配在前面，大范围的配在后面。</p>
+</blockquote>
+</li>
 </ol>
-<h3 id="2-6-zset"><a href="#2-6-zset" class="headerlink" title="2.6 zset"></a>2.6 zset</h3>
+<h2 id="六、RDBC模型-role-based-access-control"><a href="#六、RDBC模型-role-based-access-control" class="headerlink" title="六、RDBC模型 role based access control"></a>六、RDBC模型 role based access control</h2><h3 id="依赖"><a href="#依赖" class="headerlink" title="依赖"></a>依赖</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">shiro-core</span><br><span class="line">shiro-spring</span><br><span class="line"></span><br><span class="line">f</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+
       
     </div>
 
@@ -1004,7 +1149,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">114</span>
+          <span class="site-state-item-count">115</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1055,12 +1200,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">323k</span>
+    <span title="站点总字数">335k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">4:54</span>
+    <span title="站点阅读时长">5:04</span>
 </div>
 
         
