@@ -187,7 +187,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/05/04/java/socket%E7%BC%96%E7%A8%8B/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/05/05/spring/%E6%B3%A8%E8%A7%A3/schdule/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -201,7 +201,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/05/04/java/socket%E7%BC%96%E7%A8%8B/" class="post-title-link" itemprop="url">socket编程</a>
+            <a href="/2022/05/05/spring/%E6%B3%A8%E8%A7%A3/schdule/" class="post-title-link" itemprop="url">schedule注解</a>
         </h2>
 
         <div class="post-meta">
@@ -211,323 +211,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-05-04 22:34:54" itemprop="dateCreated datePublished" datetime="2022-05-04T22:34:54+08:00">2022-05-04</time>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/05/04/java/socket%E7%BC%96%E7%A8%8B/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/05/04/java/socket%E7%BC%96%E7%A8%8B/" class="cy_cmt_count" data-xid="2022/05/04/java/socket编程/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>8.4k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>8 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="一、网络编程概念"><a href="#一、网络编程概念" class="headerlink" title="一、网络编程概念"></a>一、网络编程概念</h2><blockquote>
-<p>socket就是对UDP、TCP的封装</p>
-</blockquote>
-<h3 id="1-1-TCP-UDP"><a href="#1-1-TCP-UDP" class="headerlink" title="1.1 TCP UDP"></a>1.1 TCP UDP</h3><ul>
-<li><strong>TCP</strong>：传输控制协议，是一种面向连接的、可靠的、基于字节流的传输层通信协议，TCP 层是位于 IP 层之上，应用层之下的中间层。TCP 保障了两个应用程序之间的可靠通信。通常用于互联网协议，被称 TCP / IP。</li>
-<li><strong>UDP</strong>：用户数据报协议，位于 OSI 模型的传输层。一个无连接的协议。提供了应用程序之间要发送数据的数据报。由于UDP缺乏可靠性且属于无连接协议，所以应用程序通常必须容许一些丢失、错误或重复的数据包。不局限于端到端，可以广播</li>
-</ul>
-<h3 id="1-2-socket概念"><a href="#1-2-socket概念" class="headerlink" title="1.2 socket概念"></a>1.2 socket概念</h3><ol>
-<li><p>在计算机网络中，叫套接字socket (ip:port)</p>
-<p>top连接={socket1,socket2}</p>
-</li>
-<li><p>在程序通信中，叫socket Api，网络通信接口，这是对TCP、IP的封装</p>
-</li>
-</ol>
-<h3 id="1-3-socket编程"><a href="#1-3-socket编程" class="headerlink" title="1.3 socket编程"></a>1.3 socket编程</h3><blockquote>
-<p>当连接建立时，服务器会创建一个 Socket 对象。客户端和服务器现在可以通过对 Socket 对象的写入和读取来进行通信。</p>
-</blockquote>
-<h3 id="1-4-IO模型"><a href="#1-4-IO模型" class="headerlink" title="1.4  IO模型"></a>1.4  IO模型</h3><ol>
-<li><p>阻塞IO</p>
-<p>进程进行IO操作的适合被挂起，防止被运行，指导IO操作完成。</p>
-</li>
-<li><p>非阻塞IO</p>
-<p>IO操作立即返回，返回值为读取到的数据大小。等到总线发送了中断信号，就表示IO操作完成。</p>
-</li>
-</ol>
-<h3 id="1-5-Java中的net"><a href="#1-5-Java中的net" class="headerlink" title="1.5 Java中的net"></a>1.5 Java中的net</h3><p>​    网络编程的基本模型是Client/Server模型，也就是两个进程之间进行相互通信，客户端 - 服务端是完全同步，完全耦合的</p>
-<ul>
-<li>服务端ServerSocket，负责绑定IP地址和端口，提供位置信息</li>
-<li>客户端Socket，通过连接操作，向服务端监听的端口地址发起连接请求</li>
-<li>基于TCP协议下进行三次握手连接</li>
-<li>连接成功后，双方通过网络套接字（Socket）（输入和输出流）进行同步阻塞式通信</li>
-</ul>
-<h3 id="1-6-关键技术"><a href="#1-6-关键技术" class="headerlink" title="1.6 关键技术"></a>1.6 关键技术</h3><h4 id="1-6-1-flush"><a href="#1-6-1-flush" class="headerlink" title="1.6.1 flush"></a>1.6.1 flush</h4><ol>
-<li>通常情况下，流式传输时基于1KB缓冲区的，当写入数据满1KB就会发送</li>
-<li>但是有时候不足1KB需要使用flush才发送</li>
-</ol>
-<h3 id="1-7-演进"><a href="#1-7-演进" class="headerlink" title="1.7 演进"></a>1.7 演进</h3><ol>
-<li><p>BIO</p>
-</li>
-<li><p>伪异步IO </p>
-<p>采用线程池 + 任务队列</p>
-<p>依然是同步阻塞，客户端会发生大量连接超时</p>
-</li>
-<li><p>NIO</p>
-</li>
-</ol>
-<h2 id="二、类"><a href="#二、类" class="headerlink" title="二、类"></a>二、类</h2><table>
-<thead>
-<tr>
-<th>名称</th>
-<th>协议</th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Socket</td>
-<td>tcp</td>
-<td>同时工作于客户端和服务端，所有方法都是通用的，这个类三个主要作用，校验包信息，发起连接（Client），操作流数据（Client/Server）f</td>
-</tr>
-<tr>
-<td>ServerSocket</td>
-<td>tcp</td>
-<td>ServerSocket表示为服务端，主要作用就是绑定并监听一个服务器端口，为每个建立连接的客户端“克隆/映射”一个Socket对象，具体数据操作都是通过这个Socket对象完成的，ServerSocket只关注如何和客户端建立连接</td>
-</tr>
-<tr>
-<td>DatagramSocket</td>
-<td>udp</td>
-<td>用于表示发送和接收数据报包的套接字</td>
-</tr>
-<tr>
-<td>DatagramPacket</td>
-<td>udp</td>
-<td>类用来表示数据报包，数据报包用来实现无连接包投递服务</td>
-</tr>
-<tr>
-<td>InetAddress</td>
-<td>ip+端口</td>
-<td>代表互联网协议（IP）地址，InetAddress类没有提供构造器，而是提供了如下两个静态方法来获取InetAddress实例</td>
-</tr>
-<tr>
-<td>InetSocketAddress</td>
-<td>ip+端口</td>
-<td>在使用Socket来连接服务器时最简单的方式就是直接使用IP和端口，但Socket类中并未提供这种方式，而是靠SocketAddress的子类InetSocketAddress来实现 IP 地址 + 端口号的创建，不依赖任何协议。</td>
-</tr>
-</tbody></table>
-<h3 id="2-1-ServerSocket"><a href="#2-1-ServerSocket" class="headerlink" title="2.1 ServerSocket"></a>2.1 ServerSocket</h3><table>
-<thead>
-<tr>
-<th>序号</th>
-<th>方法名</th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>1</td>
-<td>ServerSocket(int port)</td>
-<td>构造函数</td>
-</tr>
-<tr>
-<td>2</td>
-<td><strong>getLocalPort</strong></td>
-<td>获得端口</td>
-</tr>
-<tr>
-<td>3</td>
-<td><strong>accept</strong></td>
-<td>监听</td>
-</tr>
-</tbody></table>
-<h3 id="2-2-Socket"><a href="#2-2-Socket" class="headerlink" title="2.2 Socket"></a>2.2 Socket</h3><table>
-<thead>
-<tr>
-<th>序号</th>
-<th>方法名</th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>1</td>
-<td>Socket(String host, int port)</td>
-<td>构造函数</td>
-</tr>
-<tr>
-<td>2</td>
-<td>**connect(**SocketAddress host, int timeout)</td>
-<td>连接</td>
-</tr>
-<tr>
-<td>3</td>
-<td><strong>getInetAddress</strong></td>
-<td>获得地址</td>
-</tr>
-<tr>
-<td>4</td>
-<td><strong>getPort</strong></td>
-<td></td>
-</tr>
-<tr>
-<td>5</td>
-<td><strong>getInputStream</strong></td>
-<td>获得输入流</td>
-</tr>
-<tr>
-<td>6</td>
-<td>OutputStream</td>
-<td>获得输出流</td>
-</tr>
-<tr>
-<td></td>
-<td><strong>close</strong></td>
-<td>关闭</td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-</tbody></table>
-<h3 id="2-3-InetAddress"><a href="#2-3-InetAddress" class="headerlink" title="2.3 InetAddress"></a>2.3 InetAddress</h3><table>
-<thead>
-<tr>
-<th>序号</th>
-<th>方法名</th>
-<th>作用</th>
-</tr>
-</thead>
-<tbody><tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-</tbody></table>
-<h2 id="三、步骤"><a href="#三、步骤" class="headerlink" title="三、步骤"></a>三、步骤</h2><ol>
-<li>创建一个ServerSocket，监听并绑定一个端口</li>
-<li>一系列客户端来请求这个端口</li>
-<li>服务器使用Accept，获得一个来自客户端的Socket连接对象 </li>
-<li>启动一个新线程处理连接 <ol>
-<li>读Socket，得到字节流</li>
-<li>解码协议，得到Http请求对象 </li>
-<li>处理Http请求，得到一个结果，封装成一个HttpResponse对象 </li>
-<li>编码协议，将结果序列化字节流 写Socket，将字节流发给客户端 </li>
-</ol>
-</li>
-<li>继续循环步骤3</li>
-</ol>
-<h3 id="3-1-单发、单客户端"><a href="#3-1-单发、单客户端" class="headerlink" title="3.1 单发、单客户端"></a>3.1 单发、单客户端</h3><h4 id="3-1-1-客户端"><a href="#3-1-1-客户端" class="headerlink" title="3.1.1 客户端"></a>3.1.1 客户端</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">    Java提供了一个包：java.net下的类都是用于网络通信。</span></span><br><span class="line"><span class="comment">    Java提供了基于套接字（端口）Socket的网络通信模式，我们基于这种模式就可以直接实现TCP通信。</span></span><br><span class="line"><span class="comment">    只要用Socket通信，那么就是基于TCP可靠传输通信。</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">    功能1：客户端发送一个消息，服务端接口一个消息，通信结束！！</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">    创建客户端对象：</span></span><br><span class="line"><span class="comment">        （1）创建一个Socket的通信管道，请求与服务端的端口连接。</span></span><br><span class="line"><span class="comment">        （2）从Socket管道中得到一个字节输出流。</span></span><br><span class="line"><span class="comment">        （3）把字节流改装成自己需要的流进行数据的发送</span></span><br><span class="line"><span class="comment">    创建服务端对象：</span></span><br><span class="line"><span class="comment">        （1）注册端口</span></span><br><span class="line"><span class="comment">        （2）开始等待接收客户端的连接,得到一个端到端的Socket管道</span></span><br><span class="line"><span class="comment">        （3）从Socket管道中得到一个字节输入流。</span></span><br><span class="line"><span class="comment">        （4）把字节输入流包装成自己需要的流进行数据的读取。</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">    Socket的使用：</span></span><br><span class="line"><span class="comment">        构造器：public Socket(String host, int port)</span></span><br><span class="line"><span class="comment">        方法：  public OutputStream getOutputStream()：获取字节输出流</span></span><br><span class="line"><span class="comment">               public InputStream getInputStream() :获取字节输入流</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">    ServerSocket的使用：</span></span><br><span class="line"><span class="comment">        构造器：public ServerSocket(int port)</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">    小结：</span></span><br><span class="line"><span class="comment">        通信是很严格的，对方怎么发你就怎么收，对方发多少你就只能收多少！！</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ClientDemo</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;==客户端的启动==&quot;</span>);</span><br><span class="line">        <span class="comment">// （1）创建一个Socket的通信管道，请求与服务端的端口连接。</span></span><br><span class="line">        Socket socket = <span class="keyword">new</span> Socket(<span class="string">&quot;127.0.0.1&quot;</span>,<span class="number">8888</span>);</span><br><span class="line">        <span class="comment">// （2）从Socket通信管道中得到一个字节输出流。</span></span><br><span class="line">        OutputStream os = socket.getOutputStream();</span><br><span class="line">        <span class="comment">// （3）把字节流改装成自己需要的流进行数据的发送</span></span><br><span class="line">        PrintStream ps = <span class="keyword">new</span> PrintStream(os);</span><br><span class="line">        <span class="comment">// （4）开始发送消息</span></span><br><span class="line">        ps.println(<span class="string">&quot;我是客户端，我想约你吃小龙虾！！！&quot;</span>);</span><br><span class="line">        ps.flush();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h4 id="3-1-2-服务端"><a href="#3-1-2-服务端" class="headerlink" title="3.1.2 服务端"></a>3.1.2 服务端</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ServerDemo</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;==服务器的启动==&quot;</span>);</span><br><span class="line">        <span class="comment">// （1）注册端口</span></span><br><span class="line">        ServerSocket serverSocket = <span class="keyword">new</span> ServerSocket(<span class="number">8888</span>);</span><br><span class="line">        <span class="comment">//（2）开始在这里暂停等待接收客户端的连接,得到一个端到端的Socket管道</span></span><br><span class="line">        Socket socket = serverSocket.accept();</span><br><span class="line">        <span class="comment">//（3）从Socket管道中得到一个字节输入流。</span></span><br><span class="line">        InputStream is = socket.getInputStream();</span><br><span class="line">        <span class="comment">//（4）把字节输入流包装成自己需要的流进行数据的读取。</span></span><br><span class="line">        BufferedReader br = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> InputStreamReader(is));</span><br><span class="line">        <span class="comment">//（5）读取数据</span></span><br><span class="line">        String line ;</span><br><span class="line">        <span class="keyword">while</span>((line = br.readLine())!=<span class="keyword">null</span>)&#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;服务端收到：&quot;</span>+line);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="3-2-多发"><a href="#3-2-多发" class="headerlink" title="3.2 多发"></a>3.2 多发</h3><blockquote>
-<p>关键：while(true)  + flush推送</p>
-</blockquote>
-<h4 id="3-2-1-客户端"><a href="#3-2-1-客户端" class="headerlink" title="3.2.1 客户端"></a>3.2.1 客户端</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ClientDemo</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;==客户端的启动==&quot;</span>);</span><br><span class="line">        <span class="comment">// （1）创建一个Socket的通信管道，请求与服务端的端口连接。</span></span><br><span class="line">        Socket socket = <span class="keyword">new</span> Socket(<span class="string">&quot;127.0.0.1&quot;</span>,<span class="number">8888</span>);</span><br><span class="line">        <span class="comment">// （2）从Socket通信管道中得到一个字节输出流。</span></span><br><span class="line">        OutputStream os = socket.getOutputStream();</span><br><span class="line">        <span class="comment">// （3）把字节流改装成自己需要的流进行数据的发送</span></span><br><span class="line">        PrintStream ps = <span class="keyword">new</span> PrintStream(os);</span><br><span class="line">        <span class="comment">// （4）开始发送消息</span></span><br><span class="line">        Scanner sc = <span class="keyword">new</span> Scanner(System.in);</span><br><span class="line">        <span class="keyword">while</span>(<span class="keyword">true</span>)&#123;</span><br><span class="line">            System.out.print(<span class="string">&quot;请说:&quot;</span>);</span><br><span class="line">            String msg = sc.nextLine();</span><br><span class="line">            ps.println(msg);</span><br><span class="line">            ps.flush();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h4 id="3-2-2-服务端"><a href="#3-2-2-服务端" class="headerlink" title="3.2.2 服务端"></a>3.2.2 服务端</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ServerDemo</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        String s = <span class="string">&quot;886&quot;</span>;</span><br><span class="line">        System.out.println(<span class="string">&quot;886&quot;</span>.equals(s));</span><br><span class="line">        System.out.println(<span class="string">&quot;==服务器的启动==&quot;</span>);</span><br><span class="line">        <span class="comment">//（1）注册端口</span></span><br><span class="line">        ServerSocket serverSocket = <span class="keyword">new</span> ServerSocket(<span class="number">8888</span>);</span><br><span class="line">        <span class="comment">//（2）开始在这里暂停等待接收客户端的连接,得到一个端到端的Socket管道</span></span><br><span class="line">        Socket socket = serverSocket.accept();</span><br><span class="line">        <span class="comment">//（3）从Socket管道中得到一个字节输入流。</span></span><br><span class="line">        InputStream is = socket.getInputStream();</span><br><span class="line">        <span class="comment">//（4）把字节输入流包装成  自己需要的流进行数据的读取。</span></span><br><span class="line">        BufferedReader br = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> InputStreamReader(is));</span><br><span class="line">        <span class="comment">//（5）读取数据</span></span><br><span class="line">        String line ;</span><br><span class="line">        <span class="keyword">while</span>((line = br.readLine())!=<span class="keyword">null</span>)&#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;服务端收到：&quot;</span>+line);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="3-3-多客户端"><a href="#3-3-多客户端" class="headerlink" title="3.3 多客户端"></a>3.3 多客户端</h3><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20200615181141593.png" alt="image-20200615181141593"></p>
-<blockquote>
-<p>关键：while(true) + 多线程</p>
-</blockquote>
-<h4 id="3-3-1-客户端"><a href="#3-3-1-客户端" class="headerlink" title="3.3.1 客户端"></a>3.3.1 客户端</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ClientDemo</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;==客户端的启动==&quot;</span>);</span><br><span class="line">        <span class="comment">// （1）创建一个Socket的通信管道，请求与服务端的端口连接。</span></span><br><span class="line">        Socket socket = <span class="keyword">new</span> Socket(<span class="string">&quot;127.0.0.1&quot;</span>,<span class="number">7777</span>);</span><br><span class="line">        <span class="comment">// （2）从Socket通信管道中得到一个字节输出流。</span></span><br><span class="line">        OutputStream os = socket.getOutputStream();</span><br><span class="line">        <span class="comment">// （3）把字节流改装成自己需要的流进行数据的发送</span></span><br><span class="line">        PrintStream ps = <span class="keyword">new</span> PrintStream(os);</span><br><span class="line">        <span class="comment">// （4）开始发送消息</span></span><br><span class="line">        Scanner sc = <span class="keyword">new</span> Scanner(System.in);</span><br><span class="line">        <span class="keyword">while</span>(<span class="keyword">true</span>)&#123;</span><br><span class="line">            System.out.print(<span class="string">&quot;请说:&quot;</span>);</span><br><span class="line">            String msg = sc.nextLine();</span><br><span class="line">            ps.println(msg);</span><br><span class="line">            ps.flush();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-<h4 id="3-3-2-服务端"><a href="#3-3-2-服务端" class="headerlink" title="3.3.2 服务端"></a>3.3.2 服务端</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ServerDemo</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;==服务器的启动==&quot;</span>);</span><br><span class="line">        <span class="comment">// （1）注册端口</span></span><br><span class="line">        ServerSocket serverSocket = <span class="keyword">new</span> ServerSocket(<span class="number">7777</span>);</span><br><span class="line">        <span class="keyword">while</span>(<span class="keyword">true</span>)&#123;</span><br><span class="line">            <span class="comment">//（2）开始在这里暂停等待接收客户端的连接,得到一个端到端的Socket管道</span></span><br><span class="line">            Socket socket = serverSocket.accept();</span><br><span class="line">            <span class="keyword">new</span> ServerReadThread(socket).start();</span><br><span class="line">            System.out.println(socket.getRemoteSocketAddress()+<span class="string">&quot;上线了！&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ServerReadThread</span> <span class="keyword">extends</span> <span class="title">Thread</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Socket socket;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ServerReadThread</span><span class="params">(Socket socket)</span></span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.socket = socket;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span>&#123;</span><br><span class="line">            <span class="comment">//（3）从Socket管道中得到一个字节输入流。</span></span><br><span class="line">            InputStream is = socket.getInputStream();</span><br><span class="line">            <span class="comment">//（4）把字节输入流包装成自己需要的流进行数据的读取。</span></span><br><span class="line">            BufferedReader br = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> InputStreamReader(is));</span><br><span class="line">            <span class="comment">//（5）读取数据</span></span><br><span class="line">            String line ;</span><br><span class="line">            <span class="keyword">while</span>((line = br.readLine())!=<span class="keyword">null</span>)&#123;</span><br><span class="line">                System.out.println(<span class="string">&quot;服务端收到：&quot;</span>+socket.getRemoteSocketAddress()+<span class="string">&quot;:&quot;</span>+line);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;<span class="keyword">catch</span> (Exception e)&#123;</span><br><span class="line">            System.out.println(socket.getRemoteSocketAddress()+<span class="string">&quot;下线了！&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="3-4-伪异步"><a href="#3-4-伪异步" class="headerlink" title="3.4 伪异步"></a>3.4 伪异步</h3><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20200619085953166.png" alt="image-20200619085953166"></p>
-<blockquote>
-<p>采用线程池和任务队列实现</p>
-</blockquote>
-<h4 id="3-4-0-线程池"><a href="#3-4-0-线程池" class="headerlink" title="3.4.0 线程池"></a>3.4.0 线程池</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 线程池处理类</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HandlerSocketThreadPool</span> </span>&#123;</span><br><span class="line">   </span><br><span class="line">   <span class="comment">// 线程池 </span></span><br><span class="line">   <span class="keyword">private</span> ExecutorService executor;</span><br><span class="line">   </span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="title">HandlerSocketThreadPool</span><span class="params">(<span class="keyword">int</span> maxPoolSize, <span class="keyword">int</span> queueSize)</span></span>&#123;</span><br><span class="line">      </span><br><span class="line">      <span class="keyword">this</span>.executor = <span class="keyword">new</span> ThreadPoolExecutor(</span><br><span class="line">            <span class="number">3</span>, <span class="comment">// 8</span></span><br><span class="line">            maxPoolSize,  </span><br><span class="line">            <span class="number">120L</span>, </span><br><span class="line">            TimeUnit.SECONDS,</span><br><span class="line">            <span class="keyword">new</span> ArrayBlockingQueue&lt;Runnable&gt;(queueSize) );</span><br><span class="line">   &#125;</span><br><span class="line">   </span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">(Runnable task)</span></span>&#123;</span><br><span class="line">      <span class="keyword">this</span>.executor.execute(task);</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-<h4 id="3-4-1-客户端"><a href="#3-4-1-客户端" class="headerlink" title="3.4.1 客户端"></a>3.4.1 客户端</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Client</span> </span>&#123;</span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">try</span> &#123;</span><br><span class="line">         <span class="comment">// 1.简历一个与服务端的Socket对象：套接字</span></span><br><span class="line">         Socket socket = <span class="keyword">new</span> Socket(<span class="string">&quot;127.0.0.1&quot;</span>, <span class="number">9999</span>);</span><br><span class="line">         <span class="comment">// 2.从socket管道中获取一个输出流，写数据给服务端 </span></span><br><span class="line">         OutputStream os = socket.getOutputStream() ;</span><br><span class="line">         <span class="comment">// 3.把输出流包装成一个打印流 </span></span><br><span class="line">         PrintWriter pw = <span class="keyword">new</span> PrintWriter(os);</span><br><span class="line">         <span class="comment">// 4.反复接收用户的输入 </span></span><br><span class="line">         BufferedReader br = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> InputStreamReader(System.in));</span><br><span class="line">         String line = <span class="keyword">null</span> ;</span><br><span class="line">         <span class="keyword">while</span>((line = br.readLine()) != <span class="keyword">null</span>)&#123;</span><br><span class="line">            pw.println(line);</span><br><span class="line">            pw.flush();</span><br><span class="line">         &#125;</span><br><span class="line">      &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">         e.printStackTrace();</span><br><span class="line">      &#125;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h4 id="3-4-2-服务端"><a href="#3-4-2-服务端" class="headerlink" title="3.4.2 服务端"></a>3.4.2 服务端</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Server</span> </span>&#123;</span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">try</span> &#123;</span><br><span class="line">         System.out.println(<span class="string">&quot;----------服务端启动成功------------&quot;</span>);</span><br><span class="line">         ServerSocket ss = <span class="keyword">new</span> ServerSocket(<span class="number">9999</span>);</span><br><span class="line"></span><br><span class="line">         <span class="comment">// 一个服务端只需要对应一个线程池</span></span><br><span class="line">         HandlerSocketThreadPool handlerSocketThreadPool =</span><br><span class="line">               <span class="keyword">new</span> HandlerSocketThreadPool(<span class="number">3</span>, <span class="number">1000</span>);</span><br><span class="line"></span><br><span class="line">         <span class="comment">// 客户端可能有很多个</span></span><br><span class="line">         <span class="keyword">while</span>(<span class="keyword">true</span>)&#123;</span><br><span class="line">            Socket socket = ss.accept() ; <span class="comment">// 阻塞式的！</span></span><br><span class="line">            System.out.println(<span class="string">&quot;有人上线了！！&quot;</span>);</span><br><span class="line">            <span class="comment">// 每次收到一个客户端的socket请求，都需要为这个客户端分配一个</span></span><br><span class="line">            <span class="comment">// 独立的线程 专门负责对这个客户端的通信！！</span></span><br><span class="line">            handlerSocketThreadPool.execute(<span class="keyword">new</span> ReaderClientRunnable(socket));</span><br><span class="line">         &#125;</span><br><span class="line"></span><br><span class="line">      &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">         e.printStackTrace();</span><br><span class="line">      &#125;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ReaderClientRunnable</span> <span class="keyword">implements</span> <span class="title">Runnable</span></span>&#123;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">private</span> Socket socket ;</span><br><span class="line"></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="title">ReaderClientRunnable</span><span class="params">(Socket socket)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">this</span>.socket = socket;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="keyword">try</span> &#123;</span><br><span class="line">         <span class="comment">// 读取一行数据</span></span><br><span class="line">         InputStream is = socket.getInputStream() ;</span><br><span class="line">         <span class="comment">// 转成一个缓冲字符流</span></span><br><span class="line">         Reader fr = <span class="keyword">new</span> InputStreamReader(is);</span><br><span class="line">         BufferedReader br = <span class="keyword">new</span> BufferedReader(fr);</span><br><span class="line">         <span class="comment">// 一行一行的读取数据</span></span><br><span class="line">         String line = <span class="keyword">null</span> ;</span><br><span class="line">         <span class="keyword">while</span>((line = br.readLine())!=<span class="keyword">null</span>)&#123; <span class="comment">// 阻塞式的！！</span></span><br><span class="line">            System.out.println(<span class="string">&quot;服务端收到了数据：&quot;</span>+line);</span><br><span class="line">         &#125;</span><br><span class="line">      &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">         System.out.println(<span class="string">&quot;有人下线了&quot;</span>);</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="3-5-客户端转发"><a href="#3-5-客户端转发" class="headerlink" title="3.5 客户端转发"></a>3.5 客户端转发</h3><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20200619123304241.png" alt="image-20200619123304241"></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/05/04/javaWeb/cookie-session/%E8%B7%A8%E5%9F%9Fcookie/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/05/04/javaWeb/cookie-session/%E8%B7%A8%E5%9F%9Fcookie/" class="post-title-link" itemprop="url">前后端分离解决跨域</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-05-04 21:57:46" itemprop="dateCreated datePublished" datetime="2022-05-04T21:57:46+08:00">2022-05-04</time>
+              <time title="创建时间：2022-05-05 11:59:13" itemprop="dateCreated datePublished" datetime="2022-05-05T11:59:13+08:00">2022-05-05</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -535,7 +219,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/javaWeb/" itemprop="url" rel="index"><span itemprop="name">javaWeb</span></a>
+                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
                 </span>
             </span>
 
@@ -549,8 +233,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/05/04/javaWeb/cookie-session/%E8%B7%A8%E5%9F%9Fcookie/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/05/04/javaWeb/cookie-session/%E8%B7%A8%E5%9F%9Fcookie/" class="cy_cmt_count" data-xid="2022/05/04/javaWeb/cookie-session/跨域cookie/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/05/05/spring/%E6%B3%A8%E8%A7%A3/schdule/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/05/05/spring/%E6%B3%A8%E8%A7%A3/schdule/" class="cy_cmt_count" data-xid="2022/05/05/spring/注解/schdule/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -561,422 +245,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>2.9k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>3 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="一、跨域"><a href="#一、跨域" class="headerlink" title="一、跨域"></a>一、跨域</h2><h3 id="1-1-跨域原因"><a href="#1-1-跨域原因" class="headerlink" title="1.1 跨域原因"></a>1.1 跨域原因</h3><ul>
-<li><strong>浏览器</strong>的同源策略限制：浏览器核心、基本的安全功能，如果缺少了同源策略，则浏览器的正常功能可能都会受到影响。</li>
-<li>同源策略：会阻止一个域的js和另外一个域的内容进行交互。http-host-port。</li>
-<li>前后端分离：前后端的域不一致。</li>
-</ul>
-<h3 id="1-2-没有同源策略会引发的问题"><a href="#1-2-没有同源策略会引发的问题" class="headerlink" title="1.2 没有同源策略会引发的问题"></a>1.2 没有同源策略会引发的问题</h3><p>​    一个网站用户Bob可能正在浏览聊天论坛，而同时另一个用户Alice也在此论坛中，并且后者刚刚发布了一个具有Bob银行链接的图片消息。设想一下，Alice编写了一个在Bob的银行站点上进行取款的form提交的链接，并将此链接作为图片src。如果Bob的银行在cookie中保存他的授权信息，并且此cookie没有过期，那么当Bob的浏览器尝试装载图片时将提交这个取款form和他的cookie，这样在没经Bob同意的情况下便授权了这次事务。</p>
-<ol>
-<li>病毒网站对cookie、session的<a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_37493556/article/details/106734689?utm_medium=distribute.pc_aggpage_search_result.none-task-blog-2~aggregatepage~first_rank_ecpm_v1~rank_v31_ecpm-1-106734689.pc_agg_new_rank&utm_term=%E8%B7%A8%E5%9F%9F%E7%9A%84%E6%9C%AC%E8%B4%A8%E6%98%AF%E4%BB%80%E4%B9%88&spm=1000.2123.3001.4430">盗用</a></li>
-<li>盗版网站对后台资源的复用</li>
-</ol>
-<h3 id="1-3-问题"><a href="#1-3-问题" class="headerlink" title="1.3 问题"></a>1.3 问题</h3><ol>
-<li>前端后端的代码需要部署到同一台服务器问题的跨域</li>
-<li>[前后端不同服务器]</li>
-</ol>
-<h2 id="二、解决"><a href="#二、解决" class="headerlink" title="二、解决"></a>二、解决</h2><h3 id="2-1-后端处理"><a href="#2-1-后端处理" class="headerlink" title="2.1 后端处理"></a>2.1 后端处理</h3><h4 id="前端请求"><a href="#前端请求" class="headerlink" title="前端请求"></a>前端请求</h4><blockquote>
-<p> withCredentials: true</p>
-</blockquote>
-<ol>
-<li><p>ajax</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">$.ajax(&#123;</span><br><span class="line">    <span class="attr">url</span>:bp+<span class="string">&quot;/user/test&quot;</span>,</span><br><span class="line"> <span class="attr">xhrFields</span>: &#123;</span><br><span class="line">        <span class="attr">withCredentials</span>: <span class="literal">true</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">success</span>:<span class="function"><span class="keyword">function</span>(<span class="params">result</span>)</span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(result);</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="attr">error</span>:<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></li>
-<li><p>axios</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> ax=axios.create(&#123;</span><br><span class="line">    <span class="attr">withCredentials</span>:<span class="literal">true</span>,</span><br><span class="line">&#125;)</span><br><span class="line">ax.get(bp+<span class="string">&quot;/user/test&quot;</span>).then(<span class="function"><span class="params">res</span>=&gt;</span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(res)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h4 id="2-1-1-CrossOrigin注解"><a href="#2-1-1-CrossOrigin注解" class="headerlink" title="2.1.1 CrossOrigin注解"></a>2.1.1 CrossOrigin注解</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@CrossOrigin(origins = &quot;http://localhost&quot;,allowCredentials = &quot;true&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserController</span> </span>&#123;</span><br><span class="line"><span class="comment">//origins 是保证能跨域访问</span></span><br><span class="line">    <span class="comment">//allowCredentials 是保证sessionId 唯一</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h4 id="2-1-2-Filter配置"><a href="#2-1-2-Filter配置" class="headerlink" title="2.1.2 Filter配置"></a>2.1.2 Filter配置</h4><p>response的属性</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LoginFilter</span> <span class="keyword">implements</span> <span class="title">HandlerInterceptor</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">preHandle</span><span class="params">(HttpServletRequest request, HttpServletResponse response, Object handler)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        response.setCharacterEncoding(<span class="string">&quot;UTF-8&quot;</span>);</span><br><span class="line">        response.setContentType(<span class="string">&quot;application/json; charset=utf-8&quot;</span>);</span><br><span class="line">        response.setHeader(<span class="string">&quot;Access-Control-Allow-Credentials&quot;</span>,<span class="string">&quot;true&quot;</span>);</span><br><span class="line">        response.setHeader(<span class="string">&quot;Access-Control-Allow-Origin&quot;</span>, <span class="string">&quot;http://127.0.0.1:*&quot;</span>);<span class="comment">//允许同机器下的q</span></span><br><span class="line">        response.setHeader(<span class="string">&quot;Access-Control-Allow-Headers&quot;</span>, <span class="string">&quot;Origin, X-Requested-With, Content-Type, Accept&quot;</span>);</span><br><span class="line">        response.setHeader(<span class="string">&quot;Access-Control-Allow-Methods&quot;</span>, <span class="string">&quot;GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS, PATCH&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h4 id="2-1-3-webmvcConfig"><a href="#2-1-3-webmvcConfig" class="headerlink" title="2.1.3 webmvcConfig"></a>2.1.3 webmvcConfig</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addCorsMappings</span><span class="params">(CorsRegistry registry)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//添加映射路径</span></span><br><span class="line">        registry.addMapping(<span class="string">&quot;/**&quot;</span>)</span><br><span class="line">                <span class="comment">//是否发送Cookie</span></span><br><span class="line">                .allowCredentials(<span class="keyword">true</span>)</span><br><span class="line"><span class="comment">//                //设置放行哪些原始域   SpringBoot2.4.4下低版本使用.allowedOrigins(&quot;*&quot;)</span></span><br><span class="line">               <span class="comment">// .allowedOrigins(&quot;http://localhost&quot;);  发现直接注释掉能生效</span></span><br><span class="line"><span class="comment">//                .allowedMethods(&quot;*&quot;) //或者放行全部</span></span><br><span class="line">                <span class="comment">//放行哪些原始请求头部信息</span></span><br><span class="line"><span class="comment">//                .allowedHeaders(&quot;*&quot;)</span></span><br><span class="line">                <span class="comment">//暴露哪些原始请求头部信息</span></span><br><span class="line"><span class="comment">//                .exposedHeaders(&quot;*&quot;);</span></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-
-<h4 id="2-1-4-CrosFilter-Bean"><a href="#2-1-4-CrosFilter-Bean" class="headerlink" title="2.1.4 CrosFilter Bean"></a>2.1.4 CrosFilter Bean</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GlobalCorsConfig</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> CorsFilter <span class="title">corsFilter</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">//1. 添加 CORS配置信息</span></span><br><span class="line">        CorsConfiguration config = <span class="keyword">new</span> CorsConfiguration();</span><br><span class="line">        <span class="comment">//放行哪些原始域</span></span><br><span class="line">        config.addAllowedOrigin(<span class="string">&quot;*&quot;</span>);</span><br><span class="line">        <span class="comment">//是否发送 Cookie</span></span><br><span class="line">        config.setAllowCredentials(<span class="keyword">true</span>);</span><br><span class="line">        <span class="comment">//放行哪些请求方式</span></span><br><span class="line">        config.addAllowedMethod(<span class="string">&quot;*&quot;</span>);</span><br><span class="line">        <span class="comment">//放行哪些原始请求头部信息</span></span><br><span class="line">        config.addAllowedHeader(<span class="string">&quot;*&quot;</span>);</span><br><span class="line">        <span class="comment">//暴露哪些头部信息</span></span><br><span class="line">        config.addExposedHeader(<span class="string">&quot;*&quot;</span>);</span><br><span class="line">        <span class="comment">//2. 添加映射路径</span></span><br><span class="line">        UrlBasedCorsConfigurationSource corsConfigurationSource = <span class="keyword">new</span> UrlBasedCorsConfigurationSource();</span><br><span class="line">        corsConfigurationSource.registerCorsConfiguration(<span class="string">&quot;/**&quot;</span>,config);</span><br><span class="line">        <span class="comment">//3. 返回新的CorsFilter</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> CorsFilter(corsConfigurationSource);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h3 id="nginx代理"><a href="#nginx代理" class="headerlink" title="nginx代理"></a>nginx代理</h3><h3 id="token"><a href="#token" class="headerlink" title="token"></a>token</h3>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/05/04/%E5%A4%A7%E6%95%B0%E6%8D%AE/Hadoop%E6%A6%82%E8%BF%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/05/04/%E5%A4%A7%E6%95%B0%E6%8D%AE/Hadoop%E6%A6%82%E8%BF%B0/" class="post-title-link" itemprop="url">hadoop概述</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-05-04 21:05:21" itemprop="dateCreated datePublished" datetime="2022-05-04T21:05:21+08:00">2022-05-04</time>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/05/04/%E5%A4%A7%E6%95%B0%E6%8D%AE/Hadoop%E6%A6%82%E8%BF%B0/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/05/04/%E5%A4%A7%E6%95%B0%E6%8D%AE/Hadoop%E6%A6%82%E8%BF%B0/" class="cy_cmt_count" data-xid="2022/05/04/大数据/Hadoop概述/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>2.2k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="一、概念"><a href="#一、概念" class="headerlink" title="一、概念"></a>一、概念</h2><h3 id="1-1-数据分析"><a href="#1-1-数据分析" class="headerlink" title="1.1 数据分析"></a>1.1 数据分析</h3><blockquote>
-<p>大数据：体量volume、种类variety、低价值密度、速度快、具有可靠性</p>
-</blockquote>
-<h4 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h4><ol>
-<li>当下分析、现状分析、实时分析、streaming</li>
-<li>过去分析，原因分析、离线分析、批处理</li>
-<li>未来分析，预测分析、机器学习、ML</li>
-</ol>
-<h4 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h4><ol>
-<li>明确目的<ol>
-<li>数据分析方法论</li>
-</ol>
-</li>
-<li>数据收集<ol>
-<li>业务数据</li>
-<li>日志</li>
-<li>爬虫</li>
-<li>公开数据，excel</li>
-</ol>
-</li>
-<li>数据处理<ol>
-<li>数据清洗</li>
-<li>准换、计算、提取</li>
-<li>变成干净、规则、结构化的数据</li>
-</ol>
-</li>
-<li>数据分析<ol>
-<li>数据分析方法</li>
-<li>专门软件</li>
-</ol>
-</li>
-<li>数据展现<ol>
-<li>数据可视化</li>
-<li>数据挖掘</li>
-</ol>
-</li>
-<li>报告编写</li>
-</ol>
-<h3 id="1-2-分布式"><a href="#1-2-分布式" class="headerlink" title="1.2 分布式"></a>1.2 分布式</h3><blockquote>
-<p>分布式：多台机器、每台机器部署不同机器</p>
-<p>集群：多台机器、每台机器部署相同组件</p>
-</blockquote>
-<h3 id="1-3-资源调度策略"><a href="#1-3-资源调度策略" class="headerlink" title="1.3 资源调度策略"></a>1.3 资源调度策略</h3><blockquote>
-<p>YARN资源调度器为Scheduler，以在yarn-site.xml中的yarn.resourcemanager.scheduler.class进行配置策略</p>
-</blockquote>
-<ol>
-<li>FIFO，先来先服务</li>
-<li>Capacity(默认)，权重</li>
-<li>Fair，时间片</li>
-</ol>
-<h2 id="二、Hadoop"><a href="#二、Hadoop" class="headerlink" title="二、Hadoop"></a>二、Hadoop</h2><blockquote>
-<p>狭义：Hadoop软件</p>
-<p>广义：Hadoop生态</p>
-<p>起源：谷歌三篇论文，捐给apache、2008开源</p>
-</blockquote>
-<h3 id="2-1-组件"><a href="#2-1-组件" class="headerlink" title="2.1 组件"></a>2.1 组件</h3><h4 id="2-1-1-HDFS集群"><a href="#2-1-1-HDFS集群" class="headerlink" title="2.1.1 HDFS集群"></a>2.1.1 HDFS集群</h4><blockquote>
-<p>HDFS使用多台计算机存储文件, 并且提供统一的访问接口, 像是访问一个普通文件系统一样使用分布式文件系统</p>
-</blockquote>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220504191146557.png" alt="image-20220504191146557"></p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220504171122154.png" alt="image-20220504171122154"></p>
-<p>分布式文件系统</p>
-<ol>
-<li><p>主角色 NameNode</p>
-<ol>
-<li>用于维护、管理文件系统元数据</li>
-<li>用户hdfs dfs访问的就是这个角色</li>
-<li>基于内存+磁盘持久化</li>
-</ol>
-</li>
-<li><p>从角色 DataNode</p>
-<ol>
-<li>真正存储数据的地方</li>
-<li>随时向NN汇报自己负责的块列表</li>
-</ol>
-</li>
-<li><p>主角色辅助角色 SecondaryNameNode，辅助NameNode完成大任务。</p>
-</li>
-</ol>
-<h5 id="上传流程"><a href="#上传流程" class="headerlink" title="上传流程"></a>上传流程</h5><ol>
-<li>客户端创建DistributedFileSystem对象</li>
-<li>调用create方法，发送RPC请求，让NameNode创建文件</li>
-<li>NameNode接收到请求并响应，客户端将结果封装成FSDataOutputStream输出流</li>
-<li>客户端向FSDataOutputStream写出数据</li>
-<li>开始流式传输  客户端—-&gt;第一个DataNode—-&gt;第二个DataNode—-&gt;第三个DataNode</li>
-<li>ACK数据校验  客户端&lt;—-第一个DataNode&lt;—-第二个DataNode&lt;—-第三个DataNode</li>
-<li>客户端FSDataOutputStream.close()</li>
-</ol>
-<h5 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h5><ol>
-<li><p>pipeline，管道实时传输，而非复制</p>
-</li>
-<li><p>ACK应答机制</p>
-</li>
-<li><p>默认三副本</p>
-</li>
-</ol>
-<h4 id="2-1-2-YARM"><a href="#2-1-2-YARM" class="headerlink" title="2.1.2 YARM"></a>2.1.2 YARM</h4><blockquote>
-<p>8081端口</p>
-</blockquote>
-<p>分布式资源管理、资源调度系统</p>
-<h5 id="组件"><a href="#组件" class="headerlink" title="组件"></a>组件</h5><ol>
-<li><p>主角色 ResouceManage  RM，集群层面</p>
-<ol>
-<li>决定系统中所有应用程序之间资源分配的最终权限，即最终仲裁</li>
-<li>接收用户的作业提交，并通过NM分配、管理各个机器上的计算资源</li>
-</ol>
-</li>
-<li><p>从角色  NodeManager NM ， 集群层面</p>
-<ol>
-<li>负责管理本机器上的计算资源。</li>
-</ol>
-</li>
-<li><p>应用 ApplicationMaster  AM   ，应用层面</p>
-<ol>
-<li>应用程序内的“老大”，负责程序内部各阶段的资源申请，监督程序的执行情况</li>
-<li>用户提交的每个应用程序均包含一个AM</li>
-</ol>
-</li>
-<li><p>客户端 Client ，引用层面</p>
-</li>
-<li><p>容器 Container，资源的抽象</p>
-</li>
-</ol>
-<h5 id="作业提交流程"><a href="#作业提交流程" class="headerlink" title="作业提交流程"></a>作业提交流程</h5><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220504183246347.png" alt="image-20220504183246347"></p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220504185350484.png" alt="image-20220504185350484"></p>
-<ol>
-<li>MR作业提交 Client–&gt;RM <ol>
-<li>用户提交作业jar包（下面的描述：MR==jar==作业）</li>
-</ol>
-</li>
-<li>资源的申请 MrAppMaster–&gt;RM<ol>
-<li>RM找到一个可用的Container，</li>
-<li>RM让这个Container的NM在Container中运行这个jar的ApplicationMaster（AM是前置处理，任何一个程序作业都有对应的AM）</li>
-</ol>
-</li>
-<li>MR作业状态汇报 Container（Map|Reduce Task）–&gt;Container（MrAppMaster） <ol>
-<li>AM启动成功，向RM注册信息（现在可在web上看到信息了）</li>
-<li>AM向RM申请资源</li>
-<li>mapTask，reduceTask 运行</li>
-</ol>
-</li>
-<li>节点的状态汇报 NM–&gt;RM<ol>
-<li>NM–&gt;MR 汇报</li>
-<li>MR–&gt;RM 汇报</li>
-</ol>
-</li>
-</ol>
-<h4 id="2-1-3-MapReduce"><a href="#2-1-3-MapReduce" class="headerlink" title="2.1.3 MapReduce"></a>2.1.3 MapReduce</h4><blockquote>
-<p>8088端口 MR</p>
-</blockquote>
-<p>分布式计算引擎、分而治之思想</p>
-<h5 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h5><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220504183156480.png" alt="image-20220504183156480"></p>
-<h5 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h5><ol>
-<li>易于变成</li>
-<li>方便扩展</li>
-<li>高容错性</li>
-<li>适合离线处理</li>
-</ol>
-<h5 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h5><ol>
-<li>实时计算差</li>
-<li>不能流式计算</li>
-</ol>
-<h5 id="实例进程"><a href="#实例进程" class="headerlink" title="实例进程"></a>实例进程</h5><ol>
-<li>MPAppMaster,负责整个MR程序的协调</li>
-<li>MapTask，负责map阶段的处理</li>
-<li>ReduceTask 负责reduce阶段处理</li>
-</ol>
-<h5 id="阶段组成"><a href="#阶段组成" class="headerlink" title="阶段组成"></a>阶段组成</h5><p>(map,reduce)串行化：[(map,reduce)，(map,reduce)，(map,reduce)]</p>
-<h3 id="2-2-特点"><a href="#2-2-特点" class="headerlink" title="2.2 特点"></a>2.2 特点</h3><ol>
-<li>扩容能力</li>
-<li>效率高</li>
-<li>成本低</li>
-<li>可靠性</li>
-<li>技术与业务解耦、技术就有通用性、具体到应用需要用户自行操作</li>
-<li></li>
-</ol>
-<h3 id="2-3-版本变迁"><a href="#2-3-版本变迁" class="headerlink" title="2.3 版本变迁"></a>2.3 版本变迁</h3><h4 id="开源版本"><a href="#开源版本" class="headerlink" title="开源版本"></a>开源版本</h4><ol>
-<li>更新快</li>
-<li>2.0提出YARM</li>
-<li>3.0主要是性能优化</li>
-</ol>
-<h4 id="商业版"><a href="#商业版" class="headerlink" title="商业版"></a>商业版</h4><ol>
-<li>稳定</li>
-</ol>
-<h3 id="2-4-生态圈"><a href="#2-4-生态圈" class="headerlink" title="2.4 生态圈"></a>2.4 生态圈</h3><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220504171948802.png" alt="image-20220504171948802"></p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220504121903697.png" alt="image-20220504121903697"></p>
-<ol>
-<li>Spark</li>
-</ol>
-<h2 id="三、实例"><a href="#三、实例" class="headerlink" title="三、实例"></a>三、实例</h2><h3 id="3-1-wordCount"><a href="#3-1-wordCount" class="headerlink" title="3.1 wordCount"></a>3.1 wordCount</h3><blockquote>
-<p>三个阶段</p>
-</blockquote>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/Word-count-program-flow-executed-with-MapReduce.png" alt="Word-count-program-flow-executed-with-MapReduce"></p>
-<h4 id="map"><a href="#map" class="headerlink" title="map"></a>map</h4><p>将单词切分</p>
-<h4 id="shuffle"><a href="#shuffle" class="headerlink" title="shuffle"></a>shuffle</h4><p>根据默认排序将数据打乱分配</p>
-<h4 id="reduce"><a href="#reduce" class="headerlink" title="reduce"></a>reduce</h4><p>合并结果</p>
-<h2 id="四、命令"><a href="#四、命令" class="headerlink" title="四、命令"></a>四、命令</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"> HDFS集群</span><br><span class="line">start-dfs.sh </span><br><span class="line">stop-dfs.sh </span><br><span class="line"> YARN集群</span><br><span class="line">start-yarn.sh</span><br><span class="line">stop-yarn.sh</span><br><span class="line"> Hadoop集群</span><br><span class="line">start-all.sh</span><br><span class="line">stop-all.sh </span><br></pre></td></tr></table></figure>
-
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220504204148494.png" alt="image-20220504204148494"></p>
-<p>[官方命令](<a target="_blank" rel="noopener" href="https://hadoop.apache.org/docs/r3.3.0/hadoop-project-dist/hadoop-common/FileSystemShell.html">Apache Hadoop 3.3.0 – Overview</a>)</p>
-<h3 id="hdfs"><a href="#hdfs" class="headerlink" title="hdfs"></a>hdfs</h3><ol>
-<li>创建文件夹   hadoop fs -mkdir /itcast</li>
-<li>上传文件 hadoop fs -put zookeeper.out /itcast </li>
-<li>下载 hadoop fs -get /itcast/zookeeper.out /. </li>
-<li>查看文件列表 hadoop fs -ls /</li>
-<li>查看文件 hadoop fs -cat a.txt</li>
-<li>拷贝 cp</li>
-<li>追加 appendToFile</li>
-<li>移动 mv</li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/29/%E5%BC%80%E5%8F%91/ques/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/04/29/%E5%BC%80%E5%8F%91/ques/" class="post-title-link" itemprop="url">未命名</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-04-29 23:52:36" itemprop="dateCreated datePublished" datetime="2022-04-29T23:52:36+08:00">2022-04-29</time>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/04/29/%E5%BC%80%E5%8F%91/ques/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/29/%E5%BC%80%E5%8F%91/ques/" class="cy_cmt_count" data-xid="2022/04/29/开发/ques/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.2k</span>
+              <span>741</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -995,76 +264,76 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="3-3-2-数据处理技术"><a href="#3-3-2-数据处理技术" class="headerlink" title="3.3.2 数据处理技术"></a>3.3.2 数据处理技术</h3><p>​    数据是一个系统的血液，没处交互都需要数据流动，于是我们采用mysql这种专门、开源的数据存储组件用于存储我们的数据。但是这还不够，mysql不提供只提供数据的存储，不提供数据的处理与安。所以为了实现数据的更高效的存储、查询，我们通过以下方式对数据进行了处理。</p>
-<p>​    数据处理技术</p>
-<h4 id="3-3-2-1-数据标注"><a href="#3-3-2-1-数据标注" class="headerlink" title="3.3.2.1 数据标注"></a>3.3.2.1 数据标注</h4><p>​    原始的数据文本展示在前端的时候只有一种颜色，看起来很单调，文本识别度不高，关键字也不能及时映入用户眼帘。所以给了提高系统有效信息的识别度，也就是高亮显示关键字、不同类型的关键字显示不同颜色，我们采用了NLP的BIO标注。</p>
-<h5 id="3-3-2-1-1-BIO标注介绍"><a href="#3-3-2-1-1-BIO标注介绍" class="headerlink" title="3.3.2.1.1 BIO标注介绍"></a>3.3.2.1.1 BIO标注介绍</h5><p>​    BIO标注是联合标注的一种，具体地B、I、O 分别表示Begin Inner Other，B也是一个关键字的开头字符，I是一个关键字的后续部分字符，O是非关键字字符。如图8，”中原银行的”这五个词语就对应着 B-BANK I-BANK I-BANK I-BANK O。采用这种技术能让我们的系统对不同类型的关键字显示不同的颜色。</p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220429115650491.png" alt="image-20220429115650491"></p>
-<h5 id="3-3-2-1-2-BIO标注流程"><a href="#3-3-2-1-2-BIO标注流程" class="headerlink" title="3.3.2.1.2 BIO标注流程"></a>3.3.2.1.2 BIO标注流程</h5><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220429132939222.png" alt="image-20220429132939222"></p>
-<h4 id="3-3-2-2-基于Huffman、Base64的压缩存储"><a href="#3-3-2-2-基于Huffman、Base64的压缩存储" class="headerlink" title="3.3.2.2 基于Huffman、Base64的压缩存储"></a>3.3.2.2 基于Huffman、Base64的压缩存储</h4><p>​    缓存的出现是因为计算机的CPU效率是远高于IO操作的，系统的性能上限就是数据的IO操作，包括磁盘IO、网络IO等，所以数据压缩不仅能节省空间，也能提高数据的传输效率。在系统设计过程中，我们发现直接存储BIO标注数据会产生极大的空间浪费。如图10，一条长度为29的文本的BIO标记数据，长度膨胀到了145。进一步观察可以看到BIO只有 O，I-PRODUCT，B-PRODUCT，I-COMMENTS_ADJ，B-COMMENTS_ADJ，I-BANK，B-BANK，I-COMMENTS_N，B-COMMENTS_N共九种字符，可以采用哈夫曼编码进行压缩，压缩成的二进制串经过Base64编码后存储到数据库，最终平均压缩率为%96。</p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220429121924147.png" alt="image-20220429121924147"></p>
-<h5 id="3-3-2-2-1-编码过程"><a href="#3-3-2-2-1-编码过程" class="headerlink" title="3.3.2.2.1 编码过程"></a>3.3.2.2.1 编码过程</h5><ol>
-<li><p>根据字符数量Huffman表列出Huffman字符映射表。</p>
-<table>
+          <table>
 <thead>
 <tr>
-<th>字符</th>
-<th>Huffman码</th>
+<th>注解</th>
+<th>作用</th>
+<th></th>
 </tr>
 </thead>
 <tbody><tr>
-<td>O</td>
-<td>0</td>
+<td>@EnableScheduling</td>
+<td>开启定时任务功能</td>
+<td>configuration</td>
 </tr>
 <tr>
-<td>I-BANK</td>
-<td>1000</td>
+<td>@Scheduled(cron=”0/10 * * * * ? “)</td>
+<td>指定cron表达式</td>
+<td>method</td>
 </tr>
 <tr>
-<td>B-BANK</td>
-<td>1001</td>
+<td>@Schedules</td>
+<td>指定多个周期</td>
+<td>method</td>
 </tr>
 <tr>
-<td>I-PRODUCT</td>
-<td>1010</td>
+<td>@EnableAsync</td>
+<td>开启异步支持</td>
+<td>Configuration</td>
 </tr>
 <tr>
-<td>B-PRODUCT</td>
-<td>1011</td>
+<td>@Async</td>
+<td>异步任务，spring自带的线程池(可以修改)调用该方法</td>
+<td>Method</td>
 </tr>
 <tr>
-<td>I-COMMENTS_N</td>
-<td>1100</td>
+<td></td>
+<td></td>
+<td></td>
 </tr>
 <tr>
-<td>B-COMMENTS_N</td>
-<td>1101</td>
-</tr>
-<tr>
-<td>I-COMMENTS_ADJ</td>
-<td>1110</td>
-</tr>
-<tr>
-<td>B-COMMENTS_ADJ</td>
-<td>1111</td>
+<td></td>
+<td></td>
+<td></td>
 </tr>
 </tbody></table>
-</li>
-<li><p>对一句文本根据Huffman字符映射表进行字符编码，得到一组二进制串，如[0,0,0,1111,0,0,1100,1010,1010]。</p>
-</li>
-<li><p>将这组二进制串合并，得到合并串，如：011011000100000110 。</p>
-</li>
-<li><p>对合并串每6位进行Base64编码，如：011011000100000110 编码为bEG。</p>
-<p><img src="E:\data-ana\ana-notes\experience\开发\image-20220429134326547.png" alt="image-20220429134326547"></p>
-</li>
+<h4 id="Scheduled"><a href="#Scheduled" class="headerlink" title="@Scheduled"></a>@Scheduled</h4><ol>
+<li>@Scheduled(fixedRate=2000)  // 每隔执行时间+2秒执行一次 </li>
+<li>@Scheduled(fixDelay=2000) //每隔2秒一次</li>
+<li>@Scheduled(cron=”0/10 * * * * ? “)  // 每隔10秒执行一次 </li>
+<li>@Scheduled(cron=”0 33/3 * * * ?”) //每小时的33分钟开始执行，每3分钟执行1次 </li>
 </ol>
-<h5 id="3-3-2-2-2-解码过程"><a href="#3-3-2-2-2-解码过程" class="headerlink" title="3.3.2.2.2 解码过程"></a>3.3.2.2.2 解码过程</h5><ol>
-<li><p>对Base64解码成二进制串。</p>
-</li>
-<li><p>对二进制串进行遍历，每遇到一个有效的字符串就保存，直到遍历结束。</p>
-<p><img src="E:\data-ana\ana-notes\experience\开发\image-20220429134641893.png" alt="image-20220429134641893"></p>
-</li>
+<h4 id="异步、-Async失效"><a href="#异步、-Async失效" class="headerlink" title="异步、@Async失效"></a>异步、@Async失效</h4><ol>
+<li>异步方法使用static修饰</li>
+<li>异步类没有使用@Component注解（或其他注解）导致spring无法扫描到异步类</li>
+<li>异步方法不能与异步方法在同一个类中</li>
+<li>类中需要使用@Autowired或@Resource等注解自动注入，不能自己手动new对象</li>
+<li>如果使用SpringBoot框架必须在启动类中增加@EnableAsync注解</li>
+<li>在Async 方法上标注@Transactional是没用的。 在Async 方法调用的方法上标注@Transactional 有效。</li>
+<li>调用被@Async标记的方法的调用者不能和被调用的方法在同一类中不然不会起作用！！！！！！！</li>
+<li>使用@Async时要求是不能有返回值的不然会报错的 因为异步要求是不关心结果的</li>
 </ol>
+<h3 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h3><ul>
+<li>使用简单。</li>
+<li>支持cron表达式，支持固定频率执行。</li>
+<li>代码侵入性低。</li>
+</ul>
+<h3 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h3><ul>
+<li>无法解决分布式调度问题。</li>
+<li>无法监控任务状态。</li>
+<li>无其他骚功能。如失败提醒，重试等等。</li>
+</ul>
 
       
     </div>
@@ -1084,7 +353,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/27/java/java%E7%BB%84%E4%BB%B6/file-content-type/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/05/05/spring/spring%E5%AE%B6%E6%97%8F/spring/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -1098,7 +367,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/04/27/java/java%E7%BB%84%E4%BB%B6/file-content-type/" class="post-title-link" itemprop="url">contentType</a>
+            <a href="/2022/05/05/spring/spring%E5%AE%B6%E6%97%8F/spring/" class="post-title-link" itemprop="url">spring</a>
         </h2>
 
         <div class="post-meta">
@@ -1108,7 +377,16 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-04-27 10:48:16" itemprop="dateCreated datePublished" datetime="2022-04-27T10:48:16+08:00">2022-04-27</time>
+              <time title="创建时间：2022-05-05 11:58:36" itemprop="dateCreated datePublished" datetime="2022-05-05T11:58:36+08:00">2022-05-05</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
+                </span>
             </span>
 
           
@@ -1121,8 +399,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/04/27/java/java%E7%BB%84%E4%BB%B6/file-content-type/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/27/java/java%E7%BB%84%E4%BB%B6/file-content-type/" class="cy_cmt_count" data-xid="2022/04/27/java/java组件/file-content-type/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/05/05/spring/spring%E5%AE%B6%E6%97%8F/spring/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/05/05/spring/spring%E5%AE%B6%E6%97%8F/spring/" class="cy_cmt_count" data-xid="2022/05/05/spring/spring家族/spring/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -1133,14 +411,468 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>9.3k</span>
+              <span>6.6k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>8 分钟</span>
+              <span>6 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="配合启动"><a href="#配合启动" class="headerlink" title="配合启动"></a>配合启动</h3><blockquote>
+<p>该xml</p>
+</blockquote>
+<h4 id="web-xml"><a href="#web-xml" class="headerlink" title="web.xml"></a>web.xml</h4><blockquote>
+<p>ServletContext   –&gt;实现类  org.apache.catalina.core.ApplicationContextFacade</p>
+</blockquote>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">web-app</span> <span class="attr">xmlns</span>=<span class="string">&quot;http://xmlns.jcp.org/xml/ns/javaee&quot;</span></span></span><br><span class="line"><span class="tag">         <span class="attr">xmlns:xsi</span>=<span class="string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span></span></span><br><span class="line"><span class="tag">         <span class="attr">xsi:schemaLocation</span>=<span class="string">&quot;http://xmlns.jcp.org/xml/ns/javaee</span></span></span><br><span class="line"><span class="string"><span class="tag">         http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd&quot;</span></span></span><br><span class="line"><span class="tag">         <span class="attr">version</span>=<span class="string">&quot;4.0&quot;</span>&gt;</span> </span><br><span class="line">	<span class="comment">&lt;!--dispatchServlet--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">servlet</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>servlet-01<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">servlet-class</span>&gt;</span>org.springframework.web.servlet.DispatcherServlet<span class="tag">&lt;/<span class="name">servlet-class</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">init-param</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">param-name</span>&gt;</span>contextConfigLocation<span class="tag">&lt;/<span class="name">param-name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">param-value</span>&gt;</span>classpath:config/servlet-01.xml<span class="tag">&lt;/<span class="name">param-value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">init-param</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!--立即加载--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">load-on-startup</span>&gt;</span>1<span class="tag">&lt;/<span class="name">load-on-startup</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">servlet</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">servlet-mapping</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>servlet-01<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>/<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">servlet-mapping</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!--spring监听器,监听上下文的创建--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">listener</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">listener-class</span>&gt;</span>org.springframework.web.context.ContextLoaderListener<span class="tag">&lt;/<span class="name">listener-class</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;/<span class="name">listener</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!--spring配置路径--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">context-param</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">param-name</span>&gt;</span>contextConfigLocation<span class="tag">&lt;/<span class="name">param-name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">param-value</span>&gt;</span>classpath:applicationContext.xml<span class="tag">&lt;/<span class="name">param-value</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">context-param</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!--filter--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">filter</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">filter-name</span>&gt;</span>encodingFilter<span class="tag">&lt;/<span class="name">filter-name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">filter-class</span>&gt;</span>org.springframework.web.filter.CharacterEncodingFilter<span class="tag">&lt;/<span class="name">filter-class</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">init-param</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">param-name</span>&gt;</span>encoding<span class="tag">&lt;/<span class="name">param-name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">param-value</span>&gt;</span>utf-8<span class="tag">&lt;/<span class="name">param-value</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">init-param</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">filter</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">filter-mapping</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">filter-name</span>&gt;</span>encodingFilter<span class="tag">&lt;/<span class="name">filter-name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>/*<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">filter-mapping</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">servlet-mapping</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">servlet-name</span>&gt;</span>default<span class="tag">&lt;/<span class="name">servlet-name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">url-pattern</span>&gt;</span>*.html<span class="tag">&lt;/<span class="name">url-pattern</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">servlet-mapping</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">web-app</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="servlet-01-xml"><a href="#servlet-01-xml" class="headerlink" title="servlet-01.xml"></a>servlet-01.xml</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">&quot;http://www.springframework.org/schema/beans&quot;</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xmlns:xsi</span>=<span class="string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xmlns:context</span>=<span class="string">&quot;http://www.springframework.org/schema/context&quot;</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xmlns:mvc</span>=<span class="string">&quot;http://www.springframework.org/schema/mvc&quot;</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xsi:schemaLocation</span>=<span class="string">&quot;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd&quot;</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!--controller(servlet)交由mvc控制，其他component交由spring控制--&gt;</span></span><br><span class="line">    <span class="comment">&lt;!--此处是mvc-servlet配置文件--&gt;</span></span><br><span class="line">    <span class="comment">&lt;!--扫描controller--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">context:component-scan</span> <span class="attr">base-package</span>=<span class="string">&quot;com.wyg.mvcwork.controller&quot;</span>/&gt;</span></span><br><span class="line">    <span class="comment">&lt;!--注解驱动--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">mvc:annotation-driven</span>/&gt;</span></span><br><span class="line">    <span class="comment">&lt;!--视图解析器--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">&quot;viewResolver&quot;</span> <span class="attr">class</span>=<span class="string">&quot;org.springframework.web.servlet.view.InternalResourceViewResolver&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;suffix&quot;</span> <span class="attr">value</span>=<span class="string">&quot;.jsp&quot;</span>/&gt;</span><span class="comment">&lt;!--后缀--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;prefix&quot;</span> <span class="attr">value</span>=<span class="string">&quot;/WEB-INF/jsp/&quot;</span>/&gt;</span><span class="comment">&lt;!--前缀--&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!--静态资源--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">mvc:default-servlet-handler</span>/&gt;</span></span><br><span class="line">    <span class="comment">&lt;!----&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">mvc:resources</span> <span class="attr">mapping</span>=<span class="string">&quot;/html/**&quot;</span> <span class="attr">location</span>=<span class="string">&quot;classpath:html/&quot;</span>/&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="application-xml"><a href="#application-xml" class="headerlink" title="application.xml"></a>application.xml</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">&quot;http://www.springframework.org/schema/beans&quot;</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xmlns:xsi</span>=<span class="string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xmlns:context</span>=<span class="string">&quot;http://www.springframework.org/schema/context&quot;</span> <span class="attr">xmlns:tx</span>=<span class="string">&quot;http://www.springframework.org/schema/tx&quot;</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xsi:schemaLocation</span>=<span class="string">&quot;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd&quot;</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!--controller(servlet)交由mvc控制，其他component交由spring控制--&gt;</span></span><br><span class="line">    <span class="comment">&lt;!--此处是spring配置文件--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">context:component-scan</span> <span class="attr">base-package</span>=<span class="string">&quot;com.wyg.mvcwork&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">context:exclude-filter</span> <span class="attr">type</span>=<span class="string">&quot;annotation&quot;</span> <span class="attr">expression</span>=<span class="string">&quot;org.springframework.stereotype.Controller&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">context:component-scan</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">context:property-placeholder</span> <span class="attr">location</span>=<span class="string">&quot;classpath:config/db.properties&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">context:property-placeholder</span>&gt;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--=========================配置Mybatis整合===============================--&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 配置数据源--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">&quot;dataSource&quot;</span> <span class="attr">class</span>=<span class="string">&quot;com.alibaba.druid.pool.DruidDataSource&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;url&quot;</span> <span class="attr">value</span>=<span class="string">&quot;$&#123;jdbc.url&#125;&quot;</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;driverClassName&quot;</span> <span class="attr">value</span>=<span class="string">&quot;$&#123;jdbc.driver&#125;&quot;</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;username&quot;</span> <span class="attr">value</span>=<span class="string">&quot;$&#123;jdbc.username&#125;&quot;</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;password&quot;</span> <span class="attr">value</span>=<span class="string">&quot;$&#123;jdbc.password&#125;&quot;</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">&lt;!-- 初始化连接大小 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;initialSize&quot;</span> <span class="attr">value</span>=<span class="string">&quot;0&quot;</span>/&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- 连接池最大使用连接数量 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;maxActive&quot;</span> <span class="attr">value</span>=<span class="string">&quot;20&quot;</span>/&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- 连接池最小空闲 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;minIdle&quot;</span> <span class="attr">value</span>=<span class="string">&quot;0&quot;</span>/&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- 获取连接最大等待时间 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;maxWait&quot;</span> <span class="attr">value</span>=<span class="string">&quot;60000&quot;</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- 指定mybatis配置文件 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">&quot;sqlSessionFactory&quot;</span> <span class="attr">class</span>=<span class="string">&quot;org.mybatis.spring.SqlSessionFactoryBean&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;dataSource&quot;</span> <span class="attr">ref</span>=<span class="string">&quot;dataSource&quot;</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;configLocation&quot;</span> <span class="attr">value</span>=<span class="string">&quot;classpath:config/mybatis.xml&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!--指定dao层,注入@Mapper到IOC--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">class</span>=<span class="string">&quot;org.mybatis.spring.mapper.MapperScannerConfigurer&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;basePackage&quot;</span> <span class="attr">value</span>=<span class="string">&quot;com.wyg.mvcwork.mapper&quot;</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;sqlSessionFactoryBeanName&quot;</span> <span class="attr">value</span>=<span class="string">&quot;sqlSessionFactory&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!--    &lt;bean class=&quot;org.mybatis.confi&quot;--&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 开启事务 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">&quot;transactionManager&quot;</span></span></span><br><span class="line"><span class="tag">          <span class="attr">class</span>=<span class="string">&quot;org.springframework.jdbc.datasource.DataSourceTransactionManager&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;dataSource&quot;</span> <span class="attr">ref</span>=<span class="string">&quot;dataSource&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 可通过注解控制事务 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">tx:annotation-driven</span> <span class="attr">transaction-manager</span>=<span class="string">&quot;transactionManager&quot;</span>/&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/05/05/spring/spring%E4%BA%8B%E5%8A%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/05/05/spring/spring%E4%BA%8B%E5%8A%A1/" class="post-title-link" itemprop="url">spring事务</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-05-05 11:58:13" itemprop="dateCreated datePublished" datetime="2022-05-05T11:58:13+08:00">2022-05-05</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/05/05/spring/spring%E4%BA%8B%E5%8A%A1/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/05/05/spring/spring%E4%BA%8B%E5%8A%A1/" class="cy_cmt_count" data-xid="2022/05/05/spring/spring事务/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>775</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>1</p>
+<blockquote>
+<p>开启事务的实质–&gt;</p>
+<ol>
+<li><p>事务创建一个conn</p>
+</li>
+<li><p>conn.setAutoCommit(false)</p>
+</li>
+<li><p>target.method</p>
+</li>
+<li><p>try{</p>
+</li>
+<li><p>conn.commit</p>
+<p>}catch{ conn.rollback}</p>
+</li>
+<li></li>
+</ol>
+</blockquote>
+<h3 id="传播机制Propagation"><a href="#传播机制Propagation" class="headerlink" title="传播机制Propagation"></a>传播机制Propagation</h3><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>PROPAGATION_REQUIRED</td>
+<td>如果当前存在事务，则加入该事务；如果当前没有事务，则创建一个新的事务。这是<strong>默认值</strong>。</td>
+<td>可重入</td>
+</tr>
+<tr>
+<td>PROPAGATION_REQUIRES_NEW</td>
+<td>建一个<strong>新的事务</strong>，如果当前存在事务，则把当前事务<strong>挂起</strong>。</td>
+<td>new</td>
+</tr>
+<tr>
+<td>PROPAGATION_SUPPORTS</td>
+<td>如果当前存在事务，则加入该事务；如果当前没有事务，则以非事务的方式继续运行</td>
+<td>继承</td>
+</tr>
+<tr>
+<td>PROPAGATION_NEVER</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>PROPAGATION_NOT_SUPPORTED</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>PROPAGATION_MANDATORY</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>PROPAGATION_NESTED</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id="事务失效原因"><a href="#事务失效原因" class="headerlink" title="事务失效原因"></a>事务失效原因</h3><ol>
+<li>类不是@component</li>
+<li>方法public</li>
+<li>方法调用了this.方法</li>
+<li>方法启动了新的线程</li>
+<li><strong>异常被try cache</strong></li>
+<li>抛出了受检异常</li>
+<li>数据库自身不支持事务</li>
+</ol>
+<h4 id="回滚机制"><a href="#回滚机制" class="headerlink" title="回滚机制"></a>回滚机制</h4><ol>
+<li>抛出了runtimeExcept或者error</li>
+</ol>
+<h4 id="编程式事务"><a href="#编程式事务" class="headerlink" title="编程式事务"></a>编程式事务</h4><blockquote>
+<ul>
+<li><strong>编程式事务</strong>使用TransactionTemplate或者直接使用底层的PlatformTransactionManager。对于编程式事务管理，spring推荐使用TransactionTemplate。</li>
+</ul>
+</blockquote>
+<h4 id="声明式事务"><a href="#声明式事务" class="headerlink" title="声明式事务"></a>声明式事务</h4><blockquote>
+<ul>
+<li><strong>声明式事务</strong>是建立在AOP之上的。其本质是对方法前后进行拦截，然后在目标方法开始之前创建或者加入一个事务，在执行完目标方法之后根据执行情况提交或者回滚事务。声明式事务最大的优点就是不需要通过编程的方式管理事务，这样就不需要在业务逻辑代码中掺杂事务管理的代码，只需在配置文件中做相关的事务规则声明(或通过基于@Transactional注解的方式)，便可以将事务规则应用到业务逻辑中。</li>
+</ul>
+</blockquote>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/05/05/spring/%E6%BA%90%E7%A0%81-%E5%8E%9F%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/05/05/spring/%E6%BA%90%E7%A0%81-%E5%8E%9F%E7%90%86/" class="post-title-link" itemprop="url">spring源码-原理</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-05-05 11:57:33" itemprop="dateCreated datePublished" datetime="2022-05-05T11:57:33+08:00">2022-05-05</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/05/05/spring/%E6%BA%90%E7%A0%81-%E5%8E%9F%E7%90%86/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/05/05/spring/%E6%BA%90%E7%A0%81-%E5%8E%9F%E7%90%86/" class="cy_cmt_count" data-xid="2022/05/05/spring/源码-原理/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>5k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>5 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="启动原理"><a href="#启动原理" class="headerlink" title="启动原理"></a>启动原理</h2><h3 id="main"><a href="#main" class="headerlink" title="main"></a>main</h3><p>@SpringBootApplication = (默认属性)@Configuration + @EnableAutoConfiguration + @ComponentScan</p>
+<h2 id="一、bean注入"><a href="#一、bean注入" class="headerlink" title="一、bean注入"></a>一、bean注入</h2><h3 id="Component的加载"><a href="#Component的加载" class="headerlink" title="@Component的加载"></a>@Component的加载</h3><blockquote>
+<p>@ComponentScan没指定会自动扫描本包下的Component，</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">loadClass</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="comment">//获得scan路径</span></span><br><span class="line">        <span class="keyword">final</span> ComponentScan annotation = LoginApplication.class.getAnnotation(ComponentScan.class);</span><br><span class="line">        String scanPath=annotation.value()[<span class="number">0</span>];</span><br><span class="line">        <span class="comment">//过的本jar的classLoder</span></span><br><span class="line">        ClassLoader classLoader=<span class="keyword">this</span>.getClass().getClassLoader();</span><br><span class="line">        <span class="comment">//获得资源</span></span><br><span class="line">        <span class="keyword">final</span> URL resource = classLoader.getResource(scanPath);</span><br><span class="line">        File file=<span class="keyword">new</span> File(resource.getFile());</span><br><span class="line">        <span class="keyword">final</span> File[] files = file.listFiles(f-&gt;f.getPath().endsWith(<span class="string">&quot;.class&quot;</span>));<span class="comment">//获得路径下的所有class文件</span></span><br><span class="line">        <span class="comment">//加载component;</span></span><br><span class="line">        <span class="keyword">for</span> (File f : files) &#123;</span><br><span class="line">            <span class="keyword">final</span> String path = f.getAbsoluteFile().getPath();</span><br><span class="line">            String className=path.substring(path.indexOf(<span class="string">&quot;com.wyg&quot;</span>),path.indexOf(<span class="string">&quot;.class&quot;</span>));</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="comment">//加载类</span></span><br><span class="line">                Class clazz =classLoader.loadClass(className);</span><br><span class="line">                <span class="comment">//判断是否为bean</span></span><br><span class="line">                <span class="keyword">if</span>(clazz.isAnnotationPresent(Component.class))&#123;</span><br><span class="line">                    putTypeToMap(clazz);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">catch</span> (ClassNotFoundException e) &#123;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="创建类型池—-beanDefinetionMap"><a href="#创建类型池—-beanDefinetionMap" class="headerlink" title="创建类型池—-beanDefinetionMap"></a>创建类型池—-beanDefinetionMap</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> ConcurrentHashMap&lt;String, BeanDefinition&gt; beanDefinitionMap = <span class="keyword">new</span> ConcurrentHashMap&lt;&gt;();</span><br><span class="line"> <span class="function"><span class="keyword">void</span> <span class="title">putTypeToMap</span><span class="params">(Class type)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">final</span> Component annotation = (Component) type.getAnnotation(Component.class);</span><br><span class="line">        String name = annotation.value();</span><br><span class="line">        BeanDefinition beanDefinition = <span class="keyword">new</span> BeanDefinition();</span><br><span class="line">        beanDefinition.setType(type);</span><br><span class="line">        beanDefinitionMap.put(name, beanDefinition);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="创建单例池"><a href="#创建单例池" class="headerlink" title="创建单例池"></a>创建单例池</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//获得单例池</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">putObjectToMap</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (String name : beanDefinitionMap.keySet()) &#123;</span><br><span class="line">        <span class="keyword">final</span> BeanDefinition beanDefinition = beanDefinitionMap.get(name);</span><br><span class="line">        <span class="keyword">if</span> (beanDefinition.getScope().equals(<span class="string">&quot;single&quot;</span>)) &#123;</span><br><span class="line">            <span class="keyword">final</span> Object bean = createBean(name,beanDefinition);</span><br><span class="line">            singleMap.put(name, bean);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="获得bean"><a href="#获得bean" class="headerlink" title="获得bean"></a>获得bean</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Object <span class="title">getBean</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">final</span> BeanDefinition beanDefinition = beanDefinitionMap.get(name);</span><br><span class="line">       <span class="keyword">if</span> (beanDefinition.getScope().equals(<span class="string">&quot;signle&quot;</span>)) &#123;</span><br><span class="line">           <span class="comment">//单例模式--&gt;</span></span><br><span class="line">           Object bean = singleMap.get(name);</span><br><span class="line">           <span class="keyword">if</span> (bean == <span class="keyword">null</span>) &#123;</span><br><span class="line">               bean = createBean(name,beanDefinition);</span><br><span class="line">               singleMap.put(name, bean);</span><br><span class="line">           &#125;</span><br><span class="line">           <span class="keyword">return</span> bean;</span><br><span class="line">       &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">           <span class="keyword">return</span> createBean(name,beanDefinition);</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="创建bean—单例模式"><a href="#创建bean—单例模式" class="headerlink" title="创建bean—单例模式"></a>创建bean—单例模式</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//创建单例bean</span></span><br><span class="line">    <span class="function">Object <span class="title">createBean</span><span class="params">(String beanName,BeanDefinition beanDefinition)</span> </span>&#123;</span><br><span class="line">        Class type = beanDefinition.getType();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">//依赖注入</span></span><br><span class="line">            <span class="keyword">final</span> Object bean = type.newInstance();</span><br><span class="line">            <span class="keyword">for</span> (Field field : type.getDeclaredFields()) &#123;</span><br><span class="line">                <span class="keyword">if</span>(field.isAnnotationPresent(Autowired.class))&#123;</span><br><span class="line">                    field.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">                    field.set(bean,getBean(field.getName()));<span class="comment">//注入bean</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span>(bean <span class="keyword">instanceof</span> BeanNameAware)</span><br><span class="line">                ((BeanNameAware)bean).setBeanName(beanName);</span><br><span class="line">            <span class="keyword">if</span>(bean <span class="keyword">instanceof</span> InitializingBean)&#123;</span><br><span class="line">                ((InitializingBean)bean).afterPropertiesSet();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> bean;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="依赖注入问题"><a href="#依赖注入问题" class="headerlink" title="依赖注入问题"></a>依赖注入问题</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//创建单例bean</span></span><br><span class="line"> <span class="function">Object <span class="title">createBean</span><span class="params">(BeanDefinition beanDefinition)</span> </span>&#123;</span><br><span class="line">     Class type = beanDefinition.getType();</span><br><span class="line">     <span class="keyword">try</span> &#123;</span><br><span class="line">         <span class="comment">//依赖注入</span></span><br><span class="line">         <span class="keyword">final</span> Object bean = type.newInstance();</span><br><span class="line">         <span class="keyword">for</span> (Field field : type.getDeclaredFields()) &#123;</span><br><span class="line">             <span class="keyword">if</span>(field.isAnnotationPresent(Autowired.class))&#123;</span><br><span class="line">                 field.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">                 field.set(bean,getBean(field.getName()));<span class="comment">//注入bean</span></span><br><span class="line">             &#125;</span><br><span class="line">         &#125;</span><br><span class="line">         <span class="keyword">return</span> bean;</span><br><span class="line">     &#125; <span class="keyword">catch</span> (InstantiationException | IllegalAccessException e) &#123;</span><br><span class="line">         e.printStackTrace();</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="初始化接口"><a href="#初始化接口" class="headerlink" title="初始化接口"></a>初始化接口</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">b</span> <span class="keyword">implements</span> <span class="title">InitializingBean</span></span>&#123;</span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">afterPropertiesSet</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220318173240631.png" alt="image-20220318173240339"></p>
+<h2 id="几种工厂"><a href="#几种工厂" class="headerlink" title="几种工厂"></a>几种工厂</h2><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/AnnotationConfigApplicationContext.png" alt="AnnotationConfigApplicationContext"></p>
+<h3 id="BeanFactory"><a href="#BeanFactory" class="headerlink" title="BeanFactory"></a>BeanFactory</h3><blockquote>
+<p>IOC的根接口,给除了的IOC容器的实现提供了规范</p>
+<p><strong>XMLBeanFactory</strong></p>
+<p><strong>ApplicationContext</strong> </p>
+<p><strong>ClassPathXmlApplicationContext</strong> </p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">getBean</span><span class="params">(String name)</span> <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">containsBean</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isSingleton</span><span class="params">(String name)</span> <span class="keyword">throws</span> NoSuchBeanDefinitionException </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> String[] getAliases(String name) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> String[<span class="number">0</span>];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="FactoryBean"><a href="#FactoryBean" class="headerlink" title="FactoryBean"></a>FactoryBean</h3><blockquote>
+<p>FactoryBean是一个可以生产bean的工厂(自身也是一个Bean)，有点类似工厂方法模式。</p>
+<p>它用来创建beanx工厂，工厂生产beanx，可以自定义Beanx是否为单例，只需要重写方法就ok</p>
+<p>这个接口的方法可以对比工厂方法模式(参考oneNode.设计模式.工厂方法模式)</p>
+</blockquote>
+<blockquote>
+<p>产生的bean也归spring管理，可以autowire</p>
+<p>和普通的@Component区别</p>
+<ol>
+<li>初始时机早于Spring的普通bean，所有不能依赖注入</li>
+<li>该的class方式可变，@Component是写死的</li>
+<li>提供了很多实现，比如ListFactoryBean,MapFactoryBean</li>
+</ol>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ListFactoryBean</span> <span class="keyword">extends</span> <span class="title">AbstractFactoryBean</span>&lt;<span class="title">List</span>&lt;<span class="title">Object</span>&gt;&gt; </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> List&lt;?&gt; sourceList;<span class="comment">//源list</span></span><br><span class="line">	<span class="keyword">private</span> Class&lt;? extends List&gt; targetListClass;<span class="comment">//class</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setSourceList</span><span class="params">(List&lt;?&gt; sourceList)</span> </span>&#123;<span class="keyword">this</span>.sourceList = sourceList;&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setTargetListClass</span><span class="params">(<span class="meta">@Nullable</span> Class&lt;? extends List&gt; targetListClass)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.targetListClass = targetListClass;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> Class&lt;List&gt; <span class="title">getObjectType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> List.class;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> List&lt;Object&gt; <span class="title">createInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		....</span><br><span class="line">		List&lt;Object&gt; result = <span class="keyword">null</span>;</span><br><span class="line">		<span class="keyword">if</span> (<span class="keyword">this</span>.targetListClass != <span class="keyword">null</span>) &#123;</span><br><span class="line">			result = BeanUtils.instantiateClass(<span class="keyword">this</span>.targetListClass);<span class="comment">//class.newInstance();</span></span><br><span class="line">		&#125;</span><br><span class="line">  		....</span><br><span class="line">		<span class="keyword">return</span> result;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="ApplicationContext"><a href="#ApplicationContext" class="headerlink" title="ApplicationContext"></a>ApplicationContext</h3><blockquote>
+<p>完善的BeanFactory，该IOC除了提供bean的基本管理还提供以下功能</p>
+<p>• MessageSource, 提供国际化的消息访问<br>• 资源访问，如URL和文件<br>• 事件传播<br>• 载入多个（有继承关系）上下文 ，使得每一个上下文都专注于一个特定的层次，比如应用的web层; </p>
+</blockquote>
+<h3 id="AnnotationConfigApplicationContext"><a href="#AnnotationConfigApplicationContext" class="headerlink" title="AnnotationConfigApplicationContext"></a>AnnotationConfigApplicationContext</h3>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/05/05/spring/springMaster/%E5%A4%9A%E6%95%B0%E6%8D%AE%E6%BA%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/05/05/spring/springMaster/%E5%A4%9A%E6%95%B0%E6%8D%AE%E6%BA%90/" class="post-title-link" itemprop="url">多数据源</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-05-05 11:57:26" itemprop="dateCreated datePublished" datetime="2022-05-05T11:57:26+08:00">2022-05-05</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/spring/springMaster/" itemprop="url" rel="index"><span itemprop="name">springMaster</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/05/05/spring/springMaster/%E5%A4%9A%E6%95%B0%E6%8D%AE%E6%BA%90/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/05/05/spring/springMaster/%E5%A4%9A%E6%95%B0%E6%8D%AE%E6%BA%90/" class="cy_cmt_count" data-xid="2022/05/05/spring/springMaster/多数据源/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
             </span>
 
         </div>
@@ -1153,16 +885,30 @@
 
       
           <p>[toc]</p>
-<h3 id="一、比较全面的contentType的类型值"><a href="#一、比较全面的contentType的类型值" class="headerlink" title="一、比较全面的contentType的类型值"></a>一、比较全面的contentType的类型值</h3><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_37651267/article/details/91380351">参考</a></p>
-<p>文件扩展名    Content-Type(Mime-Type)    文件扩展名    Content-Type(Mime-Type)</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/04/27/java/java%E7%BB%84%E4%BB%B6/file-content-type/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
+<blockquote>
+<p><strong>关键：指定MapperScan的SqlSessionRef</strong></p>
+<p>这里提前注入了sqlsessionFactory</p>
+</blockquote>
+<h3 id="大致步骤"><a href="#大致步骤" class="headerlink" title="大致步骤"></a>大致步骤</h3><ol>
+<li>再yml中配置两个druid连接池的参数(type,url,password)</li>
+<li>在configruation中配置两个@Bean，每个bea注入不同的druid连接池参数</li>
+</ol>
+<h3 id="Mapper的对应关系"><a href="#Mapper的对应关系" class="headerlink" title="Mapper的对应关系"></a>Mapper的对应关系</h3><p>首先拥有两个文件/类</p>
+<ul>
+<li><p>resources/mapper/mysql.mapper </p>
+</li>
+<li><p>resources/mapper/oracle.mapper</p>
+<p>这两个mapper文件的namespace对应不同的mapper.class</p>
+</li>
+<li><p>com.wyg.mapper.MysqlMapper.class</p>
+</li>
+<li><p>com.wyg.mapper.OracleMapper.class</p>
+</li>
+<li></li>
+</ul>
+<h3 id="application-yml"><a href="#application-yml" class="headerlink" title="application.yml"></a>application.yml</h3><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#spring.datasource.druid.</span></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">datasource:</span></span><br><span class="line">    <span class="attr">druid:</span></span><br><span class="line"></span><br><span class="line">      <span class="comment"># 数据库访问配置, 使用druid数据源</span></span><br><span class="line">      <span class="comment"># 数据源1 mysql</span></span><br><span class="line">      <span class="attr">mysql:</span></span><br><span class="line">        <span class="attr">type:</span> <span class="string">com.alibaba.druid.pool.DruidDataSource</span></span><br><span class="line">        <span class="attr">driver-class-name:</span> <span class="string">com.mysql.jdbc.Driver</span></span><br><span class="line">        <span class="attr">url:</span> <span class="string">jdbc:mysql://localhost:3306/test?useUnicode=true&amp;characterEncoding=UTF-8&amp;rewriteBatchedStatements=true&amp;autoReconnect=true&amp;failOverReadOnly=false&amp;zeroDateTimeBehavior=convertToNull</span></span><br><span class="line">        <span class="attr">username:</span> <span class="string">root</span></span><br><span class="line">        <span class="attr">password:</span> <span class="number">123456</span></span><br><span class="line">      <span class="comment"># 数据源2 oracle</span></span><br><span class="line">      <span class="attr">oracle:</span> </span><br><span class="line">        <span class="attr">type:</span> <span class="string">com.alibaba.druid.pool.DruidDataSource</span></span><br><span class="line">        <span class="attr">driver-class-name:</span> <span class="string">oracle.jdbc.driver.OracleDriver</span></span><br><span class="line">        <span class="attr">url:</span> <span class="string">jdbc:oracle:thin:@localhost:1521:ORCL</span></span><br><span class="line">        <span class="attr">username:</span> <span class="string">test</span></span><br><span class="line">        <span class="attr">password:</span> <span class="number">123456</span></span><br><span class="line">        </span><br><span class="line">      <span class="comment"># 连接池配置</span></span><br><span class="line">      <span class="attr">initial-size:</span> <span class="number">5</span></span><br><span class="line">      <span class="attr">min-idle:</span> <span class="number">5</span></span><br><span class="line">      <span class="attr">max-active:</span> <span class="number">20</span></span><br><span class="line">      <span class="comment"># 连接等待超时时间</span></span><br><span class="line">      <span class="attr">max-wait:</span> <span class="number">30000</span></span><br><span class="line">      <span class="comment"># 配置检测可以关闭的空闲连接间隔时间</span></span><br><span class="line">      <span class="attr">time-between-eviction-runs-millis:</span> <span class="number">60000</span></span><br><span class="line">      <span class="comment"># 配置连接在池中的最小生存时间</span></span><br><span class="line">      <span class="attr">min-evictable-idle-time-millis:</span> <span class="number">300000</span></span><br><span class="line">      <span class="attr">validation-query:</span> <span class="string">select</span> <span class="string">&#x27;1&#x27;</span> <span class="string">from</span> <span class="string">dual</span></span><br><span class="line">      <span class="attr">test-while-idle:</span> <span class="literal">true</span></span><br><span class="line">      <span class="attr">test-on-borrow:</span> <span class="literal">false</span></span><br><span class="line">      <span class="attr">test-on-return:</span> <span class="literal">false</span></span><br><span class="line">      <span class="comment"># 打开PSCache，并且指定每个连接上PSCache的大小</span></span><br><span class="line">      <span class="attr">pool-prepared-statements:</span> <span class="literal">true</span></span><br><span class="line">      <span class="attr">max-open-prepared-statements:</span> <span class="number">20</span></span><br><span class="line">      <span class="attr">max-pool-prepared-statement-per-connection-size:</span> <span class="number">20</span></span><br><span class="line">      <span class="comment"># 配置监控统计拦截的filters, 去掉后监控界面sql无法统计, &#x27;wall&#x27;用于防火墙</span></span><br><span class="line">      <span class="attr">filters:</span> <span class="string">stat,wall</span></span><br><span class="line">      <span class="comment"># Spring监控AOP切入点，如x.y.z.service.*,配置多个英文逗号分隔</span></span><br><span class="line">      <span class="attr">aop-patterns:</span> <span class="string">com.springboot.servie.*</span></span><br><span class="line">      </span><br><span class="line">    </span><br><span class="line">      <span class="comment"># WebStatFilter配置</span></span><br><span class="line">      <span class="attr">web-stat-filter:</span></span><br><span class="line">        <span class="attr">enabled:</span> <span class="literal">true</span></span><br><span class="line">        <span class="comment"># 添加过滤规则</span></span><br><span class="line">        <span class="attr">url-pattern:</span> <span class="string">/*</span></span><br><span class="line">        <span class="comment"># 忽略过滤的格式</span></span><br><span class="line">        <span class="attr">exclusions:</span> <span class="string">&#x27;*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*&#x27;</span></span><br><span class="line">      </span><br><span class="line">      <span class="comment"># StatViewServlet配置 </span></span><br><span class="line">      <span class="attr">stat-view-servlet:</span></span><br><span class="line">        <span class="attr">enabled:</span> <span class="literal">true</span></span><br><span class="line">        <span class="comment"># 访问路径为/druid时，跳转到StatViewServlet</span></span><br><span class="line">        <span class="attr">url-pattern:</span> <span class="string">/druid/*</span></span><br><span class="line">        <span class="comment"># 是否能够重置数据</span></span><br><span class="line">        <span class="attr">reset-enable:</span> <span class="literal">false</span></span><br><span class="line">        <span class="comment"># 需要账号密码才能访问控制台</span></span><br><span class="line">        <span class="attr">login-username:</span> <span class="string">druid</span></span><br><span class="line">        <span class="attr">login-password:</span> <span class="string">druid123</span></span><br><span class="line">        <span class="comment"># IP白名单</span></span><br><span class="line">        <span class="comment"># allow: 127.0.0.1</span></span><br><span class="line">        <span class="comment">#　IP黑名单（共同存在时，deny优先于allow）</span></span><br><span class="line">        <span class="comment"># deny: 192.168.1.218</span></span><br><span class="line">      </span><br><span class="line">      <span class="comment"># 配置StatFilter</span></span><br><span class="line">      <span class="attr">filter:</span> </span><br><span class="line">        <span class="attr">stat:</span> </span><br><span class="line">          <span class="attr">log-slow-sql:</span> <span class="literal">true</span> </span><br></pre></td></tr></table></figure>
+
+<h3 id="stat-view"><a href="#stat-view" class="headerlink" title="stat-view"></a>stat-view</h3><h3 id="servlet的作用"><a href="#servlet的作用" class="headerlink" title="-servlet的作用"></a>-servlet的作用</h3>
       
     </div>
 
