@@ -187,7 +187,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/05/06/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/23/%E7%BB%84%E4%BB%B6/ORM/mybatis/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -201,7 +201,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/05/06/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/" class="post-title-link" itemprop="url">java常用工具类源码</a>
+            <a href="/2022/04/23/%E7%BB%84%E4%BB%B6/ORM/mybatis/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="post-title-link" itemprop="url">mybatis源码分析</a>
         </h2>
 
         <div class="post-meta">
@@ -211,14 +211,140 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-05-06 02:14:45" itemprop="dateCreated datePublished" datetime="2022-05-06T02:14:45+08:00">2022-05-06</time>
+              <time title="创建时间：2022-04-23 00:45:20" itemprop="dateCreated datePublished" datetime="2022-04-23T00:45:20+08:00">2022-04-23</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/04/23/%E7%BB%84%E4%BB%B6/ORM/mybatis/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/23/%E7%BB%84%E4%BB%B6/ORM/mybatis/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="cy_cmt_count" data-xid="2022/04/23/组件/ORM/mybatis/源码分析/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>9.3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>8 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>前置</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">session.selectOne(String statement, Object parameter); <span class="comment">//调用session</span></span><br><span class="line">MappedStatement ms = configuration.getMappedStatement(statement);<span class="comment">//获得mapperStatement</span></span><br><span class="line">executor.query(ms, wrapCollection(parameter), rowBounds, Executor.NO_RESULT_HANDLER);<span class="comment">//调用executor(baseExecutor or cacheExecutor)</span></span><br></pre></td></tr></table></figure>
+
+<p>baseExcutor</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//baseExecutor中</span></span><br><span class="line">BoundSql boundSql = ms.getBoundSql(parameter);<span class="comment">//得到绑定sql</span></span><br><span class="line">CacheKey key = createCacheKey(ms, parameter, rowBounds, boundSql);<span class="comment">//创建缓存Key</span></span><br><span class="line">list = resultHandler == <span class="keyword">null</span> ? (List&lt;E&gt;) localCache.getObject(key) : <span class="keyword">null</span>;<span class="comment">//一级缓存</span></span><br><span class="line"><span class="keyword">else</span>  list = queryFromDatabase(ms, parameter, rowBounds, resultHandler, key, boundSql);<span class="comment">//数据库查询</span></span><br><span class="line">list = doQuery(ms, parameter, rowBounds, resultHandler, boundSql);</span><br><span class="line"><span class="comment">//simpleExecutor中</span></span><br><span class="line">stmt = prepareStatement(handler, ms.getStatementLog());<span class="comment">//获得jdbc.stateMent</span></span><br><span class="line"><span class="comment">//simpleStateMentHandler中</span></span><br><span class="line">statement.execute(sql);</span><br><span class="line"><span class="comment">//defaultResultSetHandler中</span></span><br><span class="line"><span class="keyword">final</span> List&lt;Object&gt; multipleResults = <span class="keyword">new</span> ArrayList&lt;Object&gt;();</span><br><span class="line">rsw = getNextResultSet(stmt);</span><br><span class="line">handleResultSet(rsw, resultMap, multipleResults, <span class="keyword">null</span>);</span><br><span class="line">RETURN multipleResults</span><br></pre></td></tr></table></figure>
+
+<p>cacheExcutor</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//cacheExecutor.query1中</span></span><br><span class="line">BoundSql boundSql = ms.getBoundSql(parameterObject);</span><br><span class="line">CacheKey key = createCacheKey(ms, parameterObject, rowBounds, boundSql);<span class="comment">//query时传入一个cachekey参数</span></span><br><span class="line"><span class="keyword">return</span> query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);</span><br><span class="line"><span class="comment">//cacheExecutor.query2中</span></span><br><span class="line">Cache cache = ms.getCache();</span><br><span class="line">  </span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="session-selectOne"><a href="#session-selectOne" class="headerlink" title="session.selectOne"></a>session.selectOne</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;E&gt; <span class="function">List&lt;E&gt; <span class="title">selectList</span><span class="params">(String statement, Object parameter, RowBounds rowBounds)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="comment">//根据statement id找到对应的MappedStatement</span></span><br><span class="line">      MappedStatement ms = configuration.getMappedStatement(statement);</span><br><span class="line">      <span class="comment">//转而用执行器来查询结果,注意这里传入的ResultHandler是null</span></span><br><span class="line">      <span class="keyword">return</span> executor.query(ms, wrapCollection(parameter), rowBounds, Executor.NO_RESULT_HANDLER);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">      <span class="keyword">throw</span> ExceptionFactory.wrapException(<span class="string">&quot;Error querying database.  Cause: &quot;</span> + e, e);</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">      ErrorContext.instance().reset();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="session-doQuery"><a href="#session-doQuery" class="headerlink" title="session.doQuery()"></a>session.doQuery()</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;E&gt; <span class="function">List&lt;E&gt; <span class="title">doQuery</span><span class="params">(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">  Statement stmt = <span class="keyword">null</span>;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    Configuration configuration = ms.getConfiguration();</span><br><span class="line">    <span class="comment">//新建一个StatementHandler</span></span><br><span class="line">    <span class="comment">//这里看到ResultHandler传入了</span></span><br><span class="line">    StatementHandler handler = configuration.newStatementHandler(wrapper, ms, parameter, rowBounds, resultHandler, boundSql);</span><br><span class="line">    <span class="comment">//准备语句</span></span><br><span class="line">    stmt = prepareStatement(handler, ms.getStatementLog());</span><br><span class="line">    <span class="comment">//StatementHandler.query</span></span><br><span class="line">    <span class="keyword">return</span> handler.&lt;E&gt;query(stmt, resultHandler);</span><br><span class="line">  &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    closeStatement(stmt);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="BaseExcutor-query"><a href="#BaseExcutor-query" class="headerlink" title="BaseExcutor.query"></a>BaseExcutor.query</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;E&gt; <span class="function">List&lt;E&gt; <span class="title">query</span><span class="params">(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">    <span class="comment">//得到绑定sql</span></span><br><span class="line">    BoundSql boundSql = ms.getBoundSql(parameter);</span><br><span class="line">    <span class="comment">//创建缓存Key</span></span><br><span class="line">    CacheKey key = createCacheKey(ms, parameter, rowBounds, boundSql);</span><br><span class="line">    <span class="comment">//查询</span></span><br><span class="line">    <span class="keyword">return</span> query(ms, parameter, rowBounds, resultHandler, key, boundSql);</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> &lt;E&gt; <span class="function">List&lt;E&gt; <span class="title">query</span><span class="params">(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">    ErrorContext.instance().resource(ms.getResource()).activity(<span class="string">&quot;executing a query&quot;</span>).object(ms.getId());</span><br><span class="line">    <span class="comment">//如果已经关闭，报错</span></span><br><span class="line">    <span class="keyword">if</span> (closed) &#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> ExecutorException(<span class="string">&quot;Executor was closed.&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//先清局部缓存，再查询.但仅查询堆栈为0，才清。为了处理递归调用</span></span><br><span class="line">    <span class="keyword">if</span> (queryStack == <span class="number">0</span> &amp;&amp; ms.isFlushCacheRequired()) &#123;</span><br><span class="line">      clearLocalCache();</span><br><span class="line">    &#125;</span><br><span class="line">    List&lt;E&gt; list;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="comment">//加一,这样递归调用到上面的时候就不会再清局部缓存了</span></span><br><span class="line">      queryStack++;</span><br><span class="line">      <span class="comment">//先根据cachekey从localCache去查</span></span><br><span class="line">      list = resultHandler == <span class="keyword">null</span> ? (List&lt;E&gt;) localCache.getObject(key) : <span class="keyword">null</span>;</span><br><span class="line">      <span class="keyword">if</span> (list != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="comment">//若查到localCache缓存，处理localOutputParameterCache</span></span><br><span class="line">        handleLocallyCachedOutputParameters(ms, key, parameter, boundSql);</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">//从数据库查</span></span><br><span class="line">        list = queryFromDatabase(ms, parameter, rowBounds, resultHandler, key, boundSql);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">      <span class="comment">//清空堆栈</span></span><br><span class="line">      queryStack--;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (queryStack == <span class="number">0</span>) &#123;</span><br><span class="line">      <span class="comment">//延迟加载队列中所有元素</span></span><br><span class="line">      <span class="keyword">for</span> (DeferredLoad deferredLoad : deferredLoads) &#123;</span><br><span class="line">        deferredLoad.load();</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="comment">// issue #601</span></span><br><span class="line">      <span class="comment">//清空延迟加载队列</span></span><br><span class="line">      deferredLoads.clear();</span><br><span class="line">      <span class="keyword">if</span> (configuration.getLocalCacheScope() == LocalCacheScope.STATEMENT) &#123;</span><br><span class="line">        <span class="comment">// issue #482</span></span><br><span class="line">    	<span class="comment">//如果是STATEMENT，清本地缓存</span></span><br><span class="line">        clearLocalCache();</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> list;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="baseExecutor-queryFromDatabase"><a href="#baseExecutor-queryFromDatabase" class="headerlink" title="baseExecutor.queryFromDatabase"></a>baseExecutor.queryFromDatabase</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> &lt;E&gt; <span class="function">List&lt;E&gt; <span class="title">queryFromDatabase</span><span class="params">(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">    List&lt;E&gt; list;</span><br><span class="line">    <span class="comment">//先向缓存中放入占位符？？？</span></span><br><span class="line">    localCache.putObject(key, EXECUTION_PLACEHOLDER);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      list = doQuery(ms, parameter, rowBounds, resultHandler, boundSql);</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">      <span class="comment">//最后删除占位符</span></span><br><span class="line">      localCache.removeObject(key);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//加入缓存</span></span><br><span class="line">    localCache.putObject(key, list);</span><br><span class="line">    <span class="comment">//如果是存储过程，OUT参数也加入缓存</span></span><br><span class="line">    <span class="keyword">if</span> (ms.getStatementType() == StatementType.CALLABLE) &#123;</span><br><span class="line">      localOutputParameterCache.putObject(key, parameter);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> list;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="baseExecutor-doquery"><a href="#baseExecutor-doquery" class="headerlink" title="baseExecutor.doquery"></a>baseExecutor.doquery</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Configuration configuration = ms.getConfiguration();</span><br><span class="line"><span class="comment">//新建一个StatementHandler</span></span><br><span class="line"><span class="comment">//这里看到ResultHandler传入了</span></span><br><span class="line">StatementHandler handler = configuration.newStatementHandler(wrapper, ms, parameter, rowBounds, resultHandler, boundSql);</span><br><span class="line"><span class="comment">//准备语句</span></span><br><span class="line">stmt = prepareStatement(handler, ms.getStatementLog());</span><br><span class="line"><span class="comment">//StatementHandler.query</span></span><br><span class="line"><span class="keyword">return</span> handler.&lt;E&gt;query(stmt, resultHandler);</span><br></pre></td></tr></table></figure>
+
+<h3 id="statementHandler"><a href="#statementHandler" class="headerlink" title="statementHandler"></a>statementHandler</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;E&gt; <span class="function">List&lt;E&gt; <span class="title">query</span><span class="params">(Statement statement, ResultHandler resultHandler)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">  String sql = boundSql.getSql();</span><br><span class="line">  statement.execute(sql);<span class="comment">//关键</span></span><br><span class="line">  <span class="comment">//先执行Statement.execute，然后交给ResultSetHandler.handleResultSets</span></span><br><span class="line">  <span class="keyword">return</span> resultSetHandler.&lt;E&gt;handleResultSets(statement);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="resultSetHandler"><a href="#resultSetHandler" class="headerlink" title="resultSetHandler"></a>resultSetHandler</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> List&lt;Object&gt; <span class="title">handleResultSets</span><span class="params">(Statement stmt)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> List&lt;Object&gt; multipleResults = <span class="keyword">new</span> ArrayList&lt;Object&gt;();</span><br><span class="line">    <span class="keyword">int</span> resultSetCount = <span class="number">0</span>;</span><br><span class="line">    ResultSetWrapper rsw = getFirstResultSet(stmt);</span><br><span class="line"></span><br><span class="line">    List&lt;ResultMap&gt; resultMaps = mappedStatement.getResultMaps();</span><br><span class="line">    <span class="comment">//一般resultMaps里只有一个元素</span></span><br><span class="line">    <span class="keyword">int</span> resultMapCount = resultMaps.size();</span><br><span class="line">    validateResultMapsCount(rsw, resultMapCount);</span><br><span class="line">    <span class="keyword">while</span> (rsw != <span class="keyword">null</span> &amp;&amp; resultMapCount &gt; resultSetCount) &#123;</span><br><span class="line">      ResultMap resultMap = resultMaps.get(resultSetCount);</span><br><span class="line">      handleResultSet(rsw, resultMap, multipleResults, <span class="keyword">null</span>);</span><br><span class="line">      rsw = getNextResultSet(stmt);</span><br><span class="line">      cleanUpAfterHandlingResultSet();</span><br><span class="line">      resultSetCount++;</span><br><span class="line">    &#125;</span><br><span class="line">   String[] resultSets = mappedStatement.getResulSets();</span><br><span class="line">    <span class="keyword">if</span> (resultSets != <span class="keyword">null</span>) &#123;</span><br><span class="line">      <span class="keyword">while</span> (rsw != <span class="keyword">null</span> &amp;&amp; resultSetCount &lt; resultSets.length) &#123;</span><br><span class="line">        ResultMapping parentMapping = nextResultMaps.get(resultSets[resultSetCount]);</span><br><span class="line">        <span class="keyword">if</span> (parentMapping != <span class="keyword">null</span>) &#123;</span><br><span class="line">          String nestedResultMapId = parentMapping.getNestedResultMapId();</span><br><span class="line">          ResultMap resultMap = configuration.getResultMap(nestedResultMapId);</span><br><span class="line">          handleResultSet(rsw, resultMap, <span class="keyword">null</span>, parentMapping);</span><br><span class="line">        &#125;</span><br><span class="line">        rsw = getNextResultSet(stmt);</span><br><span class="line">        cleanUpAfterHandlingResultSet();</span><br><span class="line">        resultSetCount++;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> collapseSingleResultList(multipleResults);</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="CacheExecuty"><a href="#CacheExecuty" class="headerlink" title="CacheExecuty"></a>CacheExecuty</h3><h4 id="query1"><a href="#query1" class="headerlink" title="query1"></a>query1</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;E&gt; <span class="function">List&lt;E&gt; <span class="title">query</span><span class="params">(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">      BoundSql boundSql = ms.getBoundSql(parameterObject);</span><br><span class="line">      <span class="comment">//query时传入一个cachekey参数</span></span><br><span class="line">      CacheKey key = createCacheKey(ms, parameterObject, rowBounds, boundSql);</span><br><span class="line">      <span class="keyword">return</span> query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="query2"><a href="#query2" class="headerlink" title="query2"></a>query2</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">  <span class="keyword">public</span> &lt;E&gt; <span class="function">List&lt;E&gt; <span class="title">query</span><span class="params">(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql)</span></span></span><br><span class="line"><span class="function">      <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">    Cache cache = ms.getCache();</span><br><span class="line">    <span class="comment">//默认情况下是没有开启缓存的(二级缓存).要开启二级缓存,你需要在你的 SQL 映射文件中添加一行: &lt;cache/&gt;</span></span><br><span class="line">    <span class="comment">//简单的说，就是先查CacheKey，查不到再委托给实际的执行器去查</span></span><br><span class="line">    <span class="keyword">if</span> (cache != <span class="keyword">null</span>) &#123;</span><br><span class="line">      flushCacheIfRequired(ms);</span><br><span class="line">      <span class="keyword">if</span> (ms.isUseCache() &amp;&amp; resultHandler == <span class="keyword">null</span>) &#123;</span><br><span class="line">        ensureNoOutParams(ms, parameterObject, boundSql);</span><br><span class="line">        <span class="meta">@SuppressWarnings(&quot;unchecked&quot;)</span></span><br><span class="line">        List&lt;E&gt; list = (List&lt;E&gt;) tcm.getObject(cache, key);</span><br><span class="line">        <span class="keyword">if</span> (list == <span class="keyword">null</span>) &#123;</span><br><span class="line">          list = delegate.&lt;E&gt; query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);</span><br><span class="line">          tcm.putObject(cache, key, list); <span class="comment">// issue #578 and #116</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> list;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> delegate.&lt;E&gt; query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="AddMapper"><a href="#AddMapper" class="headerlink" title="AddMapper"></a>AddMapper</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//XMLConfigBuilder中</span></span><br><span class="line">parseConfiguration(parser.evalNode(<span class="string">&quot;/configuration&quot;</span>));<span class="comment">//找到configuration节点</span></span><br><span class="line">mapperElement(root.evalNode(<span class="string">&quot;mappers&quot;</span>));<span class="comment">//找到mappers节点</span></span><br><span class="line">String mapperPackage = child.getStringAttribute(<span class="string">&quot;name&quot;</span>);<span class="comment">//找到package，不重要</span></span><br><span class="line">configuration.addMappers(mapperPackage);<span class="comment">//开始加入</span></span><br><span class="line"><span class="comment">//mapperRegistry中</span></span><br><span class="line">addMappers(packageName, Object.class);<span class="comment">//找到mapper.class</span></span><br><span class="line">addMapper(mapperClass);</span><br><span class="line">    knownMappers.put(type, <span class="keyword">new</span> MapperProxyFactory&lt;T&gt;(type));<span class="comment">//临时加入代理，先加入再解析</span></span><br><span class="line">    MapperAnnotationBuilder parser = <span class="keyword">new</span> MapperAnnotationBuilder(config, type);</span><br><span class="line">    parser.parse();<span class="comment">//关键是里面的type</span></span><br><span class="line">    loadCompleted = <span class="keyword">true</span>;</span><br><span class="line"><span class="comment">//MapperAnnotationBuilder中</span></span><br><span class="line">parse();<span class="comment">//解析</span></span><br><span class="line">	parseCache();</span><br><span class="line">		CacheNamespace cacheDomain = type.getAnnotation(CacheNamespace.class);</span><br><span class="line">		assistant.useNewCache(eviction(), flushInterval , readWrite(),<span class="keyword">null</span>);</span><br><span class="line">			 Cache cache=<span class="keyword">new</span> Cache(上面的参数);</span><br><span class="line">		  	 configuration.addCache(cache);<span class="comment">//保存到configuration.caches  </span></span><br><span class="line">			 currentCache = cache;<span class="comment">//并且保存到当前的MapperAnnotationBuilder中</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="Add-ms"><a href="#Add-ms" class="headerlink" title="Add  ms"></a>Add  ms</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//MapperAnnotationBuilder中</span></span><br><span class="line">parseStatement(method);</span><br><span class="line">	<span class="keyword">boolean</span> isSelect = sqlCommandType == SqlCommandType.SELECT;</span><br><span class="line">     <span class="keyword">boolean</span> flushCache = !isSelect;</span><br><span class="line">    <span class="keyword">boolean</span> useCache = isSelect;</span><br><span class="line">	assistant.addMappedStatement(一众参数);</span><br><span class="line"><span class="comment">//assistant中</span></span><br><span class="line">addMappedStatement();</span><br><span class="line">setStatementCache(isSelect, flushCache, useCache, currentCache, statementBuilder);<span class="comment">//这个currentCache就是之前在AddMapper里面的mapper缓存，现在将引用赋予m</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h4 id="configuation-getCache-id"><a href="#configuation-getCache-id" class="headerlink" title="configuation.getCache(id)"></a>configuation.getCache(id)</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/22/java/java%E7%BB%84%E4%BB%B6/%E6%96%87%E4%BB%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/04/22/java/java%E7%BB%84%E4%BB%B6/%E6%96%87%E4%BB%B6/" class="post-title-link" itemprop="url">文件组件</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-04-22 18:44:41" itemprop="dateCreated datePublished" datetime="2022-04-22T18:44:41+08:00">2022-04-22</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-13 03:52:56" itemprop="dateModified" datetime="2022-03-13T03:52:56+08:00">2022-03-13</time>
+                <time title="修改时间：2021-12-15 16:53:10" itemprop="dateModified" datetime="2021-12-15T16:53:10+08:00">2021-12-15</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -226,7 +352,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/javay/" itemprop="url" rel="index"><span itemprop="name">javay</span></a>
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
                 </span>
             </span>
 
@@ -240,8 +366,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/05/06/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/05/06/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/" class="cy_cmt_count" data-xid="2022/05/06/java/java源码解读/java源码解读/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/04/22/java/java%E7%BB%84%E4%BB%B6/%E6%96%87%E4%BB%B6/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/22/java/java%E7%BB%84%E4%BB%B6/%E6%96%87%E4%BB%B6/" class="cy_cmt_count" data-xid="2022/04/22/java/java组件/文件/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -252,14 +378,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>1.6k</span>
+              <span>2.8k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
+              <span>3 分钟</span>
             </span>
 
         </div>
@@ -271,18 +397,17 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="比较器Comparator"><a href="#比较器Comparator" class="headerlink" title="比较器Comparator"></a>比较器Comparator</h3><h3 id="一、比较器Comparator"><a href="#一、比较器Comparator" class="headerlink" title="一、比较器Comparator"></a>一、比较器Comparator</h3><ol>
-<li><p>Arrays.sort(users,new Comparator)</p>
-<p>-&gt;TimSort.sort(user,0,length,comparator)</p>
-<p>-&gt;if(len&lt;32)</p>
-<p>​    –&gt;i++找到合适开始index</p>
-<p>​    –&gt;2进制插入排序binarySort(a,index,length,c)</p>
-<p>​    –&gt;这是对少量元素进行排序的最佳方法，它需</p>
-</li>
+          <h2 id="File-api"><a href="#File-api" class="headerlink" title="File  api"></a>File  api</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/m0_37989184/article/details/93025734">参考</a></p>
+<p>File类的常见方法（参考一位大牛的，不小心把链接关了）</p>
+<ol>
+<li><p>创建</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">createNewFile</span><span class="params">()</span></span>; <span class="comment">//创建文件</span></span><br><span class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">mkdir</span><span class="params">()</span></span>;创建文件夹</span><br><span class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">mkdirs</span><span class="params">()</span></span>;创建多级文件夹。	</span><br></pre></td></tr></table></figure></li>
+<li><p>删除</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">delete</span><span class="params">()</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">deleteOnExit</span><span class="params">()</span></span>;在程序退出时删除文件。</span><br></pre></td></tr></table></figure></li>
 </ol>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2022/05/06/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/#more" rel="contents">
+              <a class="btn" href="/2022/04/22/java/java%E7%BB%84%E4%BB%B6/%E6%96%87%E4%BB%B6/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -306,7 +431,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/05/06/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/Java%E5%85%B3%E9%94%AE%E5%AD%97/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/14/java/javaSE/java%E7%9F%A5%E8%AF%86/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -320,7 +445,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/05/06/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/Java%E5%85%B3%E9%94%AE%E5%AD%97/" class="post-title-link" itemprop="url">java多线程关键字理解</a>
+            <a href="/2022/04/14/java/javaSE/java%E7%9F%A5%E8%AF%86/" class="post-title-link" itemprop="url">java知识</a>
         </h2>
 
         <div class="post-meta">
@@ -330,14 +455,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-05-06 02:14:45" itemprop="dateCreated datePublished" datetime="2022-05-06T02:14:45+08:00">2022-05-06</time>
+              <time title="创建时间：2022-04-14 18:45:08" itemprop="dateCreated datePublished" datetime="2022-04-14T18:45:08+08:00">2022-04-14</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-12-23 00:02:56" itemprop="dateModified" datetime="2021-12-23T00:02:56+08:00">2021-12-23</time>
+                <time title="修改时间：2022-03-25 18:25:50" itemprop="dateModified" datetime="2022-03-25T18:25:50+08:00">2022-03-25</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -346,10 +471,6 @@
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
                   <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/JUC/" itemprop="url" rel="index"><span itemprop="name">JUC</span></a>
                 </span>
             </span>
 
@@ -363,8 +484,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/05/06/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/Java%E5%85%B3%E9%94%AE%E5%AD%97/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/05/06/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/Java%E5%85%B3%E9%94%AE%E5%AD%97/" class="cy_cmt_count" data-xid="2022/05/06/java/java源码解读/Java关键字/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/04/14/java/javaSE/java%E7%9F%A5%E8%AF%86/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/14/java/javaSE/java%E7%9F%A5%E8%AF%86/" class="cy_cmt_count" data-xid="2022/04/14/java/javaSE/java知识/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -375,14 +496,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>1.1k</span>
+              <span>1.8k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
+              <span>2 分钟</span>
             </span>
 
         </div>
@@ -395,33 +516,30 @@
 
       
           <p>[toc]</p>
-<h2 id="一、synchronized"><a href="#一、synchronized" class="headerlink" title="一、synchronized"></a>一、synchronized</h2><p><a href="(http://hollischuang.gitee.io/tobetopjavaer/#/basics/concurrent-coding/synchronized?id=synchronized%E7%9A%84%E7%94%A8%E6%B3%95)">参考</a></p>
-<blockquote>
-<p> 当我们想要保证一个共享资源在同一时间只会被一个线程访问到时，我们可以在代码中使用<code>synchronized</code>关键字对类或者对象加锁/同步。</p>
-</blockquote>
-<blockquote>
-<p><code>synchronized</code>关键字在需要原子性、可见性和有序性这三种特性的时候都可以作为其中一种解决方案，看起来是“万能”的。的确，大部分并发控制操作都能使用synchronized来完成。</p>
-</blockquote>
-<h3 id="1-1-用法"><a href="#1-1-用法" class="headerlink" title="1.1 用法"></a>1.1 用法</h3><h3 id="1-2-原理"><a href="#1-2-原理" class="headerlink" title="1.2 原理"></a>1.2 原理</h3><h3 id="1-3-CSA"><a href="#1-3-CSA" class="headerlink" title="1.3 CSA"></a>1.3 CSA</h3><h3 id="可见性"><a href="#可见性" class="headerlink" title="可见性"></a>可见性</h3><blockquote>
-<p>可见性是指当多个线程访问同一个变量时，一个线程修改了这个变量的值，其他线程能够立即看得到修改的值。</p>
-</blockquote>
-<h2 id="二、volatile"><a href="#二、volatile" class="headerlink" title="二、volatile"></a>二、volatile</h2><h3 id="锁机制缺点"><a href="#锁机制缺点" class="headerlink" title="锁机制缺点"></a>锁机制缺点</h3><p>（1）在多线程竞争下，加锁、释放锁会导致比较多的上下文切换和调度延时，引起性能问题。</p>
-<p>（2）一个线程持有锁会导致其它所有需要此锁的线程挂起。</p>
-<p>（3）如果一个优先级高的线程等待一个优先级低的线程释放锁会导致优先级倒置，引起性能风险。</p>
-<p>volatile是不错的机制，但是volatile不能保证原子性。因此对于同步最终还是要回到锁机制上来。</p>
-<p>独占锁是一种悲观锁，synchronized就是一种独占锁，会导致其它所有需要锁的线程挂起，等待持有锁的线程释放锁。而另一个更加有效的锁就是乐观锁。所谓乐观锁就是，每次不加锁而是假设没有冲突而去完成某项操作，如果因为冲突失败就重试，直到成功为止。乐观锁用到的机制就是CAS，Compare and Swap。</p>
-<h3 id="三、"><a href="#三、" class="headerlink" title="三、= ="></a>三、= =</h3><blockquote>
-<p>双等号</p>
-</blockquote>
-<p>java中的数据类型，可分为两类：</p>
+<h2 id="一、java分析"><a href="#一、java分析" class="headerlink" title="一、java分析"></a>一、java分析</h2><ol>
+<li><p>基本代码分析</p>
 <ol>
-<li>基本数据类型：比较的是他们的值。</li>
-<li>引用类型<br>比较的是他们在内存中的存放地址，所以，除非是同一个new出来的对象，他们的比较后的结果为true，否则比较后结果为false。 JAVA当中所有的类都是继承于Object这个基类的，在Object中的基类中定义了一个equals的方法，这个方法的初始行为是比较对象的内存地 址，但在一些类库当中这个方法被覆盖掉了，如String,Integer,Date在这些类当中equals有其自身的实现，而不再是比较类在堆内存中的存放地址了。<br> 对于复合数据类型之间进行equals比较，在没有覆写equals方法的情况下，他们之间的比较还是基于他们在内存中的存放位置的地址值的，因为Object的equals方法也是用双等号（==）进行比较的，所以比较后的结果跟双等号（==）的结果相同。</li>
+<li>调试–栈</li>
+<li>语法糖、注解等：javac编译+javap反编译</li>
 </ol>
-<h2 id="三、transient"><a href="#三、transient" class="headerlink" title="三、transient"></a>三、<a target="_blank" rel="noopener" href="http://hollischuang.gitee.io/tobetopjavaer/#/basics/java-basic/transient-in-java?id=transient">transient</a></h2><blockquote>
-<p>​    transient修饰的成员变量，在序列化的时候其值会被忽略，在被反序列化后， transient 变量的值被设为初始值， 如 int 型的是 0，对象型的是 null。</p>
-</blockquote>
-
+</li>
+<li><p>判断两个obj是否同类  print obj.getClass</p>
+</li>
+<li><p>判断两个obj是否一样  print   obj.hashcode  但是可能hash碰撞</p>
+</li>
+<li><p>web功能分析：</p>
+<ol>
+<li><p>F12</p>
+</li>
+<li><p>Postman Swagger RestfulTools</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/04/14/java/javaSE/java%E7%9F%A5%E8%AF%86/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -440,7 +558,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/05/06/java/javaSE/%E9%87%8D%E5%86%99%E3%80%81%E9%87%8D%E8%BD%BD/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/13/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/elasticsearch%E8%AF%AD%E6%B3%95/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -454,7 +572,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/05/06/java/javaSE/%E9%87%8D%E5%86%99%E3%80%81%E9%87%8D%E8%BD%BD/" class="post-title-link" itemprop="url">java重写、重载</a>
+            <a href="/2022/04/13/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/elasticsearch%E8%AF%AD%E6%B3%95/" class="post-title-link" itemprop="url">elasticSearch语法</a>
         </h2>
 
         <div class="post-meta">
@@ -464,15 +582,8 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-05-06 02:14:45" itemprop="dateCreated datePublished" datetime="2022-05-06T02:14:45+08:00">2022-05-06</time>
+              <time title="创建时间：2022-04-13 21:43:37" itemprop="dateCreated datePublished" datetime="2022-04-13T21:43:37+08:00">2022-04-13</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-04-07 10:11:20" itemprop="dateModified" datetime="2022-04-07T10:11:20+08:00">2022-04-07</time>
-              </span>
 
           
   
@@ -484,8 +595,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/05/06/java/javaSE/%E9%87%8D%E5%86%99%E3%80%81%E9%87%8D%E8%BD%BD/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/05/06/java/javaSE/%E9%87%8D%E5%86%99%E3%80%81%E9%87%8D%E8%BD%BD/" class="cy_cmt_count" data-xid="2022/05/06/java/javaSE/重写、重载/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/04/13/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/elasticsearch%E8%AF%AD%E6%B3%95/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/13/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/elasticsearch%E8%AF%AD%E6%B3%95/" class="cy_cmt_count" data-xid="2022/04/13/数据库/nosql/elasticsearch语法/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -496,14 +607,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>713</span>
+              <span>2.4k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
+              <span>2 分钟</span>
             </span>
 
         </div>
@@ -515,64 +626,93 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <table>
+          <h2 id="Rest-Api"><a href="#Rest-Api" class="headerlink" title="Rest Api"></a>Rest Api</h2><p>122133</p>
+<h2 id="一、Rest-Api"><a href="#一、Rest-Api" class="headerlink" title="一、Rest Api"></a>一、Rest Api</h2><h3 id="1-1-索引的增删改查"><a href="#1-1-索引的增删改查" class="headerlink" title="1.1 索引的增删改查"></a>1.1 索引的增删改查</h3><h4 id="创建索引"><a href="#创建索引" class="headerlink" title="创建索引"></a>创建索引</h4><figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">put</span> /shopping</span><br></pre></td></tr></table></figure>
+
+<h4 id="删除索引"><a href="#删除索引" class="headerlink" title="删除索引"></a>删除索引</h4><figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">delete</span> /shopping</span><br></pre></td></tr></table></figure>
+
+<h4 id="获得所有的索引信息"><a href="#获得所有的索引信息" class="headerlink" title="获得所有的索引信息"></a>获得所有的索引信息</h4><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="regexp">/_cat/i</span>ndices?v</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-2-文档的增删改查"><a href="#1-2-文档的增删改查" class="headerlink" title="1.2 文档的增删改查"></a>1.2 文档的增删改查</h3><h4 id="创建文档"><a href="#创建文档" class="headerlink" title="创建文档"></a>创建文档</h4><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">post <span class="regexp">/index1/</span>_doc/ +json</span><br><span class="line">post <span class="regexp">/index1/</span>_doc/id +json</span><br></pre></td></tr></table></figure>
+
+<h4 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h4><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">delete</span>     /index1</span><br><span class="line"><span class="keyword">delete</span>     <span class="regexp">/index1/</span>_doc/id</span><br></pre></td></tr></table></figure>
+
+<h4 id="更改"><a href="#更改" class="headerlink" title="更改"></a>更改</h4><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">全量更新 put  <span class="regexp">/index1/</span>_doc/id +json</span><br><span class="line">局部更新 post <span class="regexp">/index1/</span>_update/id +json</span><br></pre></td></tr></table></figure>
+
+<h4 id="根据id查询文档"><a href="#根据id查询文档" class="headerlink" title="根据id查询文档"></a>根据id查询文档</h4><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="regexp">/index1/</span>_doc/<span class="number">1001</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="获得引的所有文档"><a href="#获得引的所有文档" class="headerlink" title="获得引的所有文档"></a>获得引的所有文档</h4><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="regexp">/index1/</span>_search</span><br></pre></td></tr></table></figure>
+
+<h4 id="批量"><a href="#批量" class="headerlink" title="批量"></a>批量</h4><pre><code>1. 插入
+1. 删除
+</code></pre>
+<h2 id="二、查询"><a href="#二、查询" class="headerlink" title="二、查询"></a>二、查询</h2><h3 id="2-0-两种"><a href="#2-0-两种" class="headerlink" title="2.0 两种"></a>2.0 两种</h3><h4 id="2-0-1-get-url"><a href="#2-0-1-get-url" class="headerlink" title="2.0.1 get+url"></a>2.0.1 get+url</h4><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ip:port<span class="regexp">/shopping/</span>_search?q=name:<span class="string">&quot;wyg&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="2-0-2-get-json"><a href="#2-0-2-get-json" class="headerlink" title="2.0.2  get+json"></a>2.0.2  get+json</h4><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="comment">//条件查询</span></span><br><span class="line">    </span><br><span class="line">	<span class="attr">&quot;query&quot;</span>:&#123;</span><br><span class="line">		<span class="attr">&quot;match&quot;</span>:&#123;</span><br><span class="line">			<span class="attr">&quot;name&quot;</span>:<span class="string">&quot;wyg&quot;</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">     <span class="comment">//只需要特定字段</span></span><br><span class="line">    <span class="string">&quot;_source&quot;</span>:[<span class="string">&quot;name&quot;</span>,<span class="string">&quot;id&quot;</span>,<span class="string">&quot;age&quot;</span>],</span><br><span class="line">	<span class="comment">//排序</span></span><br><span class="line">	<span class="attr">&quot;sort&quot;</span>:&#123;  </span><br><span class="line">        <span class="attr">&quot;age&quot;</span>:&#123;</span><br><span class="line">            <span class="attr">&quot;order&quot;</span>:<span class="string">&quot;desc&quot;</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">	<span class="comment">//分页</span></span><br><span class="line">    <span class="attr">&quot;from&quot;</span>:<span class="number">3</span>,  <span class="comment">//当前页</span></span><br><span class="line">    <span class="attr">&quot;size&quot;</span>:<span class="number">10</span>  <span class="comment">//一页数量</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;   <span class="comment">//查询全部</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span>:&#123;</span><br><span class="line">		<span class="attr">&quot;match_all&quot;</span>:&#123;	</span><br><span class="line">		&#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<h3 id="2-1-base"><a href="#2-1-base" class="headerlink" title="2.1 base"></a>2.1 base</h3><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="comment">//条件查询</span></span><br><span class="line">	<span class="attr">&quot;query&quot;</span>:&#123;</span><br><span class="line">		<span class="attr">&quot;match&quot;</span>:&#123;</span><br><span class="line">			<span class="attr">&quot;name&quot;</span>:<span class="string">&quot;wyg&quot;</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-多条件查询"><a href="#2-2-多条件查询" class="headerlink" title="2.2 多条件查询"></a>2.2 多条件查询</h3><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">	<span class="attr">&quot;query&quot;</span>:&#123;</span><br><span class="line">		<span class="attr">&quot;bool&quot;</span>:&#123;  <span class="comment">//条件</span></span><br><span class="line">			<span class="attr">&quot;should&quot;</span>:[  <span class="comment">//多条件必须匹配,还有must</span></span><br><span class="line">                &#123; </span><br><span class="line">                    <span class="attr">&quot;match&quot;</span>:&#123;</span><br><span class="line">                        <span class="attr">&quot;name&quot;</span>:<span class="string">&quot;wyg&quot;</span></span><br><span class="line">                	&#125;</span><br><span class="line">                &#125;,</span><br><span class="line">                &#123;</span><br><span class="line">                	<span class="attr">&quot;mathch&quot;</span>:&#123;</span><br><span class="line">                	    <span class="attr">&quot;name&quot;</span>:<span class="string">&quot;abc&quot;</span></span><br><span class="line">                	&#125;</span><br><span class="line">                &#125;</span><br><span class="line">            ],</span><br><span class="line">            <span class="attr">&quot;filter&quot;</span>:&#123;  <span class="comment">//过滤条件</span></span><br><span class="line">                <span class="attr">&quot;range&quot;</span>:&#123; <span class="comment">//范围</span></span><br><span class="line">                    <span class="attr">&quot;age&quot;</span>:&#123;</span><br><span class="line">                        <span class="attr">&quot;gt&quot;</span>:<span class="number">20</span><span class="comment">//20岁以上</span></span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="2-3-模糊查询—-gt-基于倒排索引"><a href="#2-3-模糊查询—-gt-基于倒排索引" class="headerlink" title="2.3 模糊查询—&gt;基于倒排索引"></a>2.3 模糊查询—&gt;基于倒排索引</h3><h4 id="模糊"><a href="#模糊" class="headerlink" title="模糊"></a>模糊</h4><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">/ &#123;<span class="comment">//条件查询</span></span><br><span class="line">	<span class="attr">&quot;query&quot;</span>:&#123;</span><br><span class="line">		<span class="attr">&quot;match&quot;</span>:&#123;</span><br><span class="line">			<span class="attr">&quot;name&quot;</span>:<span class="string">&quot;wyg&quot;</span> <span class="comment">//拆解 w y g </span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="完全匹配"><a href="#完全匹配" class="headerlink" title="完全匹配"></a>完全匹配</h4><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">	<span class="attr">&quot;query&quot;</span>:&#123;</span><br><span class="line">		<span class="attr">&quot;match_phrase&quot;</span>:&#123;</span><br><span class="line">			<span class="attr">&quot;name&quot;</span>:<span class="string">&quot;wyg&quot;</span> <span class="comment">//拆解 w y g </span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;,</span><br><span class="line">    <span class="comment">//对字段高亮</span></span><br><span class="line">    <span class="attr">&quot;highlight&quot;</span>:&#123;</span><br><span class="line">        <span class="attr">&quot;fields&quot;</span>:&#123;</span><br><span class="line">            <span class="attr">&quot;name&quot;</span>:&#123;&#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、mapping"><a href="#三、mapping" class="headerlink" title="三、mapping"></a>三、mapping</h2><blockquote>
+<p>mapping 是对<strong>文档</strong>的约束， 类似于DDL，create table（）</p>
+<p>也用于es    index的创建</p>
+</blockquote>
+<table>
 <thead>
 <tr>
-<th>规则</th>
-<th>重写override</th>
-<th>重载</th>
+<th>属性</th>
+<th>名称</th>
+<th>选项</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>参数</td>
-<td>必须一样</td>
-<td>必须不一样</td>
+<td>type</td>
+<td>数据类型</td>
+<td>text（可拆分）  keyword  八大类型 date  object</td>
 </tr>
 <tr>
-<td>异常</td>
-<td>受检异常：子类方法不能抛出父类<strong>没抛出的异常</strong>，也能不抛出。<strong>非受检异常：无规则</strong></td>
+<td>index</td>
+<td>释放创建倒排索引</td>
+<td>true  false</td>
+</tr>
+<tr>
+<td>analyzer</td>
+<td>分词器</td>
 <td></td>
 </tr>
 <tr>
-<td>返回值类型</td>
-<td>同上（可以理解为返回的范围更小）</td>
+<td>properties</td>
+<td>字段</td>
 <td></td>
-</tr>
-<tr>
-<td>权限</td>
-<td>只有父类和子类在同一个包中，才能重写default方法，否则被重写的<strong>最低权限是protected</strong>、并且<strong>访问权限&gt;父亲</strong></td>
-<td></td>
-</tr>
-<tr>
-<td>其他</td>
-<td>final static 不能被重写</td>
-<td><strong>被重载的方法已经不再是父类方法，不受override规则约束</strong></td>
 </tr>
 </tbody></table>
-<h3 id="一、重写-override"><a href="#一、重写-override" class="headerlink" title="一、重写 override"></a>一、重写 override</h3><blockquote>
-<p>继承，外壳不变，内容改变</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">	<span class="attr">&quot;mapping&quot;</span>:&#123;</span><br><span class="line">        <span class="attr">&quot;properties&quot;</span>:&#123;</span><br><span class="line">            <span class="attr">&quot;name&quot;</span>:&#123;</span><br><span class="line">                type:<span class="string">&quot;keyword&quot;</span>,</span><br><span class="line">                index:<span class="string">&quot;false&quot;</span></span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="attr">&quot;info&quot;</span>:&#123;</span><br><span class="line">                <span class="attr">&quot;type&quot;</span>:<span class="string">&quot;text&quot;</span>,</span><br><span class="line">                <span class="attr">&quot;index&quot;</span>:<span class="string">&quot;true&quot;</span></span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="attr">&quot;edu&quot;</span>:&#123;</span><br><span class="line">                <span class="attr">&quot;type&quot;</span>:<span class="string">&quot;object&quot;</span>,</span><br><span class="line">                <span class="attr">&quot;properties&quot;</span>&#123;</span><br><span class="line">                </span><br><span class="line">            &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+<h2 id="四、elasticsearch-java"><a href="#四、elasticsearch-java" class="headerlink" title="四、elasticsearch-java"></a>四、elasticsearch-java</h2><blockquote>
+<p>操作elasticSearch的两种方式，通过restApi http:9200  通过tco:9300</p>
 </blockquote>
-<h4 id="1-1-参数规则"><a href="#1-1-参数规则" class="headerlink" title="1.1 参数规则"></a>1.1 参数规则</h4><p>​    参数列表必须相同</p>
-<h4 id="1-2-异常规则"><a href="#1-2-异常规则" class="headerlink" title="1.2 异常规则"></a>1.2 异常规则</h4><ol>
-<li><p>可抛出任意的RuntimeException</p>
-</li>
-<li><p>对于强制性异常，儿子抛出的异常小于父亲的异常、(儿子抛出子异常)。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">a</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">t</span><span class="params">()</span> <span class="keyword">throws</span> Exception</span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">b</span> <span class="keyword">extends</span> <span class="title">a</span></span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">t</span><span class="params">()</span> <span class="keyword">throws</span> SQLClientInfoException</span>&#123;</span><br><span class="line">        System.out.println();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<p><a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/java-rest-high-search.html">官网</a></p>
+<h3 id="三个组件"><a href="#三个组件" class="headerlink" title="三个组件"></a>三个组件</h3><ol>
+<li>api cilent</li>
+<li>json mapping</li>
+<li>传输层</li>
+<li>、、</li>
 </ol>
-<h4 id="1-3返回值规则"><a href="#1-3返回值规则" class="headerlink" title="1.3返回值规则"></a>1.3返回值规则</h4><p>​    返回值必须返回 ? &gt; Object (规则同异常)</p>
-<h4 id="1-4-权限规则"><a href="#1-4-权限规则" class="headerlink" title="1.4 权限规则"></a>1.4 权限规则</h4><p>​    只有父类和子类在同一个包中，才能重写default方法，否则被重写的最低权限是protected、并且访问权限&gt;父亲</p>
-<h4 id="1-5-其他规则"><a href="#1-5-其他规则" class="headerlink" title="1.5 其他规则"></a>1.5 其他规则</h4><ol>
-<li>final、static、构造方法不能被重写</li>
-<li>写@override注解的优点<ol>
-<li>可以当注释用,方便阅读</li>
-<li>编译器可以验证@Override下面的方法名是否是你父类中所有的，如果没有则报错</li>
-</ol>
-</li>
-</ol>
-<h3 id="二、重载"><a href="#二、重载" class="headerlink" title="二、重载"></a>二、重载</h3><blockquote>
-<p>原则：本质上是两个方法，基于参数列表区分</p>
-</blockquote>
-<h4 id="2-1-参数规则"><a href="#2-1-参数规则" class="headerlink" title="2.1 参数规则"></a>2.1 参数规则</h4><p><strong>必须</strong>改变参数列表(参数个数或类型不一样)</p>
 
       
     </div>
@@ -592,7 +732,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/05/06/java/javaSE/%E6%B3%A8%E8%A7%A3/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/13/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%B4%A2%E5%BC%95/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -606,7 +746,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/05/06/java/javaSE/%E6%B3%A8%E8%A7%A3/" class="post-title-link" itemprop="url">java注解</a>
+            <a href="/2022/04/13/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%B4%A2%E5%BC%95/" class="post-title-link" itemprop="url">mysql索引</a>
         </h2>
 
         <div class="post-meta">
@@ -616,23 +756,7 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-05-06 02:14:45" itemprop="dateCreated datePublished" datetime="2022-05-06T02:14:45+08:00">2022-05-06</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-04-12 19:11:16" itemprop="dateModified" datetime="2022-04-12T19:11:16+08:00">2022-04-12</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
-                </span>
+              <time title="创建时间：2022-04-13 18:11:52" itemprop="dateCreated datePublished" datetime="2022-04-13T18:11:52+08:00">2022-04-13</time>
             </span>
 
           
@@ -645,8 +769,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/05/06/java/javaSE/%E6%B3%A8%E8%A7%A3/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/05/06/java/javaSE/%E6%B3%A8%E8%A7%A3/" class="cy_cmt_count" data-xid="2022/05/06/java/javaSE/注解/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/04/13/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%B4%A2%E5%BC%95/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/13/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%B4%A2%E5%BC%95/" class="cy_cmt_count" data-xid="2022/04/13/数据库/mysql索引/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -657,14 +781,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>1.2k</span>
+              <span>2k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
+              <span>2 分钟</span>
             </span>
 
         </div>
@@ -676,230 +800,187 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h3 id="1-内置注解"><a href="#1-内置注解" class="headerlink" title="1. 内置注解"></a>1. 内置注解</h3><ol>
-<li><p>@Override </p>
-</li>
-<li><p>@Supersswarnings 类/方法</p>
-</li>
-<li><p>@Deprecated 类/方法</p>
-</li>
-<li><p>元注解 </p>
-<ol>
-<li><p>@Target 作用范围</p>
-<p>ElementType 枚举值</p>
-<ol>
-<li>Type 类上</li>
-<li>Method 方法上</li>
-<li>Field 属性上</li>
+          <p>​    </p>
+<h2 id="一、索引原理"><a href="#一、索引原理" class="headerlink" title="一、索引原理"></a>一、索引原理</h2><blockquote>
+<p>索引原理：</p>
+<p>索引是一种利用某种规则的数据结构与实际数据的关系加快数据查找的功能；索引数据节点中有着实际文件的位置，因为索引是根据特定的规则和算法构建的,在查找的时候遵循索引的规则可以快速查找到对应数据的节点，从而达到快速查找数据的效果；其实宏观来说索引其实是一种概念而不是具体的某项技术，只是我们在某个技术中运用得比较广泛和鲜明（比如说数据库）渐渐的有了特定领域的标签，其实在生活中索引的使用无处不在，比如说：书本里的目录；读书时的座位号，考试编号都有类似索引的功能;</p>
+<p>总结来所有通过某规则数据结构和实际目标关联，根据特定规则算法快速寻址的功能都可以称之为索引；</p>
+</blockquote>
+<h3 id="术语"><a href="#术语" class="headerlink" title="术语"></a>术语</h3><h4 id="索引覆盖"><a href="#索引覆盖" class="headerlink" title="索引覆盖"></a>索引覆盖</h4><blockquote>
+<p>正好命中索引，不需要回表</p>
+<p>select id,name from user  索引覆盖的前提是name有索引，因为name的索引表中存储的是（name,id），一个表就存储了name和id</p>
+</blockquote>
+<h4 id="索引下推"><a href="#索引下推" class="headerlink" title="索引下推"></a>索引下推</h4><figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">联合索引的情况:</span></span><br><span class="line">	对索引中包含的字段先做判断，过滤掉不符合条件的记录，减少回表字数。</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220404235036297.png" alt="image-20220404235036297"></p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220404235043708.png" alt="image-20220404235043708"></p>
+<h2 id="二、索引结构"><a href="#二、索引结构" class="headerlink" title="二、索引结构"></a>二、索引结构</h2><h3 id="1-1-为什么是b-树"><a href="#1-1-为什么是b-树" class="headerlink" title="1.1 为什么是b+树"></a>1.1 为什么是b+树</h3><ol>
+<li>索引的表象是一个目录</li>
+<li>底层原理   [字段值,地址] 某种数据结构的映射</li>
 </ol>
-</li>
-<li><p>@Retetion 什么时候有效  默认runtime</p>
-</li>
-<li><p>@Inherited 继承</p>
-</li>
-<li><p>@Documented 生成文档</p>
-</li>
+<h3 id="1-2-排序的结构"><a href="#1-2-排序的结构" class="headerlink" title="1.2 排序的结构"></a>1.2 排序的结构</h3><ol>
+<li>二叉树   —&gt; 递增有序的情况    <strong>树高度==n</strong></li>
+<li>AVL 平衡二叉树   旋转次数多</li>
+<li>红黑树 弱平衡二叉树         弊端: 高度高</li>
+<li>B树   m叉树+平衡查找树     扩大横分叉，高度可控</li>
+<li>B+树  每个节点从左到右一次递增<ol>
+<li>非叶子节点不存数据，只存冗余索引</li>
+<li>叶子节点从大到小相互连接</li>
+<li>每个页16KB<ol>
+<li>如果满了  节点分裂  高度增加</li>
 </ol>
-</li>
-<li><p>次元注解(注解的注解)</p>
-<ol>
-<li><p>@Repeatable(Persons.class)</p>
-<p>可重复的</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 不能重复使用</span></span><br><span class="line"><span class="meta">@Identity(&quot;父亲&quot;)</span></span><br><span class="line"><span class="meta">@Identity(&quot;教师&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RepeatableTest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></li>
-</ol>
-</li>
-<li><p>本质：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">myAnno</span>.<span class="title">An1</span> <span class="keyword">extends</span> <span class="title">java</span>.<span class="title">lang</span>.<span class="title">annotation</span>.<span class="title">Annotation</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p>三大主干类</p>
-<ol>
-<li><p>祖先</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> java.lang.annotation;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Annotation</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object obj)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function">String <span class="title">toString</span><span class="params">()</span></span>;</span><br><span class="line">    Class&lt;? extends Annotation&gt; annotationType();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p>作用域</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">enum</span> <span class="title">ElementType</span> </span>&#123;</span><br><span class="line">    TYPE,               <span class="comment">/* 类、接口（包括注释类型）或枚举声明  */</span></span><br><span class="line">    FIELD,              <span class="comment">/* 字段声明（包括枚举常量）  */</span></span><br><span class="line">    METHOD,             <span class="comment">/* 方法声明  */</span></span><br><span class="line">    PARAMETER,          <span class="comment">/* 参数声明  */</span></span><br><span class="line">    CONSTRUCTOR,        <span class="comment">/* 构造方法声明  */</span></span><br><span class="line">    LOCAL_VARIABLE,     <span class="comment">/* 局部变量声明  */</span></span><br><span class="line">    ANNOTATION_TYPE,    <span class="comment">/* 注释类型声明  */</span></span><br><span class="line">    PACKAGE             <span class="comment">/* 包声明  */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p>作用时间</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> java.lang.annotation;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">enum</span> <span class="title">RetentionPolicy</span> </span>&#123;</span><br><span class="line">    SOURCE,            <span class="comment">/* Annotation信息仅存在于编译器处理期间，编译器处理完之后就没有该Annotation信息了  */</span></span><br><span class="line">    CLASS,             <span class="comment">/* 编译器将Annotation存储于类对应的.class文件中。默认行为  */</span></span><br><span class="line">    RUNTIME            <span class="comment">/* 编译器将Annotation存储于class文件中，并且可由JVM读入 */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-</ol>
-</li>
-<li><p>属性—抽象方法</p>
-<ol>
-<li><p>这是一种java特定规约方法,无参+返回</p>
-<p>object method();</p>
-<p>类似的还有@Test的</p>
-<p>void method();</p>
-</li>
-<li><p>返回值类型</p>
-<ol>
-<li>注解(不能是自己，循环注解)</li>
-<li>string</li>
-<li>枚举</li>
-<li>数组</li>
-<li>基本类型(不是integer)</li>
-</ol>
-</li>
-<li><p>可以default</p>
-</li>
-<li><p>在注解被使用的时候属性必须有值</p>
-</li>
-<li><p>每个属性—抽象方法都能根据反射获得值</p>
 </li>
 </ol>
 </li>
-<li><p>作用</p>
-<ol>
-<li>编译检查<ol>
-<li>override检查父类是否有该方法<ol>
-<li>其实override加不加都能覆盖,但是加了能起到检查的作用</li>
+</ol>
+<h4 id="B-树相对于B树优点"><a href="#B-树相对于B树优点" class="headerlink" title="B+树相对于B树优点"></a>B+树相对于B树优点</h4><ol>
+<li>非叶子节点都存有冗余，这样的目的是为了让叶子节点存有所有的数据</li>
+<li>非叶子节点<strong>不带有指向记录</strong>的指针，则一个块可以存储更多的索引项，如此可以降低树的高度。</li>
+<li>叶子节点之间有指针连接，则在范围扫描时避免了在内部节点来回移动。</li>
+</ol>
+<h4 id="B-树搜索过程"><a href="#B-树搜索过程" class="headerlink" title="B+树搜索过程"></a>B+树搜索过程</h4><ol>
+<li>根据冗余索引找到data叶子节点</li>
+<li>把data加载到内存 然后二分查找</li>
+</ol>
+<h4 id="特别的"><a href="#特别的" class="headerlink" title="特别的"></a>特别的</h4><ol>
+<li>如果只有一层  那么就相当于二分查找 ，但是，但是这意味着把所有的数据加载到内存，内存吃不消。 </li>
+<li>hash表<ol>
+<li>数组+链表</li>
+<li>hash运算—&gt;存到链表(hash冲突直接加在链表尾部)</li>
+<li><strong>不支持范围查找</strong></li>
+<li>不支持模糊查询</li>
+<li>大量重复数据，会严重影响查询性能</li>
 </ol>
 </li>
-<li>supersswarnings 检查警告</li>
+<li>mysql的memory支持hash索引，一般hash索引用于名字，而不用于数字</li>
+<li>innodb不支持hash索引，</li>
+</ol>
+<h2 id="三、索引分类"><a href="#三、索引分类" class="headerlink" title="三、索引分类"></a>三、索引分类</h2><blockquote>
+<p>索引分类 innodb才有   mylsam没有分类</p>
+<blockquote>
+<p>主键是不能为null的唯一索引</p>
+<p>唯一索引null可以出现多次,</p>
+<p>普通索引的所有值都能出现多次</p>
+</blockquote>
+</blockquote>
+<h3 id="3-1-聚集索引："><a href="#3-1-聚集索引：" class="headerlink" title="3.1 聚集索引："></a>3.1 聚集索引：</h3><blockquote>
+<p> InnoDB必须要有，且只有一个聚集索引</p>
+<ol>
+<li>如果表定义了PK，则PK就是聚集索引；</li>
+<li>如果表没有定义PK，则第一个not NULL unique列是聚集索引；</li>
+<li>否则，InnoDB会创建一个隐藏的row-id作为聚集索引；</li>
+</ol>
+</blockquote>
+<blockquote>
+<p>存(id,data)    </p>
+<p>数据按照索引的顺序来存储的，索引的顺序与表中记录的物理顺序一致。对于聚集索引，叶子结点即存储了真实的数据行，不再有另外单独的数据页。 在一张表上最多只能创建一个聚集索引，因为真实数据的物理顺序只能有一种</p>
+</blockquote>
+<ol>
+<li><p>索引和数据一起存储 ，找到了索引就是找到了数据</p>
+</li>
+<li><p>一个文件 idb</p>
+</li>
+<li><p><strong>优势</strong>：</p>
+<ol>
+<li>直接拿到数据，不需要二次查询。</li>
+<li>范围查询好</li>
+<li>是否排序的场合</li>
+</ol>
+</li>
+<li><p>劣势</p>
+<ol>
+<li><p>维护差，需要大量操作</p>
+</li>
+<li><p>使用uuid做主键，插入就会变得随机性，</p>
+</li>
+<li><p>id很大的化，辅助索引也会占用很大的空间</p>
+<blockquote>
+<p>辅助索引就是存(age,id)</p>
+</blockquote>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="3-2-非聚集-稀疏，二级索引-索引："><a href="#3-2-非聚集-稀疏，二级索引-索引：" class="headerlink" title="3.2 非聚集(稀疏，二级索引)索引："></a>3.2 非聚集(稀疏，二级索引)索引：</h3><blockquote>
+<p>存储(key,主键)</p>
+</blockquote>
+<ol>
+<li><p>查完得到主键</p>
+</li>
+<li><p>再回表去主键索引查询位置</p>
+</li>
+</ol>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220320213638194.png" alt="image-20220320213638194"></p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220320213755722.png" alt="image-20220320213755722"></p>
+<h3 id="3-3-联合索引"><a href="#3-3-联合索引" class="headerlink" title="3.3 联合索引"></a>3.3 联合索引</h3><ol>
+<li><p>底层</p>
+</li>
+<li><p>最左前缀原则(a,b,c)</p>
+<ol>
+<li><p>为什么最左前缀</p>
+<p>在相同的a下才会排序b</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211014212733501.png" alt="image-20211014212733501"></p>
+</li>
 <li></li>
 </ol>
 </li>
 </ol>
-</li>
-<li><p>4. </p>
-</li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/05/06/java/javaSE/%E6%B3%9B%E5%9E%8B/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/05/06/java/javaSE/%E6%B3%9B%E5%9E%8B/" class="post-title-link" itemprop="url">泛型</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-05-06 02:14:45" itemprop="dateCreated datePublished" datetime="2022-05-06T02:14:45+08:00">2022-05-06</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-04-09 01:28:21" itemprop="dateModified" datetime="2022-04-09T01:28:21+08:00">2022-04-09</time>
-              </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/05/06/java/javaSE/%E6%B3%9B%E5%9E%8B/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/05/06/java/javaSE/%E6%B3%9B%E5%9E%8B/" class="cy_cmt_count" data-xid="2022/05/06/java/javaSE/泛型/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.4k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <blockquote>
-<p>菱形运算符&lt;&gt;，菱形运算符就是为了规范返回与传入，全部Object一堆乱+强制类型转换</p>
+<h3 id="3-4-全文索引"><a href="#3-4-全文索引" class="headerlink" title="3.4 全文索引"></a>3.4 全文索引</h3><blockquote>
+<p>5.6之后开始支持全文索引，</p>
 </blockquote>
+<h2 id="三、索引选择"><a href="#三、索引选择" class="headerlink" title="三、索引选择"></a>三、索引选择</h2><h3 id="3-1-B-树索引"><a href="#3-1-B-树索引" class="headerlink" title="3.1 B+树索引"></a>3.1 B+树索引</h3><h4 id="优势"><a href="#优势" class="headerlink" title="优势"></a>优势</h4><ol>
+<li>完全匹配</li>
+<li>范围匹配</li>
+<li>前缀匹配（左模糊）</li>
+</ol>
+<h4 id="限制"><a href="#限制" class="headerlink" title="限制"></a>限制</h4><ol>
+<li>对于index(a,b,c)，有最左原则，也就是只有选了a才能用索引</li>
+</ol>
+<h3 id="3-2-hash索引"><a href="#3-2-hash索引" class="headerlink" title="3.2 hash索引"></a>3.2 hash索引</h3><h4 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h4><ol>
+<li>简单</li>
+<li>快</li>
+</ol>
+<h4 id="限制-1"><a href="#限制-1" class="headerlink" title="限制"></a>限制</h4><ol>
+<li>不能范围</li>
+<li>不能排序</li>
+<li>不能模糊查询</li>
+<li>考虑hash冲突</li>
+</ol>
+<h2 id="四、索引创建原则"><a href="#四、索引创建原则" class="headerlink" title="四、索引创建原则"></a>四、索引创建原则</h2><h3 id="需要建立索引"><a href="#需要建立索引" class="headerlink" title="需要建立索引"></a>需要建立索引</h3><ol>
+<li>该字段经常select+where, update+where delete where</li>
+<li>需要分组、排序的字段</li>
+<li>唯一的字段</li>
+</ol>
+<h3 id="不需要建立索引"><a href="#不需要建立索引" class="headerlink" title="不需要建立索引"></a>不需要建立索引</h3><ol>
+<li><p>数据量小不建立</p>
+</li>
+<li><p>经常update,delete,insert</p>
+</li>
+<li><p>不经常where</p>
+</li>
+<li><p>数据重复严重 </p>
 <blockquote>
-<p>泛型就是检错，泛型的擦除就是检错完成后让代码和不使用泛型的代码完全相同</p>
+<p>索引的目的是为了加速，比如把sex建立索引，加速太小，反而还需要维护索引，不如全表扫描</p>
 </blockquote>
-<h3 id="1-通配符"><a href="#1-通配符" class="headerlink" title="1.通配符"></a>1.通配符</h3><ol>
-<li>无限通配符 List&lt;?&gt;<ol>
-<li> 不能添加，只能add null，用作迭代</li>
-<li> List&lt;?&gt; 在 逻 辑 上 是List&lt;String&gt;,List&lt;Integer&gt; 的父类</li>
-</ol>
 </li>
-<li>原类型List<ol>
-<li> <code>类型</code>不安全,可以将任何类型元素加入</li>
-<li> 这个类型是为了兼容jdk1.5之前的代码，不然java会禁用这种写法</li>
-</ol>
+<li><p>字段长度太大</p>
 </li>
-<li> 通配符List&lt;T&gt;</li>
 </ol>
-<h3 id="2-泛型方法"><a href="#2-泛型方法" class="headerlink" title="2. 泛型方法"></a>2. 泛型方法</h3><h5 id="2-1-E：：较为常用"><a href="#2-1-E：：较为常用" class="headerlink" title="2.1 E：：较为常用"></a>2.1 E：：<strong>较为常用</strong></h5><blockquote>
-<p>这里的参数为? extend Object </p>
+<h2 id="五、索引失效"><a href="#五、索引失效" class="headerlink" title="五、索引失效"></a>五、索引失效</h2><blockquote>
+<p>模：代表模糊查询。</p>
+<p>型：代表数据类型。  str要用引号引起来</p>
+<p>数：代表函数。</p>
+<p>空：是Null的意思。</p>
+<p>​    单列索引不存储null值，复合索引不存储全为null的值。</p>
+<p>​    Null值的特殊性就在于参与的运算大多取值为null。这样的话，null值实际上是不能参与进建索引的过程</p>
+<p>运：代表运算。</p>
+<p>最：代表最左原则。</p>
+<p>快：全表扫描更快的意思</p>
+<p>or ：A or B 都有单独索引才不会失效</p>
+<p>不等于 </p>
 </blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;X&gt; <span class="function">List&lt;X&gt; <span class="title">test1</span><span class="params">(String name,X)</span></span>&#123;  <span class="comment">//这里的E 默认为Class&lt;Obeject&gt;</span></span><br><span class="line">    List&lt;X&gt;list=process(name,e.getClass());</span><br><span class="line">    <span class="keyword">return</span> list;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//使用</span></span><br><span class="line">List&lt;Student&gt; a = test2(<span class="string">&quot;a&quot;</span>, <span class="keyword">new</span> Student());</span><br></pre></td></tr></table></figure>
+<h2 id="六、索引调优"><a href="#六、索引调优" class="headerlink" title="六、索引调优"></a>六、索引调优</h2><h3 id="6-1-长字段索引"><a href="#6-1-长字段索引" class="headerlink" title="6.1 长字段索引"></a>6.1 长字段索引</h3><p>字符串长度太大不适合索引</p>
 
-<h4 id="2-2-Class-lt-E-gt"><a href="#2-2-Class-lt-E-gt" class="headerlink" title="2.2 Class&lt;E&gt;"></a>2.2 Class&lt;E&gt;</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;X&gt; <span class="function">List&lt;X&gt; <span class="title">test2</span><span class="params">(String name,Class&lt;X&gt;xClass)</span></span>&#123;  <span class="comment">//第一个X 就是参数化类型，参数里面的X就是指定</span></span><br><span class="line">    List&lt;X&gt;list=process(name,xClass);</span><br><span class="line">    <span class="keyword">return</span> list;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//使用</span></span><br><span class="line">List&lt;Student&gt; a = test1(<span class="string">&quot;a&quot;</span>, Student.class);</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-3-Objects方法"><a href="#2-3-Objects方法" class="headerlink" title="2.3 Objects方法"></a>2.3 Objects方法</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function"><span class="keyword">int</span> <span class="title">compare</span><span class="params">(T a, T b, Comparator&lt;? <span class="keyword">super</span> T&gt; c)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">return</span> (a == b) ? <span class="number">0</span> :  c.compare(a, b);</span><br><span class="line">   &#125;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">T <span class="title">requireNonNull</span><span class="params">(T obj)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">if</span> (obj == <span class="keyword">null</span>)</span><br><span class="line">           <span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException();</span><br><span class="line">       <span class="keyword">return</span> obj;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
-
-<h4 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h4><ol>
-<li><p>泛型无效性—&gt; 编译过后 泛型信息消失</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">(List&lt;Integer&gt;list)</span></span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">(List&lt;String&gt;list)</span></span>&#123;  <span class="comment">//报错 </span></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h4 id="逆变"><a href="#逆变" class="headerlink" title="逆变"></a>逆变</h4><ol>
-<li><p>数组具有协变</p>
-<blockquote>
-<p>可以把数组理解成一个简单的Class，而不是集合</p>
-<p>? extend E </p>
-</blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//协变就是协助多态的意思，</span></span><br><span class="line">Object[]o=<span class="keyword">new</span> String[<span class="number">2</span>];</span><br><span class="line"><span class="comment">//但是协变也造成了另一个困难，类型未知</span></span><br><span class="line">o[<span class="number">0</span>]=<span class="keyword">new</span> Integer(<span class="number">2</span>);</span><br></pre></td></tr></table></figure></li>
-<li><p>集合不能协变</p>
-<blockquote>
-<p>意思就是E 就是E</p>
-</blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">List&lt;Object&gt;list=<span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">List&lt;String&gt;list2=<span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">list=list2;<span class="comment">//报错</span></span><br><span class="line"><span class="comment">//解决办法 手动extend</span></span><br><span class="line">List&lt;? extends Object&gt;list=<span class="keyword">new</span> ArrayList&lt;&gt;();</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h4 id="协变"><a href="#协变" class="headerlink" title="协变"></a>协变</h4>
       
     </div>
 
@@ -1036,12 +1117,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">335k</span>
+    <span title="站点总字数">340k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">5:04</span>
+    <span title="站点阅读时长">5:09</span>
 </div>
 
         

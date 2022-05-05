@@ -187,7 +187,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/08/java/javaSE/JUC/%E9%94%81/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/30/java/javaSE/jvm/JMM-java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -201,7 +201,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/04/08/java/javaSE/JUC/%E9%94%81/" class="post-title-link" itemprop="url">锁</a>
+            <a href="/2022/03/30/java/javaSE/jvm/JMM-java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/" class="post-title-link" itemprop="url">java内存模型</a>
         </h2>
 
         <div class="post-meta">
@@ -211,7 +211,20 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-04-08 04:05:01" itemprop="dateCreated datePublished" datetime="2022-04-08T04:05:01+08:00">2022-04-08</time>
+              <time title="创建时间：2022-03-30 14:09:51" itemprop="dateCreated datePublished" datetime="2022-03-30T14:09:51+08:00">2022-03-30</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/JVM/" itemprop="url" rel="index"><span itemprop="name">JVM</span></a>
+                </span>
             </span>
 
           
@@ -224,8 +237,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/04/08/java/javaSE/JUC/%E9%94%81/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/08/java/javaSE/JUC/%E9%94%81/" class="cy_cmt_count" data-xid="2022/04/08/java/javaSE/JUC/锁/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/03/30/java/javaSE/jvm/JMM-java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/30/java/javaSE/jvm/JMM-java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/" class="cy_cmt_count" data-xid="2022/03/30/java/javaSE/jvm/JMM-java内存模型/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -236,7 +249,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>1.4k</span>
+              <span>991</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -255,60 +268,49 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>·</p>
-<h2 id="一、Lock的使用"><a href="#一、Lock的使用" class="headerlink" title="一、Lock的使用"></a>一、Lock的使用</h2><blockquote>
-<p><code>ReentrantLock</code>的实现是基于其内部类<code>FairSync</code>(公平锁)和<code>NonFairSync</code>(非公平锁)实现的。 其可重入性是基于<code>Thread.currentThread()</code>实现的: 如果当前线程已经获得了执行序列中的锁， 那执行序列之后的所有方法都可以获得这个锁。</p>
+          <p>[toc]</p>
+<h2 id="痛点-转载"><a href="#痛点-转载" class="headerlink" title="痛点-转载"></a><a target="_blank" rel="noopener" href="https://www.hollischuang.com/archives/2550">痛点-转载</a></h2><p>​    但是随着CPU技术的发展，CPU的执行速度越来越快。而由于内存的技术并没有太大的变化，所以从内存中读取和写入数据的过程和CPU的执行速度比起来差距就会越来越大,这就导致CPU每次操作内存都要耗费很多等待时间。</p>
+<ul>
+<li>所以，人们想出来了一个好的办法，就是在CPU和内存之间增加高速缓存。缓存的概念大家都知道，就是保存一份数据拷贝。他的特点是速度快，内存小，并且昂贵。</li>
+<li><strong>当程序在运行过程中，会将运算需要的数据从主存复制一份到CPU的高速缓存当中，那么CPU进行计算时就可以直接从它的高速缓存读取数据和向其中写入数据，当运算结束之后，再将高速缓存中的数据刷新到主存当中。</strong></li>
+<li>随着CPU能力的不断提升，一层缓存就慢慢的无法满足要求了，就逐渐的衍生出多级缓存。按照数据读取顺序和与CPU结合的紧密程度，CPU缓存可以分为一级缓存（L1），二级缓存（L3），部分高端CPU还具有三级缓存（L3），每一级缓存中所储存的全部数据都是下一级缓存的一部分</li>
+<li>当CPU要读取一个数据时，首先从一级缓存中查找，如果没有找到再从二级缓存中查找，如果还是没有就从三级缓存或内存中查找。</li>
+<li>单核CPU只含有一套L1，L2，L3缓存；如果CPU含有多个核心，即多核CPU，则每个核心都含有一套L1（甚至和L2）缓存，而共享L3（或者和L2）缓存。</li>
+</ul>
+<h4 id="计算机内存模型"><a href="#计算机内存模型" class="headerlink" title="计算机内存模型"></a>计算机内存模型</h4><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211214014833316.png" alt="image-20211214014833316"></p>
+<h4 id="JMM"><a href="#JMM" class="headerlink" title="JMM"></a>JMM</h4><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220330140949648.png" alt="image-20220330140949648"></p>
+<h2 id="二、并发编程的三个问题"><a href="#二、并发编程的三个问题" class="headerlink" title="二、并发编程的三个问题"></a>二、并发编程的三个问题</h2><h3 id="2-1-原子性"><a href="#2-1-原子性" class="headerlink" title="2.1 原子性"></a>2.1 原子性</h3><blockquote>
+<p>和数据库的原子性一样，要么全成功，要么全失败</p>
+</blockquote>
+<p>jvm只保证了对8大基本类型(除了double,long)读、取操作时原子的</p>
+<h3 id="2-2-有序性"><a href="#2-2-有序性" class="headerlink" title="2.2 有序性"></a>2.2 有序性</h3><blockquote>
+<p>由于变量的读取经过 工作内存–&gt;缓存–&gt;主存 </p>
+<p>各个存储点存储变量的地址不一样，可能变量a，b的地址会近一些，所以操作完a会优先操作b</p>
 </blockquote>
 <blockquote>
-<p>自增 lock上锁，condition 状态转换</p>
+<p>指令重排不会影响单个线程的结果，但在多线程下就会变得不安全。</p>
 </blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">Lock lock = <span class="keyword">new</span> ReentrantLock();<span class="comment">//可重入锁，lock.lock()上锁 unlock解锁</span></span><br><span class="line">Condition condition = lock.newCondition();<span class="comment">//状态监视-转换器 await 等待， signalAll 唤醒全部</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">int</span> num;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">increment</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    lock.lock();<span class="comment">//上锁</span></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">while</span> (num != <span class="number">0</span>) &#123;</span><br><span class="line">            condition.await();<span class="comment">//等待</span></span><br><span class="line">        &#125;</span><br><span class="line">        num++;</span><br><span class="line">        condition.signal();<span class="comment">//唤醒</span></span><br><span class="line">    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line"></span><br><span class="line">    &#125;<span class="keyword">finally</span>&#123;</span><br><span class="line">    	lock.unlock();<span class="comment">//解锁</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>例如</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//线程a:</span></span><br><span class="line">student = <span class="keyword">new</span> Student();   <span class="comment">//语句1</span></span><br><span class="line">inited = <span class="keyword">true</span>;             <span class="comment">//语句2</span></span><br></pre></td></tr></table></figure>
 
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//线程b:</span></span><br><span class="line"><span class="keyword">while</span>(!inited )&#123;</span><br><span class="line">  sleep()</span><br><span class="line">&#125;</span><br><span class="line">student.doWork();</span><br></pre></td></tr></table></figure>
 
-
-<h4 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h4><blockquote>
-<p>基于AQS+CSA</p>
+<ul>
+<li>如果线程a按照1、2顺序执行，那么线程b将永远不会在student初始化之前就doWork</li>
+</ul>
+<h3 id="2-3-可见性"><a href="#2-3-可见性" class="headerlink" title="2.3 可见性"></a>2.3 可见性</h3><blockquote>
+<p>该特性可以理解为值时直接访问主存的到的，大家看到的都一样</p>
 </blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (compareAndSetState(<span class="number">0</span>, <span class="number">1</span>))</span><br><span class="line">    setExclusiveOwnerThread(Thread.currentThread());</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    acquire(<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
-
-
-
-<h4 id="精准唤醒"><a href="#精准唤醒" class="headerlink" title="精准唤醒"></a>精准唤醒</h4><h2 id="synchonized"><a href="#synchonized" class="headerlink" title="synchonized"></a>synchonized</h2><h3 id="内存语义"><a href="#内存语义" class="headerlink" title="内存语义"></a>内存语义</h3><h3 id="synchonized和Lock区别"><a href="#synchonized和Lock区别" class="headerlink" title="synchonized和Lock区别"></a>synchonized和Lock区别</h3><ol>
-<li>synchonized是一个关键字，Lock是一个类</li>
-<li>synchonized是隐式锁，自动上锁解锁，Lock是显式锁，手动操作</li>
-<li>synchonized无法获得所得状态，Lock可以判断是否获得了锁，更灵活</li>
-<li>synchonized是<code>非公平锁</code>，Lock默认是<code>非公平锁</code>，可设置</li>
-<li>synchonized适合锁少量的代码，Lock是否大量代码<ol>
-<li>conditon可以精准唤醒，可以灵活调整获得锁的顺序</li>
-</ol>
+<h2 id="三、关键字"><a href="#三、关键字" class="headerlink" title="三、关键字"></a>三、关键字</h2><h3 id="3-1-关键字volatile"><a href="#3-1-关键字volatile" class="headerlink" title="3.1 关键字volatile"></a>3.1 关键字volatile</h3><blockquote>
+<p>易见的，易变的</p>
+</blockquote>
+<h4 id="解决两个问题"><a href="#解决两个问题" class="headerlink" title="解决两个问题"></a>解决两个问题</h4><ol>
+<li><p>可见性</p>
+<p>原理：面向主存读写</p>
+</li>
+<li><p>有序性</p>
 </li>
 </ol>
-<h3 id="乐观锁"><a href="#乐观锁" class="headerlink" title="乐观锁"></a>乐观锁</h3><blockquote>
-<p>基于版本</p>
-</blockquote>
-<ol>
-<li><p>支持并发</p>
-</li>
-<li><p>在提交任务之前比较版本号，不一致就放弃，再申请提交，知道提交完成</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">update t_goods </span><br><span class="line"><span class="keyword">set</span> status<span class="operator">=</span><span class="number">2</span>,version<span class="operator">=</span>version<span class="operator">+</span><span class="number">1</span></span><br><span class="line"><span class="keyword">where</span> id<span class="operator">=</span>#&#123;id&#125; <span class="keyword">and</span> version<span class="operator">=</span>#&#123;version&#125;;</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h3 id="悲观锁"><a href="#悲观锁" class="headerlink" title="悲观锁"></a>悲观锁</h3><ol>
-<li>串行化</li>
-</ol>
-<h3 id="表锁"><a href="#表锁" class="headerlink" title="表锁"></a>表锁</h3><h3 id="行锁"><a href="#行锁" class="headerlink" title="行锁"></a>行锁</h3><h3 id="读锁、共享锁、S锁、"><a href="#读锁、共享锁、S锁、" class="headerlink" title="读锁、共享锁、S锁、"></a>读锁、共享锁、S锁、</h3><blockquote>
-<p>如果事务T对数据A加上共享锁后，则其他事务只能对A再加共享锁，不能加排他锁。获准共享锁的事务只能读数据，不能修改数据。</p>
-</blockquote>
-<h3 id="写锁、独占锁、排他锁、T锁"><a href="#写锁、独占锁、排他锁、T锁" class="headerlink" title="写锁、独占锁、排他锁、T锁"></a>写锁、独占锁、排他锁、T锁</h3><blockquote>
-<p>如果事务T对数据A加上排他锁后，则其他事务不能再对A加任任何类型的封锁。获准排他锁的事务既能读数据，又能修改数据。</p>
-</blockquote>
-<h3 id="公平锁，非公平锁"><a href="#公平锁，非公平锁" class="headerlink" title="公平锁，非公平锁"></a>公平锁，非公平锁</h3><blockquote>
-<p>最早请求的锁最早获得锁，需要队列实现，影响性能</p>
-</blockquote>
-<h3 id="对写锁"><a href="#对写锁" class="headerlink" title="对写锁"></a>对写锁</h3><blockquote>
-<p>有独占锁，也有共享锁</p>
-</blockquote>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">Book</span>&#123;</span><br><span class="line">	<span class="keyword">private</span> Lock=<span class="keyword">new</span> ReetranWriteReadLock();</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">read</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">		<span class="keyword">lock</span>.writeLock().<span class="keyword">lock</span>();</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">wirte</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">		<span class="keyword">lock</span>.rLock().<span class="keyword">lock</span>();</span><br><span class="line">	</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 
       
     </div>
@@ -328,7 +330,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/08/java/javaSE/JUC/JUC/">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/30/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/redis/reids%E5%91%BD%E4%BB%A4/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/t2.png">
@@ -342,7 +344,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/04/08/java/javaSE/JUC/JUC/" class="post-title-link" itemprop="url">JUC</a>
+            <a href="/2022/03/30/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/redis/reids%E5%91%BD%E4%BB%A4/" class="post-title-link" itemprop="url">redis命令</a>
         </h2>
 
         <div class="post-meta">
@@ -352,7 +354,407 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-04-08 03:53:07" itemprop="dateCreated datePublished" datetime="2022-04-08T03:53:07+08:00">2022-04-08</time>
+              <time title="创建时间：2022-03-30 00:41:11" itemprop="dateCreated datePublished" datetime="2022-03-30T00:41:11+08:00">2022-03-30</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/30/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/redis/reids%E5%91%BD%E4%BB%A4/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/30/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/redis/reids%E5%91%BD%E4%BB%A4/" class="cy_cmt_count" data-xid="2022/03/30/数据库/nosql/redis/reids命令/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.7k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <blockquote>
+<p>1.基于内存的key-value数据库<br>2.基于c语言编写的，可以支持多种语言的api //set每秒11万次，取get 81000次<br>3.支持数据持久化<br>4.value可以是string，hash， list， set, sorted set</p>
+<p>使用场景</p>
+<ol>
+<li>去最新n个数据的操作</li>
+<li>排行榜，取top n个数据 //最佳人气前10条</li>
+<li>精确的设置过期时间</li>
+<li>计数器</li>
+<li>实时系统， 反垃圾系统</li>
+<li>pub， sub发布订阅构建实时消息系统</li>
+<li>构建消息队列</li>
+<li>缓存</li>
+</ol>
+</blockquote>
+<h2 id="一、命令"><a href="#一、命令" class="headerlink" title="一、命令"></a>一、命令</h2><h3 id="1-1-启动-连接-停止"><a href="#1-1-启动-连接-停止" class="headerlink" title="1.1      启动 连接 停止"></a>1.1      启动 连接 停止</h3><p>启动</p>
+<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cd</span> src</span><br><span class="line"><span class="string">./redis-servie</span></span><br></pre></td></tr></table></figure>
+
+<p>连接客户端</p>
+<figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./redis-<span class="keyword">cli</span></span><br><span class="line">./redis-<span class="keyword">cli</span> -h <span class="built_in">ip</span>地址 -p 端口</span><br></pre></td></tr></table></figure>
+
+<p>停止/kill</p>
+<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">./redis-cli</span> <span class="keyword">shutdown</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="二、操作"><a href="#二、操作" class="headerlink" title="二、操作"></a>二、操作</h2><h3 id="2-0-配置命令"><a href="#2-0-配置命令" class="headerlink" title="2.0 配置命令"></a>2.0 配置命令</h3><ol>
+<li><p>获得配置信息</p>
+<p>config get key</p>
+</li>
+</ol>
+<h3 id="2-1-全局"><a href="#2-1-全局" class="headerlink" title="2.1 全局"></a>2.1 全局</h3><h4 id="2-1-1-库操作"><a href="#2-1-1-库操作" class="headerlink" title="2.1.1  库操作"></a>2.1.1  库操作</h4><ol>
+<li>切换库 select 1</li>
+<li>dbsize数据库大小</li>
+<li>flushdb 清空库</li>
+</ol>
+<h4 id="2-1-2-key操作"><a href="#2-1-2-key操作" class="headerlink" title="2.1.2 key操作"></a>2.1.2 key操作</h4><blockquote>
+<p>注意每个单词要有空格分开</p>
+</blockquote>
+<ol>
+<li>查看所有 keys *   keys nam*  查看所有 nam开头的* </li>
+<li> 赋值 set k v </li>
+<li> 多赋值 mset k1 k2 v1 v2</li>
+<li> 获取值  get k</li>
+<li> 多取值 mget k1 k2</li>
+<li>检查是否存在  exists key</li>
+<li>key类型 type key </li>
+<li>删除key del key</li>
+<li>删除所有key flushdb</li>
+<li>设置过期时间秒 expire key  10  </li>
+<li>persist key 删除过期时间</li>
+<li>ttl  key 查看多少秒过期  -2 已经过期   -1 永不过期</li>
+</ol>
+<h3 id="2-2-string"><a href="#2-2-string" class="headerlink" title="2.2 string"></a>2.2 string</h3><ol>
+<li>set k str  get k</li>
+<li>append k 追加</li>
+<li>strlen k</li>
+<li>setnx  不存在则设置   返回0表示已经存在</li>
+<li>incr/decr k  增加/减少1 </li>
+<li>incrby/decrby k n  增加/减少n   原子性操作</li>
+<li>mset mget msetnx(都不存在才成功)</li>
+<li>getrange k begin end    —-&gt;substring</li>
+<li>setrange k begin  str       —-&gt;替换覆盖</li>
+<li>setex k 100 v  同时设置</li>
+<li>getset 取了就换 </li>
+</ol>
+<h4 id="2-3-list"><a href="#2-3-list" class="headerlink" title="2.3 list"></a>2.3 list</h4><ol>
+<li>push k v1 v2  左是头-头插法  v2 v1</li>
+<li>rpush k v1 v2 右是头头插法 v1 v2</li>
+<li>lrange k begin end 从左开始取</li>
+<li>lpop/rpop  从左/右吐出一个</li>
+<li>rpoplpush  右边吐一个放在左边 </li>
+<li>index k 0  按下标取</li>
+<li>llen</li>
+<li>linsert k before/after “str3”  “strn” 在str3 前面插入strn</li>
+<li>lrem k before/after “str3”  …</li>
+<li>lset k 0 “wang” 把第一个设置为”wang”</li>
+</ol>
+<h3 id="2-4-hash"><a href="#2-4-hash" class="headerlink" title="2.4 hash"></a>2.4 hash</h3><table>
+<thead>
+<tr>
+<th>1</th>
+<th>hdel hs key field1 [field2]        删除一个或多个哈希表字段</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>2</td>
+<td>hexisit hs key field 查看哈希表 key 中，指定的字段是否存在。</td>
+</tr>
+<tr>
+<td>3</td>
+<td>hget key field 获取存储在哈希表中指定字段的值。</td>
+</tr>
+<tr>
+<td>4</td>
+<td>hgetall hs  key 获取在哈希表中指定 key 的所有字段和值</td>
+</tr>
+<tr>
+<td>5</td>
+<td><a target="_blank" rel="noopener" href="https://www.runoob.com/redis/hashes-hincrby.html">HINCRBY key field increment</a> 为哈希表 key 中的指定字段的整数值加上增量 increment 。</td>
+</tr>
+<tr>
+<td>6</td>
+<td><a target="_blank" rel="noopener" href="https://www.runoob.com/redis/hashes-hincrbyfloat.html">HINCRBYFLOAT key field increment</a> 为哈希表 key 中的指定字段的浮点数值加上增量 increment 。</td>
+</tr>
+<tr>
+<td>7</td>
+<td><a target="_blank" rel="noopener" href="https://www.runoob.com/redis/hashes-hkeys.html">HKEYS key</a> 获取所有哈希表中的字段</td>
+</tr>
+<tr>
+<td>8</td>
+<td><a target="_blank" rel="noopener" href="https://www.runoob.com/redis/hashes-hlen.html">HLEN key</a> 获取哈希表中字段的数量</td>
+</tr>
+<tr>
+<td>9</td>
+<td>[HMGET key field1 <a target="_blank" rel="noopener" href="https://www.runoob.com/redis/hashes-hmget.html">field2]</a> 获取所有给定字段的值</td>
+</tr>
+<tr>
+<td>10</td>
+<td>[HMSET key field1 value1 <a target="_blank" rel="noopener" href="https://www.runoob.com/redis/hashes-hmset.html">field2 value2 ]</a> 同时将多个 field-value (域-值)对设置到哈希表 key 中。</td>
+</tr>
+<tr>
+<td>11</td>
+<td><a target="_blank" rel="noopener" href="https://www.runoob.com/redis/hashes-hset.html">HSET key field value</a> 将哈希表 key 中的字段 field 的值设为 value 。</td>
+</tr>
+<tr>
+<td>12</td>
+<td><a target="_blank" rel="noopener" href="https://www.runoob.com/redis/hashes-hsetnx.html">HSETNX key field value</a> 只有在字段 field 不存在时，设置哈希表字段的值。</td>
+</tr>
+<tr>
+<td>13</td>
+<td><a target="_blank" rel="noopener" href="https://www.runoob.com/redis/hashes-hvals.html">HVALS key</a> 获取哈希表中所有值。</td>
+</tr>
+<tr>
+<td>14</td>
+<td>[HSCAN key cursor <a target="_blank" rel="noopener" href="https://www.runoob.com/redis/hashes-hscan.html">MATCH pattern] [COUNT count]</a> 迭代哈希表中的键值对。</td>
+</tr>
+</tbody></table>
+<h3 id="2-5-set"><a href="#2-5-set" class="headerlink" title="2.5 set"></a>2.5 set</h3><ol>
+<li>sadd k v1 v2</li>
+<li>smembers k</li>
+<li>sismember k v v是否存在 1true</li>
+<li>scard k   返回个数</li>
+<li>spop 随机吐出一个</li>
+<li>srandmenber k  n随机取出n个</li>
+<li>smove k v k2   迁移</li>
+<li>交集</li>
+<li>并集</li>
+</ol>
+<h3 id="2-6-zset"><a href="#2-6-zset" class="headerlink" title="2.6 zset"></a>2.6 zset</h3>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/30/408/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E8%BF%9B%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/30/408/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E8%BF%9B%E7%A8%8B/" class="post-title-link" itemprop="url">进程</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-30 00:14:46" itemprop="dateCreated datePublished" datetime="2022-03-30T00:14:46+08:00">2022-03-30</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">操作系统</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/30/408/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E8%BF%9B%E7%A8%8B/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/30/408/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E8%BF%9B%E7%A8%8B/" class="cy_cmt_count" data-xid="2022/03/30/408/操作系统/进程/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.7k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>`</p>
+<h2 id="一、同步、异步与阻塞、非阻塞"><a href="#一、同步、异步与阻塞、非阻塞" class="headerlink" title="一、同步、异步与阻塞、非阻塞"></a>一、同步、异步与阻塞、非阻塞</h2><p><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/19732473">参考</a></p>
+<h3 id="同步、异步"><a href="#同步、异步" class="headerlink" title="同步、异步"></a>同步、异步</h3><ul>
+<li><p>所谓同步，就是在发出一个<em>调用</em>时，在没有得到结果之前，该<em>调用</em>就不返回。但是一旦调用返回，就得到返回值，<br>换句话说，就是由调用者主动等待这个<em>调用</em>的结果。</p>
+</li>
+<li><p>而异步则是相反，调用在发出之后，这个调用就直接返回了，所以没有返回结果。换句话说，当一个异步过程调用发出后，调用者不会立刻得到结果。而是在<em>调用</em>发出后，<em>被调用者</em>通过状态、通知来通知调用者，或通过回调函数处理这个调用。</p>
+</li>
+<li><p>同步</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">  </span><br></pre></td></tr></table></figure></li>
+<li><p>异步: 雇一个新的线程callBack</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Response res;</span><br><span class="line"><span class="keyword">new</span> Thread(()-&gt;&#123;</span><br><span class="line">    res=requset();</span><br><span class="line">	callBack();</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="阻塞、非阻塞"><a href="#阻塞、非阻塞" class="headerlink" title="阻塞、非阻塞"></a>阻塞、非阻塞</h3><ul>
+<li><p>阻塞就是</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Object result=doAndwaitResult();</span><br><span class="line"><span class="function">Object <span class="title">doAndwaitResult</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.wait();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>非阻塞就是</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span>(<span class="keyword">true</span>)&#123;</span><br><span class="line">    Object result=<span class="keyword">new</span> Object();</span><br><span class="line">    getResource(result);</span><br><span class="line">    <span class="keyword">while</span>((result=testResult())!=<span class="keyword">null</span>)&#123;</span><br><span class="line">        doOther();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="二、进程"><a href="#二、进程" class="headerlink" title="二、进程"></a>二、进程</h2><h3 id="2-1-进程状态"><a href="#2-1-进程状态" class="headerlink" title="2.1 进程状态"></a>2.1 进程状态</h3><h4 id="2-1-1-五状态"><a href="#2-1-1-五状态" class="headerlink" title="2.1.1 五状态"></a>2.1.1 五状态</h4><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220325232538100.png" alt="image-20220325232538100"></p>
+<h4 id="2-1-2-挂起状态"><a href="#2-1-2-挂起状态" class="headerlink" title="2.1.2 挂起状态"></a>2.1.2 挂起状态</h4><blockquote>
+<p>​    被阻塞状态的进程占用着物理内存就一种浪费物理内存的行为，在虚拟内存管理的操作系统中，通常会把阻塞状态的进程的物理内存空间换出到硬盘，等需要再次运行的时候，再从硬盘换入到物理内存</p>
+</blockquote>
+<p><strong>描述进程没有占用实际的物理内存空间的情况，这个状态就是挂起状态</strong></p>
+<ul>
+<li>阻塞挂起状态：进程在外存（硬盘）并等待某个事件的出现；</li>
+<li>就绪挂起状态：进程在外存（硬盘），但只要进入内存，即刻立刻运行；</li>
+<li>通过 sleep 让进程间歇性挂起，其工作原理是设置一个定时器，到期后唤醒进程</li>
+<li>处于挂起的进程进入<strong>等待队列</strong>，等待某个事件发生</li>
+</ul>
+<h4 id="2-1-3-七状态"><a href="#2-1-3-七状态" class="headerlink" title="2.1.3 七状态"></a>2.1.3 七状态</h4><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220325232849106.png" alt="image-20220325232849106"></p>
+<h3 id="2-2-进程控制"><a href="#2-2-进程控制" class="headerlink" title="2.2 进程控制"></a>2.2 进程控制</h3><blockquote>
+<p>用进程控制块（process control block，PCB）数据结构来描述进程，是进程存在的唯一标识</p>
+</blockquote>
+<h4 id="2-2-1-PCB-信息"><a href="#2-2-1-PCB-信息" class="headerlink" title="2.2.1 PCB 信息"></a>2.2.1 PCB 信息</h4><ul>
+<li>进程标识符：标识各个进程，每个进程都有一个并且唯一的标识符；</li>
+<li>用户标识符：进程归属的用户，用户标识符主要为共享和保护服务；</li>
+<li>进程当前状态，如 new、ready、running、waiting 或 blocked 等；</li>
+<li>有关内存地址空间或虚拟地址空间的信息，所打开文件的列表和所使用的 I/O 设备信息。</li>
+<li>CPU 中各个寄存器的值，当进程被切换时，CPU 的状态信息都会被保存在相应的 PCB 中，以便进程<br>重新执行时，能从断点处继续执行</li>
+</ul>
+<h4 id="2-2-2-PCB-连接"><a href="#2-2-2-PCB-连接" class="headerlink" title="2.2.2 PCB 连接"></a>2.2.2 PCB 连接</h4><blockquote>
+<p>通常是通过链表的方式进行组织，把具有相同状态的进程链在一起，组成各种队列。</p>
+</blockquote>
+<ul>
+<li>将所有处于就绪状态的进程链在一起，称为就绪队列</li>
+<li>把所有因等待某事件而处于等待状态的进程链在一起就组成各种阻塞队列</li>
+</ul>
+<h4 id="2-2-3-进程阻塞"><a href="#2-2-3-进程阻塞" class="headerlink" title="2.2.3 进程阻塞"></a>2.2.3 进程阻塞</h4><p>阻塞状态的进程是绝对不可能叫醒自己的</p>
+<h4 id="2-2-4-进程唤醒"><a href="#2-2-4-进程唤醒" class="headerlink" title="2.2.4 进程唤醒"></a>2.2.4 进程唤醒</h4><blockquote>
+<p>​    如某进程正在等待 I/O 事件，需由别的进程发消息给它，则只有当该进程所期待的事件出现时，才由发<br>现者进程用唤醒语句叫醒它</p>
+</blockquote>
+<h4 id="2-2-5-进程终止"><a href="#2-2-5-进程终止" class="headerlink" title="2.2.5 进程终止"></a>2.2.5 进程终止</h4><p>进程可以有 3 种终止方式：正常结束、异常结束以及外界干预（信号 kill 掉）。</p>
+<h2 id="三、线程"><a href="#三、线程" class="headerlink" title="三、线程"></a>三、线程</h2><h4 id="3-1-原因"><a href="#3-1-原因" class="headerlink" title="3.1 原因"></a>3.1 原因</h4><ol>
+<li>开销问题</li>
+<li>内存共享问题(进程间通信，线程间通信)</li>
+</ol>
+<h4 id="3-2-三种线程"><a href="#3-2-三种线程" class="headerlink" title="3.2 三种线程"></a>3.2 三种线程</h4><ol>
+<li>用户线程</li>
+<li>内核线程</li>
+<li>轻量级</li>
+</ol>
+<h4 id="3-3-线程切换"><a href="#3-3-线程切换" class="headerlink" title="3.3 线程切换"></a>3.3 线程切换</h4><p>线程切换时，虚拟内存这些共享的资源就保持不变，只需要切换线程的私有数据、寄存器等不共享的数据；</p>
+<h4 id="3-4-线程与进程对比"><a href="#3-4-线程与进程对比" class="headerlink" title="3.4 线程与进程对比"></a>3.4 线程与进程对比</h4><p>线程相比进程能减少开销，体现在：</p>
+<ul>
+<li>线程的<code>创建快</code>，因为进程在创建的过程中，还需要资源管理信息，比如内存管理信息、文<br>件管理信息，而线程在创建的过程中，不会涉及这些资源管理信息，而是共享它们；</li>
+<li>线程的<code>终止快</code>，因为线程释放的资源相比进程少很多；</li>
+<li>同一个进程内的线程切换比进程<code>切换快</code>，因为线程具有相同的地址空间（虚拟内存共享），这意味着<br>同一个进程的线程都具有同一个⻚表，那么在切换的时候不需要切换⻚表。而对于进程之间的切换，<br>切换的时候要把⻚表给切换掉，而⻚表的切换过程开销是比较大的；</li>
+<li>由于同一进程的各线程间<code>共享内存</code>和文件资源，那么在线程之间数据传递的时候，就不需要经过内核<br>了，这就使得线程之间的数据交互效率更高了；</li>
+</ul>
+<h3 id=""><a href="#" class="headerlink" title=""></a></h3>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/30/java/javaSE/JUC/java%E9%98%BB%E5%A1%9E/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/30/java/javaSE/JUC/java%E9%98%BB%E5%A1%9E/" class="post-title-link" itemprop="url">java阻塞</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-30 00:08:43" itemprop="dateCreated datePublished" datetime="2022-03-30T00:08:43+08:00">2022-03-30</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -378,8 +780,8 @@
       <span class="post-meta-item-text">Changyan：</span>
     
     
-      <a title="changyan" href="/2022/04/08/java/javaSE/JUC/JUC/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/08/java/javaSE/JUC/JUC/" class="cy_cmt_count" data-xid="2022/04/08/java/javaSE/JUC/JUC/" itemprop="commentCount"></span>
+      <a title="changyan" href="/2022/03/30/java/javaSE/JUC/java%E9%98%BB%E5%A1%9E/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/30/java/javaSE/JUC/java%E9%98%BB%E5%A1%9E/" class="cy_cmt_count" data-xid="2022/03/30/java/javaSE/JUC/java阻塞/" itemprop="commentCount"></span>
       </a>
     
   </span>
@@ -390,7 +792,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>679</span>
+              <span>840</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -409,466 +811,286 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>.</p>
-<h2 id="一、线程和进程概念"><a href="#一、线程和进程概念" class="headerlink" title="一、线程和进程概念"></a>一、线程和进程概念</h2><h3 id="1-1-进程与线程"><a href="#1-1-进程与线程" class="headerlink" title="1.1 进程与线程"></a>1.1 进程与线程</h3><ol>
-<li>进程是<strong>分配资源</strong>的基本单元，运行的一个程序</li>
-<li>线程是<strong>cpu调度</strong>的基本单元，程序执行的基本单位</li>
-<li>管程:<ol>
-<li>Monitor、监视器、锁</li>
-<li>同步机制，保证只有一个线程能访问资源</li>
+          <p>·</p>
+<p>挂起：一般是主动的，由系统或程序发出，甚至于辅存中去。（不释放CPU，可能释放内存，放在外存）</p>
+<p>阻塞：一般是被动的，在抢占资源中得不到资源，被动的挂起在内存，等待某种资源或信号量（即有了资源）将他唤醒。（释放CPU，不释放内存）</p>
+<h1 id="浅谈JAVA中的线程阻塞方法"><a href="#浅谈JAVA中的线程阻塞方法" class="headerlink" title="浅谈JAVA中的线程阻塞方法"></a>浅谈JAVA中的线程阻塞方法</h1><ol>
+<li><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/c5715fa91dd8">参考</a></li>
 </ol>
-</li>
-<li>用户线程和守护线程<ol>
-<li>用户线程：普通的线程，main结束了，用户线程还会继续运行</li>
-<li>守护线程：后台默默运行的线程 isDaemon，main结束，收回线程会结束</li>
-</ol>
-</li>
-</ol>
-<h3 id="1-2-线程的状态"><a href="#1-2-线程的状态" class="headerlink" title="1.2 线程的状态"></a>1.2 线程的状态</h3><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220325162011992.png" alt="image-20220325162011992"></p>
-<ol>
-<li>新建</li>
-<li>就绪</li>
-<li>等待</li>
-<li>运行</li>
-<li>死亡</li>
-</ol>
-<h3 id="1-3-wati和sleep"><a href="#1-3-wati和sleep" class="headerlink" title="1.3 wati和sleep"></a>1.3 wati和sleep</h3><ol>
-<li>Object.wait<ol>
-<li>释放锁</li>
-</ol>
-</li>
-<li>Thread.sleep<ol>
-<li>不释放当前锁</li>
-</ol>
-</li>
-</ol>
-<h3 id="1-4-并发和并行"><a href="#1-4-并发和并行" class="headerlink" title="1.4 并发和并行"></a>1.4 并发和并行</h3><ol>
-<li>串行：排队执行</li>
-<li>并行：一并执行</li>
-<li>并发：一个cpu表面上运行多个线程</li>
-<li>并行：多个cpu</li>
-</ol>
-<h3 id="1-5-Lock、synchronize"><a href="#1-5-Lock、synchronize" class="headerlink" title="1.5 Lock、synchronize"></a>1.5 Lock、synchronize</h3><h4 id="1-5-1-synchronize，同步锁"><a href="#1-5-1-synchronize，同步锁" class="headerlink" title="1.5.1 synchronize，同步锁"></a>1.5.1 synchronize，同步锁</h4><ol>
-<li>修饰代码块<ol>
-<li>作用于对象是调用这个代码块的对象</li>
-</ol>
-</li>
-<li>修饰方法<ol>
-<li>被修饰的方法称为同步方法，其</li>
-<li>作用的对象是调用这个方法的对象； </li>
-</ol>
-</li>
-<li>修饰静态方法<ol>
-<li>作用的对象是这个类的所有对象</li>
-</ol>
-</li>
-<li>修饰类<ol>
-<li>作用主的对象是这个类的所有对象</li>
-</ol>
-</li>
-</ol>
-<h4 id="1-5-2-lock和synchronized区别"><a href="#1-5-2-lock和synchronized区别" class="headerlink" title="1.5.2 lock和synchronized区别"></a>1.5.2 lock和synchronized区别</h4><ol>
-<li><p>lock可获得更广泛的锁</p>
-</li>
-<li><p>lock是类，不是java内置</p>
-</li>
-<li><p>lock是手动锁，synchronized是自动锁</p>
-</li>
-<li><p>synchronized发生异常或者结束会自动释放，而lock发生了异常会一直占用锁</p>
-</li>
-<li><p>lock可以判断是否得到了锁</p>
-</li>
-<li><p>lock可以在竞争激烈的情况下提高效率</p>
-</li>
-<li><p>1. </p>
-</li>
-</ol>
-<h3 id="多线程编程步骤"><a href="#多线程编程步骤" class="headerlink" title="多线程编程步骤"></a>多线程编程步骤</h3><ol>
-<li>创建资源类</li>
-<li>资源类的消费和供给方法<ol>
-<li>判断<ol>
-<li>否：wait等待其他线程的natify</li>
-<li>是：干活<ol>
-<li>通知</li>
-</ol>
-</li>
-</ol>
-</li>
-</ol>
-</li>
-<li>创建线程，调用消费、共给方法</li>
-</ol>
-<h2 id="线程间通信"><a href="#线程间通信" class="headerlink" title="线程间通信"></a>线程间通信</h2><h3 id="线程间定制化通信"><a href="#线程间定制化通信" class="headerlink" title="线程间定制化通信"></a>线程间定制化通信</h3><ol>
-<li>标志位</li>
-</ol>
-<h3 id="特殊"><a href="#特殊" class="headerlink" title="特殊"></a>特殊</h3><ol>
-<li>wait 需要用while循环放置虚假唤醒</li>
-</ol>
-<h3 id="疑惑"><a href="#疑惑" class="headerlink" title="疑惑"></a>疑惑</h3><ol>
-<li>lock原理</li>
-<li>wait</li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/08/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DML/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/04/08/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DML/" class="post-title-link" itemprop="url">DML数据库，操纵语言</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-04-08 03:20:27" itemprop="dateCreated datePublished" datetime="2022-04-08T03:20:27+08:00">2022-04-08</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/sql%E8%AF%AD%E5%8F%A5/" itemprop="url" rel="index"><span itemprop="name">sql语句</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/04/08/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DML/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/08/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DML/" class="cy_cmt_count" data-xid="2022/04/08/数据库/sql/DML/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>2.1k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>[toc]</p>
-<h3 id="一、Select"><a href="#一、Select" class="headerlink" title="一、Select"></a>一、Select</h3><h4 id="1-1-where-like-and-or-between-in"><a href="#1-1-where-like-and-or-between-in" class="headerlink" title="1.1 where  like  and  or  between  in"></a>1.1 where  like  and  or  between  in</h4><ol>
-<li><p>select * from name where  age &lt;&gt; 18; 查询年龄不等于18的人</p>
-</li>
-<li><p>select * from name where age&gt;18 and sex=’男’ </p>
-</li>
-<li><p>update name set age =18 where not id =10;  按条件修改</p>
-</li>
-<li><p>select * from name where age between 4 and 10; 查询4-10岁  前闭后开</p>
-</li>
-<li><p>select * from name where age in (3,4,10)  查询3，4，10 岁数据</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/04/08/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DML/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/08/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DDL/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/04/08/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DDL/" class="post-title-link" itemprop="url">DDL数据库定义语言</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-04-08 01:45:00" itemprop="dateCreated datePublished" datetime="2022-04-08T01:45:00+08:00">2022-04-08</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/sql%E8%AF%AD%E5%8F%A5/" itemprop="url" rel="index"><span itemprop="name">sql语句</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/04/08/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DDL/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/08/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DDL/" class="cy_cmt_count" data-xid="2022/04/08/数据库/sql/DDL/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>[TOC]</p>
-<h2 id="一、创建"><a href="#一、创建" class="headerlink" title="一、创建"></a>一、创建</h2><h3 id="1-1-库"><a href="#1-1-库" class="headerlink" title="1.1 库"></a>1.1 库</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> database a <span class="keyword">default</span> <span class="type">character</span> <span class="keyword">set</span> utf8mb4 <span class="keyword">collate</span> utf8mb4_unicode_ci;</span><br></pre></td></tr></table></figure>
-
-<h3 id="1-2-表"><a href="#1-2-表" class="headerlink" title="1.2 表"></a>1.2 表</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> Persons(</span><br><span class="line">    id <span class="type">int</span> <span class="keyword">NOT</span> <span class="keyword">NULL</span> AUTO_INCREMENT,</span><br><span class="line">	name <span class="type">varchar</span>(<span class="number">255</span>) <span class="keyword">NOT</span> <span class="keyword">NULL</span>,</span><br><span class="line">	city <span class="type">varchar</span>(<span class="number">255</span>),</span><br><span class="line">	<span class="keyword">PRIMARY</span> KEY (ID)	</span><br><span class="line">)ENGINE<span class="operator">=</span>INNODB  <span class="keyword">DEFAULT</span> CHARSET<span class="operator">=</span>utf8 ;</span><br><span class="line"></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> test (name <span class="type">varchar</span>(<span class="number">20</span>),age <span class="type">int</span>(<span class="number">2</span>) <span class="keyword">PRIMARY</span> key auto_increment) auto_increment<span class="operator">=</span><span class="number">2</span> ;</span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> test (name <span class="type">varchar</span>(<span class="number">20</span>),age <span class="type">int</span>(<span class="number">2</span>)  auto_increment ,<span class="keyword">unique</span>(age) ,key(name));</span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/04/08/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DDL/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/08/spring/springMaster/%E5%A4%9A%E6%95%B0%E6%8D%AE%E6%BA%90/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/04/08/spring/springMaster/%E5%A4%9A%E6%95%B0%E6%8D%AE%E6%BA%90/" class="post-title-link" itemprop="url">多数据源</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-04-08 00:30:59" itemprop="dateCreated datePublished" datetime="2022-04-08T00:30:59+08:00">2022-04-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-05-05 11:57:26" itemprop="dateModified" datetime="2022-05-05T11:57:26+08:00">2022-05-05</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/spring/springMaster/" itemprop="url" rel="index"><span itemprop="name">springMaster</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/04/08/spring/springMaster/%E5%A4%9A%E6%95%B0%E6%8D%AE%E6%BA%90/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/08/spring/springMaster/%E5%A4%9A%E6%95%B0%E6%8D%AE%E6%BA%90/" class="cy_cmt_count" data-xid="2022/04/08/spring/springMaster/多数据源/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>2.1k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>[toc]</p>
 <blockquote>
-<p><strong>关键：指定MapperScan的SqlSessionRef</strong></p>
-<p>这里提前注入了sqlsessionFactory</p>
+<p>如果线程是因为调用了wait()、sleep()或者join()方法而导致的阻塞，可以中断线程，并且通过抛出InterruptedException来唤醒它;如果线程遇到了IO阻塞，无能为力，因为IO是操作系统实现的，Java代码并没有办法直接接触到操作系统。以下是详细的唤醒方法：</p>
 </blockquote>
-<h3 id="大致步骤"><a href="#大致步骤" class="headerlink" title="大致步骤"></a>大致步骤</h3><ol>
-<li>再yml中配置两个druid连接池的参数(type,url,password)</li>
-<li>在configruation中配置两个@Bean，每个bea注入不同的druid连接池参数</li>
-</ol>
-<h3 id="Mapper的对应关系"><a href="#Mapper的对应关系" class="headerlink" title="Mapper的对应关系"></a>Mapper的对应关系</h3><p>首先拥有两个文件/类</p>
+<ol>
+<li><p>sleep() 方法</p>
+<p>sleep(毫秒)，指定以毫秒为单位的时间，使线程在该时间内进入线程阻塞状态，期间得不到cpu的时间片，等到时间过去了，线程重新进入可执行状态。(暂停线程，不会释放锁)</p>
+</li>
+<li><p>suspend() 和 resume() 方法</p>
+<p>挂起和唤醒线程，suspend()使线程进入阻塞状态，只有对应的resume()被调用的时候，线程才会进入可执行状态。(不建议用，容易发生死锁)</p>
+</li>
+<li><p>yield() 方法</p>
+<p>会使的线程放弃当前分得的cpu时间片，进入<code>就绪</code>状态，接下来和平竞争，可能又直接进入<code>运行</code>状态。</p>
+</li>
+<li><p>wait() 和 notify() 方法</p>
 <ul>
-<li><p>resources/mapper/mysql.mapper </p>
+<li><p>wait()，线程进入<code>阻塞</code>状态</p>
+<p>notify()，线程进入<code>就绪</code>状态。</p>
 </li>
-<li><p>resources/mapper/oracle.mapper</p>
-<p>这两个mapper文件的namespace对应不同的mapper.class</p>
+<li><p>wait()内可加或不加参数，加参数时是以毫秒为单位，当到了指定时间或调用notify()方法时，进入就绪状态。</p>
 </li>
-<li><p>com.wyg.mapper.MysqlMapper.class</p>
-</li>
-<li><p>com.wyg.mapper.OracleMapper.class</p>
-</li>
-<li></li>
 </ul>
-<h3 id="application-yml"><a href="#application-yml" class="headerlink" title="application.yml"></a>application.yml</h3><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#spring.datasource.druid.</span></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">datasource:</span></span><br><span class="line">    <span class="attr">druid:</span></span><br><span class="line"></span><br><span class="line">      <span class="comment"># 数据库访问配置, 使用druid数据源</span></span><br><span class="line">      <span class="comment"># 数据源1 mysql</span></span><br><span class="line">      <span class="attr">mysql:</span></span><br><span class="line">        <span class="attr">type:</span> <span class="string">com.alibaba.druid.pool.DruidDataSource</span></span><br><span class="line">        <span class="attr">driver-class-name:</span> <span class="string">com.mysql.jdbc.Driver</span></span><br><span class="line">        <span class="attr">url:</span> <span class="string">jdbc:mysql://localhost:3306/test?useUnicode=true&amp;characterEncoding=UTF-8&amp;rewriteBatchedStatements=true&amp;autoReconnect=true&amp;failOverReadOnly=false&amp;zeroDateTimeBehavior=convertToNull</span></span><br><span class="line">        <span class="attr">username:</span> <span class="string">root</span></span><br><span class="line">        <span class="attr">password:</span> <span class="number">123456</span></span><br><span class="line">      <span class="comment"># 数据源2 oracle</span></span><br><span class="line">      <span class="attr">oracle:</span> </span><br><span class="line">        <span class="attr">type:</span> <span class="string">com.alibaba.druid.pool.DruidDataSource</span></span><br><span class="line">        <span class="attr">driver-class-name:</span> <span class="string">oracle.jdbc.driver.OracleDriver</span></span><br><span class="line">        <span class="attr">url:</span> <span class="string">jdbc:oracle:thin:@localhost:1521:ORCL</span></span><br><span class="line">        <span class="attr">username:</span> <span class="string">test</span></span><br><span class="line">        <span class="attr">password:</span> <span class="number">123456</span></span><br><span class="line">        </span><br><span class="line">      <span class="comment"># 连接池配置</span></span><br><span class="line">      <span class="attr">initial-size:</span> <span class="number">5</span></span><br><span class="line">      <span class="attr">min-idle:</span> <span class="number">5</span></span><br><span class="line">      <span class="attr">max-active:</span> <span class="number">20</span></span><br><span class="line">      <span class="comment"># 连接等待超时时间</span></span><br><span class="line">      <span class="attr">max-wait:</span> <span class="number">30000</span></span><br><span class="line">      <span class="comment"># 配置检测可以关闭的空闲连接间隔时间</span></span><br><span class="line">      <span class="attr">time-between-eviction-runs-millis:</span> <span class="number">60000</span></span><br><span class="line">      <span class="comment"># 配置连接在池中的最小生存时间</span></span><br><span class="line">      <span class="attr">min-evictable-idle-time-millis:</span> <span class="number">300000</span></span><br><span class="line">      <span class="attr">validation-query:</span> <span class="string">select</span> <span class="string">&#x27;1&#x27;</span> <span class="string">from</span> <span class="string">dual</span></span><br><span class="line">      <span class="attr">test-while-idle:</span> <span class="literal">true</span></span><br><span class="line">      <span class="attr">test-on-borrow:</span> <span class="literal">false</span></span><br><span class="line">      <span class="attr">test-on-return:</span> <span class="literal">false</span></span><br><span class="line">      <span class="comment"># 打开PSCache，并且指定每个连接上PSCache的大小</span></span><br><span class="line">      <span class="attr">pool-prepared-statements:</span> <span class="literal">true</span></span><br><span class="line">      <span class="attr">max-open-prepared-statements:</span> <span class="number">20</span></span><br><span class="line">      <span class="attr">max-pool-prepared-statement-per-connection-size:</span> <span class="number">20</span></span><br><span class="line">      <span class="comment"># 配置监控统计拦截的filters, 去掉后监控界面sql无法统计, &#x27;wall&#x27;用于防火墙</span></span><br><span class="line">      <span class="attr">filters:</span> <span class="string">stat,wall</span></span><br><span class="line">      <span class="comment"># Spring监控AOP切入点，如x.y.z.service.*,配置多个英文逗号分隔</span></span><br><span class="line">      <span class="attr">aop-patterns:</span> <span class="string">com.springboot.servie.*</span></span><br><span class="line">      </span><br><span class="line">    </span><br><span class="line">      <span class="comment"># WebStatFilter配置</span></span><br><span class="line">      <span class="attr">web-stat-filter:</span></span><br><span class="line">        <span class="attr">enabled:</span> <span class="literal">true</span></span><br><span class="line">        <span class="comment"># 添加过滤规则</span></span><br><span class="line">        <span class="attr">url-pattern:</span> <span class="string">/*</span></span><br><span class="line">        <span class="comment"># 忽略过滤的格式</span></span><br><span class="line">        <span class="attr">exclusions:</span> <span class="string">&#x27;*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*&#x27;</span></span><br><span class="line">      </span><br><span class="line">      <span class="comment"># StatViewServlet配置 </span></span><br><span class="line">      <span class="attr">stat-view-servlet:</span></span><br><span class="line">        <span class="attr">enabled:</span> <span class="literal">true</span></span><br><span class="line">        <span class="comment"># 访问路径为/druid时，跳转到StatViewServlet</span></span><br><span class="line">        <span class="attr">url-pattern:</span> <span class="string">/druid/*</span></span><br><span class="line">        <span class="comment"># 是否能够重置数据</span></span><br><span class="line">        <span class="attr">reset-enable:</span> <span class="literal">false</span></span><br><span class="line">        <span class="comment"># 需要账号密码才能访问控制台</span></span><br><span class="line">        <span class="attr">login-username:</span> <span class="string">druid</span></span><br><span class="line">        <span class="attr">login-password:</span> <span class="string">druid123</span></span><br><span class="line">        <span class="comment"># IP白名单</span></span><br><span class="line">        <span class="comment"># allow: 127.0.0.1</span></span><br><span class="line">        <span class="comment">#　IP黑名单（共同存在时，deny优先于allow）</span></span><br><span class="line">        <span class="comment"># deny: 192.168.1.218</span></span><br><span class="line">      </span><br><span class="line">      <span class="comment"># 配置StatFilter</span></span><br><span class="line">      <span class="attr">filter:</span> </span><br><span class="line">        <span class="attr">stat:</span> </span><br><span class="line">          <span class="attr">log-slow-sql:</span> <span class="literal">true</span> </span><br></pre></td></tr></table></figure>
+</li>
+<li><p>join()方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">doSome();</span><br><span class="line">B.join();</span><br><span class="line">doSome();</span><br></pre></td></tr></table></figure>
 
-<h3 id="stat-view"><a href="#stat-view" class="headerlink" title="stat-view"></a>stat-view</h3><h3 id="servlet的作用"><a href="#servlet的作用" class="headerlink" title="-servlet的作用"></a>-servlet的作用</h3>
+
+
+<p>是当前线程A调用另一个线程B的join()方法，当前线程转A入阻塞状态，直到线程B运行结束，线程A才由阻塞状态转为可执行状态。</p>
+</li>
+<li><p>以上是Java线程唤醒和阻塞的五种常用方法，不同的方法有不同的特点，其中wait() 和 notify()是其中功能最强大、使用最灵活的方法，但这也导致了它们效率较低、较容易出错的特性，因此，在实际应用中应灵活运用各种方法，以达到期望的目的与效果!</p>
+</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/29/java/java%E7%BB%84%E4%BB%B6/NIO/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/29/java/java%E7%BB%84%E4%BB%B6/NIO/" class="post-title-link" itemprop="url">NIO</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-29 02:49:21" itemprop="dateCreated datePublished" datetime="2022-03-29T02:49:21+08:00">2022-03-29</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java%E9%AB%98%E7%BA%A7/" itemprop="url" rel="index"><span itemprop="name">java高级</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/29/java/java%E7%BB%84%E4%BB%B6/NIO/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/29/java/java%E7%BB%84%E4%BB%B6/NIO/" class="cy_cmt_count" data-xid="2022/03/29/java/java组件/NIO/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>[toc]</p>
+<h2 id="一、IO概述"><a href="#一、IO概述" class="headerlink" title="一、IO概述"></a>一、IO概述</h2><ol>
+<li>同步阻塞IO-面向流-BIO<ol>
+<li>一个请求连接一个线程，</li>
+<li>问题：需要创建很多的线程，所有的线程还是同步的</li>
+<li>解决：线程池，但是线程池数量有上限</li>
+<li>适合请求少的场景，程序简单</li>
+</ol>
+</li>
+<li>同步非阻塞IO-多路复用器-NIO<ol>
+<li>一个线程可以处理多个请求</li>
+<li>selector 选择器(复用器)</li>
+<li>适合请求多，请求时间短：聊天，弹幕</li>
+</ol>
+</li>
+<li>异步非阻塞IO–AIO(NIO2.0)<ol>
+<li>一个请求一个线程</li>
+<li>适合请求较多，且请求时间长场景</li>
+</ol>
+</li>
+</ol>
+<h2 id="二、BIO"><a href="#二、BIO" class="headerlink" title="二、BIO"></a>二、BIO</h2><ol>
+<li>java.io</li>
+</ol>
+<h3 id="2-1-一对一"><a href="#2-1-一对一" class="headerlink" title="2.1 一对一"></a>2.1 一对一</h3><blockquote>
+<p>服务端只有一个线程，只能处理唯一一个请求</p>
+</blockquote>
+<h4 id="2-1-1-服务端"><a href="#2-1-1-服务端" class="headerlink" title="2.1.1 服务端"></a>2.1.1 服务端</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">ServerSocket serverSocket=<span class="keyword">new</span> ServerSocket(<span class="number">8888</span>);</span><br><span class="line"><span class="comment">//开启监听</span></span><br><span class="line">Socket accept = serverSocket.accept();</span><br><span class="line"><span class="comment">//从socket获得流</span></span><br><span class="line">InputStream inputStream = accept.getInputStream();</span><br><span class="line"><span class="comment">//包装缓冲区</span></span><br><span class="line">String msg= FileUtil.readFile(inputStream);</span><br><span class="line">System.out.println(msg);</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-1-2-客户端"><a href="#2-1-2-客户端" class="headerlink" title="2.1.2 客户端"></a>2.1.2 客户端</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">Socket socket=<span class="keyword">new</span> Socket(<span class="string">&quot;127.0.0.1&quot;</span>,<span class="number">8888</span>);</span><br><span class="line"><span class="comment">//获得输出流</span></span><br><span class="line">OutputStream outputStream = socket.getOutputStream();</span><br><span class="line">PrintWriter printWriter=<span class="keyword">new</span> PrintWriter(outputStream);</span><br><span class="line">Scanner scanner=<span class="keyword">new</span> Scanner(System.in);</span><br><span class="line"><span class="keyword">while</span> (<span class="keyword">true</span>)&#123;</span><br><span class="line">    System.out.print(<span class="string">&quot;发送:&quot;</span>);</span><br><span class="line">    String s = scanner.nextLine();</span><br><span class="line">    <span class="keyword">if</span>(s.equals(<span class="string">&quot;-1&quot;</span>))</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    printWriter.println(s);</span><br><span class="line">    printWriter.flush();</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-多对多"><a href="#2-2-多对多" class="headerlink" title="2.2 多对多"></a>2.2 多对多</h3><blockquote>
+<p>每个请求创建一个线程去处理请求</p>
+</blockquote>
+<h4 id="2-2-1-服务端"><a href="#2-2-1-服务端" class="headerlink" title="2.2.1 服务端"></a>2.2.1 服务端</h4><h4 id="2-2-2-客户端"><a href="#2-2-2-客户端" class="headerlink" title="2.2.2 客户端"></a>2.2.2 客户端</h4><h4 id="2-2-3-缺陷"><a href="#2-2-3-缺陷" class="headerlink" title="2.2.3 缺陷"></a>2.2.3 缺陷</h4><ol>
+<li>每个请求都创建线程，线程的切换、竞争会浪费资源</li>
+<li>线程本身也占用cpu资源</li>
+<li>并不是每个请求线程</li>
+</ol>
+<h3 id="2-3-伪异步"><a href="#2-3-伪异步" class="headerlink" title="2.3 伪异步"></a>2.3 伪异步</h3><ul>
+<li>优：创建线程池，能避免创建线程的资源消耗问题</li>
+<li>缺：底层还是阻塞的，如果请求处理较慢，那么新的请求就会长时间的再请求队列中，产生大量超时</li>
+<li>适应：小批量，请求处理快速的场景</li>
+</ul>
+<h3 id="BIO总结"><a href="#BIO总结" class="headerlink" title="BIO总结"></a>BIO总结</h3><ol>
+<li><p>发送</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dataOutputStream.flush();</span><br></pre></td></tr></table></figure></li>
+<li><p>发送结束声明</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socket.shutdownOutput();</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="三、NIO"><a href="#三、NIO" class="headerlink" title="三、NIO"></a>三、NIO</h2><h3 id="3-1-NIO概述"><a href="#3-1-NIO概述" class="headerlink" title="3.1 NIO概述"></a>3.1 NIO概述</h3><h4 id="3-1-1-基本概念"><a href="#3-1-1-基本概念" class="headerlink" title="3.1.1 基本概念"></a>3.1.1 基本概念</h4><ol>
+<li>since JDK1.4</li>
+<li>基于通道的非阻塞IO，IO复用</li>
+<li>支持面向缓冲区</li>
+</ol>
+<h4 id="3-1-2-三大核心组件"><a href="#3-1-2-三大核心组件" class="headerlink" title="3.1.2 三大核心组件"></a>3.1.2 三大核心组件</h4><ol>
+<li>Channel 通道</li>
+<li>Buffer 缓冲区</li>
+<li>Selector 选择器(多路复用器)<ol>
+<li>轮询每个通道</li>
+</ol>
+</li>
+</ol>
+<h4 id="3-1-3-非阻塞模式"><a href="#3-1-3-非阻塞模式" class="headerlink" title="3.1.3 非阻塞模式"></a>3.1.3 非阻塞模式</h4><p>一个线程可以同时处理很多请求，基于监听器</p>
+<h4 id="3-1-4-NIO模型图"><a href="#3-1-4-NIO模型图" class="headerlink" title="3.1.4 NIO模型图"></a>3.1.4 NIO模型图</h4><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211207225509511.png" alt="image-20211207225509511"></p>
+<h4 id="3-1-5-NIO-vs-BIO"><a href="#3-1-5-NIO-vs-BIO" class="headerlink" title="3.1.5 NIO  vs  BIO"></a>3.1.5 NIO  vs  BIO</h4><table>
+<thead>
+<tr>
+<th>BIO</th>
+<th>NIO</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>数据流(字节，字符)</td>
+<td>数据块(缓冲区，通道)</td>
+</tr>
+<tr>
+<td>流：单向</td>
+<td>通道：双向</td>
+</tr>
+<tr>
+<td>阻塞</td>
+<td>非阻塞</td>
+</tr>
+<tr>
+<td>一个请求需要一个线程</td>
+<td>一个线程处理处理多个请求(选择器监听)</td>
+</tr>
+</tbody></table>
+<h3 id="3-2-Buffer"><a href="#3-2-Buffer" class="headerlink" title="3.2 Buffer"></a>3.2 Buffer</h3><h4 id="3-2-2-Buffer属性"><a href="#3-2-2-Buffer属性" class="headerlink" title="3.2.2 Buffer属性"></a>3.2.2 Buffer属性</h4><ol>
+<li>容量：数组大小,不可更改<ol>
+<li>通过allocate分配</li>
+</ol>
+</li>
+<li>限制：可操作的最后位置<ol>
+<li>读：表示有数据的最后位置</li>
+<li>写：表示容量</li>
+</ol>
+</li>
+<li>位置：写入、读取的当前位置索引<ol>
+<li>标记：mark该位置</li>
+<li>重置：重置到mark位置</li>
+</ol>
+</li>
+</ol>
+<h4 id="3-2-3-Buffer-Api"><a href="#3-2-3-Buffer-Api" class="headerlink" title="3.2.3 Buffer Api"></a>3.2.3 Buffer Api</h4><ol>
+<li>clear 清空缓存区</li>
+<li>flip：转换成可读模式</li>
+<li>Remaining：获得缓冲区长度</li>
+<li>hasRemaining：是否有数据</li>
+<li>rewind：将位置置0清除mark</li>
+</ol>
+<h4 id="3-2-4-缓冲区分类"><a href="#3-2-4-缓冲区分类" class="headerlink" title="3.2.4 缓冲区分类"></a>3.2.4 缓冲区分类</h4><h5 id="3-2-4-1-直接缓冲区"><a href="#3-2-4-1-直接缓冲区" class="headerlink" title="3.2.4.1 直接缓冲区"></a>3.2.4.1 直接缓冲区</h5><blockquote>
+<p>写入到直接内存，高并发场景</p>
+</blockquote>
+<h5 id="3-2-4-2-非直接缓冲区"><a href="#3-2-4-2-非直接缓冲区" class="headerlink" title="3.2.4.2 非直接缓冲区"></a>3.2.4.2 非直接缓冲区</h5><blockquote>
+<p>写入堆内存</p>
+</blockquote>
+<h3 id="3-3-Channel"><a href="#3-3-Channel" class="headerlink" title="3.3 Channel"></a>3.3 Channel</h3><blockquote>
+<p>Channel代表这一个网络连接通道，当Channel注册到Selector后会返回一个SelectionKey对象，该SelectionKey对象则代表这这个Channel和它注册的Selector间的关系。并且SelectionKey中维护着两个很重要的属性：interestOps、readyOps。</p>
+<p>interestOps是我们希望Selector监听Channel的哪些事件。我们将我们感兴趣的事件设置到该字段，这样在selection操作时，当发现该Channel有我们所<strong>感兴趣的事件</strong>发生时，就会将我们感兴趣的事件再设置到readyOps中，这样我们就能得知是哪些事件发生了以做相应处理。 </p>
+</blockquote>
+<h4 id="3-3-1-特点"><a href="#3-3-1-特点" class="headerlink" title="3.3.1 特点"></a>3.3.1 特点</h4><ol>
+<li>双向的</li>
+<li>不能直接数据交互，需借助buffer</li>
+<li>异步读写</li>
+</ol>
+<h4 id="3-3-2-Channel实现"><a href="#3-3-2-Channel实现" class="headerlink" title="3.3.2 Channel实现"></a>3.3.2 Channel实现</h4><ol>
+<li>FileChannel 文件</li>
+<li>DatagramChannel  UDP</li>
+<li>SocketChannel  TCP</li>
+<li>ServerSockeChannel  监听Web的TCP连接，每一个连接创建一个Channel</li>
+</ol>
+<h3 id="3-4-Selector"><a href="#3-4-Selector" class="headerlink" title="3.4 Selector"></a>3.4 Selector</h3><blockquote>
+<p>选择器，Selector是NIO中实现I/O多路复用的关键类。Selector实现了通过一个线程管理多个Channel，从而管理多个网络连接的目的，</p>
+</blockquote>
+<h4 id="3-4-1-工作方式"><a href="#3-4-1-工作方式" class="headerlink" title="3.4.1 工作方式"></a>3.4.1 工作方式</h4><blockquote>
+<p>多个 Channel 以事件的方式可以注册到同一个Selector，如果有事件发生，便获取事件然后针对每个事件进行相应的处理。这样就可以只用<strong>一个单线程</strong>去管理<strong>多个通道</strong>，也就是管理多个连接和请求。避免了多线程之间的上下文切换导致的开销</p>
+</blockquote>
+<h4 id="3-4-2-选择器作用"><a href="#3-4-2-选择器作用" class="headerlink" title="3.4.2 选择器作用"></a>3.4.2 选择器作用</h4><ol>
+<li>轮询Channel选出可用的Channel</li>
+</ol>
+<h3 id="3-5-Reactor模式"><a href="#3-5-Reactor模式" class="headerlink" title="3.5 Reactor模式"></a>3.5 Reactor模式</h3><ol>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/93612337">参考</a></li>
+</ol>
+
       
     </div>
 
@@ -1005,12 +1227,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">335k</span>
+    <span title="站点总字数">340k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">5:04</span>
+    <span title="站点阅读时长">5:09</span>
 </div>
 
         
