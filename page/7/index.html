@@ -187,6 +187,300 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%97%A5%E5%BF%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%97%A5%E5%BF%97/" class="post-title-link" itemprop="url">mysql-log</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-04-10 14:43:32" itemprop="dateCreated datePublished" datetime="2022-04-10T14:43:32+08:00">2022-04-10</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%97%A5%E5%BF%97/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%97%A5%E5%BF%97/" class="cy_cmt_count" data-xid="2022/04/10/数据库/日志/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/cswiki/p/15816371.html">转载</a></p>
+<h2 id="binlog-持久化"><a href="#binlog-持久化" class="headerlink" title="binlog 持久化"></a>binlog 持久化</h2><p>这里引入了一个新的概念：binlog cache</p>
+<p>从名字就能看出来，binlog cache 其实就是一片内存区域，充当缓存的作用。</p>
+<p>每个线程都有自己 binlog cache 区域，<strong>在事务运行的过程中，MySQL 会先把日志写到 binlog cache 中，等到事务真正提交的时候，再统一把 binlog cache 中的数据写到 binlog 文件中</strong>。（binlog cache 有很多个，binlog 文件只有一个！）</p>
+<p>事实上，这个从 binlog cache 写到 binlog 文件中的操作，并<strong>不</strong>就是落盘操作了，这里仅仅是把 binlog 写到了文件系统的 page cache 上（这一步对应下图中的 <code>write</code> 操作）。</p>
+<blockquote>
+<p>简单解释下文件系统的 page cache：</p>
+<p>CPU 如果要访问外部磁盘上的文件，需要首先将这些文件的内容拷贝到内存中，由于硬件的限制，从磁盘到内存的数据传输速度是很慢的，如果现在物理内存有空余，干嘛不用这些空闲内存来缓存一些磁盘的文件内容呢，<strong>这部分用作缓存磁盘文件的内存就叫做 page cache</strong>。</p>
+<p>很多同学看到这里可能觉得特别特别熟悉，是的，和 CPU 里的高速缓存是不是很像？两者其实都是利用的局部性原理，只不过<strong>高速缓存是 CPU 缓存内存的数据，而 page cache 是内存缓存磁盘的数据</strong>，这也体现了操作系统内存层次结构分级的思想。</p>
+</blockquote>
+<p>所以，最后需要把 page cache 中的数据同步到磁盘上，才算真正完成了 binlog 的持久化（这一步对应下图中的 <code>fsync</code> 操作）。一般情况下，我们认为 <code>fsync</code> 才占磁盘的 IOPS (Input/Output Operations Per Second)</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220410143626228.png" alt="image-20220410143626228"></p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">write 和 fsync 的时机，是由参数 sync_binlog 控制的：</span><br><span class="line"></span><br><span class="line">sync_binlog = <span class="number">0</span>，每次提交事务的时候，只进行 write，不进行 fsync</span><br><span class="line">sync_binlog = <span class="number">1</span>候，每次提交事务的时候，执行 write 和 fsync</span><br><span class="line">sync_binlog = N(N&gt;<span class="number">1</span>)，每次提交事务的时候，执行 write，累积 N 个事务后再执行 fsync</span><br><span class="line">可以看出来，如果业务场景涉及到的 IO 操作很多的话，可以适当增大 sync_binlog 的值，提高性能。但是也存在一定的风险，比如你设置成 <span class="number">100</span>，万一在第 <span class="number">80</span> 个事务提交的时候数据库宕机了，那这些事务的 binlog 日志由于没有执行 fsync，也就丢失了。</span><br></pre></td></tr></table></figure>
+
+<h2 id="redolog-持久化"><a href="#redolog-持久化" class="headerlink" title="redolog 持久化"></a>redolog 持久化</h2><p>类比 binlog，在事务执行过程中，binlog 都是存在 binlog cache 中，redolog 也有这样一块内存区域，叫作 <strong>redolog buffer</strong>。</p>
+<p><strong>在事务运行的过程中，MySQL 会先把日志写到 redolog buffer 中，等到事务真正提交的时候，再统一把 redolog buffer 中的数据写到 redolog 文件中</strong>。和 binlog 的落盘操作一样，这个从 redolog buffer 写到 redolog 文件中的操作，并<strong>不</strong>就是落盘操作了，这里仅仅是把 redolog 写到了文件系统的 page cache 上，最后还需要执行 <code>fsync</code> 才能够实现真正的落盘。</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220410143800256.png" alt="image-20220410143800256"></p>
+<p>解释下 redo log buffer？</p>
+<p>在一个事务的更新过程中，日志是要写多次的。比如下面这个事务：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">begin</span>;</span><br><span class="line">	<span class="keyword">insert</span> <span class="keyword">into</span> table1 ...</span><br><span class="line">	<span class="keyword">insert</span> <span class="keyword">into</span> table2 ...</span><br><span class="line"><span class="keyword">commit</span>;</span><br></pre></td></tr></table></figure>
+
+<p>这个事务要往两个表 table1 和 table2 中插入记录，为了确保这个事务不被拆开，一次性的完整写入日志文件中，在插入数据的过程中，我们需要把生成的日志都先保存起来。redolog buffer 就是这么一个用来先存 redo 日志的地方。</p>
+<p>也就是说，在执行第一条 insert 语句的时候，redolog buffer 也就写入了这条记录的日志。</p>
+<p>不同于 binlog cache 每个线程都有一个，<strong>redolog buffer 只有那么一个</strong>。</p>
+<p>事实上，日志写到 redolog buffer 是很快的，wirte 到 page cache 也差不多，但是 fsync 持久化到磁盘的速度就慢多了，为了控制 redo log 的写入策略，InnoDB 提供了 <code>innodb_flush_log_at_trx_commit</code> 参数，它有三种可能取值：</p>
+<ul>
+<li><code>innodb_flush_log_at_trx_commit = 0</code>，每次事务提交的时候，都只是把 redolog 留在 redolog buffer 中</li>
+<li><code>innodb_flush_log_at_trx_commit = 1</code>，每次事务提交的时候，都执行 fsync 将 redolog 直接持久化到磁盘</li>
+<li><code>innodb_flush_log_at_trx_commit = 2</code>，每次事务提交的时候，都只执行 write 将 redolog 写到文件系统的 page cache 中</li>
+</ul>
+<p>说了这么多，各位小伙伴们对 binlog 和 redolog 的持久化机制想必都有所了解了，我们来看文题：<strong>事务还没提交的时候，redolog 能不能被持久化到磁盘呢</strong>？</p>
+<p>先说答案，答案就是<strong>有可能</strong>。</p>
+<p>分析下 redolog 可能存在的三种状态（binlog 也差不多）：</p>
+<ul>
+<li>事务执行过程中，存在 MySQL 的进程内存中的 redolog buffer 中</li>
+<li>事务提交，执行 write 操作存在文件系统的 page cache 中，但是没有执行 fsync 操作持久化到磁盘</li>
+<li>事务提交，执行 fsync 操作持久化到磁盘</li>
+</ul>
+<p>至于为什么说事务还没提交的时候，redolog 也有可能被持久化到磁盘呢？</p>
+<p>InnoDB 有一个后台线程，每隔 1 秒轮询一次，具体的操作是这样的：</p>
+<ol>
+<li>调用 write 将 redolog buffer 中的日志写到文件系统的 page cache，</li>
+<li>然后调用 fsync 持久化到磁盘。而在事务执行中间过程的 redolog 都是直接写在 redolog buffer 中的，也就是说，一个没有提交的事务的 redolog，也是有可能会被后台线程一起持久化到磁盘的。</li>
+</ol>
+<p>另外，除了后台线程每秒一次的轮询操作外，还有两种场景会让一个没有提交的事务的 redolog 写盘：</p>
+<ol>
+<li><p>innodb_flush_log_at_trx_commit 设置是 1，这样并行的某个事务提交的时候，就会顺带将这个事务的 redolog buffer 持久化到磁盘</p>
+<p>举个例子，假设事务 A 执行到一半，已经写了一些 redolog 到 redolog buffer 中，这时候有另外一个事务 B 提交，按照 innodb_flush_log_at_trx_commit = 1 的逻辑，事务 B 要把 redolog buffer 里的日志全部持久化到磁盘，这时候，就会带上事务 A 在 redolog buffer 里的日志一起持久化到磁盘</p>
+</li>
+<li><p>redo log buffer 占用的空间达到 redolo buffer 大小（由参数 <code>innodb_log_buffer_size</code> 控制，默认是 8MB）一半的时候，后台线程会主动写盘。不过由于这个事务并没有提交，所以这个写盘动作只是 write 到了文件系统的 page cache，仍然是在内存中，并没有调用 fsync 真正落盘</p>
+</li>
+</ol>
+<hr>
+<p>最后放上这道题的背诵版：</p>
+<blockquote>
+<p>🥸 <strong>面试官</strong>：</p>
+<ul>
+<li>问题：事务还没提交的时候，redo log 能不能被持久化到磁盘呢？</li>
+<li>相关问题：MySQL 是如何保证数据不丢失的呢？</li>
+</ul>
+<p>😎 <strong>小牛肉</strong>：事务还没有提交的时候，redo log 是有可能被持久化到磁盘的。</p>
+<p>redolog 的具体落盘操作是这样的：在事务运行的过程中，MySQL 会先把日志写到 redolog buffer 中，等到事务真正提交的时候，再统一把 redolog buffer 中的数据写到 redolog 文件中。不过这个从 redolog buffer 写到 redolog 文件中的操作也就是 write 并不就是落盘操作了，这里仅仅是把 redolog 写到了文件系统的 page cache 上，最后还需要执行 fsync 才能够实现真正的落盘。</p>
+<p>也就是说，redolog 其实存在三种状态：</p>
+<ul>
+<li>事务执行过程中，存在 MySQL 的进程内存中的 redolog buffer 中</li>
+<li>事务提交，执行 write 操作存在文件系统的 page cache 中，但是没有执行 fsync 操作持久化到磁盘</li>
+<li>事务提交，执行 fsync 操作持久化到磁盘</li>
+</ul>
+<p>额为什么说事务还没提交的时候，redolog 也有可能被持久化到磁盘呢？</p>
+<p>主要有三种可能的原因：</p>
+<ol>
+<li>第一种情况：InnoDB 有一个后台线程，每隔 1 秒轮询一次，具体的操作是这样的：调用 write 将 redolog buffer 中的日志写到文件系统的 page cache，然后调用 fsync 持久化到磁盘。而在事务执行中间过程的 redolog 都是直接写在 redolog buffer 中的，也就是说，一个没有提交的事务的 redolog，也是有可能会被后台线程一起持久化到磁盘的。</li>
+<li>第二种情况：innodb_flush_log_at_trx_commit 设置是 1，这个参数的意思就是，每次事务提交的时候，都执行 fsync 将 redolog 直接持久化到磁盘（还有 0 和 2 的选择，0 表示每次事务提交的时候，都只是把 redolog 留在 redolog buffer 中；2 表示每次事务提交的时候，都只执行 write 将 redolog 写到文件系统的 page cache 中）。举个例子，假设事务 A 执行到一半，已经写了一些 redolog 到 redolog buffer 中，这时候有另外一个事务 B 提交，按照 innodb_flush_log_at_trx_commit = 1 的逻辑，事务 B 要把 redolog buffer 里的日志全部持久化到磁盘，这时候，就会带上事务 A 在 redolog buffer 里的日志一起持久化到磁盘</li>
+<li>第二种情况：redo log buffer 占用的空间达到 redolog buffer 大小（由参数 <code>innodb_log_buffer_size</code> 控制，默认是 8MB）一半的时候，后台线程会主动写盘。不过由于这个事务并没有提交，所以这个写盘动作只是 write 到了文件系统的 page cache，仍然是在内存中，并没有调用 fsync 真正落盘</li>
+</ol>
+</blockquote>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/mysql%E4%B8%80%E6%9D%A1%E8%AF%AD%E5%8F%A5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/mysql%E4%B8%80%E6%9D%A1%E8%AF%AD%E5%8F%A5/" class="post-title-link" itemprop="url">mysql分析</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-04-10 14:35:22" itemprop="dateCreated datePublished" datetime="2022-04-10T14:35:22+08:00">2022-04-10</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/mysql%E4%B8%80%E6%9D%A1%E8%AF%AD%E5%8F%A5/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/mysql%E4%B8%80%E6%9D%A1%E8%AF%AD%E5%8F%A5/" class="cy_cmt_count" data-xid="2022/04/10/数据库/nosql/mysql一条语句/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="Buffer-pool"><a href="#Buffer-pool" class="headerlink" title="Buffer pool"></a>Buffer pool</h3><p>第一次在查询的时候会将查询的结果存到  Buffer Pool 中，这样后面再有请求的时候就会先从缓冲池中去查询，如果没有再去磁盘中查找，然后在放到  Buffer Pool 中</p>
+<h3 id="执行顺序"><a href="#执行顺序" class="headerlink" title="执行顺序"></a>执行顺序</h3><p>undo</p>
+<p>磁盘——–&gt;buffer Pool———&gt;在buffer中完成运算—&gt;结果写入到redo log buffer —-&gt;写入redo log —&gt;</p>
+<p>​      ——-&gt;将更新语句反句加载到undo</p>
+<ul>
+<li>准备更新一条 SQL 语句</li>
+<li>MySQL（innodb）会先去缓冲池（BufferPool）中去查找这条数据，没找到就会去磁盘中查找，如果查找到就会将这条数据加载到缓冲池（BufferPool）中</li>
+<li>在加载到 Buffer Pool 的同时，会将这条数据的原始记录保存到 undo 日志文件中</li>
+<li>innodb 会在 Buffer Pool 中执行更新操作</li>
+<li>更新后的数据会记录在 redo log buffer 中</li>
+<li>MySQL 提交事务的时候，会将 redo log buffer 中的数据写入到 redo 日志文件中 刷磁盘可以通过 innodb_flush_log_at_trx_commit 参数来设置<ul>
+<li>值为 0 表示不刷入磁盘</li>
+<li>值为 1 表示立即刷入磁盘</li>
+<li>值为 2 表示先刷到 os cache</li>
+</ul>
+</li>
+<li>myslq 重启的时候会将 redo 日志恢复到缓冲池中</li>
+</ul>
+<h4 id="当前读"><a href="#当前读" class="headerlink" title="当前读"></a>当前读</h4><blockquote>
+<p>当前读, 读取的是最新版本, 并且<strong>对读取的记录加锁, 阻塞其他事务同时改动相同</strong>记录，避免出现安全问题</p>
+</blockquote>
+<p>当前读的实现方式：next-key锁(行记录锁+Gap间隙锁)</p>
+<ol>
+<li>对主键或唯一索引，如果当前读时，where条件全部精确命中(=或者in)，这种场景本身就不会出现幻读，所以只会加行记录锁。</li>
+<li>没有索引的列，当前读操作时，会加全表gap锁，生产环境要注意。</li>
+<li>非唯一索引列，如果where条件部分命中(&gt;、&lt;、like等)或者全未命中，则会加附近Gap间隙锁。例如，某表数据如下，非唯一索引2,6,9,9,11,15。如下语句要操作非唯一索引列9的数据，gap锁将会锁定的列是(6,11]，该区间内无法插入数据。</li>
+</ol>
+<h4 id="快照读"><a href="#快照读" class="headerlink" title="快照读"></a>快照读</h4><blockquote>
+<p>readView  [未提交事务数组]、max_id</p>
+<p>执行DML才会给事务id</p>
+</blockquote>
+<blockquote>
+<p>版本链上适合自己的一个版本快照</p>
+<p>通过 </p>
+<p>生成时机：begin<strong>之后第一条</strong>语句</p>
+<p>作用范围：库的所有表，每个表都对应一个版本链，</p>
+</blockquote>
+<p>只读事务不分配trx_id（会分配一个假trx_id），只有涉及到数据更新才会分配事务ID。</p>
+<ul>
+<li>在事务隔离级别为<code>RR</code>时，在第一次进行<code>select</code>查询时生成<code>read view</code>;</li>
+<li>在事务隔离级别为<code>RC</code>时，每一次<code>select</code>查询都会生成<code>read view</code>;</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/lmlzww/article/details/119087426?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-0.pc_relevant_default&amp;spm=1001.2101.3001.4242.1&amp;utm_relevant_index=2">https://blog.csdn.net/lmlzww/article/details/119087426?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-0.pc_relevant_default&amp;spm=1001.2101.3001.4242.1&amp;utm_relevant_index=2</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_44823898/article/details/115718622">https://blog.csdn.net/qq_44823898/article/details/115718622</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/10/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/%E5%9F%BA%E4%BA%8E%E6%8B%A6%E6%88%AA%E5%99%A8%E7%9A%84/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -522,395 +816,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/09/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%B3%BB%E7%BB%9F%E8%A1%A8/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/04/09/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%B3%BB%E7%BB%9F%E8%A1%A8/" class="post-title-link" itemprop="url">mysql系统表</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-04-09 23:37:59" itemprop="dateCreated datePublished" datetime="2022-04-09T23:37:59+08:00">2022-04-09</time>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/04/09/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%B3%BB%E7%BB%9F%E8%A1%A8/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/09/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%B3%BB%E7%BB%9F%E8%A1%A8/" class="cy_cmt_count" data-xid="2022/04/09/数据库/mysql系统表/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>738</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>·</p>
-<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><table>
-<thead>
-<tr>
-<th>库名</th>
-<th>表数量</th>
-<th>视图数量</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>information_schema</td>
-<td>61</td>
-<td>0</td>
-</tr>
-<tr>
-<td>mysql</td>
-<td>32</td>
-<td>0</td>
-</tr>
-<tr>
-<td>performance_schema</td>
-<td>87</td>
-<td>0</td>
-</tr>
-<tr>
-<td>sys</td>
-<td>1</td>
-<td>100</td>
-</tr>
-</tbody></table>
-<h2 id="一、infomation-schema"><a href="#一、infomation-schema" class="headerlink" title="一、infomation_schema"></a>一、infomation_schema</h2><blockquote>
-<p>信息数据库，保存着关于MySQL其他数据库的信息。如数据库名，数据库的表，表栏的数据类型与访问权限等</p>
-</blockquote>
-<table>
-<thead>
-<tr>
-<th>表名</th>
-<th>作用</th>
-<th></th>
-</tr>
-</thead>
-<tbody><tr>
-<td>数据库-表-字段-索引你</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>SCHEMATA</td>
-<td>数据库信息(名称，字符类型)</td>
-<td>show database</td>
-</tr>
-<tr>
-<td>TABLES</td>
-<td>表信息(属于哪个数据库，自增id，创建时间，行数，数据大小，字符，引擎)</td>
-<td>show tables</td>
-</tr>
-<tr>
-<td>columns</td>
-<td>行信息</td>
-<td>desc</td>
-</tr>
-<tr>
-<td>user_privileges</td>
-<td>用户权限</td>
-<td></td>
-</tr>
-<tr>
-<td>key_columns_usage</td>
-<td>表的索引信息</td>
-<td>show key</td>
-</tr>
-<tr>
-<td><strong>锁信息</strong></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>innodb_trx</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>innodb_locks</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>innodb_lock_wait</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td><strong>其他</strong></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>files</td>
-<td>mysql用到的文件</td>
-<td></td>
-</tr>
-</tbody></table>
-<h2 id="二、mysql"><a href="#二、mysql" class="headerlink" title="二、mysql"></a>二、mysql</h2><blockquote>
-<p>主要是权限的信息</p>
-</blockquote>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody><tr>
-<td>user</td>
-<td>用户列、权限列、安全列、资源控制列</td>
-<td></td>
-</tr>
-<tr>
-<td>innodb_table_stas</td>
-<td>表信息， 更新时间，行数</td>
-<td></td>
-</tr>
-</tbody></table>
-<h2 id="三、performance-scheme"><a href="#三、performance-scheme" class="headerlink" title="三、performance_scheme"></a>三、performance_scheme</h2><blockquote>
-<p>PERFORMANCE_SCHEMA这个功能默认是关闭的。需要设置参数： performance_schema 才可以启动该功能，这个参数是静态参数，只能写在my.cnf 中 不能动态修改。</p>
-</blockquote>
-<table>
-<thead>
-<tr>
-<th>表名</th>
-<th>作用</th>
-<th></th>
-</tr>
-</thead>
-<tbody><tr>
-<td>users</td>
-<td>用户连接的次数，当前连接数</td>
-<td></td>
-</tr>
-<tr>
-<td>hosts</td>
-<td>类似于users表</td>
-<td></td>
-</tr>
-<tr>
-<td>accounts</td>
-<td>是users+hosts</td>
-<td></td>
-</tr>
-<tr>
-<td>threads</td>
-<td>当前存活线程(ip,username,状态)</td>
-<td></td>
-</tr>
-<tr>
-<td>gloable_variables</td>
-<td>全局变量</td>
-<td></td>
-</tr>
-</tbody></table>
-<h2 id="四、sys"><a href="#四、sys" class="headerlink" title="四、sys"></a>四、sys</h2><p>配置更改表</p>
-<ul>
-<li>variable ： 配置选项名称</li>
-<li>value ： 配置选项值</li>
-<li>set_time ： 该行配置修改的时间</li>
-<li>set_by ： 该行配置信息修改者，如果从被安装没有修改过，那么这个数据应该为NULL</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/09/java/java%E7%BB%84%E4%BB%B6/%E6%97%B6%E9%97%B4%E7%B1%BB/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/04/09/java/java%E7%BB%84%E4%BB%B6/%E6%97%B6%E9%97%B4%E7%B1%BB/" class="post-title-link" itemprop="url">时间组件</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-04-09 20:49:26" itemprop="dateCreated datePublished" datetime="2022-04-09T20:49:26+08:00">2022-04-09</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/javautils/" itemprop="url" rel="index"><span itemprop="name">javautils</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/04/09/java/java%E7%BB%84%E4%BB%B6/%E6%97%B6%E9%97%B4%E7%B1%BB/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/09/java/java%E7%BB%84%E4%BB%B6/%E6%97%B6%E9%97%B4%E7%B1%BB/" class="cy_cmt_count" data-xid="2022/04/09/java/java组件/时间类/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.7k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>[toc]</p>
-<h2 id="一、java-util-Date"><a href="#一、java-util-Date" class="headerlink" title="一、java.util.Date"></a>一、java.util.Date</h2><h2 id="二、java-util-calendar"><a href="#二、java-util-calendar" class="headerlink" title="二、java.util.calendar"></a>二、java.util.calendar</h2><h2 id="三、java-time"><a href="#三、java-time" class="headerlink" title="三、java.time"></a>三、java.time</h2><blockquote>
-<p>jdk8的新类，</p>
-</blockquote>
-<h3 id="新类出现的原因"><a href="#新类出现的原因" class="headerlink" title="新类出现的原因"></a>新类出现的原因</h3><ol>
-<li><p>原始的Date的toString显示的是Tue Sep 10 09:34:04 CST 2019，</p>
-</li>
-<li><p>可以用sdf格式化，但是sdf线程不安全，而且格式化类和本类不在一起，影响性能</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> StringBuffer <span class="title">format</span><span class="params">(Date)</span></span>&#123;</span><br><span class="line">	calendar.setTime(date);</span><br><span class="line">&#125;<span class="comment">//sdf的格式默认为year-month-day pm hour:mounth</span></span><br></pre></td></tr></table></figure></li>
-</ol>
-<h3 id="三、Calendar"><a href="#三、Calendar" class="headerlink" title="三、Calendar"></a>三、Calendar</h3><h4 id="3-1-创建"><a href="#3-1-创建" class="headerlink" title="3.1 创建"></a>3.1 创建</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Calendar c = Calendar.getInstance();</span><br><span class="line">System.out.println(c.getTime());</span><br></pre></td></tr></table></figure>
-
-<h4 id="3-2-获得部分日期"><a href="#3-2-获得部分日期" class="headerlink" title="3.2 获得部分日期"></a>3.2 获得部分日期</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Calendar c = Calendar.getInstance();</span><br><span class="line">System.out.println(c.get(Calendar.YEAR)); 输出：<span class="number">2021</span></span><br><span class="line">System.out.println(c.get(Calendar.MONTH)); 输出：<span class="number">7</span></span><br><span class="line">System.out.println(c.get(Calendar.DAY_OF_MONTH)); 输出：<span class="number">26</span></span><br></pre></td></tr></table></figure>
-
-<h4 id="3-3-赋值"><a href="#3-3-赋值" class="headerlink" title="3.3 赋值"></a>3.3 赋值</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Calendar ca = Calendar.getInstance();</span><br><span class="line">ca.set(Calendar.YEAR, <span class="number">2019</span>);</span><br><span class="line">ca.set(Calendar.MONTH, <span class="number">0</span>);</span><br><span class="line">ca.set(Calendar.DATE, <span class="number">1</span>);</span><br><span class="line">ca.set(Calendar.HOUR_OF_DAY, <span class="number">0</span>);</span><br><span class="line">ca.set(Calendar.MINUTE, <span class="number">0</span>);</span><br><span class="line">ca.set(Calendar.SECOND, <span class="number">0</span>);</span><br><span class="line">SimpleDateFormat sdf = <span class="keyword">new</span> SimpleDateFormat(<span class="string">&quot;yyyy-MM-dd HH:mm:ss&quot;</span>);</span><br><span class="line">System.out.println(sdf.format(ca.getTime())); 输出：<span class="number">2019</span>-<span class="number">01</span>-<span class="number">01</span> <span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span></span><br></pre></td></tr></table></figure>
-
-<h4 id="3-4-转换"><a href="#3-4-转换" class="headerlink" title="3.4 转换"></a>3.4 转换</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Cal.setTime(<span class="keyword">new</span> Date());</span><br><span class="line">Date date = cal.getTime;</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-<h3 id="LocalDate"><a href="#LocalDate" class="headerlink" title="LocalDate"></a>LocalDate</h3><h3 id="LocalTime"><a href="#LocalTime" class="headerlink" title="LocalTime"></a>LocalTime</h3><h3 id="LocalDateTime"><a href="#LocalDateTime" class="headerlink" title="LocalDateTime"></a>LocalDateTime</h3><h3 id="自定义"><a href="#自定义" class="headerlink" title="自定义"></a>自定义</h3><ol>
-<li><p>sql—util转换</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">java.sql.Date sqlDate = <span class="keyword">new</span> java.sql.Date(utilDate.getTime());</span><br><span class="line">Date date = <span class="keyword">new</span> Date(sqlDate.getTime());<span class="comment">//sql.Date转util.Date        </span></span><br></pre></td></tr></table></figure></li>
-</ol>
-<h3 id="jar包–joda"><a href="#jar包–joda" class="headerlink" title="jar包–joda"></a>jar包–joda</h3><ol>
-<li><p>joda</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>joda-time<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>joda-time<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-<li><p>主要获取当前时间 好看字符串</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">DateTime dt = <span class="keyword">new</span> DateTime();</span><br><span class="line">DateTime dt1 = DateTime.now();<span class="comment">//2021-10-21T13:59:41.040+08:00</span></span><br><span class="line">DateTime dt2 = <span class="keyword">new</span> DateTime(<span class="keyword">new</span> Date());<span class="comment">//2021-10-21T13:59:41.132+08:00</span></span><br><span class="line"><span class="comment">// 指定年月日点分秒生成(参数依次是：年,月,日,时,分,秒,毫秒)</span></span><br><span class="line">DateTime dt3 = <span class="keyword">new</span> DateTime(<span class="number">2012</span>, <span class="number">5</span>, <span class="number">20</span>, <span class="number">13</span>, <span class="number">14</span>, <span class="number">0</span>, <span class="number">0</span>);        <span class="comment">// 制定ISO8601生成</span></span><br><span class="line">DateTime dt4 = <span class="keyword">new</span> DateTime(<span class="string">&quot;2014-08-01T12:32:3&quot;</span>);</span><br><span class="line">DateTime dt5 = <span class="keyword">new</span> DateTime(<span class="string">&quot;2014-08-01&quot;</span>);</span><br><span class="line">DateTime dt6 = <span class="keyword">new</span> DateTime(Calendar.getInstance())</span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/04/09/java/java%E7%BB%84%E4%BB%B6/%E6%97%B6%E9%97%B4%E7%B1%BB/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -982,7 +887,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">116</span>
+          <span class="site-state-item-count">120</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1033,12 +938,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">343k</span>
+    <span title="站点总字数">354k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">5:12</span>
+    <span title="站点阅读时长">5:21</span>
 </div>
 
         

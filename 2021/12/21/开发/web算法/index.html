@@ -22,15 +22,15 @@
     var CONFIG = {"hostname":"wang-yonggan.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":true,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="限流算法 在开发高并发系统时，有三把利器用来保护系统：缓存、降级和限流。  计数器算法规定1分钟1个ip只能100次请求，所有ip只能10000此请求 问题：用户A在00:59发送了100次请求，又在01:00发送了100次请求，这就相当于2秒内发送了200次，也可能会压垮服务器。 滑动窗口算法这里的1分钟是滑动的，而非一定是00:00-01:00 令牌桶算法漏桶算法规定一共只能有这么多次请求,多">
+  <meta name="description" content="一、限流算法 在开发高并发系统时，有三把利器用来保护系统：缓存、降级和限流。  1.1 计数器算法规定1分钟1个ip只能100次请求，所有ip只能10000此请求 问题：用户A在00:59发送了100次请求，又在01:00发送了100次请求，这就相当于2秒内发送了200次，也可能会压垮服务器。 1.2 滑动窗口算法这里的1分钟是滑动的，而非一定是00:00-01:00 1.3 令牌桶算法 基于总量">
 <meta property="og:type" content="article">
 <meta property="og:title" content="web算法">
 <meta property="og:url" content="https://wang-yonggan.github.io/2021/12/21/%E5%BC%80%E5%8F%91/web%E7%AE%97%E6%B3%95/index.html">
 <meta property="og:site_name" content="MySoul">
-<meta property="og:description" content="限流算法 在开发高并发系统时，有三把利器用来保护系统：缓存、降级和限流。  计数器算法规定1分钟1个ip只能100次请求，所有ip只能10000此请求 问题：用户A在00:59发送了100次请求，又在01:00发送了100次请求，这就相当于2秒内发送了200次，也可能会压垮服务器。 滑动窗口算法这里的1分钟是滑动的，而非一定是00:00-01:00 令牌桶算法漏桶算法规定一共只能有这么多次请求,多">
+<meta property="og:description" content="一、限流算法 在开发高并发系统时，有三把利器用来保护系统：缓存、降级和限流。  1.1 计数器算法规定1分钟1个ip只能100次请求，所有ip只能10000此请求 问题：用户A在00:59发送了100次请求，又在01:00发送了100次请求，这就相当于2秒内发送了200次，也可能会压垮服务器。 1.2 滑动窗口算法这里的1分钟是滑动的，而非一定是00:00-01:00 1.3 令牌桶算法 基于总量">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-12-20T16:28:02.000Z">
-<meta property="article:modified_time" content="2021-12-20T16:28:02.220Z">
+<meta property="article:modified_time" content="2022-05-09T14:18:01.573Z">
 <meta property="article:author" content="勇敢">
 <meta name="twitter:card" content="summary">
 
@@ -215,6 +215,13 @@
 
               <time title="创建时间：2021-12-21 00:28:02" itemprop="dateCreated datePublished" datetime="2021-12-21T00:28:02+08:00">2021-12-21</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-05-09 22:18:01" itemprop="dateModified" datetime="2022-05-09T22:18:01+08:00">2022-05-09</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -266,14 +273,19 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h3 id="限流算法"><a href="#限流算法" class="headerlink" title="限流算法"></a>限流算法</h3><blockquote>
+        <h2 id="一、限流算法"><a href="#一、限流算法" class="headerlink" title="一、限流算法"></a>一、限流算法</h2><blockquote>
 <p>在开发高并发系统时，有三把利器用来保护系统：缓存、降级和限流。</p>
 </blockquote>
-<h4 id="计数器算法"><a href="#计数器算法" class="headerlink" title="计数器算法"></a>计数器算法</h4><p>规定1分钟1个ip只能100次请求，所有ip只能10000此请求</p>
+<h3 id="1-1-计数器算法"><a href="#1-1-计数器算法" class="headerlink" title="1.1 计数器算法"></a>1.1 计数器算法</h3><p>规定1分钟1个ip只能100次请求，所有ip只能10000此请求</p>
 <p>问题：用户A在00:59发送了100次请求，又在01:00发送了100次请求，这就相当于2秒内发送了200次，也可能会压垮服务器。</p>
-<h4 id="滑动窗口算法"><a href="#滑动窗口算法" class="headerlink" title="滑动窗口算法"></a>滑动窗口算法</h4><p>这里的1分钟是滑动的，而非一定是00:00-01:00</p>
-<h3 id="令牌桶算法"><a href="#令牌桶算法" class="headerlink" title="令牌桶算法"></a>令牌桶算法</h3><h3 id="漏桶算法"><a href="#漏桶算法" class="headerlink" title="漏桶算法"></a>漏桶算法</h3><p>规定一共只能有这么多次请求,多的请求直接被抛弃</p>
-<h3 id="雪花算法"><a href="#雪花算法" class="headerlink" title="雪花算法"></a>雪花算法</h3><h2 id="二、加密算法"><a href="#二、加密算法" class="headerlink" title="二、加密算法"></a>二、加密算法</h2><h3 id="2-1-MD5算法"><a href="#2-1-MD5算法" class="headerlink" title="2.1 MD5算法"></a>2.1 <a target="_blank" rel="noopener" href="https://blog.csdn.net/UtopiaOfArtoria/article/details/82429467">MD5算法</a></h3><blockquote>
+<h3 id="1-2-滑动窗口算法"><a href="#1-2-滑动窗口算法" class="headerlink" title="1.2 滑动窗口算法"></a>1.2 滑动窗口算法</h3><p>这里的1分钟是滑动的，而非一定是00:00-01:00</p>
+<h3 id="1-3-令牌桶算法"><a href="#1-3-令牌桶算法" class="headerlink" title="1.3 令牌桶算法"></a>1.3 令牌桶算法</h3><blockquote>
+<p>基于总量，每个能被处理的请求都被分配一个令牌，规定令牌总数有上限</p>
+</blockquote>
+<h3 id="1-4-漏桶算法"><a href="#1-4-漏桶算法" class="headerlink" title="1.4 漏桶算法"></a>1.4 漏桶算法</h3><blockquote>
+<p>基于速率，规定每秒处理次数有上限</p>
+</blockquote>
+<h3 id=""><a href="#" class="headerlink" title=""></a></h3><h2 id="二、加密算法"><a href="#二、加密算法" class="headerlink" title="二、加密算法"></a>二、加密算法</h2><h3 id="2-1-MD5算法"><a href="#2-1-MD5算法" class="headerlink" title="2.1 MD5算法"></a>2.1 <a target="_blank" rel="noopener" href="https://blog.csdn.net/UtopiaOfArtoria/article/details/82429467">MD5算法</a></h3><blockquote>
 <p>MD5,是一种信息摘要算法。简单来说，就是把一段信息（明文），通过一种有损的方式压缩成定长的字符（32位密文）。因为这种压缩方式是会损失信息的，所以是无法还原出“明文”的。虽然无法从数学上破解MD5算法，但由于现在计算机具备强大的计算能力，还是可以通过“穷举法”破解该算法。如果想用该算法加密，还可以通过“加盐”的方式提高解密难度。该算法允许多传一个参数”salt”,指定通过MD5加密的次数，这样是能够提高解密难度的。</p>
 </blockquote>
 <p><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/8852668/what-is-the-clash-rate-for-md5">md5冲突概率</a></p>
@@ -288,7 +300,7 @@
 <p>为每个客户(User)生成一对密钥(keyPairs)，<br>将公钥(publicKey)通过URL接口向前端公开，私钥(userId:privateKey)保存在数据库或redis中，<br>然后前端客户可以通过公钥加密自己的信息（前端用JS进行RSA公钥加密），后端通过该用户对应的私钥解析出用户信息(后端用Java进行RSA私钥解密)，再将用户信息保存在数据库。</p>
 <h3 id="2-3-3-非对称加密缺陷"><a href="#2-3-3-非对称加密缺陷" class="headerlink" title="2.3.3 非对称加密缺陷"></a>2.3.3 非对称加密缺陷</h3><p>​    非对称性加密依然没有解决数据传输的安全性问题，比如A想向B发数据，B首先生成一对密钥(公钥和私钥)，然后将公钥发给A，A拿到B发给他的公钥有就可以使用公钥加密数据后发给B，然而在B公钥发送给A的这个过程中，很有可能会被第三方C截获，C截获到B的公钥后，也使用B的公钥加密数据，然后发给B，B接收到数据后就晕了，因为搞不清楚接收到的数据到底是A发的还是C发的，这是其中一个问题，另一个问题就是，C截获到B发的公钥后，C可以自己生成一对密钥(公钥和私钥)，然后发给A，A拿到公钥后就以为是B发给他的，然后就使用公钥加密数据发给B，发送给B的过程中被C截获下来，由于A是用C发给他的公钥加密数据的，而C有私钥，因此就可以解密A加密过后的内容了，而B接收到A发给他的数据后反而解不开了，因为数据是用C的公钥加密的，B没有C的私钥，所以就无法解密。</p>
 <p>​    所以，非对称性加密存在一个问题：A想向B发数据，A如何确定拿到的公钥一定是B发的呢？那么如何解决这个问题呢？只能靠一个第三方机构(CA机构，即证书授权中心(Certificate Authority )，或称证书授权机构)来担保。A想向B发数据，B首先将公钥发给CA机构，CA机构拿到B的公钥后跑到B的家里问：这是你发的公钥吗？B确认过后说是：没错，是我发的！那么此时CA机构就会为B的公钥做担保，生成一份数字证书给B，数字证书包含了CA的担保认证签名和B的公钥，B拿到CA的这份数字证书后，就发给A，A拿到数字证书后，看到上有CA的签名，就可以确定当前拿到的公钥是B发的，那么就可以放心大胆地使用公钥加密数据，然后发给B了。</p>
-<h3 id="2-4-Base64-非加密"><a href="#2-4-Base64-非加密" class="headerlink" title="2.4 Base64(非加密"></a>2.4 Base64(非加密</h3><h2 id="三、https连接器"><a href="#三、https连接器" class="headerlink" title="三、https连接器"></a>三、https连接器</h2><p>　　明白了互联网上的加密原理之后，下面来看看浏览器与服务器交互时，浏览器想将数据加密后再发送给服务器，那么该怎么做呢？服务器首先要向浏览器出示一份数字证书，浏览器看到数字证书后，就可以使用数字证书里面的公钥加密数据，所以要想做浏览器和服务器的加密数据传输，那么首先得针对服务器生成一份数字证书。然后再配置一下服务器，让服务器收到浏览器的请求之后，会向浏览器出示它的数字证书。</p>
+<h3 id="2-4-Base64编码-非加密"><a href="#2-4-Base64编码-非加密" class="headerlink" title="2.4 Base64编码(非加密)"></a>2.4 Base64编码(非加密)</h3><h2 id="三、https连接器"><a href="#三、https连接器" class="headerlink" title="三、https连接器"></a>三、https连接器</h2><p>　　明白了互联网上的加密原理之后，下面来看看浏览器与服务器交互时，浏览器想将数据加密后再发送给服务器，那么该怎么做呢？服务器首先要向浏览器出示一份数字证书，浏览器看到数字证书后，就可以使用数字证书里面的公钥加密数据，所以要想做浏览器和服务器的加密数据传输，那么首先得针对服务器生成一份数字证书。然后再配置一下服务器，让服务器收到浏览器的请求之后，会向浏览器出示它的数字证书。</p>
 
     </div>
 
@@ -374,7 +386,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%99%90%E6%B5%81%E7%AE%97%E6%B3%95"><span class="nav-number">1.</span> <span class="nav-text">限流算法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AE%A1%E6%95%B0%E5%99%A8%E7%AE%97%E6%B3%95"><span class="nav-number">1.1.</span> <span class="nav-text">计数器算法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95"><span class="nav-number">1.2.</span> <span class="nav-text">滑动窗口算法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A4%E7%89%8C%E6%A1%B6%E7%AE%97%E6%B3%95"><span class="nav-number">2.</span> <span class="nav-text">令牌桶算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BC%8F%E6%A1%B6%E7%AE%97%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">漏桶算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9B%AA%E8%8A%B1%E7%AE%97%E6%B3%95"><span class="nav-number">4.</span> <span class="nav-text">雪花算法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95"><span class="nav-number"></span> <span class="nav-text">二、加密算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-MD5%E7%AE%97%E6%B3%95"><span class="nav-number">1.</span> <span class="nav-text">2.1 MD5算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-SHA%E7%AE%97%E6%B3%95"><span class="nav-number">2.</span> <span class="nav-text">2.2 SHA算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-RSA%E7%AE%97%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">2.3 RSA算法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-1-%E5%8E%9F%E7%90%86"><span class="nav-number">3.1.</span> <span class="nav-text">2.3.1 原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-2-%E5%9C%BA%E6%99%AF"><span class="nav-number">3.2.</span> <span class="nav-text">2.3.2 场景</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-3-%E9%9D%9E%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%BC%BA%E9%99%B7"><span class="nav-number">4.</span> <span class="nav-text">2.3.3 非对称加密缺陷</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-Base64-%E9%9D%9E%E5%8A%A0%E5%AF%86"><span class="nav-number">5.</span> <span class="nav-text">2.4 Base64(非加密</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81https%E8%BF%9E%E6%8E%A5%E5%99%A8"><span class="nav-number"></span> <span class="nav-text">三、https连接器</span></a></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E9%99%90%E6%B5%81%E7%AE%97%E6%B3%95"><span class="nav-number">1.</span> <span class="nav-text">一、限流算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E8%AE%A1%E6%95%B0%E5%99%A8%E7%AE%97%E6%B3%95"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 计数器算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3%E7%AE%97%E6%B3%95"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 滑动窗口算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-%E4%BB%A4%E7%89%8C%E6%A1%B6%E7%AE%97%E6%B3%95"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 令牌桶算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-%E6%BC%8F%E6%A1%B6%E7%AE%97%E6%B3%95"><span class="nav-number">1.4.</span> <span class="nav-text">1.4 漏桶算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">1.5.</span> <span class="nav-text"></span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95"><span class="nav-number">2.</span> <span class="nav-text">二、加密算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-MD5%E7%AE%97%E6%B3%95"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 MD5算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-SHA%E7%AE%97%E6%B3%95"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 SHA算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-RSA%E7%AE%97%E6%B3%95"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 RSA算法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-1-%E5%8E%9F%E7%90%86"><span class="nav-number">2.3.1.</span> <span class="nav-text">2.3.1 原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-2-%E5%9C%BA%E6%99%AF"><span class="nav-number">2.3.2.</span> <span class="nav-text">2.3.2 场景</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-3-%E9%9D%9E%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%BC%BA%E9%99%B7"><span class="nav-number">2.4.</span> <span class="nav-text">2.3.3 非对称加密缺陷</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-Base64%E7%BC%96%E7%A0%81-%E9%9D%9E%E5%8A%A0%E5%AF%86"><span class="nav-number">2.5.</span> <span class="nav-text">2.4 Base64编码(非加密)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81https%E8%BF%9E%E6%8E%A5%E5%99%A8"><span class="nav-number">3.</span> <span class="nav-text">三、https连接器</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -390,7 +402,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">116</span>
+          <span class="site-state-item-count">120</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -441,12 +453,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">343k</span>
+    <span title="站点总字数">354k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">5:12</span>
+    <span title="站点阅读时长">5:21</span>
 </div>
 
         
