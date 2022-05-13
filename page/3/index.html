@@ -300,7 +300,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/04/24/%E7%BB%84%E4%BB%B6/ORM/mybatis/mybatis/" class="post-title-link" itemprop="url">未命名</a>
+            <a href="/2022/04/24/%E7%BB%84%E4%BB%B6/ORM/mybatis/mybatis/" class="post-title-link" itemprop="url">Mybatis杂记</a>
         </h2>
 
         <div class="post-meta">
@@ -317,7 +317,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-05-06 01:19:27" itemprop="dateModified" datetime="2022-05-06T01:19:27+08:00">2022-05-06</time>
+                <time title="修改时间：2022-05-13 14:38:07" itemprop="dateModified" datetime="2022-05-13T14:38:07+08:00">2022-05-13</time>
               </span>
 
           
@@ -361,8 +361,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>[toc]</p>
-<h2 id="一、"><a href="#一、" class="headerlink" title="一、"></a>一、</h2><h3 id="大致步骤"><a href="#大致步骤" class="headerlink" title="大致步骤"></a>大致步骤</h3><ol>
+          <h3 id="大致步骤"><a href="#大致步骤" class="headerlink" title="大致步骤"></a>大致步骤</h3><ol>
 <li>sqlSessionFactoryBuilder   &lt;- sqlMapConfig</li>
 <li>sqlSessionFactory –&gt;sqlSession（Connection的封装，有增删改查功能）</li>
 <li>①生成代理对象          ② 定义通用的sql语句</li>
@@ -390,12 +389,14 @@
 
 
 
-<h3 id="二、类"><a href="#二、类" class="headerlink" title="二、类"></a>二、类</h3><ol>
+
+
+<ol>
 <li>sqlSessionFactory</li>
 <li>sqlSession   自定义mybatis和数据库交互的核心类   </li>
 <li>IuerDao<br> @select(“select * from name”)<br> List<user> findAll(); </li>
 </ol>
-<h3 id="三、类"><a href="#三、类" class="headerlink" title="三、类"></a>三、类</h3><ol>
+<h3 id="二、类"><a href="#二、类" class="headerlink" title="二、类"></a>二、类</h3><ol>
 <li>class Resource  使用类加载器读取配置文件的类 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> inputstream <span class="title">getResourceStream</span><span class="params">(filePath)</span></span></span><br><span class="line"><span class="function">    return Resource.Class.getClassloader.<span class="title">getResourceAsStream</span><span class="params">(filePath)</span> <span class="comment">//获取字节码     获取字节码类加载器   根据类加载器读取配置</span></span></span><br></pre></td></tr></table></figure>
 </li>
 <li>class sqlSessionFactoryBuilder    //用于创建工厂对象  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> sqlSessionFactory <span class="title">build</span><span class="params">(Inputstream config)</span></span></span><br><span class="line"><span class="function">    configration cfg </span>=XMLConfigBuider.loadConfigration(config)</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> factory(config) </span><br></pre></td></tr></table></figure>
@@ -418,7 +419,7 @@
  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">    </span><br></pre></td></tr></table></figure>
 </li>
 </ol>
-<h3 id="四、配置文件"><a href="#四、配置文件" class="headerlink" title="四、配置文件"></a>四、配置文件</h3><h4 id="4-1-sqlMapConfig-xml"><a href="#4-1-sqlMapConfig-xml" class="headerlink" title="4.1 sqlMapConfig.xml"></a>4.1 sqlMapConfig.xml</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">conf</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">envs</span> <span class="attr">default</span>=<span class="string">&quot;mysql&quot;</span>&gt;</span>  <span class="comment">&lt;!--配置环境--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">env</span> <span class="attr">id</span>=<span class="string">&quot;mysql&quot;</span>&gt;</span>    <span class="comment">&lt;!--配置mysql环境--&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">transactionmanger</span> <span class="attr">type</span>=<span class="string">&quot;JDBC&quot;</span>&gt;</span><span class="comment">&lt;!--配置事物类型--&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">dataSource</span> <span class="attr">type</span>=<span class="string">&quot;POOLED&quot;</span>&gt;</span> <span class="comment">&lt;!--配置数据源--&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span> =<span class="string">&quot;driver&quot;</span> <span class="attr">value</span> <span class="attr">com.driver....</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">property</span> <span class="attr">url</span> &gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">property</span> <span class="attr">username</span> &gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">property</span> <span class="attr">password</span>&gt;</span></span><br><span class="line">             /&gt;   </span><br><span class="line">        /&gt;</span><br><span class="line">    /&gt;</span><br><span class="line">    <span class="tag">&lt;<span class="name">mappers</span>&gt;</span>   <span class="comment">&lt;!--指定映射文件--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">mapper</span> <span class="attr">resource</span> =<span class="string">&quot;iuserdao.xml&quot;</span>&gt;</span> <span class="comment">&lt;!--xml型--&gt;</span> </span><br><span class="line">        <span class="tag">&lt;<span class="name">mapper</span> <span class="attr">class</span> =<span class="string">&quot;com.wyg.dao.IuerDao&quot;</span>&gt;</span><span class="comment">&lt;!--注解型--&gt;</span></span><br><span class="line">    /&gt;</span><br><span class="line">/&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h3 id="三、配置文件"><a href="#三、配置文件" class="headerlink" title="三、配置文件"></a>三、配置文件</h3><h4 id="4-1-sqlMapConfig-xml"><a href="#4-1-sqlMapConfig-xml" class="headerlink" title="4.1 sqlMapConfig.xml"></a>4.1 sqlMapConfig.xml</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">conf</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">envs</span> <span class="attr">default</span>=<span class="string">&quot;mysql&quot;</span>&gt;</span>  <span class="comment">&lt;!--配置环境--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">env</span> <span class="attr">id</span>=<span class="string">&quot;mysql&quot;</span>&gt;</span>    <span class="comment">&lt;!--配置mysql环境--&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">transactionmanger</span> <span class="attr">type</span>=<span class="string">&quot;JDBC&quot;</span>&gt;</span><span class="comment">&lt;!--配置事物类型--&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">dataSource</span> <span class="attr">type</span>=<span class="string">&quot;POOLED&quot;</span>&gt;</span> <span class="comment">&lt;!--配置数据源--&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span> =<span class="string">&quot;driver&quot;</span> <span class="attr">value</span> <span class="attr">com.driver....</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">property</span> <span class="attr">url</span> &gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">property</span> <span class="attr">username</span> &gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">property</span> <span class="attr">password</span>&gt;</span></span><br><span class="line">             /&gt;   </span><br><span class="line">        /&gt;</span><br><span class="line">    /&gt;</span><br><span class="line">    <span class="tag">&lt;<span class="name">mappers</span>&gt;</span>   <span class="comment">&lt;!--指定映射文件--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">mapper</span> <span class="attr">resource</span> =<span class="string">&quot;iuserdao.xml&quot;</span>&gt;</span> <span class="comment">&lt;!--xml型--&gt;</span> </span><br><span class="line">        <span class="tag">&lt;<span class="name">mapper</span> <span class="attr">class</span> =<span class="string">&quot;com.wyg.dao.IuerDao&quot;</span>&gt;</span><span class="comment">&lt;!--注解型--&gt;</span></span><br><span class="line">    /&gt;</span><br><span class="line">/&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <h4 id="4-2-mapper-xml"><a href="#4-2-mapper-xml" class="headerlink" title="4.2 mapper.xml"></a>4.2 mapper.xml</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">mapper</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;findAll&quot;</span> <span class="attr">resultType</span>=<span class="string">&quot;&quot;</span>&gt;</span>   <span class="comment">&lt;!--id 方法名  --&gt;</span></span><br><span class="line">    /&gt;</span><br><span class="line">/&gt;</span><br></pre></td></tr></table></figure>
 
@@ -1179,7 +1180,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">357k</span>
+    <span title="站点总字数">358k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
