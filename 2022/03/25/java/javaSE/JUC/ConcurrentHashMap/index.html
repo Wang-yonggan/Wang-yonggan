@@ -22,15 +22,15 @@
     var CONFIG = {"hostname":"wang-yonggan.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":true,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="1. HashMap的核心参数 初始化桶大小，因为底层是数组，16  1&lt;&lt;4。 1transient Entry&lt;K,V&gt;[] table &#x3D; (Entry&lt;K,V&gt;[]) EMPTY_TABLE;  12为什么transient 因为collection都实现了writeObject方法实现是先把size buckets 放进，再把元素一一个个放入(先放k紧">
+  <meta name="description" content="一、ConcurrentMap1.1 理解 基于 Voliate + synchronized + 状态变量  + CSA + 尾插法   CSA用于创建table的新节点，谁CSA成功了谁就是链表的头节点 synchronized用于put  Voliate 用于链表可见性 状态变量用于记录map的状态  二、HashMap1.HashMap的核心参数 初始化桶大小，因为底层是数组，16  1&amp;">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ConcurrentHashMap">
 <meta property="og:url" content="https://wang-yonggan.github.io/2022/03/25/java/javaSE/JUC/ConcurrentHashMap/index.html">
 <meta property="og:site_name" content="MySoul">
-<meta property="og:description" content="1. HashMap的核心参数 初始化桶大小，因为底层是数组，16  1&lt;&lt;4。 1transient Entry&lt;K,V&gt;[] table &#x3D; (Entry&lt;K,V&gt;[]) EMPTY_TABLE;  12为什么transient 因为collection都实现了writeObject方法实现是先把size buckets 放进，再把元素一一个个放入(先放k紧">
+<meta property="og:description" content="一、ConcurrentMap1.1 理解 基于 Voliate + synchronized + 状态变量  + CSA + 尾插法   CSA用于创建table的新节点，谁CSA成功了谁就是链表的头节点 synchronized用于put  Voliate 用于链表可见性 状态变量用于记录map的状态  二、HashMap1.HashMap的核心参数 初始化桶大小，因为底层是数组，16  1&amp;">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-03-25T08:56:02.000Z">
-<meta property="article:modified_time" content="2022-05-07T04:52:40.318Z">
+<meta property="article:modified_time" content="2022-05-12T04:36:26.955Z">
 <meta property="article:author" content="勇敢">
 <meta name="twitter:card" content="summary">
 
@@ -220,7 +220,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-05-07 12:52:40" itemprop="dateModified" datetime="2022-05-07T12:52:40+08:00">2022-05-07</time>
+                <time title="修改时间：2022-05-12 12:36:26" itemprop="dateModified" datetime="2022-05-12T12:36:26+08:00">2022-05-12</time>
               </span>
 
           
@@ -245,7 +245,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>1.4k</span>
+              <span>1.6k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -264,7 +264,16 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h3 id="1-HashMap的核心参数"><a href="#1-HashMap的核心参数" class="headerlink" title="1. HashMap的核心参数"></a>1. HashMap的核心参数</h3><ol>
+        <h2 id="一、ConcurrentMap"><a href="#一、ConcurrentMap" class="headerlink" title="一、ConcurrentMap"></a>一、ConcurrentMap</h2><h3 id="1-1-理解"><a href="#1-1-理解" class="headerlink" title="1.1 理解"></a>1.1 理解</h3><blockquote>
+<p>基于 Voliate + synchronized + 状态变量  + CSA + 尾插法</p>
+</blockquote>
+<ol>
+<li>CSA用于创建table的新节点，谁CSA成功了谁就是链表的头节点</li>
+<li>synchronized用于put </li>
+<li>Voliate 用于链表可见性</li>
+<li>状态变量用于记录map的状态</li>
+</ol>
+<h2 id="二、HashMap"><a href="#二、HashMap" class="headerlink" title="二、HashMap"></a>二、HashMap</h2><h3 id="1-HashMap的核心参数"><a href="#1-HashMap的核心参数" class="headerlink" title="1.HashMap的核心参数"></a>1.HashMap的核心参数</h3><ol>
 <li><p>初始化桶大小，因为底层是数组，16  1&lt;&lt;4。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">transient</span> Entry&lt;K,V&gt;[] table = (Entry&lt;K,V&gt;[]) EMPTY_TABLE;</span><br></pre></td></tr></table></figure>
 
@@ -323,8 +332,8 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2022/03/25/java/javaSE/java%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86/" rel="prev" title="动态代理">
-      <i class="fa fa-chevron-left"></i> 动态代理
+    <a href="/2022/03/22/java/javaSE/%E5%86%85%E9%83%A8%E7%B1%BB/" rel="prev" title="内部类">
+      <i class="fa fa-chevron-left"></i> 内部类
     </a></div>
       <div class="post-nav-item">
     <a href="/2022/03/26/spring/%E6%B3%A8%E8%A7%A3/schdule/" rel="next" title="schedule注解">
@@ -393,7 +402,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-HashMap%E7%9A%84%E6%A0%B8%E5%BF%83%E5%8F%82%E6%95%B0"><span class="nav-number">1.</span> <span class="nav-text">1. HashMap的核心参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-HashMap%E9%81%8D%E5%8E%86%E6%96%B9%E5%BC%8F"><span class="nav-number">2.</span> <span class="nav-text">2. HashMap遍历方式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-%E5%AF%B9entrySet%E9%81%8D%E5%8E%86-%E4%B8%8D%E6%8E%A8%E8%8D%90"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 对entrySet遍历(不推荐)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-%E8%BF%AD%E4%BB%A3%E5%99%A8%E9%81%8D%E5%8E%86"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 迭代器遍历</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-foreach%E8%BF%AD%E4%BB%A3"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 foreach迭代</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E5%87%A0%E4%B8%AA%E7%89%B9%E6%AE%8A%E6%96%B9%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">3. 几个特殊方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-computeIfAbsent"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 computeIfAbsent</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-putIfAbsent"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 putIfAbsent</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-HashSet"><span class="nav-number">4.</span> <span class="nav-text">4. HashSet</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ConcurrentHashMap%E4%B8%BA%E4%BB%80%E4%B9%88k-v%E4%B8%8D%E8%83%BD%E4%B8%BAnull"><span class="nav-number">4.1.</span> <span class="nav-text">ConcurrentHashMap为什么k v不能为null</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#map%E5%B9%B6%E5%8F%91%E7%8E%AF%E5%A2%83%E4%B8%8B%E8%82%AF%E8%83%BD%E9%80%A0%E6%88%90%E6%AD%BB%E5%BE%AA%E7%8E%AF"><span class="nav-number">4.2.</span> <span class="nav-text">map并发环境下肯能造成死循环</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#put%E6%B5%81%E7%A8%8B"><span class="nav-number">5.</span> <span class="nav-text">put流程</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81ConcurrentMap"><span class="nav-number">1.</span> <span class="nav-text">一、ConcurrentMap</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E7%90%86%E8%A7%A3"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 理解</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81HashMap"><span class="nav-number">2.</span> <span class="nav-text">二、HashMap</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-HashMap%E7%9A%84%E6%A0%B8%E5%BF%83%E5%8F%82%E6%95%B0"><span class="nav-number">2.1.</span> <span class="nav-text">1.HashMap的核心参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-HashMap%E9%81%8D%E5%8E%86%E6%96%B9%E5%BC%8F"><span class="nav-number">2.2.</span> <span class="nav-text">2. HashMap遍历方式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-%E5%AF%B9entrySet%E9%81%8D%E5%8E%86-%E4%B8%8D%E6%8E%A8%E8%8D%90"><span class="nav-number">2.2.1.</span> <span class="nav-text">2.1 对entrySet遍历(不推荐)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-%E8%BF%AD%E4%BB%A3%E5%99%A8%E9%81%8D%E5%8E%86"><span class="nav-number">2.2.2.</span> <span class="nav-text">2.2 迭代器遍历</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-foreach%E8%BF%AD%E4%BB%A3"><span class="nav-number">2.2.3.</span> <span class="nav-text">2.3 foreach迭代</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E5%87%A0%E4%B8%AA%E7%89%B9%E6%AE%8A%E6%96%B9%E6%B3%95"><span class="nav-number">2.3.</span> <span class="nav-text">3. 几个特殊方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-computeIfAbsent"><span class="nav-number">2.3.1.</span> <span class="nav-text">3.1 computeIfAbsent</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-putIfAbsent"><span class="nav-number">2.3.2.</span> <span class="nav-text">3.2 putIfAbsent</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-HashSet"><span class="nav-number">2.4.</span> <span class="nav-text">4. HashSet</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ConcurrentHashMap%E4%B8%BA%E4%BB%80%E4%B9%88k-v%E4%B8%8D%E8%83%BD%E4%B8%BAnull"><span class="nav-number">2.4.1.</span> <span class="nav-text">ConcurrentHashMap为什么k v不能为null</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#map%E5%B9%B6%E5%8F%91%E7%8E%AF%E5%A2%83%E4%B8%8B%E8%82%AF%E8%83%BD%E9%80%A0%E6%88%90%E6%AD%BB%E5%BE%AA%E7%8E%AF"><span class="nav-number">2.4.2.</span> <span class="nav-text">map并发环境下肯能造成死循环</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#put%E6%B5%81%E7%A8%8B"><span class="nav-number">2.5.</span> <span class="nav-text">put流程</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -409,14 +418,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">120</span>
+          <span class="site-state-item-count">121</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-count">25</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>
@@ -460,12 +469,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">354k</span>
+    <span title="站点总字数">357k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">5:21</span>
+    <span title="站点阅读时长">5:25</span>
 </div>
 
         
