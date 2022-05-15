@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/chrome2.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"wang-yonggan.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":true,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="一、zuul1.1 概述​    API网关是一个服务器，是系统对外的唯一入口。API网关封装了系统内部架构，为每个客户端提供一个定制的API。API网关方式的核心要点是，所有的客户端和消费端都通过统一的网关接入微服务，在网关层处理所有的非业务功能。通常，网关也是提供REST&#x2F;HTTP的访问API。服务端通过API-GW注册和管理服务。  ZUUL是Netflix开源的微服务网关，本质是一系列的s">
+<meta property="og:type" content="article">
+<meta property="og:title" content="微服务2">
+<meta property="og:url" content="https://wang-yonggan.github.io/2022/05/15/%E6%9E%B6%E6%9E%84/%E7%BD%91%E5%85%B3/index.html">
+<meta property="og:site_name" content="MySoul">
+<meta property="og:description" content="一、zuul1.1 概述​    API网关是一个服务器，是系统对外的唯一入口。API网关封装了系统内部架构，为每个客户端提供一个定制的API。API网关方式的核心要点是，所有的客户端和消费端都通过统一的网关接入微服务，在网关层处理所有的非业务功能。通常，网关也是提供REST&#x2F;HTTP的访问API。服务端通过API-GW注册和管理服务。  ZUUL是Netflix开源的微服务网关，本质是一系列的s">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220515005940111.png">
+<meta property="og:image" content="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220515130952178.png">
+<meta property="article:published_time" content="2022-05-15T07:16:35.168Z">
+<meta property="article:modified_time" content="2022-05-15T05:15:05.869Z">
+<meta property="article:author" content="勇敢">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220515005940111.png">
+
+<link rel="canonical" href="https://wang-yonggan.github.io/2022/05/15/%E6%9E%B6%E6%9E%84/%E7%BD%91%E5%85%B3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>微服务2 | MySoul</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">MySoul</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">取上得中，取中得下</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/05/15/%E6%9E%B6%E6%9E%84/%E7%BD%91%E5%85%B3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          微服务2
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-05-15 15:16:35" itemprop="dateCreated datePublished" datetime="2022-05-15T15:16:35+08:00">2022-05-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-05-15 13:15:05" itemprop="dateModified" datetime="2022-05-15T13:15:05+08:00">2022-05-15</time>
+              </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/05/15/%E6%9E%B6%E6%9E%84/%E7%BD%91%E5%85%B3/#SOHUCS" itemprop="discussionUrl">
+        <span id="changyan_count_unit" class="post-comments-count hc-comment-count" data-xid="2022/05/15/架构/网关/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>4.3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="一、zuul"><a href="#一、zuul" class="headerlink" title="一、zuul"></a>一、zuul</h2><h3 id="1-1-概述"><a href="#1-1-概述" class="headerlink" title="1.1 概述"></a>1.1 概述</h3><p>​    API网关是一个服务器，是系统对外的唯一入口。API网关封装了系统内部架构，为每个客户端提供一个定制的API。API网关方式的核心要点是，所有的客户端和消费端都通过统一的网关接入微服务，在网关层处理所有的非业务功能。通常，网关也是提供REST/HTTP的访问API。服务端通过API-GW注册和管理服务。</p>
+<blockquote>
+<p>ZUUL是Netflix开源的微服务网关，本质是一系列的servlet+filter </p>
+</blockquote>
+<h4 id="1-1-2-zuul的缺点"><a href="#1-1-2-zuul的缺点" class="headerlink" title="1.1.2 zuul的缺点"></a>1.1.2 zuul的缺点</h4><ol>
+<li>性能问题<br>Zuul1x基于阻塞 IO ，本质上就是一个同步Servlet。每来一个请求，Servlet容器要为该请求分配一个线程专门负责处理这个请求，直到响应返回客户端这个线程才会被释放返回容器线程池。如果后台服务调用比较耗时，那么这个线程就会被阻塞，阻塞期间线程资源被占用，不能干其它事情。我们知道Servlet容器线程池的大小是有限制的，当前端请求量大，而后台慢服务比较多时，很容易耗尽容器线程池内的线程，造成容器无法接受新的请求。</li>
+<li>不支持任何长连接，如websocket</li>
+</ol>
+<p>​    直到 2018 年 5 月，Zuul 2.x（基于Netty，也是非阻塞的，支持长连接）才发布，但 Spring Cloud 暂时还没有整合计划。Spring Cloud</p>
+<p>​    Gateway 比 Zuul 1.x 系列的性能和功能整体要好</p>
+<h3 id="1-2-过滤器方法"><a href="#1-2-过滤器方法" class="headerlink" title="1.2 过滤器方法"></a>1.2 过滤器方法</h3><ol>
+<li>shouldFilter ：返回一个 Boolean 值，判断该过滤器是否需要执行。返回true执行，返回false不执行。</li>
+<li>run ：过滤器的具体业务逻辑。</li>
+<li>filterType ：返回字符串，代表过滤器的类型：就是那四种。</li>
+<li>filterOrder ：通过返回的int值来定义过滤器的执行顺序，数字越小优先级越高。</li>
+</ol>
+<h3 id="1-3-过滤器类型与生命周期"><a href="#1-3-过滤器类型与生命周期" class="headerlink" title="1.3 过滤器类型与生命周期"></a>1.3 过滤器类型与生命周期</h3><blockquote>
+<p>zuul 提供了4种过滤器，对应不同的场景</p>
+</blockquote>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220515005940111.png" alt="image-20220515005940111"></p>
+<h4 id="1-3-1-PRE"><a href="#1-3-1-PRE" class="headerlink" title="1.3.1 PRE"></a>1.3.1 PRE</h4><p>​    在<strong>请求被路由之前调用</strong>，我们可利用这种过滤器实现<strong>身份验证</strong>、在集群中选择请求的微服务、记录调试信息等。</p>
+<h4 id="1-3-2-ROUTING"><a href="#1-3-2-ROUTING" class="headerlink" title="1.3.2 ROUTING"></a>1.3.2 ROUTING</h4><p>​    服务过滤器，用于构建发送给微服务的请求，并使用Apache HttpClient或Netfilx Ribbon<strong>请求微服务</strong>。</p>
+<h4 id="1-3-3-POST"><a href="#1-3-3-POST" class="headerlink" title="1.3.3 POST"></a>1.3.3 POST</h4><p>​    在<strong>路由到微服务以后</strong>执行，可用来为<strong>响应</strong>添加标准的HTTP Header、收集统计信息和指标、将响应从微服务发送给客户端等。</p>
+<h4 id="1-3-4-ERROR"><a href="#1-3-4-ERROR" class="headerlink" title="1.3.4 ERROR"></a>1.3.4 ERROR</h4><p>​    在其他阶段发生<strong>错误时</strong>执行该过滤器</p>
+<h3 id="1-4-过滤器功能"><a href="#1-4-过滤器功能" class="headerlink" title="1.4 过滤器功能"></a>1.4 过滤器功能</h3><ol>
+<li>动态路由：动态将请求路由到不同后端集群</li>
+<li>压力测试：逐渐增加指向集群的流量，以了解性能</li>
+<li>负载分配：为每一种负载类型分配对应容量，并弃用超出限定值的请求</li>
+<li>静态响应处理：边缘位置进行响应，避免转发到内部集群</li>
+<li>身份认证和安全: 识别每一个资源的验证要求，并拒绝那些不符的请求。Spring Cloud对Zuul进行了整合和增强。Spring Cloud对Zuul进行了整合和增强</li>
+</ol>
+<h3 id="1-5-使用"><a href="#1-5-使用" class="headerlink" title="1.5 使用"></a>1.5 使用</h3><h4 id="请求转发"><a href="#请求转发" class="headerlink" title="请求转发"></a>请求转发</h4><blockquote>
+<p>基于alias（虚拟uri），请求 <a target="_blank" rel="noopener" href="http://localhost:8080/e-mail/test">http://localhost:8080/e-mail/test</a> 实际请求的是<a target="_blank" rel="noopener" href="http://localhost:7001/test">http://localhost:7001/test</a></p>
+</blockquote>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">zuul:</span></span><br><span class="line">  <span class="attr">routes:</span></span><br><span class="line">	<span class="comment"># 硬编码配置，url固定</span></span><br><span class="line">	<span class="attr">mail-service:</span></span><br><span class="line">      <span class="attr">path:</span> <span class="string">/e-mail/**</span></span><br><span class="line">      <span class="attr">url:</span> <span class="string">http://localhost:7001</span></span><br><span class="line">     <span class="comment"># 缺省路由配置，基于eureka+service_id获得url</span></span><br><span class="line">     <span class="attr">mail-sevice:</span></span><br><span class="line">        <span class="attr">path:</span> <span class="string">/e-mail/**</span></span><br><span class="line">        <span class="attr">serviceId:</span> <span class="string">ep-mail</span></span><br><span class="line">     <span class="comment"># 简化配置 ,现在报错，区别就是 之前访问的是e-mail/test  现在访问的是ep-mail/test</span></span><br><span class="line">	<span class="attr">mail-service:</span></span><br><span class="line">		<span class="attr">abc:</span> <span class="string">/ep-mail/**</span> </span><br></pre></td></tr></table></figure>
+
+<h4 id="过滤"><a href="#过滤" class="headerlink" title="过滤"></a>过滤</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestFilter</span> <span class="keyword">extends</span> <span class="title">ZuulFilter</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">shouldFilter</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">run</span><span class="params">()</span> <span class="keyword">throws</span> ZuulException </span>&#123;</span><br><span class="line">        RequestContext ctx = RequestContext.getCurrentContext();</span><br><span class="line">        System.out.println(ctx.getRequest().getRequestURI());</span><br><span class="line">        System.out.println(<span class="string">&quot;过滤&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">filterType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;pre&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">filterOrder</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="二、GateWay"><a href="#二、GateWay" class="headerlink" title="二、GateWay"></a>二、GateWay</h2><h3 id="2-1-概述"><a href="#2-1-概述" class="headerlink" title="2.1 概述"></a>2.1 概述</h3><h4 id="2-1-1-介绍"><a href="#2-1-1-介绍" class="headerlink" title="2.1.1 介绍"></a>2.1.1 介绍</h4><p>​    Spring Cloud Gateway 是 Spring 官方基于 Spring 5.0，Spring Boot 2.0 和 Project Reactor 等技术开发的网关，旨在为微服务架构提供一种简单而有效的统一的 API 路由管理方式，统一访问接口。SpringCloud Gateway 作为 Spring Cloud 生态系中的网关，目标是替代 Netflix ZUUL，其不仅提供统一的路由方式，并且基于 Filter 链的方式提供了网关基本的功能，例如：安全，监控/埋点，和限流等。它是基于Nttey的响应式开发模式。</p>
+<h4 id="2-1-2-注意"><a href="#2-1-2-注意" class="headerlink" title="2.1.2 注意"></a>2.1.2 <strong>注意</strong></h4><ol>
+<li><p>SpringCloud Gateway使用的web框架为webflux，和SpringMVC不兼容。所以一般gateway的父工程没有web-starter依赖，引入的限流组件是hystrix。redis底层不再使用jedis，而是lettuce</p>
+</li>
+<li><p>gateway的路由和Zuul有点不一样，</p>
+<ol>
+<li>基于list</li>
+<li>基于root (真实url)，zuul基于alila</li>
+</ol>
+</li>
+</ol>
+<h3 id="2-2-核心概念"><a href="#2-2-核心概念" class="headerlink" title="2.2 核心概念"></a>2.2 核心概念</h3><blockquote>
+<p>GateWay提出了路由、断言和过滤器的概念，这些内容可以直接在<strong>yml配置文件中使用</strong></p>
+</blockquote>
+<h4 id="2-2-1-路由"><a href="#2-2-1-路由" class="headerlink" title="2.2.1 路由"></a>2.2.1 路由</h4><p>路由是网关最基础的部分，路由信息由一个ID、一个目的URL、一组断言工厂和一组Filter组成。如果断言为真，则说明请求URL和配置的路由匹配。</p>
+<h4 id="2-2-2-断言"><a href="#2-2-2-断言" class="headerlink" title="2.2.2 断言"></a>2.2.2 <strong>断言</strong></h4><p>Java8中的断言函数，Spring Cloud Gateway中的断言函数输入类型是Spring5.0框架中的ServerWebExchange。Spring Cloud Gateway中的断言函数<strong>允许开发者去定义匹配来自Http Request中的任何信息，比如请求头和参数等</strong>。</p>
+<h4 id="2-2-3-过滤器"><a href="#2-2-3-过滤器" class="headerlink" title="2.2.3 过滤器"></a>2.2.3 过滤器</h4><p> 一个标准的Spring webFilter，Spring Cloud Gateway中的Filter分为两种类型，分别是<strong>Gateway Filter</strong>和<strong>Global Filter</strong>。过滤器Filter可以对请求和响应进行处理。</p>
+<h3 id="2-3-过滤器"><a href="#2-3-过滤器" class="headerlink" title="2.3 过滤器"></a>2.3 过滤器</h3><blockquote>
+<p>相对于zuul，gateway提供两种过滤器 pre post，可以自己编写过滤器。</p>
+</blockquote>
+<blockquote>
+<p>作用范围上也可以分为</p>
+<ul>
+<li>GatewayFilter：应用到单个路由或者一个分组的路由上</li>
+<li>GlobalFilter：应用到所有的路由上</li>
+</ul>
+</blockquote>
+<h4 id="局部过滤器"><a href="#局部过滤器" class="headerlink" title="局部过滤器"></a>局部过滤器</h4><p>gateway提供了很多种类的过滤器</p>
+<p>作用：操作Requst，Responst，请求限流，重定向等</p>
+<h4 id="全局过滤器"><a href="#全局过滤器" class="headerlink" title="全局过滤器"></a>全局过滤器</h4><h4 id="自定义过滤器"><a href="#自定义过滤器" class="headerlink" title="自定义过滤器"></a>自定义过滤器</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//创建类</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestGatewayFilter</span> <span class="keyword">implements</span> <span class="title">GatewayFilter</span> , <span class="title">Ordered</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Mono&lt;Void&gt; <span class="title">filter</span><span class="params">(ServerWebExchange exchange, GatewayFilterChain chain)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;过滤&quot;</span>);</span><br><span class="line">        <span class="keyword">final</span> ServerHttpRequest request = exchange.getRequest();</span><br><span class="line">        <span class="keyword">if</span>(!request.getHeaders().get(<span class="string">&quot;token&quot;</span>).equals(<span class="string">&quot;abc&quot;</span>))</span><br><span class="line">            <span class="keyword">return</span> chain.filter(exchange);</span><br><span class="line">        <span class="keyword">return</span> exchange.getResponse().setComplete();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getOrder</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 注册</span></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FilterConfig</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> RouteLocator <span class="title">customerRouteLocator</span><span class="params">(RouteLocatorBuilder builder)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> builder.routes()</span><br><span class="line">                .route(</span><br><span class="line">                        r -&gt; r.path(<span class="string">&quot;/t/**&quot;</span>)</span><br><span class="line">                                .filters(f -&gt; f.filter(<span class="keyword">new</span> TestGatewayFilter()))</span><br><span class="line">                                .uri(<span class="string">&quot;http://localhots:7001&quot;</span>))</span><br><span class="line">                .build();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-4-其他功能"><a href="#2-4-其他功能" class="headerlink" title="2.4 其他功能"></a>2.4 其他功能</h3><h4 id="统一鉴权"><a href="#统一鉴权" class="headerlink" title="统一鉴权"></a>统一鉴权</h4><blockquote>
+<p>基于自定义过滤器设置统一鉴权</p>
+</blockquote>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220515130952178.png" alt="image-20220515130952178"></p>
+<h4 id="限流"><a href="#限流" class="headerlink" title="限流"></a>限流</h4><h3 id="2-5-使用"><a href="#2-5-使用" class="headerlink" title="2.5 使用"></a>2.5 使用</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-gateway<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">application:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">ep-gateway</span> <span class="comment">#指定服务名</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">gateway:</span></span><br><span class="line">      <span class="attr">routes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">id:</span> <span class="string">abc</span></span><br><span class="line">        <span class="comment">#路由</span></span><br><span class="line">        <span class="attr">uri:</span> <span class="string">http://127.0.0.1:7001</span></span><br><span class="line">        <span class="comment">#动态路由 uri: lb://shop-service-product 前提是由注册中心</span></span><br><span class="line">       	<span class="comment">#断言</span></span><br><span class="line">        <span class="attr">predicates:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">Path=/t/**</span></span><br><span class="line">        <span class="comment">#过滤器,转发重写rewrite</span></span><br><span class="line">        <span class="attr">filters:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">RewritePath=/product-service/(?&lt;segment&gt;.*),/$\&#123;segment&#125;</span></span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/05/15/%E6%9E%B6%E6%9E%84/springCloud%E7%B1%BB%E3%80%81%E6%B3%A8%E8%A7%A3%E4%B8%8E%E9%85%8D%E7%BD%AE/" rel="prev" title="">
+      <i class="fa fa-chevron-left"></i> 
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2022/05/15/%E6%9E%B6%E6%9E%84/%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83/" rel="next" title="微服务配置中心">
+      微服务配置中心 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="SOHUCS"></div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81zuul"><span class="nav-number">1.</span> <span class="nav-text">一、zuul</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E6%A6%82%E8%BF%B0"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 概述</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-2-zuul%E7%9A%84%E7%BC%BA%E7%82%B9"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.1.2 zuul的缺点</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E8%BF%87%E6%BB%A4%E5%99%A8%E6%96%B9%E6%B3%95"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 过滤器方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-%E8%BF%87%E6%BB%A4%E5%99%A8%E7%B1%BB%E5%9E%8B%E4%B8%8E%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 过滤器类型与生命周期</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-1-PRE"><span class="nav-number">1.3.1.</span> <span class="nav-text">1.3.1 PRE</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-2-ROUTING"><span class="nav-number">1.3.2.</span> <span class="nav-text">1.3.2 ROUTING</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-3-POST"><span class="nav-number">1.3.3.</span> <span class="nav-text">1.3.3 POST</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-4-ERROR"><span class="nav-number">1.3.4.</span> <span class="nav-text">1.3.4 ERROR</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-%E8%BF%87%E6%BB%A4%E5%99%A8%E5%8A%9F%E8%83%BD"><span class="nav-number">1.4.</span> <span class="nav-text">1.4 过滤器功能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-5-%E4%BD%BF%E7%94%A8"><span class="nav-number">1.5.</span> <span class="nav-text">1.5 使用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AF%B7%E6%B1%82%E8%BD%AC%E5%8F%91"><span class="nav-number">1.5.1.</span> <span class="nav-text">请求转发</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%87%E6%BB%A4"><span class="nav-number">1.5.2.</span> <span class="nav-text">过滤</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81GateWay"><span class="nav-number">2.</span> <span class="nav-text">二、GateWay</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E6%A6%82%E8%BF%B0"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 概述</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-1-%E4%BB%8B%E7%BB%8D"><span class="nav-number">2.1.1.</span> <span class="nav-text">2.1.1 介绍</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-2-%E6%B3%A8%E6%84%8F"><span class="nav-number">2.1.2.</span> <span class="nav-text">2.1.2 注意</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 核心概念</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-1-%E8%B7%AF%E7%94%B1"><span class="nav-number">2.2.1.</span> <span class="nav-text">2.2.1 路由</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-2-%E6%96%AD%E8%A8%80"><span class="nav-number">2.2.2.</span> <span class="nav-text">2.2.2 断言</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-3-%E8%BF%87%E6%BB%A4%E5%99%A8"><span class="nav-number">2.2.3.</span> <span class="nav-text">2.2.3 过滤器</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E8%BF%87%E6%BB%A4%E5%99%A8"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 过滤器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B1%80%E9%83%A8%E8%BF%87%E6%BB%A4%E5%99%A8"><span class="nav-number">2.3.1.</span> <span class="nav-text">局部过滤器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%A8%E5%B1%80%E8%BF%87%E6%BB%A4%E5%99%A8"><span class="nav-number">2.3.2.</span> <span class="nav-text">全局过滤器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E8%BF%87%E6%BB%A4%E5%99%A8"><span class="nav-number">2.3.3.</span> <span class="nav-text">自定义过滤器</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-%E5%85%B6%E4%BB%96%E5%8A%9F%E8%83%BD"><span class="nav-number">2.4.</span> <span class="nav-text">2.4 其他功能</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BB%9F%E4%B8%80%E9%89%B4%E6%9D%83"><span class="nav-number">2.4.1.</span> <span class="nav-text">统一鉴权</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%99%90%E6%B5%81"><span class="nav-number">2.4.2.</span> <span class="nav-text">限流</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-5-%E4%BD%BF%E7%94%A8"><span class="nav-number">2.5.</span> <span class="nav-text">2.5 使用</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="勇敢"
+      src="/images/t2.png">
+  <p class="site-author-name" itemprop="name">勇敢</p>
+  <div class="site-description" itemprop="description">学无止境</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">124</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="mailto:2245316014@qq.com" title="E-Mail → mailto:2245316014@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">勇敢</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">370k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">5:36</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script size="300" alpha="0.6" zIndex="-1" src="/lib/canvas-ribbon/canvas-ribbon.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+<script src="/js/bookmark.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  <script>
+  NexT.utils.loadComments(document.querySelector('#SOHUCS'), () => {
+    var appid = 'cyvGB7eAg';
+    var conf = 'e6246a7464cec504b3ea8361e3a3ff72';
+    var width = window.innerWidth || document.documentElement.clientWidth;
+    if (width < 960) {
+      window.document.write('<script id="changyan_mobile_js" charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/mobile/wap-js/changyan_mobile.js?client_id=' + appid + '&conf=' + conf + '"><\/script>');
+    } else {
+      var loadJs=function(d,a){var c=document.getElementsByTagName("head")[0]||document.head||document.documentElement;var b=document.createElement("script");b.setAttribute("type","text/javascript");b.setAttribute("charset","UTF-8");b.setAttribute("src",d);if(typeof a==="function"){if(window.attachEvent){b.onreadystatechange=function(){var e=b.readyState;if(e==="loaded"||e==="complete"){b.onreadystatechange=null;a()}}}else{b.onload=a}}c.appendChild(b)};loadJs("https://changyan.sohu.com/upload/changyan.js",function(){window.changyan.api.config({appid:appid,conf:conf})});
+    }
+  });
+  </script>
+  <script src="https://assets.changyan.sohu.com/upload/plugins/plugins.count.js"></script>
+
+</body>
+</html>
