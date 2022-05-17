@@ -185,6 +185,384 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/30/java/javaSE/JUC/java%E9%98%BB%E5%A1%9E/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/30/java/javaSE/JUC/java%E9%98%BB%E5%A1%9E/" class="post-title-link" itemprop="url">java阻塞</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-30 00:08:43" itemprop="dateCreated datePublished" datetime="2022-03-30T00:08:43+08:00">2022-03-30</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/JUC/" itemprop="url" rel="index"><span itemprop="name">JUC</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/30/java/javaSE/JUC/java%E9%98%BB%E5%A1%9E/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/30/java/javaSE/JUC/java%E9%98%BB%E5%A1%9E/" class="cy_cmt_count" data-xid="2022/03/30/java/javaSE/JUC/java阻塞/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>840</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>·</p>
+<p>挂起：一般是主动的，由系统或程序发出，甚至于辅存中去。（不释放CPU，可能释放内存，放在外存）</p>
+<p>阻塞：一般是被动的，在抢占资源中得不到资源，被动的挂起在内存，等待某种资源或信号量（即有了资源）将他唤醒。（释放CPU，不释放内存）</p>
+<h1 id="浅谈JAVA中的线程阻塞方法"><a href="#浅谈JAVA中的线程阻塞方法" class="headerlink" title="浅谈JAVA中的线程阻塞方法"></a>浅谈JAVA中的线程阻塞方法</h1><ol>
+<li><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/c5715fa91dd8">参考</a></li>
+</ol>
+<blockquote>
+<p>如果线程是因为调用了wait()、sleep()或者join()方法而导致的阻塞，可以中断线程，并且通过抛出InterruptedException来唤醒它;如果线程遇到了IO阻塞，无能为力，因为IO是操作系统实现的，Java代码并没有办法直接接触到操作系统。以下是详细的唤醒方法：</p>
+</blockquote>
+<ol>
+<li><p>sleep() 方法</p>
+<p>sleep(毫秒)，指定以毫秒为单位的时间，使线程在该时间内进入线程阻塞状态，期间得不到cpu的时间片，等到时间过去了，线程重新进入可执行状态。(暂停线程，不会释放锁)</p>
+</li>
+<li><p>suspend() 和 resume() 方法</p>
+<p>挂起和唤醒线程，suspend()使线程进入阻塞状态，只有对应的resume()被调用的时候，线程才会进入可执行状态。(不建议用，容易发生死锁)</p>
+</li>
+<li><p>yield() 方法</p>
+<p>会使的线程放弃当前分得的cpu时间片，进入<code>就绪</code>状态，接下来和平竞争，可能又直接进入<code>运行</code>状态。</p>
+</li>
+<li><p>wait() 和 notify() 方法</p>
+<ul>
+<li><p>wait()，线程进入<code>阻塞</code>状态</p>
+<p>notify()，线程进入<code>就绪</code>状态。</p>
+</li>
+<li><p>wait()内可加或不加参数，加参数时是以毫秒为单位，当到了指定时间或调用notify()方法时，进入就绪状态。</p>
+</li>
+</ul>
+</li>
+<li><p>join()方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">doSome();</span><br><span class="line">B.join();</span><br><span class="line">doSome();</span><br></pre></td></tr></table></figure>
+
+
+
+<p>是当前线程A调用另一个线程B的join()方法，当前线程转A入阻塞状态，直到线程B运行结束，线程A才由阻塞状态转为可执行状态。</p>
+</li>
+<li><p>以上是Java线程唤醒和阻塞的五种常用方法，不同的方法有不同的特点，其中wait() 和 notify()是其中功能最强大、使用最灵活的方法，但这也导致了它们效率较低、较容易出错的特性，因此，在实际应用中应灵活运用各种方法，以达到期望的目的与效果!</p>
+</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/27/java/javaSE/JUC/%E7%BA%BF%E7%A8%8B%E6%B1%A0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/27/java/javaSE/JUC/%E7%BA%BF%E7%A8%8B%E6%B1%A0/" class="post-title-link" itemprop="url">线程池</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-27 14:46:58" itemprop="dateCreated datePublished" datetime="2022-03-27T14:46:58+08:00">2022-03-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-05-12 04:34:51" itemprop="dateModified" datetime="2022-05-12T04:34:51+08:00">2022-05-12</time>
+              </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/27/java/javaSE/JUC/%E7%BA%BF%E7%A8%8B%E6%B1%A0/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/27/java/javaSE/JUC/%E7%BA%BF%E7%A8%8B%E6%B1%A0/" class="cy_cmt_count" data-xid="2022/03/27/java/javaSE/JUC/线程池/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.8k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="线程池的作用"><a href="#线程池的作用" class="headerlink" title="线程池的作用"></a>线程池的作用</h3><p>1.减少了创建和销毁线程的次数，每个工作线程都可以被重复利用，可执行多个任务。</p>
+<p>2.可以根据系统的承受能力，调整线程池中工作线线程的数目，防止因为消耗过多的内存，而把服务器累趴下(每个线程需要大约1MB内存，线程开的越多，消耗的内存也就越大，最后死机)。</p>
+<h4 id="submit与execute区别"><a href="#submit与execute区别" class="headerlink" title="submit与execute区别"></a>submit与execute区别</h4><ol>
+<li>summit 提交 callable，可以进行异常管理</li>
+<li>execute runable </li>
+</ol>
+<h3 id="参数-ThreadPoolExecutor"><a href="#参数-ThreadPoolExecutor" class="headerlink" title="参数 ThreadPoolExecutor"></a>参数 ThreadPoolExecutor</h3><table>
+<thead>
+<tr>
+<th>参数</th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>int corePoolSize</td>
+<td>常驻线程数量</td>
+<td></td>
+</tr>
+<tr>
+<td>int maximumPoolSize</td>
+<td>表示最大线程数，如当前任务较多，将核心线程数都用完了，此时就会创建新的线程，但线程池内线程总数不会超过最大线程数</td>
+<td></td>
+</tr>
+<tr>
+<td>long keepAliveTime</td>
+<td>空闲线程存活时间(减少到常驻数量)</td>
+<td></td>
+</tr>
+<tr>
+<td>TimeUnit unit</td>
+<td>时间类型</td>
+<td></td>
+</tr>
+<tr>
+<td>BlockingQueue<Runnable> workQueue</td>
+<td>多的线程进入–&gt;阻塞队列</td>
+<td></td>
+</tr>
+<tr>
+<td>ThreadFactory threadFactory</td>
+<td>线程工厂</td>
+<td></td>
+</tr>
+<tr>
+<td>RejectedExecutionHandler handler</td>
+<td>当队列满的时候，拒绝策略</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id="二、类型"><a href="#二、类型" class="headerlink" title="二、类型"></a>二、类型</h2><table>
+<thead>
+<tr>
+<th>名称</th>
+<th>参数</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>newFixedThreadPool</td>
+<td>(x,x)  0   LinkedBlockingQueue</td>
+<td>前x个能运行，其余进入队列</td>
+</tr>
+<tr>
+<td>newSingleThreadExecutor</td>
+<td>(1,1)  0  LinkedBlockingQueue</td>
+<td>只能一个运行，其余进入队列</td>
+</tr>
+<tr>
+<td>newCachedThreadPool</td>
+<td>(0,N) 60s  SynchronousQueue</td>
+<td>无限长变化池，来一个运行一个</td>
+</tr>
+<tr>
+<td>newScheduledThreadPool</td>
+<td>(x,N) 0  DelayedWorkQueue</td>
+<td>无限长变化池，延迟运行</td>
+</tr>
+</tbody></table>
+<h4 id="2-1-定长线程池"><a href="#2-1-定长线程池" class="headerlink" title="2.1 定长线程池"></a>2.1 定长线程池</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ExecutorService pools = Executors.newFixedThreadPool(<span class="number">5</span>);<span class="comment">//一池5线程</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>多出的线程进入LinkedBlockingQueue，</p>
+</blockquote>
+<h4 id="2-2-一池一线程"><a href="#2-2-一池一线程" class="headerlink" title="2.2 一池一线程"></a>2.2 一池一线程</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> ExecutorService singleExecutor = Executors.newSingleThreadExecutor();</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-3-可扩容池"><a href="#2-3-可扩容池" class="headerlink" title="2.3 可扩容池"></a>2.3 可扩容池</h4><ul>
+<li>它比较适合处理执行时间比较小的任务；</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> ExecutorService cachedThreadPool = Executors.newCachedThreadPool();</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-4-定长延迟线程池"><a href="#2-4-定长延迟线程池" class="headerlink" title="2.4 定长延迟线程池"></a>2.4 定长延迟线程池</h4><blockquote>
+<p>可周期性，延迟性</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(<span class="number">2</span>);<span class="comment">//2个线程</span></span><br><span class="line">scheduledThreadPool.schedule(()-&gt;sout,<span class="number">3</span>,TimeUtil.SECONDS);<span class="comment">//延迟性，3秒后执行</span></span><br><span class="line">scheduledThreadPool.schedule(()-&gt;sout,<span class="number">1</span>,<span class="number">3</span>,TimeUtil.SECONDS);<span class="comment">//周期性，延迟性，1秒后执行，每三秒执行一次</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="三、queue类型"><a href="#三、queue类型" class="headerlink" title="三、queue类型"></a>三、queue类型</h2><h3 id="SynchronousQueue"><a href="#SynchronousQueue" class="headerlink" title="SynchronousQueue"></a>SynchronousQueue</h3><blockquote>
+<p>没有容量，直接提交。</p>
+<p>SynchronousQueue阻塞队列一般要求maximumPoolSizes为无界，避免线程拒绝执行操作。</p>
+</blockquote>
+<h3 id="LinkedBlockingQueue"><a href="#LinkedBlockingQueue" class="headerlink" title="LinkedBlockingQueue"></a>LinkedBlockingQueue</h3><blockquote>
+<p>无界队列，多于corePoolSize的线程被放进来等待，maximumPoolSizess变为无效参数</p>
+</blockquote>
+<h3 id="ArrayBlockingQueue"><a href="#ArrayBlockingQueue" class="headerlink" title="ArrayBlockingQueue"></a>ArrayBlockingQueue</h3><blockquote>
+<p>有界队列，可以指定缓存队列的大小，当线程数量大于corePoolSize时，多余的任务会缓存在ArrayBlockingQueue队列中等待有空闲的线程时继续执行；当ArrayBlockingQueue满时，则又会开启新的线程去执行，直到线程数量达到maximumPoolSize；当线程数已经达到最大的maximumPoolSize时，再有新的任务到达时会执行拒绝执行策略</p>
+</blockquote>
+<h4 id="DelayedWorkQueue"><a href="#DelayedWorkQueue" class="headerlink" title="DelayedWorkQueue"></a>DelayedWorkQueue</h4><blockquote>
+<p>无界阻塞延迟队列，根据剩余时间进行堆排序，最先过期的在最前面</p>
+</blockquote>
+<h2 id="四、其他"><a href="#四、其他" class="headerlink" title="四、其他"></a>四、其他</h2><h3 id="4-2-拒绝策略"><a href="#4-2-拒绝策略" class="headerlink" title="4.2 拒绝策略"></a>4.2 拒绝策略</h3><table>
+<thead>
+<tr>
+<th>名称</th>
+<th>作用</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CallerRunsPolicy</td>
+<td>使用调用线程直接运行任务</td>
+<td></td>
+</tr>
+<tr>
+<td>AbortPolicy</td>
+<td>丢弃</td>
+<td></td>
+</tr>
+<tr>
+<td>DiscardPolicy</td>
+<td>丢弃，抛出异常</td>
+<td></td>
+</tr>
+<tr>
+<td>DiscardOldestPolicy</td>
+<td>丢弃阻塞队列 workQueue 中最老的一个任务，并将新任务加入</td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id="4-2-ThreadFactory"><a href="#4-2-ThreadFactory" class="headerlink" title="4.2 ThreadFactory"></a>4.2 ThreadFactory</h3><blockquote>
+<p>线程池可选参数，在线程放入线程池前处理线程</p>
+</blockquote>
+<ol>
+<li>设置名称</li>
+<li>设置是否为守护线程</li>
+<li>设置优先级</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/27/java/javaSE/JUC/JUC%E7%9A%84%E5%9F%BA%E7%A1%80/CSA/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -748,404 +1126,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/22/java/javaSE/%E5%86%85%E9%83%A8%E7%B1%BB/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/22/java/javaSE/%E5%86%85%E9%83%A8%E7%B1%BB/" class="post-title-link" itemprop="url">内部类</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-22 18:44:47" itemprop="dateCreated datePublished" datetime="2022-03-22T18:44:47+08:00">2022-03-22</time>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/22/java/javaSE/%E5%86%85%E9%83%A8%E7%B1%BB/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/22/java/javaSE/%E5%86%85%E9%83%A8%E7%B1%BB/" class="cy_cmt_count" data-xid="2022/03/22/java/javaSE/内部类/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>2.4k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h4 id="1-作用"><a href="#1-作用" class="headerlink" title="1 作用"></a>1 作用</h4><ol>
-<li>可以实现多重继承：定义一个半成品类继承类1，</li>
-<li>可以直接访问外部类的成员，包括私有</li>
-</ol>
-<h4 id="2-内部类的分类"><a href="#2-内部类的分类" class="headerlink" title="2  内部类的分类"></a>2  内部类的分类</h4><ul>
-<li><p>成员内部类 –&gt; 类里的类</p>
-<blockquote>
-<p>不能定义静态变量，除了final修饰的</p>
-</blockquote>
-</li>
-<li><p>局部内部类 –&gt; 函数里面的类</p>
-</li>
-<li><p>静态内部类 –&gt; 类里面static类</p>
-<blockquote>
-<p>和普通的类差不多,引用方式  Out.Inner inner =  new Out.Inner();  inner.do();</p>
-</blockquote>
-</li>
-<li><p>匿名内部类 –&gt;  lambda</p>
-</li>
-</ul>
-<h4 id="3-注意点"><a href="#3-注意点" class="headerlink" title="3 注意点"></a>3 注意点</h4><ol>
-<li><p>各个类也有访问权限</p>
-<ol>
-<li>默认defalut</li>
-<li>只有public的能在别的包创建这个内部类</li>
-</ol>
-</li>
-<li><p>非static的成员内部类不能有static方法,也即不能有main函数</p>
-</li>
-<li><p>创建一个成员内类就相当于创建了两个类: 外部+内部</p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211203232620875.png" alt="image-20211203232620875"></p>
-</li>
-<li><p>函数里面不能有权限符号 private等,所有局部内部类都是只有这个方法能访问的</p>
-</li>
-<li><p>为什么局部内部类访问局部变量必须加final修饰呢</p>
-<blockquote>
-<p>​    因为<strong>局部变量是随着方法的调用而调用</strong>，<strong>使用完毕就消失</strong>，<strong>而堆内存的数据并不会立即消失</strong>。</p>
-<p>所以，堆内存还是用该变量，而该变量已经没有了。<strong>为了让该值还存在，就加final修饰。</strong></p>
-<p>原因是，当我们使用final修饰变量后，堆内存直接存储的<strong>是值</strong>，而<strong>不是变量名</strong>。</p>
-</blockquote>
-</li>
-</ol>
-<h3 id="2-成员内部类"><a href="#2-成员内部类" class="headerlink" title="2. 成员内部类"></a>2. 成员内部类</h3><blockquote>
-<p>成员内部类不能定义静态变量。类初始化的时候先初始化静态成员，如果允许成员内。部类定义静态变量，那么成员内部类的静态变量初始化顺序是有歧义的</p>
-</blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SSS</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> age;</span><br><span class="line">	</span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Inner</span> </span>&#123;  	<span class="comment">//成员内部类</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">show</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            System.out.println(age);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Inner2</span> </span>&#123;  <span class="comment">//静态内部类/嵌套内部类</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">show</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            System.out.println(<span class="number">111</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">SSS.Inner a=<span class="keyword">new</span> SSS().<span class="function">new <span class="title">Inner</span><span class="params">()</span></span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="3-局部内部类"><a href="#3-局部内部类" class="headerlink" title="3. 局部内部类"></a>3. 局部内部类</h3><h3 id="4-HashMap内部类"><a href="#4-HashMap内部类" class="headerlink" title="4.  HashMap内部类"></a>4.  HashMap内部类</h3><ol>
-<li><p>keySet,Values</p>
-<blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">KeySet</span> <span class="keyword">extends</span> <span class="title">AbstractSet</span>&lt;<span class="title">K</span>&gt; </span></span><br></pre></td></tr></table></figure>
-
-
-
-<p>用于懒加载</p>
-</blockquote>
-</li>
-<li><p>EntrySet</p>
-<blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">EntrySet</span> <span class="keyword">extends</span> <span class="title">AbstractSet</span>&lt;<span class="title">Map</span>.<span class="title">Entry</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt;&gt;</span>&#123;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>懒加载类，</p>
-</blockquote>
-</li>
-<li><p>EntryIterator</p>
-<blockquote>
-<p>基于HashMap自身的next方法的迭代器</p>
-</blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">EntryIterator</span> <span class="keyword">extends</span> <span class="title">HashIterator</span> <span class="keyword">implements</span> <span class="title">Iterator</span>&lt;<span class="title">Map</span>.<span class="title">Entry</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt;&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">final</span> Map.<span class="function">Entry&lt;K,V&gt; <span class="title">next</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> nextNode(); &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">final</span> Node&lt;K,V&gt; <span class="title">nextNode</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Node&lt;K,V&gt;[] t;</span><br><span class="line">    Node&lt;K,V&gt; e = next;</span><br><span class="line">    <span class="keyword">if</span> (modCount != expectedModCount)</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> ConcurrentModificationException();</span><br><span class="line">    <span class="keyword">if</span> (e == <span class="keyword">null</span>)</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> NoSuchElementException();</span><br><span class="line">    <span class="keyword">if</span> ((next = (current = e).next) == <span class="keyword">null</span> &amp;&amp; (t = table) != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">do</span> &#123;&#125; <span class="keyword">while</span> (index &lt; t.length &amp;&amp; (next = t[index++]) == <span class="keyword">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> e;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h4 id="静态内部类"><a href="#静态内部类" class="headerlink" title="静态内部类"></a>静态内部类</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Node</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; <span class="keyword">implements</span> <span class="title">Map</span>.<span class="title">Entry</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt;</span>&#123;</span><br><span class="line">    Node(<span class="keyword">int</span> hash, K key, V value, Node&lt;K,V&gt; next) &#123;</span><br><span class="line">           <span class="keyword">this</span>.hash = hash;</span><br><span class="line">           <span class="keyword">this</span>.key = key;</span><br><span class="line">           <span class="keyword">this</span>.value = value;</span><br><span class="line">           <span class="keyword">this</span>.next = next;</span><br><span class="line">       &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h4 id="foreach实现"><a href="#foreach实现" class="headerlink" title="foreach实现"></a>foreach实现</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (Map.Entry&lt;K, V&gt; entry : entrySet()) &#123;</span><br><span class="line">    action.accept(k, v);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//  --&gt;  entrySet()=new EntrySet(); </span></span><br><span class="line"><span class="comment">//  --&gt;  EntrySet 实现了iterable接口 具体方法为</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> Iterator&lt;Map.Entry&lt;K,V&gt;&gt; iterator() &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> EntryIterator();</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//  --&gt; 迭代器next方法的本质为</span></span><br><span class="line"><span class="comment">// 1. .next遍历链表或者红黑树，直到为null</span></span><br><span class="line"><span class="comment">// 2. 遍历数组，找到新的元素再.next遍历</span></span><br><span class="line"><span class="function"><span class="keyword">final</span> Node&lt;K,V&gt; <span class="title">nextNode</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Node&lt;K,V&gt;[] t;</span><br><span class="line">    Node&lt;K,V&gt; e = next;</span><br><span class="line">    <span class="keyword">if</span> (modCount != expectedModCount)</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> ConcurrentModificationException();</span><br><span class="line">    <span class="keyword">if</span> ((next = (current = e).next) == <span class="keyword">null</span> &amp;&amp; (t = table) != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">do</span> &#123;&#125; <span class="keyword">while</span> (index &lt; t.length &amp;&amp; (next = t[index++]) == <span class="keyword">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> e;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//  --&gt; </span></span><br><span class="line"><span class="comment">//  --&gt; </span></span><br></pre></td></tr></table></figure></li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/22/java/javaSE/jvm/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/22/java/javaSE/jvm/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B/" class="post-title-link" itemprop="url">类加载</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-22 18:04:19" itemprop="dateCreated datePublished" datetime="2022-03-22T18:04:19+08:00">2022-03-22</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/JVM/" itemprop="url" rel="index"><span itemprop="name">JVM</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/22/java/javaSE/jvm/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/22/java/javaSE/jvm/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B/" class="cy_cmt_count" data-xid="2022/03/22/java/javaSE/jvm/类加载过程/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>3k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>3 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>[toc]</p>
-<h2 id="一、生命周期"><a href="#一、生命周期" class="headerlink" title="一、生命周期"></a>一、生命周期</h2><blockquote>
-<p>  JVM把class文件加载的内存，并对数据进行校验、转换解析和初始化，最终形成JVM可以直接使用的Java类型的过程就是加载机制。</p>
-</blockquote>
-<h3 id="1-1-加载-参考"><a href="#1-1-加载-参考" class="headerlink" title="1.1 加载-参考"></a>1.1 <a target="_blank" rel="noopener" href="https://my.oschina.net/winHerson/blog/114180?p=%7B%7BtotalPage%7D%7D">加载-参考</a></h3><ol>
-<li>通过一个类的权限定名从文件(.class、.jar、网络)中来获取定义此类的二进制字节流</li>
-<li>将这个字节流所代表的静态存储结构转化为方法去的运行时数据结构</li>
-<li>在java堆中生成一个代表这个类的java.lang.Class对象，作为方法去这些数据的访问入口。</li>
-</ol>
-<h3 id="1-2-连接"><a href="#1-2-连接" class="headerlink" title="1.2 连接"></a>1.2 连接</h3><h4 id="1-2-1-验证"><a href="#1-2-1-验证" class="headerlink" title="1.2.1 验证"></a>1.2.1 验证</h4><ol>
-<li><p>文件格式验证</p>
-<p>验证class文件格式规范，例如： class文件是否已魔术0xCAFEBABE开头 ， 主、次版本号是否在当前虚拟机处理范围之内等</p>
-</li>
-<li><p>元数据验证</p>
-<p>这个阶段是对字节码描述的信息进行语义分析，以保证起描述的信息符合java语言规范要求。验证点可能包括：这个类是否有父类(除了java.lang.Object之外，所有的类都应当有父类)、这个类是否继承了不允许被继承的类(被final修饰的)、如果这个类的父类是抽象类，是否实现了起父类或接口中要求实现的所有方法。</p>
-</li>
-<li><p>字节码验证</p>
-<p>进行数据流和控制流分析，这个阶段对类的方法体进行校验分析，这个阶段的任务是保证被校验类的方法在运行时不会做出危害虚拟机安全的行为.如：保证访法体中的类型转换有效，例如可以把一个子类对象赋值给父类数据类型，这是安全的，但不能把一个父类对象赋值给子类数据类型、保证跳转命令不会跳转到方法体以外的字节码命令上。</p>
-</li>
-<li><p>符号引用验证</p>
-<p>符号引用中通过字符串描述的全限定名是否能找到对应的类、符号引用类中的类，字段和方法的访问性(private、protected、public、default)是否可被当前类访问。</p>
-</li>
-</ol>
-<h4 id="1-2-1-准备"><a href="#1-2-1-准备" class="headerlink" title="1.2.1 准备"></a>1.2.1 准备</h4><blockquote>
-<p>为类变量分配内存并设置变量初始值(零值)的阶段，这些内存都将在方法去中进行分配。</p>
-</blockquote>
-<ol>
-<li><p>进行内存分配的仅包括类变量（被static修饰的变量），而不包括实例变量，实例变量将会在对象实例化时随着对象一起分配在java堆中</p>
-</li>
-<li><p>初始值是指数据类型为零值，主要是为了初始化内存，并不做逻辑代码</p>
-<ul>
-<li><p>public static int value = 123</p>
-<p>那么变量value在准备阶段过后的值是0，而不是123，因为这时候尚未开始执行任何java方法。</p>
-</li>
-<li><p>public static final int value = 123</p>
-<p>final修饰的字段，子啊准备阶段虚拟机就会根据赋值，value的值为123.</p>
-</li>
-</ul>
-</li>
-</ol>
-<h4 id="1-2-3-解析"><a href="#1-2-3-解析" class="headerlink" title="1.2.3 解析"></a>1.2.3 解析</h4><blockquote>
-<p> 虚拟机将常量池内的符号引用替换为直接引用的过程</p>
-</blockquote>
-<h5 id="1-2-3-1-符号、直接引用"><a href="#1-2-3-1-符号、直接引用" class="headerlink" title="1.2.3.1 符号、直接引用"></a>1.2.3.1 符号、直接引用</h5><ul>
-<li>符号引用：描述所引用的目标对象的符号，可以是任何形式的字面量，只要使用时能无歧义地定位到目标即可。引用的目标对象并不一定已经加载到内存中。</li>
-<li>直接引用：指向目标对象的指针、相对偏移量、一个能间接定位到目标的句柄。直接引用的目标必定已经在内存中存在。</li>
-<li>例如 String a=”str”; 这个a在解析阶段之前就是符号引用，解析之后就是直接引用</li>
-</ul>
-<h5 id="1-2-3-2-解析内容"><a href="#1-2-3-2-解析内容" class="headerlink" title="1.2.3.2 解析内容"></a>1.2.3.2 解析内容</h5><ol>
-<li><p>类或接口的解析</p>
-</li>
-<li><p>字段解析：解析出类的方法表的class_index项中索引的字段所属的类或接口的符号引用</p>
-</li>
-<li><p>类方法解析：首先解析出类的方法表的class_index项中索引的方法所属的类或接口的符号引用</p>
-</li>
-<li><p>接口方法解析：首先解析出类的方法表的class_index项中索引的方法所属的类或接口的符号引用。</p>
-</li>
-</ol>
-<h3 id="1-3-初始化"><a href="#1-3-初始化" class="headerlink" title="1.3 初始化"></a>1.3 初始化</h3><blockquote>
-<p>执行类中定义的java程序逻辑代码</p>
-</blockquote>
-<h4 id="1-3-1-触发条件"><a href="#1-3-1-触发条件" class="headerlink" title="1.3.1 触发条件"></a>1.3.1 触发条件</h4><p>以下四种情况触发执行类构造器clinit()方法</p>
-<ol>
-<li>new关键字实例化对象</li>
-<li>访问一个类的静态字段(被final修饰、已在编译器把结果放入常量池的静态字段除外)</li>
-<li>调用类的静态方法</li>
-<li>使用java.lang.reflect包的方法对类进行反射调用的时候</li>
-<li>jvm启动时，用户指定一个执行的主类(包含main方法的那个类)，虚拟机会先初始化这个类</li>
-<li>当初始化一个类的时候，如果发现其父类还没有进行过初始化、则需要先出发其父类的初始化</li>
-</ol>
-<h3 id="1-4-使用"><a href="#1-4-使用" class="headerlink" title="1.4 使用"></a>1.4 使用</h3><h3 id="1-5-卸载"><a href="#1-5-卸载" class="headerlink" title="1.5 卸载"></a>1.5 卸载</h3><h2 id="二、其他"><a href="#二、其他" class="headerlink" title="二、其他"></a>二、其他</h2><h3 id="2-1-双亲委派机制"><a href="#2-1-双亲委派机制" class="headerlink" title="2.1 双亲委派机制"></a>2.1 双亲委派机制</h3><h3 id="2-2-实例化对象的方式"><a href="#2-2-实例化对象的方式" class="headerlink" title="2.2 实例化对象的方式"></a>2.2 实例化对象的方式</h3><ol>
-<li>创建<ol>
-<li>new</li>
-<li>newInstance(要求有无参构造)</li>
-<li>clone</li>
-</ol>
-</li>
-<li>序列化<ol>
-<li>加载文件</li>
-<li>反序列化</li>
-<li>网络请求</li>
-</ol>
-</li>
-</ol>
-<h3 id="2-3-newInstance与new"><a href="#2-3-newInstance与new" class="headerlink" title="2.3 newInstance与new"></a>2.3 <a target="_blank" rel="noopener" href="https://www.cnblogs.com/zouxiangzhongyan/p/10722118.html">newInstance与new</a></h3><blockquote>
-<p>spring中有很多的newInstance</p>
-</blockquote>
-<ol>
-<li>newInstance要求<ol>
-<li>这个类已经加载</li>
-<li>这个类已经连接了</li>
-<li>这两步可用Class.forname完成</li>
-</ol>
-</li>
-<li>newInstance是通过反射创建对象的，在创建一个类的对象的时候，你可以对该类一无所知，一些开源框架比如Spring内部大都是通过反射来创建实例的，当然这种方法创建对象的时候必须拥有该类的句柄，甚至必要的时候还要有相关的权限设置（比如无参构造函数是私有的），而句柄是可以动态载入的，实际上JVM内部也是这样加载类的。该方法创建对象的时候，只会调用该类的无参数构造函数，不会调用其他的有参构造函数。</li>
-<li>new  后面接类名参数，是最常见的创建实例的方式。这是必须要知道一个明确的类才能使用</li>
-</ol>
-<h4 id="2-3-2-解耦"><a href="#2-3-2-解耦" class="headerlink" title="2.3.2 解耦"></a>2.3.2 解耦</h4><blockquote>
-<p>newInstance实际上是把new方式分解为两步</p>
-</blockquote>
-<ol>
-<li>首先调用Class加载方法加载某个类</li>
-<li>然后实例化。</li>
-</ol>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"> Class a1 = Class.forName(<span class="string">&quot;A&quot;</span>);</span><br><span class="line">BeanFactory a2 =  (BeanFactory) a1.newInstance();</span><br><span class="line">System.out.println(a2);</span><br><span class="line">Class b1 = Class.forName(<span class="string">&quot;B&quot;</span>);</span><br><span class="line">BeanFactory b2 =  (BeanFactory) b1.newInstance();</span><br><span class="line">System.out.println(b2); <span class="comment">//两个l</span></span><br></pre></td></tr></table></figure>
-
-
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">String className = readfromXMlConfig;<span class="comment">//从xml 配置文件中获需要加载的类</span></span><br><span class="line">Class c = Class.forName（className）；</span><br><span class="line">factory = （AInterface）c.newInstance（）；<span class="comment">//这样，在不知道是实现类的类名的情况下创建到了实现类</span></span><br></pre></td></tr></table></figure>
-
-<p>可以在调用class.forName时获得更好的灵活性（获得更宽泛的类名），提供给了一种降耦(降低耦合度)的手段。</p>
-<h4 id="2-3-3-区别总结"><a href="#2-3-3-区别总结" class="headerlink" title="2.3.3  区别总结"></a>2.3.3  区别总结</h4><ul>
-<li>newInstance: 方法级别，弱类型。低效率。只能调用无参构造。</li>
-<li>new: 关键字级别，强类型。相对高效。能调用任何public构造。</li>
-</ul>
-<h4 id="2-3-4-newInstance用途"><a href="#2-3-4-newInstance用途" class="headerlink" title="2.3.4 newInstance用途"></a>2.3.4 newInstance用途</h4><p>是实现IOC、反射、依赖倒置 等技术方法的必然选择，new 只能实现具体类的实例化，不适合于接口编程。类里面就是经过这个类的默认构造函数构建了一个对象，若是没有默认构造函数就抛出InstantiationException, 若是没有访问默认构造函数的权限就抛出IllegalAccessException xml</p>
-<h2 id="三、类加载器"><a href="#三、类加载器" class="headerlink" title="三、类加载器"></a>三、类加载器</h2><h3 id="3-1-三级"><a href="#3-1-三级" class="headerlink" title="3.1 三级"></a>3.1 三级</h3><h4 id="3-1-1-Bootstrap类加载器"><a href="#3-1-1-Bootstrap类加载器" class="headerlink" title="3.1.1 Bootstrap类加载器"></a>3.1.1 Bootstrap类加载器</h4><ul>
-<li>作用：加载java.lib下面的核心类库<ul>
-<li>rt.jar</li>
-<li>resources.jar</li>
-</ul>
-</li>
-<li>获取：System.getProperty(“sun.boot.class.path”)</li>
-</ul>
-<h4 id="3-1-2-Extension类加载器"><a href="#3-1-2-Extension类加载器" class="headerlink" title="3.1.2 Extension类加载器"></a>3.1.2 Extension类加载器</h4><ul>
-<li>作用：加载java.lib.ext下的类</li>
-<li>System.getProperty(“java.ext.dirs”)</li>
-</ul>
-<h4 id="3-1-3-System类加载器"><a href="#3-1-3-System类加载器" class="headerlink" title="3.1.3 System类加载器"></a>3.1.3 System类加载器</h4><ul>
-<li>作用：加载javaclasspath下的类</li>
-</ul>
-<h3 id="3-2-双亲委派机制"><a href="#3-2-双亲委派机制" class="headerlink" title="3.2 双亲委派机制"></a>3.2 双亲委派机制</h3>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/9/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><span class="page-number current">10</span><a class="page-number" href="/page/11/">11</a><span class="space">&hellip;</span><a class="page-number" href="/page/25/">25</a><a class="extend next" rel="next" href="/page/11/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/9/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><span class="page-number current">10</span><a class="page-number" href="/page/11/">11</a><span class="space">&hellip;</span><a class="page-number" href="/page/26/">26</a><a class="extend next" rel="next" href="/page/11/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1213,14 +1197,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">124</span>
+          <span class="site-state-item-count">126</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-count">28</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>
@@ -1261,12 +1245,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">370k</span>
+    <span title="站点总字数">379k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">5:36</span>
+    <span title="站点阅读时长">5:45</span>
 </div>
 
         
