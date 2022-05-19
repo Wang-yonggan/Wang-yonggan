@@ -185,6 +185,412 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/02/21/%E7%BB%84%E4%BB%B6/ORM/mybatis/mybatis-%E5%8A%A8%E6%80%81sql/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/02/21/%E7%BB%84%E4%BB%B6/ORM/mybatis/mybatis-%E5%8A%A8%E6%80%81sql/" class="post-title-link" itemprop="url">mybatis之动态sql</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-02-21 12:55:14" itemprop="dateCreated datePublished" datetime="2022-02-21T12:55:14+08:00">2022-02-21</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%BB%84%E4%BB%B6/" itemprop="url" rel="index"><span itemprop="name">组件</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/02/21/%E7%BB%84%E4%BB%B6/ORM/mybatis/mybatis-%E5%8A%A8%E6%80%81sql/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/02/21/%E7%BB%84%E4%BB%B6/ORM/mybatis/mybatis-%E5%8A%A8%E6%80%81sql/" class="cy_cmt_count" data-xid="2022/02/21/组件/ORM/mybatis/mybatis-动态sql/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="mybatis之动态sql"><a href="#mybatis之动态sql" class="headerlink" title="mybatis之动态sql"></a>mybatis之动态sql</h1><p>动态sql是Mybatis增加mapper.xml的sql语句的灵活性而设计的。</p>
+<p>[toc]</p>
+<h3 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h3><ol>
+<li><p>date-string转换函数</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">update</span> <span class="attr">id</span>=<span class="string">&quot;updateInventory&quot;</span> <span class="attr">parameterType</span>=<span class="string">&quot;com.docc.model.Inventory&quot;</span>&gt;</span></span><br><span class="line">update BUS_INVENTORY</span><br><span class="line">set orgcode = #&#123;orgcode,jdbcType=VARCHAR&#125;,</span><br><span class="line">    reportdate = #&#123;reportdate,jdbcType=CHAR&#125;,</span><br><span class="line">    checkname = &#x27;$&#123;checkname&#125;&#x27;,</span><br><span class="line">    archivetime = to_date(#&#123;archivetime,jdbcType=DATE&#125;,&#x27;yyyy-mm-dd&#x27;)      </span><br><span class="line">where id = #&#123;id,jdbcType=DECIMAL&#125;</span><br><span class="line"><span class="tag">&lt;/<span class="name">update</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="条件"><a href="#条件" class="headerlink" title="条件"></a>条件</h3><ol>
+<li><p>条件if</p>
+<p> 一定要注意多if于单if下where,and所在位置，但条件的话where就要在if里面，且不需要and，下面用trim解决</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;findActiveBlogWithTitleLike&quot;</span> <span class="attr">resultType</span>=<span class="string">&quot;Blog&quot;</span>&gt;</span></span><br><span class="line">  SELECT * FROM BLOG</span><br><span class="line">  WHERE state = ‘ACTIVE’</span><br><span class="line">  <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">&quot;title != null&quot;</span>&gt;</span></span><br><span class="line">    AND title like #&#123;title&#125;</span><br><span class="line">  <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>优先条件 choose-when-otherwise</p>
+<p>优先条件查询：繁杂的when&lt;—-&gt;繁杂的if-else</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;findActiveBlogLike&quot;</span> <span class="attr">resultType</span>=<span class="string">&quot;Blog&quot;</span>&gt;</span></span><br><span class="line">  SELECT * FROM BLOG WHERE state = ‘ACTIVE’</span><br><span class="line">  <span class="tag">&lt;<span class="name">choose</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">when</span> <span class="attr">test</span>=<span class="string">&quot;title != null&quot;</span>&gt;</span></span><br><span class="line">      AND title like #&#123;title&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">when</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">when</span> <span class="attr">test</span>=<span class="string">&quot;author != null and author.name != null&quot;</span>&gt;</span></span><br><span class="line">      AND author_name like #&#123;author.name&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">when</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">otherwise</span>&gt;</span></span><br><span class="line">      AND featured = 1</span><br><span class="line">    <span class="tag">&lt;/<span class="name">otherwise</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">choose</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>为null条件trim-where-set</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;findActiveBlogLike&quot;</span> <span class="attr">resultType</span>=<span class="string">&quot;Blog&quot;</span>&gt;</span></span><br><span class="line">  SELECT * FROM BLOG WHERE</span><br><span class="line">  <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">&quot;state != null&quot;</span>&gt;</span></span><br><span class="line">    state = #&#123;state&#125;</span><br><span class="line">  <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">&quot;title != null&quot;</span>&gt;</span></span><br><span class="line">    AND title like #&#123;title&#125;</span><br><span class="line">  <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">if</span> <span class="attr">test</span>=<span class="string">&quot;author != null and author.name != null&quot;</span>&gt;</span></span><br><span class="line">    AND author_name like #&#123;author.name&#125;</span><br><span class="line">  <span class="tag">&lt;/<span class="name">if</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>集合遍历—foreach  (in)</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;selectPostIn&quot;</span> <span class="attr">resultType</span>=<span class="string">&quot;domain.blog.Post&quot;</span>&gt;</span></span><br><span class="line">  SELECT * FROM POST P</span><br><span class="line">  WHERE ID in</span><br><span class="line">  <span class="tag">&lt;<span class="name">foreach</span> <span class="attr">item</span>=<span class="string">&quot;item&quot;</span> <span class="attr">index</span>=<span class="string">&quot;index&quot;</span> <span class="attr">collection</span>=<span class="string">&quot;list&quot;</span></span></span><br><span class="line"><span class="tag">      <span class="attr">open</span>=<span class="string">&quot;(&quot;</span> <span class="attr">separator</span>=<span class="string">&quot;,&quot;</span> <span class="attr">close</span>=<span class="string">&quot;)&quot;</span>&gt;</span></span><br><span class="line">        #&#123;item&#125;</span><br><span class="line">  <span class="tag">&lt;/<span class="name">foreach</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li></li>
+</ol>
+<h3 id=""><a href="#" class="headerlink" title=""></a></h3><h3 id="传参"><a href="#传参" class="headerlink" title="传参"></a>传参</h3><h2 id="映射"><a href="#映射" class="headerlink" title="映射"></a>映射</h2><blockquote>
+<p>找到小明的学校信息</p>
+</blockquote>
+<h3 id="一对一"><a href="#一对一" class="headerlink" title="一对一"></a>一对一</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">resultMap</span> <span class="attr">type</span>=<span class="string">&quot;com.wyg.entity.Student&quot;</span> <span class="attr">id</span>=<span class="string">&quot;resMap&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">id</span> <span class="attr">property</span>=<span class="string">&quot;id&quot;</span> <span class="attr">column</span>=<span class="string">&quot;id&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">result</span> <span class="attr">property</span>=<span class="string">&quot;name&quot;</span> <span class="attr">column</span>=<span class="string">&quot;name&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">association</span> <span class="attr">property</span>=<span class="string">&quot;school&quot;</span> <span class="attr">column</span>=<span class="string">&quot;id&quot;</span> </span></span><br><span class="line"><span class="tag">                 <span class="attr">select</span>=<span class="string">&quot;com.wyg.mapper.SchoolMapper.getSchoolById&quot;</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">resultMap</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>property：java类属性</p>
+<p>column：mysql字段</p>
+<p>association：联系</p>
+<p>select：get—sql方法</p>
+<h3 id="一对多"><a href="#一对多" class="headerlink" title="一对多"></a>一对多</h3><blockquote>
+<p>找到小明的老师们的信息</p>
+</blockquote>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">resultMap</span> <span class="attr">type</span>=<span class="string">&quot;com.wyg.entity.Student&quot;</span> <span class="attr">id</span>=<span class="string">&quot;resMap&quot;</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">id</span> <span class="attr">property</span>=<span class="string">&quot;id&quot;</span> <span class="attr">column</span>=<span class="string">&quot;id&quot;</span>/&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">result</span> <span class="attr">property</span>=<span class="string">&quot;name&quot;</span> <span class="attr">column</span>=<span class="string">&quot;name&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">collection</span> <span class="attr">property</span>=<span class="string">&quot;teachers&quot;</span> <span class="attr">javaType</span>=<span class="string">&quot;ArrayList&quot;</span> <span class="attr">column</span>=<span class="string">&quot;id&quot;</span></span></span><br><span class="line"><span class="tag">                <span class="attr">ofType</span>=<span class="string">&quot;com.wyg.entity.teacher&quot;</span></span></span><br><span class="line"><span class="tag">                <span class="attr">select</span>=<span class="string">&quot;com.wyg.mapper.TeacherMapper.getTeacherById&quot;</span></span></span><br><span class="line"><span class="tag">                <span class="attr">fetchType</span>=<span class="string">&quot;lazy&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">id</span> <span class="attr">property</span>=<span class="string">&quot;tId&quot;</span> <span class="attr">column</span>=<span class="string">&quot;t_id&quot;</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">property</span>=<span class="string">&quot;tName&quot;</span> <span class="attr">column</span>=<span class="string">&quot;t_name&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">collection</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">resultMap</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="多对多"><a href="#多对多" class="headerlink" title="多对多"></a>多对多</h3><h3 id="注入攻击"><a href="#注入攻击" class="headerlink" title="注入攻击"></a>注入攻击</h3>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/02/13/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%B4%A2%E5%BC%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/02/13/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%B4%A2%E5%BC%95/" class="post-title-link" itemprop="url">mysql索引</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-02-13 18:11:52" itemprop="dateCreated datePublished" datetime="2022-02-13T18:11:52+08:00">2022-02-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-05-12 20:16:37" itemprop="dateModified" datetime="2022-05-12T20:16:37+08:00">2022-05-12</time>
+              </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/02/13/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%B4%A2%E5%BC%95/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/02/13/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%B4%A2%E5%BC%95/" class="cy_cmt_count" data-xid="2022/02/13/数据库/mysql索引/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>​    </p>
+<h2 id="一、索引原理"><a href="#一、索引原理" class="headerlink" title="一、索引原理"></a>一、索引原理</h2><blockquote>
+<p>索引原理：</p>
+<p>索引是一种利用某种规则的数据结构与实际数据的关系加快数据查找的功能；索引数据节点中有着实际文件的位置，因为索引是根据特定的规则和算法构建的,在查找的时候遵循索引的规则可以快速查找到对应数据的节点，从而达到快速查找数据的效果；其实宏观来说索引其实是一种概念而不是具体的某项技术，只是我们在某个技术中运用得比较广泛和鲜明（比如说数据库）渐渐的有了特定领域的标签，其实在生活中索引的使用无处不在，比如说：书本里的目录；读书时的座位号，考试编号都有类似索引的功能;</p>
+<p>总结来所有通过某规则数据结构和实际目标关联，根据特定规则算法快速寻址的功能都可以称之为索引；</p>
+</blockquote>
+<h3 id="术语"><a href="#术语" class="headerlink" title="术语"></a>术语</h3><h4 id="索引覆盖"><a href="#索引覆盖" class="headerlink" title="索引覆盖"></a>索引覆盖</h4><blockquote>
+<p>正好命中索引，不需要回表</p>
+<p>select id,name from user  索引覆盖的前提是name有索引，因为name的索引表中存储的是（name,id），一个表就存储了name和id</p>
+</blockquote>
+<h4 id="索引下推"><a href="#索引下推" class="headerlink" title="索引下推"></a>索引下推</h4><figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">联合索引的情况:</span></span><br><span class="line">	对索引中包含的字段先做判断，过滤掉不符合条件的记录，减少回表字数。</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220404235036297.png" alt="image-20220404235036297"></p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220404235043708.png" alt="image-20220404235043708"></p>
+<h2 id="二、索引结构"><a href="#二、索引结构" class="headerlink" title="二、索引结构"></a>二、索引结构</h2><h3 id="1-1-为什么是b-树"><a href="#1-1-为什么是b-树" class="headerlink" title="1.1 为什么是b+树"></a>1.1 为什么是b+树</h3><ol>
+<li>索引的表象是一个目录</li>
+<li>底层原理   [字段值,地址] 某种数据结构的映射</li>
+</ol>
+<h3 id="1-2-排序的结构"><a href="#1-2-排序的结构" class="headerlink" title="1.2 排序的结构"></a>1.2 排序的结构</h3><ol>
+<li>二叉树   —&gt; 递增有序的情况    <strong>树高度==n</strong></li>
+<li>AVL 平衡二叉树   旋转次数多</li>
+<li>红黑树 弱平衡二叉树         弊端: 高度高</li>
+<li>B树   m叉树+平衡查找树     扩大横分叉，高度可控</li>
+<li>B+树  每个节点从左到右一次递增<ol>
+<li>非叶子节点不存数据，只存冗余索引</li>
+<li>叶子节点从大到小相互连接</li>
+<li>每个页16KB<ol>
+<li>如果满了  节点分裂  高度增加</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<h4 id="B-树相对于B树优点"><a href="#B-树相对于B树优点" class="headerlink" title="B+树相对于B树优点"></a>B+树相对于B树优点</h4><ol>
+<li>非叶子节点都存有冗余，这样的目的是为了让叶子节点存有所有的数据</li>
+<li>非叶子节点<strong>不带有指向记录</strong>的指针，则一个块可以存储更多的索引项，如此可以降低树的高度。</li>
+<li>叶子节点之间有指针连接，则在范围扫描时避免了在内部节点来回移动。</li>
+</ol>
+<h4 id="B-树搜索过程"><a href="#B-树搜索过程" class="headerlink" title="B+树搜索过程"></a>B+树搜索过程</h4><ol>
+<li>根据冗余索引找到data叶子节点</li>
+<li>把data加载到内存 然后二分查找</li>
+</ol>
+<h4 id="特别的"><a href="#特别的" class="headerlink" title="特别的"></a>特别的</h4><ol>
+<li>如果只有一层  那么就相当于二分查找 ，但是，但是这意味着把所有的数据加载到内存，内存吃不消。 </li>
+<li>hash表<ol>
+<li>数组+链表</li>
+<li>hash运算—&gt;存到链表(hash冲突直接加在链表尾部)</li>
+<li><strong>不支持范围查找</strong></li>
+<li>不支持模糊查询</li>
+<li>大量重复数据，会严重影响查询性能</li>
+</ol>
+</li>
+<li>mysql的memory支持hash索引，一般hash索引用于名字，而不用于数字</li>
+<li>innodb不支持hash索引，</li>
+</ol>
+<h2 id="三、索引分类"><a href="#三、索引分类" class="headerlink" title="三、索引分类"></a>三、索引分类</h2><blockquote>
+<p>索引分类 innodb才有   mylsam没有分类</p>
+<blockquote>
+<p>主键是不能为null的唯一索引</p>
+<p>唯一索引null可以出现多次,</p>
+<p>普通索引的所有值都能出现多次</p>
+</blockquote>
+</blockquote>
+<h3 id="3-1-聚集索引："><a href="#3-1-聚集索引：" class="headerlink" title="3.1 聚集索引："></a>3.1 聚集索引：</h3><blockquote>
+<p> InnoDB必须要有，且只有一个聚集索引</p>
+<ol>
+<li>如果表定义了PK，则PK就是聚集索引；</li>
+<li>如果表没有定义PK，则第一个not NULL unique列是聚集索引；</li>
+<li>否则，InnoDB会创建一个隐藏的row-id作为聚集索引；</li>
+</ol>
+</blockquote>
+<blockquote>
+<p>存(id,data)    </p>
+<p>数据按照索引的顺序来存储的，索引的顺序与表中记录的物理顺序一致。对于聚集索引，叶子结点即存储了真实的数据行，不再有另外单独的数据页。 在一张表上最多只能创建一个聚集索引，因为真实数据的物理顺序只能有一种</p>
+</blockquote>
+<ol>
+<li><p>索引和数据一起存储 ，找到了索引就是找到了数据</p>
+</li>
+<li><p>一个文件 idb</p>
+</li>
+<li><p><strong>优势</strong>：</p>
+<ol>
+<li>直接拿到数据，不需要二次查询。</li>
+<li>范围查询好</li>
+<li>是否排序的场合</li>
+</ol>
+</li>
+<li><p>劣势</p>
+<ol>
+<li><p>维护差，需要大量操作</p>
+</li>
+<li><p>使用uuid做主键，插入就会变得随机性，</p>
+</li>
+<li><p>id很大的化，辅助索引也会占用很大的空间</p>
+<blockquote>
+<p>辅助索引就是存(age,id)</p>
+</blockquote>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="3-2-非聚集-稀疏，二级索引-索引："><a href="#3-2-非聚集-稀疏，二级索引-索引：" class="headerlink" title="3.2 非聚集(稀疏，二级索引)索引："></a>3.2 非聚集(稀疏，二级索引)索引：</h3><blockquote>
+<p>存储(key,主键)</p>
+</blockquote>
+<ol>
+<li><p>查完得到主键</p>
+</li>
+<li><p>再回表去主键索引查询位置</p>
+</li>
+</ol>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220320213638194.png" alt="image-20220320213638194"></p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220320213755722.png" alt="image-20220320213755722"></p>
+<h3 id="3-3-联合索引"><a href="#3-3-联合索引" class="headerlink" title="3.3 联合索引"></a>3.3 联合索引</h3><ol>
+<li><p>底层</p>
+</li>
+<li><p>最左前缀原则(a,b,c)</p>
+<ol>
+<li><p>为什么最左前缀</p>
+<p>在相同的a下才会排序b</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211014212733501.png" alt="image-20211014212733501"></p>
+</li>
+<li></li>
+</ol>
+</li>
+</ol>
+<h3 id="3-4-全文索引"><a href="#3-4-全文索引" class="headerlink" title="3.4 全文索引"></a>3.4 全文索引</h3><blockquote>
+<p>5.6之后开始支持全文索引，</p>
+</blockquote>
+<p>基于分词器，</p>
+<h2 id="三、索引选择"><a href="#三、索引选择" class="headerlink" title="三、索引选择"></a>三、索引选择</h2><h3 id="3-1-B-树索引"><a href="#3-1-B-树索引" class="headerlink" title="3.1 B+树索引"></a>3.1 B+树索引</h3><h4 id="优势"><a href="#优势" class="headerlink" title="优势"></a>优势</h4><ol>
+<li>完全匹配</li>
+<li>范围匹配</li>
+<li>前缀匹配（左模糊）</li>
+</ol>
+<h4 id="限制"><a href="#限制" class="headerlink" title="限制"></a>限制</h4><ol>
+<li>对于index(a,b,c)，有最左原则，也就是只有选了a才能用索引</li>
+</ol>
+<h3 id="3-2-hash索引"><a href="#3-2-hash索引" class="headerlink" title="3.2 hash索引"></a>3.2 hash索引</h3><h4 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h4><ol>
+<li>简单</li>
+<li>快</li>
+</ol>
+<h4 id="限制-1"><a href="#限制-1" class="headerlink" title="限制"></a>限制</h4><ol>
+<li>不能范围</li>
+<li>不能排序</li>
+<li>不能模糊查询</li>
+<li>考虑hash冲突</li>
+</ol>
+<h2 id="四、索引创建原则"><a href="#四、索引创建原则" class="headerlink" title="四、索引创建原则"></a>四、索引创建原则</h2><h3 id="需要建立索引"><a href="#需要建立索引" class="headerlink" title="需要建立索引"></a>需要建立索引</h3><ol>
+<li>该字段经常select+where, update+where delete where</li>
+<li>需要分组、排序的字段</li>
+<li>唯一的字段</li>
+</ol>
+<h3 id="不需要建立索引"><a href="#不需要建立索引" class="headerlink" title="不需要建立索引"></a>不需要建立索引</h3><ol>
+<li><p>数据量小不建立</p>
+</li>
+<li><p>经常update,delete,insert</p>
+</li>
+<li><p>不经常where</p>
+</li>
+<li><p>数据重复严重 </p>
+<blockquote>
+<p>索引的目的是为了加速，比如把sex建立索引，加速太小，反而还需要维护索引，不如全表扫描</p>
+</blockquote>
+</li>
+<li><p>字段长度太大</p>
+</li>
+</ol>
+<h2 id="五、索引失效"><a href="#五、索引失效" class="headerlink" title="五、索引失效"></a>五、索引失效</h2><blockquote>
+<p>模：代表模糊查询。</p>
+<p>型：代表数据类型。  str要用引号引起来</p>
+<p>数：代表函数。</p>
+<p>空：是Null的意思。</p>
+<p>​    单列索引不存储null值，复合索引不存储全为null的值。</p>
+<p>​    Null值的特殊性就在于参与的运算大多取值为null。这样的话，null值实际上是不能参与进建索引的过程</p>
+<p>运：代表运算。</p>
+<p>最：代表最左原则。</p>
+<p>快：全表扫描更快的意思</p>
+<p>or ：A or B 都有单独索引才不会失效</p>
+<p>不等于 </p>
+</blockquote>
+<h2 id="六、索引调优"><a href="#六、索引调优" class="headerlink" title="六、索引调优"></a>六、索引调优</h2><h3 id="6-1-长字段索引"><a href="#6-1-长字段索引" class="headerlink" title="6.1 长字段索引"></a>6.1 长字段索引</h3><p>字符串长度太大不适合索引</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/02/10/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/sql%E5%87%BD%E6%95%B0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -704,268 +1110,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/02/08/linux/linux--%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/02/08/linux/linux--%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/" class="post-title-link" itemprop="url">未命名</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-02-08 18:34:25" itemprop="dateCreated datePublished" datetime="2022-02-08T18:34:25+08:00">2022-02-08</time>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/02/08/linux/linux--%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/02/08/linux/linux--%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/" class="cy_cmt_count" data-xid="2022/02/08/linux/linux--定时任务/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.2k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <ol>
-<li><p>nohup(no hang up) 挂起运行  </p>
-</li>
-<li><p>crontab </p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">crontab</span> -e  <span class="comment">#进入当前用户b</span></span><br></pre></td></tr></table></figure></li>
-</ol>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">*    *    *    *    *</span><br><span class="line">-    -    -    -    -</span><br><span class="line">|    |    |    |    |</span><br><span class="line">|    |    |    |    +----- 星期中星期几 (<span class="number">0</span> - <span class="number">6</span>) (星期天 为<span class="number">0</span>)</span><br><span class="line">|    |    |    +---------- 月份 (<span class="number">1</span> - <span class="number">12</span>) </span><br><span class="line">|    |    +--------------- 一个月中的第几天 (<span class="number">1</span> - <span class="number">31</span>)</span><br><span class="line">|    +-------------------- 小时 (<span class="number">0</span> - <span class="number">23</span>)</span><br><span class="line">+------------------------- 分钟 (<span class="number">0</span> - <span class="number">59</span>)</span><br></pre></td></tr></table></figure>
-
-<p>例如：</p>
-<ol>
-<li><p>每一分钟执行一次 /bin/ls：</p>
-<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">*</span> <span class="emphasis">* *</span> <span class="emphasis">* *</span> /bin/ls</span><br></pre></td></tr></table></figure></li>
-<li><p>在 12 月内, 每天的早上 6 点到 12 点，每隔 3 个小时 0 分钟执行一次 /usr/bin/backup：</p>
-<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">0 </span><span class="number">6</span>-<span class="number">12</span>/<span class="number">3</span> * <span class="number">12</span> * /<span class="keyword">usr</span>/bin/backup</span><br></pre></td></tr></table></figure></li>
-<li><p>周一到周五每天下午 5:00 寄一封信给 <a href="mailto:&#97;&#108;&#101;&#x78;&#64;&#100;&#111;&#109;&#x61;&#105;&#x6e;&#x2e;&#x6e;&#97;&#x6d;&#x65;">&#97;&#108;&#101;&#x78;&#64;&#100;&#111;&#109;&#x61;&#105;&#x6e;&#x2e;&#x6e;&#97;&#x6d;&#x65;</a>：</p>
-<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">0 </span><span class="number">17</span> * * <span class="number">1</span>-<span class="number">5</span> mail -s <span class="string">&quot;hi&quot;</span> alex@domain.<span class="keyword">name</span> &lt; /tmp/maildata</span><br></pre></td></tr></table></figure></li>
-<li><p>每月每天的午夜 0 点 20 分, 2 点 20 分, 4 点 20 分….执行 echo “haha”：</p>
-<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">20 </span><span class="number">0</span>-<span class="number">23</span>/<span class="number">2</span> * * * echo <span class="string">&quot;haha&quot;</span></span><br></pre></td></tr></table></figure></li>
-<li><pre><code>0 */2 * * * /sbin/service httpd restart  意思是每两个小时重启一次apache 
-
-50 7 * * * /sbin/service sshd start  意思是每天7：50开启ssh服务 
-
-50 22 * * * /sbin/service sshd stop  意思是每天22：50关闭ssh服务 
-
-0 0 1,15 * * fsck /home  每月1号和15号检查/home 磁盘 
-
-1 * * * * /home/bruce/backup  每小时的第一分执行 /home/bruce/backup这个文件 
-
-00 03 * * 1-5 find /home &quot;*.xxx&quot; -mtime +4 -exec rm &#123;&#125; \;  每周一至周五3点钟，在目录/home中，查找文件名为*.xxx的文件，并删除4天前的文件。
-
-30 6 */10 * * ls  意思是每月的1、11、21、31日是的6：30执行一次ls命令
-</code></pre>
-</li>
-<li><p>ping baidu.com -c  3 请求三次baidu </p>
-</li>
-<li><p>ssh-keygen -t rsa 生成rsa型密钥默认在 ~/.ssh中，有两个文件，一个私钥，一个pub公钥</p>
-</li>
-<li><p>yum 类似于Pip</p>
-</li>
-<li><p>定时同步时间：0 1 * * * /usr/sbin/ntpdate cn.pool.ntp.org</p>
-</li>
-<li><p>防火墙</p>
-<ol>
-<li>systemctl status firewalld.service  查看防火墙状态</li>
-<li>systemctl stop firewalld.service 关闭防护墙</li>
-<li>systemctl disable firewalld.service 开启</li>
-</ol>
-</li>
-<li></li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/02/08/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DML/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/02/08/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DML/" class="post-title-link" itemprop="url">DML数据库，操纵语言</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-02-08 03:20:27" itemprop="dateCreated datePublished" datetime="2022-02-08T03:20:27+08:00">2022-02-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-04-08 03:20:27" itemprop="dateModified" datetime="2022-04-08T03:20:27+08:00">2022-04-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/sql%E8%AF%AD%E5%8F%A5/" itemprop="url" rel="index"><span itemprop="name">sql语句</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/02/08/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DML/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/02/08/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DML/" class="cy_cmt_count" data-xid="2022/02/08/数据库/sql/DML/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>2.1k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>[toc]</p>
-<h3 id="一、Select"><a href="#一、Select" class="headerlink" title="一、Select"></a>一、Select</h3><h4 id="1-1-where-like-and-or-between-in"><a href="#1-1-where-like-and-or-between-in" class="headerlink" title="1.1 where  like  and  or  between  in"></a>1.1 where  like  and  or  between  in</h4><ol>
-<li><p>select * from name where  age &lt;&gt; 18; 查询年龄不等于18的人</p>
-</li>
-<li><p>select * from name where age&gt;18 and sex=’男’ </p>
-</li>
-<li><p>update name set age =18 where not id =10;  按条件修改</p>
-</li>
-<li><p>select * from name where age between 4 and 10; 查询4-10岁  前闭后开</p>
-</li>
-<li><p>select * from name where age in (3,4,10)  查询3，4，10 岁数据</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/02/08/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/DML/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1037,14 +1181,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">126</span>
+          <span class="site-state-item-count">128</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-count">27</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>
@@ -1085,12 +1229,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">379k</span>
+    <span title="站点总字数">382k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">5:45</span>
+    <span title="站点阅读时长">5:47</span>
 </div>
 
         
