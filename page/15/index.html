@@ -185,6 +185,443 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/02/25/spring/%E9%85%8D%E7%BD%AE/WebMvcConfigurer/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/02/25/spring/%E9%85%8D%E7%BD%AE/WebMvcConfigurer/" class="post-title-link" itemprop="url">WebMvcConfigurer</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-02-25 21:02:55" itemprop="dateCreated datePublished" datetime="2022-02-25T21:02:55+08:00">2022-02-25</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/02/25/spring/%E9%85%8D%E7%BD%AE/WebMvcConfigurer/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/02/25/spring/%E9%85%8D%E7%BD%AE/WebMvcConfigurer/" class="cy_cmt_count" data-xid="2022/02/25/spring/配置/WebMvcConfigurer/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>6.2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>6 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>[toc]</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/zhangpower1993/article/details/89016503">参考</a></p>
+<h2 id="一、概述"><a href="#一、概述" class="headerlink" title="一、概述"></a>一、概述</h2><h3 id="1-概念"><a href="#1-概念" class="headerlink" title="1. 概念"></a>1. 概念</h3><ol>
+<li><p>WebMvcConfigurer和spring，springBoot的关系</p>
+<p>WebMvcConfigurer和SpringBoot没啥关系，只不过原本在Spring中以xml配置文件中存在的相关配置，到SpringBoot中都会使用配置类的方式进行管理，即加了@Configuration注解的类。</p>
+</li>
+<li><p>WebMvcConfigurer配置类其实是<code>Spring</code>内部的一种配置方式，采用<code>JavaBean</code>的形式来代替传统的<code>xml</code>配置文件形式进行针对框架个性化定制，可以自定义一些Handler，Interceptor，ViewResolver，MessageConverter.</p>
+</li>
+<li><p>在Spring Boot 1.5版本都是靠重写<strong>WebMvcConfigurerAdapter</strong>的方法来添加自定义拦截器，消息转换器等</p>
+</li>
+</ol>
+<h3 id="2-接口方法"><a href="#2-接口方法" class="headerlink" title="2. 接口方法"></a>2. 接口方法</h3><ol>
+<li><p>所有方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">WebMvcConfigurer</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">configurePathMatch</span><span class="params">(PathMatchConfigurer var1)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">configureContentNegotiation</span><span class="params">(ContentNegotiationConfigurer var1)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">configureAsyncSupport</span><span class="params">(AsyncSupportConfigurer var1)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">configureDefaultServletHandling</span><span class="params">(DefaultServletHandlerConfigurer var1)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">addFormatters</span><span class="params">(FormatterRegistry var1)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">addInterceptors</span><span class="params">(InterceptorRegistry var1)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">addResourceHandlers</span><span class="params">(ResourceHandlerRegistry var1)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">addCorsMappings</span><span class="params">(CorsRegistry var1)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">addViewControllers</span><span class="params">(ViewControllerRegistry var1)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">configureViewResolvers</span><span class="params">(ViewResolverRegistry var1)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">addArgumentResolvers</span><span class="params">(List&lt;HandlerMethodArgumentResolver&gt; var1)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">addReturnValueHandlers</span><span class="params">(List&lt;HandlerMethodReturnValueHandler&gt; var1)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">configureMessageConverters</span><span class="params">(List&lt;HttpMessageConverter&lt;?&gt;&gt; var1)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">extendMessageConverters</span><span class="params">(List&lt;HttpMessageConverter&lt;?&gt;&gt; var1)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">configureHandlerExceptionResolvers</span><span class="params">(List&lt;HandlerExceptionResolver&gt; var1)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">extendHandlerExceptionResolvers</span><span class="params">(List&lt;HandlerExceptionResolver&gt; var1)</span></span>;</span><br><span class="line">    <span class="function">Validator <span class="title">getValidator</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function">MessageCodesResolver <span class="title">getMessageCodesResolver</span><span class="params">()</span></span>;&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>常用方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">/* 拦截器配置 */</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">addInterceptors</span><span class="params">(InterceptorRegistry var1)</span></span>;</span><br><span class="line"><span class="comment">/* 视图跳转控制器 */</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">addViewControllers</span><span class="params">(ViewControllerRegistry registry)</span></span>;</span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     *静态资源处理</span></span><br><span class="line"><span class="comment">**/</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">addResourceHandlers</span><span class="params">(ResourceHandlerRegistry registry)</span></span>;</span><br><span class="line"><span class="comment">/* 默认静态资源处理器 */</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">configureDefaultServletHandling</span><span class="params">(DefaultServletHandlerConfigurer configurer)</span></span>;</span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 这里配置视图解析器</span></span><br><span class="line"><span class="comment"> **/</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">configureViewResolvers</span><span class="params">(ViewResolverRegistry registry)</span></span>;</span><br><span class="line"><span class="comment">/* 配置内容裁决的一些选项*/</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">configureContentNegotiation</span><span class="params">(ContentNegotiationConfigurer configurer)</span></span>;</span><br><span class="line"><span class="comment">/** 解决跨域问题 **/</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addCorsMappings</span><span class="params">(CorsRegistry registry)</span> </span>;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="三、配件"><a href="#三、配件" class="headerlink" title="三、配件"></a>三、配件</h2><h3 id="1-addInterceptors：拦截器"><a href="#1-addInterceptors：拦截器" class="headerlink" title="1. addInterceptors：拦截器"></a>1. addInterceptors：拦截器</h3><ul>
+<li>addInterceptor：需要一个实现HandlerInterceptor接口的拦截器实例</li>
+<li>addPathPatterns：用于设置拦截器的过滤路径规则；<code>addPathPatterns(&quot;/**&quot;)</code>对所有请求都拦截</li>
+<li>excludePathPatterns：用于设置不需要拦截的过滤规则</li>
+<li>拦截器主要用途：进行用户登录状态的拦截，日志的拦截等。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addInterceptors</span><span class="params">(InterceptorRegistry registry)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>.addInterceptors(registry);</span><br><span class="line">    registry.addInterceptor(<span class="keyword">new</span> TestInterceptor()).addPathPatterns(<span class="string">&quot;/**&quot;</span>).excludePathPatterns(<span class="string">&quot;/emp/toLogin&quot;</span>,<span class="string">&quot;/emp/login&quot;</span>,<span class="string">&quot;/js/**&quot;</span>,<span class="string">&quot;/css/**&quot;</span>,<span class="string">&quot;/images/**&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-addViewControllers：页面跳转"><a href="#2-addViewControllers：页面跳转" class="headerlink" title="2. addViewControllers：页面跳转"></a>2. addViewControllers：页面跳转</h3><p>​    以前写SpringMVC的时候，如果需要访问一个页面，必须要写Controller类，然后再写一个方法跳转到页面，感觉好麻烦，下面这种方法可以省略一个Controller的requestMapping</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addViewControllers</span><span class="params">(ViewControllerRegistry registry)</span> </span>&#123;</span><br><span class="line">    registry.addViewController(<span class="string">&quot;/toLogin&quot;</span>).setViewName(<span class="string">&quot;login&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>​    在这里重写addViewControllers方法，并不会覆盖<strong>WebMvcAutoConfiguration</strong>（Springboot自动配置）中的addViewControllers（在此方法中，Spring Boot将“/”映射至index.html），这也就意味着自己的配置和Spring Boot的自动配置同时有效，这也是我们推荐添加自己的MVC配置的方式。</p>
+</blockquote>
+<h3 id="3-addResourceHandlers：静态资源"><a href="#3-addResourceHandlers：静态资源" class="headerlink" title="3. addResourceHandlers：静态资源"></a>3. addResourceHandlers：静态资源</h3><p>比如，我们想自定义静态资源映射目录的话，只需重写addResourceHandlers方法即可。</p>
+<p>注：如果继承WebMvcConfigurationSupport类实现配置时必须要重写该方法，具体见其它文章</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyWebMvcConfigurerAdapter</span> <span class="keyword">implements</span> <span class="title">WebMvcConfigurer</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addResourceHandlers</span><span class="params">(ResourceHandlerRegistry registry)</span> </span>&#123;</span><br><span class="line">        registry.addResourceHandler(<span class="string">&quot;/my/**&quot;</span>).addResourceLocations(<span class="string">&quot;classpath:/my/&quot;</span>);</span><br><span class="line">        registry.addResourceHandler(<span class="string">&quot;/img/**&quot;</span>).addResourceLocations(<span class="string">&quot;classpath:/img/&quot;</span>);</span><br><span class="line">        registry.addResourceHandler(<span class="string">&quot;/img/**&quot;</span>).addResourceLocations(<span class="string">&quot;file:&quot;</span> + Constant.fileLoadPath + <span class="string">&quot;/&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>addResoureHandler：指的是对外暴露的访问路径</li>
+<li>addResourceLocations：指的是内部文件放置的目录</li>
+</ul>
+<h3 id="2-4-configureDefaultServletHandling：默认静态资源处理器Servlet"><a href="#2-4-configureDefaultServletHandling：默认静态资源处理器Servlet" class="headerlink" title="2.4 configureDefaultServletHandling：默认静态资源处理器Servlet"></a>2.4 configureDefaultServletHandling：默认静态资源处理器Servlet</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">configureDefaultServletHandling</span><span class="params">(DefaultServletHandlerConfigurer configurer)</span> </span>&#123;</span><br><span class="line">        configurer.enable();</span><br><span class="line">        configurer.enable(<span class="string">&quot;defaultServletName&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>​    此时会注册一个默认的Handler：DefaultServletHttpRequestHandler，这个Handler也是用来处理静态文件的，它会尝试映射/。当DispatcherServelt映射/时（/ 和/ 是有区别的），并且没有找到合适的Handler来处理请求时，就会交给DefaultServletHttpRequestHandler 来处理。注意：这里的静态资源是放置在web根目录下，而非WEB-INF 下。<br>　可能这里的描述有点不好懂（我自己也这么觉得），所以简单举个例子，例如：在webroot目录下有一个图片：1.png 我们知道Servelt规范中web根目录（webroot）下的文件可以直接访问的，但是由于DispatcherServlet配置了映射路径是：/ ，它几乎把所有的请求都拦截了，从而导致1.png 访问不到，这时注册一个DefaultServletHttpRequestHandler 就可以解决这个问题。其实可以理解为DispatcherServlet破坏了Servlet的一个特性（根目录下的文件可以直接访问），DefaultServletHttpRequestHandler是帮助回归这个特性的。</p>
+<h3 id="2-5-configureViewResolvers：视图解析器"><a href="#2-5-configureViewResolvers：视图解析器" class="headerlink" title="2.5 configureViewResolvers：视图解析器"></a>2.5 configureViewResolvers：视图解析器</h3><p>这个方法是用来配置视图解析器的，该方法的参数ViewResolverRegistry 是一个注册器，用来注册你想自定义的视图解析器等。ViewResolverRegistry 常用的几个方法：<a target="_blank" rel="noopener" href="https://blog.csdn.net/fmwind/article/details/81235401">https://blog.csdn.net/fmwind/article/details/81235401</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> InternalResourceViewResolver <span class="title">resourceViewResolver</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	InternalResourceViewResolver internalResourceViewResolver = <span class="keyword">new</span> InternalResourceViewResolver();</span><br><span class="line">	<span class="comment">//请求视图文件的前缀地址</span></span><br><span class="line">	internalResourceViewResolver.setPrefix(<span class="string">&quot;/WEB-INF/jsp/&quot;</span>);</span><br><span class="line">	<span class="comment">//请求视图文件的后缀</span></span><br><span class="line">	internalResourceViewResolver.setSuffix(<span class="string">&quot;.jsp&quot;</span>);</span><br><span class="line">	<span class="keyword">return</span> internalResourceViewResolver;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">configureViewResolvers</span><span class="params">(ViewResolverRegistry registry)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">super</span>.configureViewResolvers(registry);</span><br><span class="line">	registry.viewResolver(resourceViewResolver());</span><br><span class="line">	<span class="comment">/*registry.jsp(&quot;/WEB-INF/jsp/&quot;,&quot;.jsp&quot;);*/</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-6-configureContentNegotiation：配置内容裁决的一些参数"><a href="#2-6-configureContentNegotiation：配置内容裁决的一些参数" class="headerlink" title="2.6 configureContentNegotiation：配置内容裁决的一些参数"></a>2.6 configureContentNegotiation：配置内容裁决的一些参数</h3><h3 id="2-7-addCorsMappings：跨域"><a href="#2-7-addCorsMappings：跨域" class="headerlink" title="2.7 addCorsMappings：跨域"></a>2.7 addCorsMappings：跨域</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addCorsMappings</span><span class="params">(CorsRegistry registry)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>.addCorsMappings(registry);</span><br><span class="line">    registry.addMapping(<span class="string">&quot;/cors/**&quot;</span>)</span><br><span class="line">        </span><br><span class="line">            .allowedHeaders(<span class="string">&quot;*&quot;</span>)</span><br><span class="line">            .allowedMethods(<span class="string">&quot;POST&quot;</span>,<span class="string">&quot;GET&quot;</span>)</span><br><span class="line">            .allowedOrigins(<span class="string">&quot;*&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-8-configureMessageConverters：信息转换器"><a href="#2-8-configureMessageConverters：信息转换器" class="headerlink" title="2.8 configureMessageConverters：信息转换器"></a>2.8 configureMessageConverters：信息转换器</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//配置fastJson返回json转换</span></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">configureMessageConverters</span><span class="params">(List&lt;HttpMessageConverter&lt;?&gt;&gt; converters)</span> </span></span><br><span class="line"><span class="function">    <span class="keyword">super</span>.<span class="title">configureMessageConverters</span><span class="params">(converters)</span></span>;</span><br><span class="line">    <span class="comment">//创建fastJson消息转换器</span></span><br><span class="line">    FastJsonHttpMessageConverter fastConverter = <span class="keyword">new</span> FastJsonHttpMessageConverter();</span><br><span class="line">    <span class="comment">//创建配置类</span></span><br><span class="line">    FastJsonConfig fastJsonConfig = <span class="keyword">new</span> FastJsonConfig();</span><br><span class="line">    <span class="comment">//修改配置返回内容的过滤</span></span><br><span class="line">    fastJsonConfig.setSerializerFeatures(</span><br><span class="line">            SerializerFeature.DisableCircularReferenceDetect,</span><br><span class="line">            SerializerFeature.WriteMapNullValue,</span><br><span class="line">            SerializerFeature.WriteNullStringAsEmpty</span><br><span class="line">    );</span><br><span class="line">    fastConverter.setFastJsonConfig(fastJsonConfig);</span><br><span class="line">    <span class="comment">//将fastjson添加到视图消息转换器列表内</span></span><br><span class="line">    converters.add(fastConverter);</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/02/21/spring/spring%E5%AE%B6%E6%97%8F/springMVC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/02/21/spring/spring%E5%AE%B6%E6%97%8F/springMVC/" class="post-title-link" itemprop="url">springMVC</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-02-21 22:17:02" itemprop="dateCreated datePublished" datetime="2022-02-21T22:17:02+08:00">2022-02-21</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/02/21/spring/spring%E5%AE%B6%E6%97%8F/springMVC/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/02/21/spring/spring%E5%AE%B6%E6%97%8F/springMVC/" class="cy_cmt_count" data-xid="2022/02/21/spring/spring家族/springMVC/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.6k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>[toc]</p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/bsjl/p/7723440.html">优秀文章</a></p>
+<h2 id="一、MVC的理解"><a href="#一、MVC的理解" class="headerlink" title="一、MVC的理解"></a>一、MVC的理解</h2><blockquote>
+<p>MVC包括MVC、MVP、MVVM</p>
+</blockquote>
+<h3 id="1-1-侠义MVC"><a href="#1-1-侠义MVC" class="headerlink" title="1.1 侠义MVC"></a>1.1 侠义MVC</h3><blockquote>
+<p>mvc是前后端不分离的model view controller 对应springmvc的</p>
+</blockquote>
+<h4 id="1-1-1-mvc含义"><a href="#1-1-1-mvc含义" class="headerlink" title="1.1.1 mvc含义"></a>1.1.1 mvc含义</h4><ol>
+<li>model=pojo    数据模型，核心</li>
+<li>view=jsp/html+modelAndView 渲染数据</li>
+<li>controller=controller，接收用户请求<ol>
+<li>前端控制器 dispatch</li>
+<li>后端控制器 controller</li>
+</ol>
+</li>
+</ol>
+<h4 id="1-1-2-ModelAndView"><a href="#1-1-2-ModelAndView" class="headerlink" title="1.1.2 ModelAndView"></a>1.1.2 ModelAndView</h4><ol>
+<li>model 响应数据（map结构）/ javaBean    <ol>
+<li>请求的最后阶段 框架会把数据加入到request作用域</li>
+</ol>
+</li>
+<li>view jsp地址<ol>
+<li>框架对视图执行forward重定向操作</li>
+</ol>
+</li>
+</ol>
+<h4 id="1-1-3-model-返回的数据"><a href="#1-1-3-model-返回的数据" class="headerlink" title="1.1.3 model  返回的数据"></a>1.1.3 model  返回的数据</h4><ol>
+<li>modelAndView.addObject(“name”,”王勇敢”);其实和request.serAttribute(“name”,”王勇敢”)</li>
+<li>四种数据<ol>
+<li>obj<ol>
+<li>json的转换   和    返回设置格式 context:json是固定重复代码</li>
+<li>除去重复代码：基于消息转换器.jackon<ol>
+<li>加入依赖  jackson-core  jackson-databind  注意版本</li>
+<li>加入注解驱动 注意是mvc的driven</li>
+<li>加@ResponseBody</li>
+</ol>
+</li>
+<li>返回json原理<ol>
+<li>注解驱动的接口httpMessageConverter定义很多obj转换方法，如xml,json,txt</li>
+<li>spring注入这个接口的是是实现类。</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>string(视图路径)</li>
+<li>string,int 数据</li>
+<li>void使用response.WriteStream响应（只有数据，没有视图）</li>
+</ol>
+</li>
+</ol>
+<h3 id="1-2-MVVM"><a href="#1-2-MVVM" class="headerlink" title="1.2 MVVM"></a>1.2 MVVM</h3><blockquote>
+<p>MVVM是流行的前后端分离model view modelAndView，这个更多的体现在前端</p>
+</blockquote>
+<ol>
+<li>model=controller+pojo</li>
+<li>view=html(model)</li>
+<li>modelAndView=model-view转换器</li>
+</ol>
+<h3 id="1-3-mvc优缺点"><a href="#1-3-mvc优缺点" class="headerlink" title="1.3 mvc优缺点"></a>1.3 mvc优缺点</h3><h4 id="1-3-1-优点"><a href="#1-3-1-优点" class="headerlink" title="1.3.1 优点"></a>1.3.1 优点</h4><ol>
+<li>耦合度低：表改了，只需修改model</li>
+<li>复用性高：model可以在不同的视图中使用</li>
+<li>可维护性高</li>
+<li>分层，结构清晰，开发快</li>
+</ol>
+<h4 id="1-3-2-缺点："><a href="#1-3-2-缺点：" class="headerlink" title="1.3.2 缺点："></a>1.3.2 缺点：</h4><ol>
+<li>适合大型项目，但是现在的小型项目也在使用这种模式，就有点得不偿失</li>
+<li>增加了系统的复杂性，降低了运行效率</li>
+</ol>
+<h2 id="二、SpringMVC"><a href="#二、SpringMVC" class="headerlink" title="二、SpringMVC"></a>二、SpringMVC</h2><h3 id="2-1-概念"><a href="#2-1-概念" class="headerlink" title="2.1 概念"></a>2.1 概念</h3><ol>
+<li><p>spring web mvc   spring&gt;3.0</p>
+</li>
+<li><p>支持restful</p>
+</li>
+<li><p>单例 每个servlet只有一个。所以说ssm是基于方法的，struts2是基于类的。</p>
+</li>
+<li><p>模块化，各个组件一次进行</p>
+<ol>
+<li>dispatch前端控制器</li>
+<li>controller后端配置器</li>
+<li>handler请求映射器</li>
+<li>handlerAdapter处理适配器</li>
+<li>ViewRelover视图解析器</li>
+<li>验证器viliader Jsr303</li>
+</ol>
+</li>
+<li><p>springmvc  spring、IOC是容器，ioc管理对象  </p>
+<ol>
+<li>&lt;bean&gt; @controller @respository @ mapper</li>
+<li>@controller是控制器对象  不是servlet</li>
+</ol>
+</li>
+</ol>
+<h3 id="2-2-dispatcherservlet"><a href="#2-2-dispatcherservlet" class="headerlink" title="2.2 dispatcherservlet"></a>2.2 dispatcherservlet</h3><ol>
+<li><p>springmvc 内置的<strong>超级servlet</strong> 用于接受所有请求 ，然后把请求分发给controller</p>
+</li>
+<li><p>dispatcherservlet别名</p>
+<ol>
+<li>超级servlet  继承自httpserlvet</li>
+<li>中央调度器</li>
+<li>前端控制器</li>
+</ol>
+</li>
+<li><p>dispatcherservlet作用</p>
+<ol>
+<li>接受所有请求 调用控制器对象</li>
+<li>把请求响应返还个用户</li>
+<li>核心方法 doDispatch(req,resp)</li>
+</ol>
+</li>
+</ol>
+<h3 id="2-3-mvc启动过程"><a href="#2-3-mvc启动过程" class="headerlink" title="2.3 mvc启动过程"></a>2.3 mvc启动过程</h3><ol>
+<li><p>tomcat启动  </p>
+</li>
+<li><p>创建dispatcher</p>
+</li>
+<li><p>执行servlet.inti() 创建sprig容器webapplicationContext</p>
+</li>
+<li><p>把spring容器放进serlevtContext</p>
+<p>getServletContext().setAttribute(name,webapplicationContext)</p>
+<p>这个servlet就是dispatcher</p>
+</li>
+<li><p>把对象注入spring容器</p>
+</li>
+</ol>
+<h2 id="三、创建springmvc项目"><a href="#三、创建springmvc项目" class="headerlink" title="三、创建springmvc项目"></a>三、创建springmvc项目</h2><ol>
+<li><p>创建</p>
+<ol>
+<li><p>maven -&gt;maven-archetype-webapp模板</p>
+</li>
+<li><p>加入依赖</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">groupId</span>&gt;</span>javax.servlet<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>javax.servlet-api<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-webmvc<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>wel.xml 全局serlvet配置</p>
+</li>
+<li><p>创建springmvc配置</p>
+</li>
+<li><p>创建控制器@Controller 加入@requetMapping</p>
+</li>
+<li><p>创建jsp</p>
+</li>
+</ol>
+</li>
+<li><p>idea配置</p>
+<ol>
+<li>项目结构–模块–删除部署描述  添加部署描述为web1.xml </li>
+<li>更改web1.xml 为web.xml</li>
+</ol>
+</li>
+<li><p>web.xml配置</p>
+<ol>
+<li>servlet<ol>
+<li>name </li>
+<li>url-partter</li>
+</ol>
+</li>
+<li>过滤器 ：处理请求乱码</li>
+</ol>
+</li>
+<li><p>st.xml配置</p>
+<ol>
+<li>控制器扫描器</li>
+<li>视图解析器</li>
+</ol>
+</li>
+<li><p>tomcat配置</p>
+</li>
+</ol>
+<h3 id="注入mybatis的-mapper"><a href="#注入mybatis的-mapper" class="headerlink" title="注入mybatis的@mapper"></a>注入mybatis的@mapper</h3><h3 id="访问html"><a href="#访问html" class="headerlink" title="访问html"></a>访问html</h3><p>servlet-01.xml</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">mvc:resources</span> <span class="attr">mapping</span>=<span class="string">&quot;/html/**&quot;</span> <span class="attr">location</span>=<span class="string">&quot;classpath:html/&quot;</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="四、其他"><a href="#四、其他" class="headerlink" title="四、其他"></a>四、其他</h2><ol>
+<li>@requestMapper{“a”,”b”} 访问两个路径都可以</li>
+<li>url-parrten 为接受所有请求 且表示优先级最高 一般用于过滤器</li>
+<li>访问资源<ol>
+<li>动态资源.html/jsp的路径tomcat</li>
+<li>静态资源  tomcat      因为tomcat内置一个dafaultServlet(在tomcat.conf)    启动的时候自动创建 ,<ol>
+<li>处理为映射到controller.Mapping的路径</li>
+<li>对所有的静态资源 </li>
+<li>当某个servlet的url-patter为/或者/* 那么这个servlet就会接手这个内置servlet的工作</li>
+</ol>
+</li>
+<li>url(controller)  有mvc内置的servlet    dispatchServlet处理</li>
+</ol>
+</li>
+</ol>
+<h2 id="五、SpringMVC问题"><a href="#五、SpringMVC问题" class="headerlink" title="五、SpringMVC问题"></a>五、SpringMVC问题</h2><ol>
+<li>静态资源访问失败<ol>
+<li>原因可能是servlet的partten接手了//资源，而静态资源默认是//路径</li>
+<li>处理：加配置</li>
+</ol>
+</li>
+</ol>
+<h3 id="springmvc处理请求流程"><a href="#springmvc处理请求流程" class="headerlink" title="springmvc处理请求流程"></a>springmvc处理请求流程</h3><ol>
+<li>tomcat–&gt;url-partter匹配—&gt;dispatcher—&gt;st.servlet—&gt;wyg.controller–&gt;TestController</li>
+</ol>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211019003549650.png" alt="image-20211019003549650"></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/02/21/%E7%BB%84%E4%BB%B6/ORM/mybatis/mybatis-%E5%8A%A8%E6%80%81sql/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -347,7 +784,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-05-12 20:16:37" itemprop="dateModified" datetime="2022-05-12T20:16:37+08:00">2022-05-12</time>
+                <time title="修改时间：2022-05-21 01:52:52" itemprop="dateModified" datetime="2022-05-21T01:52:52+08:00">2022-05-21</time>
               </span>
 
           
@@ -372,7 +809,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>2k</span>
+              <span>1.8k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -393,9 +830,7 @@
       
           <p>​    </p>
 <h2 id="一、索引原理"><a href="#一、索引原理" class="headerlink" title="一、索引原理"></a>一、索引原理</h2><blockquote>
-<p>索引原理：</p>
-<p>索引是一种利用某种规则的数据结构与实际数据的关系加快数据查找的功能；索引数据节点中有着实际文件的位置，因为索引是根据特定的规则和算法构建的,在查找的时候遵循索引的规则可以快速查找到对应数据的节点，从而达到快速查找数据的效果；其实宏观来说索引其实是一种概念而不是具体的某项技术，只是我们在某个技术中运用得比较广泛和鲜明（比如说数据库）渐渐的有了特定领域的标签，其实在生活中索引的使用无处不在，比如说：书本里的目录；读书时的座位号，考试编号都有类似索引的功能;</p>
-<p>总结来所有通过某规则数据结构和实际目标关联，根据特定规则算法快速寻址的功能都可以称之为索引；</p>
+<p>索引原理：索引就像是一本字典的目录，如果没有目录，我们只能一页页的翻找，这就好像没有索引我们需要把所有的data都加载进来查找一样很浪费时间。</p>
 </blockquote>
 <h3 id="术语"><a href="#术语" class="headerlink" title="术语"></a>术语</h3><h4 id="索引覆盖"><a href="#索引覆盖" class="headerlink" title="索引覆盖"></a>索引覆盖</h4><blockquote>
 <p>正好命中索引，不需要回表</p>
@@ -410,13 +845,19 @@
 <li>底层原理   [字段值,地址] 某种数据结构的映射</li>
 </ol>
 <h3 id="1-2-排序的结构"><a href="#1-2-排序的结构" class="headerlink" title="1.2 排序的结构"></a>1.2 排序的结构</h3><ol>
-<li>二叉树   —&gt; 递增有序的情况    <strong>树高度==n</strong></li>
-<li>AVL 平衡二叉树   旋转次数多</li>
-<li>红黑树 弱平衡二叉树         弊端: 高度高</li>
-<li>B树   m叉树+平衡查找树     扩大横分叉，高度可控</li>
-<li>B+树  每个节点从左到右一次递增<ol>
-<li>非叶子节点不存数据，只存冗余索引</li>
-<li>叶子节点从大到小相互连接</li>
+<li><p>二叉树   —&gt; 递增有序的情况    <strong>树高度==n</strong></p>
+</li>
+<li><p>AVL 平衡二叉树   旋转次数多</p>
+</li>
+<li><p>红黑树 弱平衡二叉树         弊端: 高度高</p>
+</li>
+<li><p>B树   m叉树+平衡查找树     扩大横分叉，高度可控</p>
+</li>
+<li><p>B+树  每个节点从左到右一次递增</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220521015047006.png" alt="image-20220521015047006"></p>
+<ol>
+<li>非叶子节点不存数据，只存冗余索引，这样就能存储更多的索引</li>
+<li>叶子节点从大到小相互连接，以链表的形式展现</li>
 <li>每个页16KB<ol>
 <li>如果满了  节点分裂  高度增加</li>
 </ol>
@@ -710,410 +1151,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/02/10/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/mysql%E4%B8%80%E6%9D%A1%E8%AF%AD%E5%8F%A5/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/02/10/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/mysql%E4%B8%80%E6%9D%A1%E8%AF%AD%E5%8F%A5/" class="post-title-link" itemprop="url">mysql分析</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-02-10 14:35:22" itemprop="dateCreated datePublished" datetime="2022-02-10T14:35:22+08:00">2022-02-10</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-04-10 14:35:22" itemprop="dateModified" datetime="2022-04-10T14:35:22+08:00">2022-04-10</time>
-              </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/02/10/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/mysql%E4%B8%80%E6%9D%A1%E8%AF%AD%E5%8F%A5/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/02/10/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/mysql%E4%B8%80%E6%9D%A1%E8%AF%AD%E5%8F%A5/" class="cy_cmt_count" data-xid="2022/02/10/数据库/nosql/mysql一条语句/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.3k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="Buffer-pool"><a href="#Buffer-pool" class="headerlink" title="Buffer pool"></a>Buffer pool</h3><p>第一次在查询的时候会将查询的结果存到  Buffer Pool 中，这样后面再有请求的时候就会先从缓冲池中去查询，如果没有再去磁盘中查找，然后在放到  Buffer Pool 中</p>
-<h3 id="执行顺序"><a href="#执行顺序" class="headerlink" title="执行顺序"></a>执行顺序</h3><p>undo</p>
-<p>磁盘——–&gt;buffer Pool———&gt;在buffer中完成运算—&gt;结果写入到redo log buffer —-&gt;写入redo log —&gt;</p>
-<p>​      ——-&gt;将更新语句反句加载到undo</p>
-<ul>
-<li>准备更新一条 SQL 语句</li>
-<li>MySQL（innodb）会先去缓冲池（BufferPool）中去查找这条数据，没找到就会去磁盘中查找，如果查找到就会将这条数据加载到缓冲池（BufferPool）中</li>
-<li>在加载到 Buffer Pool 的同时，会将这条数据的原始记录保存到 undo 日志文件中</li>
-<li>innodb 会在 Buffer Pool 中执行更新操作</li>
-<li>更新后的数据会记录在 redo log buffer 中</li>
-<li>MySQL 提交事务的时候，会将 redo log buffer 中的数据写入到 redo 日志文件中 刷磁盘可以通过 innodb_flush_log_at_trx_commit 参数来设置<ul>
-<li>值为 0 表示不刷入磁盘</li>
-<li>值为 1 表示立即刷入磁盘</li>
-<li>值为 2 表示先刷到 os cache</li>
-</ul>
-</li>
-<li>myslq 重启的时候会将 redo 日志恢复到缓冲池中</li>
-</ul>
-<h4 id="当前读"><a href="#当前读" class="headerlink" title="当前读"></a>当前读</h4><blockquote>
-<p>当前读, 读取的是最新版本, 并且<strong>对读取的记录加锁, 阻塞其他事务同时改动相同</strong>记录，避免出现安全问题</p>
-</blockquote>
-<p>当前读的实现方式：next-key锁(行记录锁+Gap间隙锁)</p>
-<ol>
-<li>对主键或唯一索引，如果当前读时，where条件全部精确命中(=或者in)，这种场景本身就不会出现幻读，所以只会加行记录锁。</li>
-<li>没有索引的列，当前读操作时，会加全表gap锁，生产环境要注意。</li>
-<li>非唯一索引列，如果where条件部分命中(&gt;、&lt;、like等)或者全未命中，则会加附近Gap间隙锁。例如，某表数据如下，非唯一索引2,6,9,9,11,15。如下语句要操作非唯一索引列9的数据，gap锁将会锁定的列是(6,11]，该区间内无法插入数据。</li>
-</ol>
-<h4 id="快照读"><a href="#快照读" class="headerlink" title="快照读"></a>快照读</h4><blockquote>
-<p>readView  [未提交事务数组]、max_id</p>
-<p>执行DML才会给事务id</p>
-</blockquote>
-<blockquote>
-<p>版本链上适合自己的一个版本快照</p>
-<p>通过 </p>
-<p>生成时机：begin<strong>之后第一条</strong>语句</p>
-<p>作用范围：库的所有表，每个表都对应一个版本链，</p>
-</blockquote>
-<p>只读事务不分配trx_id（会分配一个假trx_id），只有涉及到数据更新才会分配事务ID。</p>
-<ul>
-<li>在事务隔离级别为<code>RR</code>时，在第一次进行<code>select</code>查询时生成<code>read view</code>;</li>
-<li>在事务隔离级别为<code>RC</code>时，每一次<code>select</code>查询都会生成<code>read view</code>;</li>
-</ul>
-<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/lmlzww/article/details/119087426?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-0.pc_relevant_default&amp;spm=1001.2101.3001.4242.1&amp;utm_relevant_index=2">https://blog.csdn.net/lmlzww/article/details/119087426?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-0.pc_relevant_default&amp;spm=1001.2101.3001.4242.1&amp;utm_relevant_index=2</a></p>
-<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_44823898/article/details/115718622">https://blog.csdn.net/qq_44823898/article/details/115718622</a></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/02/09/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%B3%BB%E7%BB%9F%E8%A1%A8/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/02/09/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%B3%BB%E7%BB%9F%E8%A1%A8/" class="post-title-link" itemprop="url">mysql系统表</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-02-09 23:37:59" itemprop="dateCreated datePublished" datetime="2022-02-09T23:37:59+08:00">2022-02-09</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-04-09 23:37:59" itemprop="dateModified" datetime="2022-04-09T23:37:59+08:00">2022-04-09</time>
-              </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/02/09/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%B3%BB%E7%BB%9F%E8%A1%A8/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/02/09/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%B3%BB%E7%BB%9F%E8%A1%A8/" class="cy_cmt_count" data-xid="2022/02/09/数据库/mysql系统表/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>738</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>·</p>
-<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><table>
-<thead>
-<tr>
-<th>库名</th>
-<th>表数量</th>
-<th>视图数量</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>information_schema</td>
-<td>61</td>
-<td>0</td>
-</tr>
-<tr>
-<td>mysql</td>
-<td>32</td>
-<td>0</td>
-</tr>
-<tr>
-<td>performance_schema</td>
-<td>87</td>
-<td>0</td>
-</tr>
-<tr>
-<td>sys</td>
-<td>1</td>
-<td>100</td>
-</tr>
-</tbody></table>
-<h2 id="一、infomation-schema"><a href="#一、infomation-schema" class="headerlink" title="一、infomation_schema"></a>一、infomation_schema</h2><blockquote>
-<p>信息数据库，保存着关于MySQL其他数据库的信息。如数据库名，数据库的表，表栏的数据类型与访问权限等</p>
-</blockquote>
-<table>
-<thead>
-<tr>
-<th>表名</th>
-<th>作用</th>
-<th></th>
-</tr>
-</thead>
-<tbody><tr>
-<td>数据库-表-字段-索引你</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>SCHEMATA</td>
-<td>数据库信息(名称，字符类型)</td>
-<td>show database</td>
-</tr>
-<tr>
-<td>TABLES</td>
-<td>表信息(属于哪个数据库，自增id，创建时间，行数，数据大小，字符，引擎)</td>
-<td>show tables</td>
-</tr>
-<tr>
-<td>columns</td>
-<td>行信息</td>
-<td>desc</td>
-</tr>
-<tr>
-<td>user_privileges</td>
-<td>用户权限</td>
-<td></td>
-</tr>
-<tr>
-<td>key_columns_usage</td>
-<td>表的索引信息</td>
-<td>show key</td>
-</tr>
-<tr>
-<td><strong>锁信息</strong></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>innodb_trx</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>innodb_locks</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>innodb_lock_wait</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td><strong>其他</strong></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>files</td>
-<td>mysql用到的文件</td>
-<td></td>
-</tr>
-</tbody></table>
-<h2 id="二、mysql"><a href="#二、mysql" class="headerlink" title="二、mysql"></a>二、mysql</h2><blockquote>
-<p>主要是权限的信息</p>
-</blockquote>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody><tr>
-<td>user</td>
-<td>用户列、权限列、安全列、资源控制列</td>
-<td></td>
-</tr>
-<tr>
-<td>innodb_table_stas</td>
-<td>表信息， 更新时间，行数</td>
-<td></td>
-</tr>
-</tbody></table>
-<h2 id="三、performance-scheme"><a href="#三、performance-scheme" class="headerlink" title="三、performance_scheme"></a>三、performance_scheme</h2><blockquote>
-<p>PERFORMANCE_SCHEMA这个功能默认是关闭的。需要设置参数： performance_schema 才可以启动该功能，这个参数是静态参数，只能写在my.cnf 中 不能动态修改。</p>
-</blockquote>
-<table>
-<thead>
-<tr>
-<th>表名</th>
-<th>作用</th>
-<th></th>
-</tr>
-</thead>
-<tbody><tr>
-<td>users</td>
-<td>用户连接的次数，当前连接数</td>
-<td></td>
-</tr>
-<tr>
-<td>hosts</td>
-<td>类似于users表</td>
-<td></td>
-</tr>
-<tr>
-<td>accounts</td>
-<td>是users+hosts</td>
-<td></td>
-</tr>
-<tr>
-<td>threads</td>
-<td>当前存活线程(ip,username,状态)</td>
-<td></td>
-</tr>
-<tr>
-<td>gloable_variables</td>
-<td>全局变量</td>
-<td></td>
-</tr>
-</tbody></table>
-<h2 id="四、sys"><a href="#四、sys" class="headerlink" title="四、sys"></a>四、sys</h2><p>配置更改表</p>
-<ul>
-<li>variable ： 配置选项名称</li>
-<li>value ： 配置选项值</li>
-<li>set_time ： 该行配置修改的时间</li>
-<li>set_by ： 该行配置信息修改者，如果从被安装没有修改过，那么这个数据应该为NULL</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/14/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/">14</a><span class="page-number current">15</span><a class="page-number" href="/page/16/">16</a><span class="space">&hellip;</span><a class="page-number" href="/page/26/">26</a><a class="extend next" rel="next" href="/page/16/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/14/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/">14</a><span class="page-number current">15</span><a class="page-number" href="/page/16/">16</a><span class="space">&hellip;</span><a class="page-number" href="/page/27/">27</a><a class="extend next" rel="next" href="/page/16/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1181,14 +1222,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">128</span>
+          <span class="site-state-item-count">131</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-count">29</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>
@@ -1229,12 +1270,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">382k</span>
+    <span title="站点总字数">391k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">5:47</span>
+    <span title="站点阅读时长">5:55</span>
 </div>
 
         

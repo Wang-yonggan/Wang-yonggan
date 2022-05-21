@@ -185,6 +185,672 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/24/%E7%BB%84%E4%BB%B6/ORM/mybatis/mybatis/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/04/24/%E7%BB%84%E4%BB%B6/ORM/mybatis/mybatis/" class="post-title-link" itemprop="url">Mybatis杂记</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-04-24 12:07:10" itemprop="dateCreated datePublished" datetime="2022-04-24T12:07:10+08:00">2022-04-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-05-13 14:38:07" itemprop="dateModified" datetime="2022-05-13T14:38:07+08:00">2022-05-13</time>
+              </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/04/24/%E7%BB%84%E4%BB%B6/ORM/mybatis/mybatis/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/24/%E7%BB%84%E4%BB%B6/ORM/mybatis/mybatis/" class="cy_cmt_count" data-xid="2022/04/24/组件/ORM/mybatis/mybatis/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>4.8k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="大致步骤"><a href="#大致步骤" class="headerlink" title="大致步骤"></a>大致步骤</h3><ol>
+<li>sqlSessionFactoryBuilder   &lt;- sqlMapConfig</li>
+<li>sqlSessionFactory –&gt;sqlSession（Connection的封装，有增删改查功能）</li>
+<li>①生成代理对象          ② 定义通用的sql语句</li>
+<li>这地方没听会</li>
+<li>封装结果集</li>
+</ol>
+<h3 id="特别的"><a href="#特别的" class="headerlink" title="特别的"></a>特别的</h3><ol>
+<li><p>插入后对象会自动生成id</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Repo entity = <span class="keyword">new</span> Repo();</span><br><span class="line">BeanMapper.copy(reqDTO, entity);</span><br><span class="line"><span class="keyword">this</span>.saveOrUpdate(entity);</span><br><span class="line">RepoCategories repoCategories = <span class="keyword">new</span> RepoCategories();</span><br><span class="line">BeanMapper.copy(reqDTO, repoCategories);</span><br><span class="line"><span class="comment">//已经自动copy parentId</span></span><br><span class="line"><span class="comment">//插入entity已经自动形成id</span></span><br><span class="line">repoCategories.setId(entity.getId());</span><br></pre></td></tr></table></figure></li>
+<li><p>xml可以 arg0  param1 但是不能写参数类型</p>
+</li>
+<li><p>模糊查询</p>
+<ol>
+<li>传入前加入%%</li>
+<li>在mapper.xml中写    ‘%${arg0}%’</li>
+<li>like concat(‘%’,#{arg0},’%’)</li>
+</ol>
+</li>
+</ol>
+<h3 id="tree-查询-树形查询"><a href="#tree-查询-树形查询" class="headerlink" title="tree 查询  树形查询"></a>tree 查询  树形查询</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AppInfo</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> id;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> parentid;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">    <span class="keyword">private</span> List&lt;AppInfo&gt; childList;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">resultMap</span> <span class="attr">id</span>=<span class="string">&quot;appsTree&quot;</span> <span class="attr">type</span>=<span class="string">&quot;com.lg.business.common.ws.AppInfo&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">id</span> <span class="attr">column</span>=<span class="string">&quot;id&quot;</span> <span class="attr">property</span>=<span class="string">&quot;id&quot;</span> <span class="attr">javaType</span>=<span class="string">&quot;int&quot;</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">&quot;parentid&quot;</span> <span class="attr">property</span>=<span class="string">&quot;parentid&quot;</span> <span class="attr">javaType</span>=<span class="string">&quot;int&quot;</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">&quot;name&quot;</span> <span class="attr">property</span>=<span class="string">&quot;name&quot;</span> <span class="attr">javaType</span>=<span class="string">&quot;String&quot;</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">collection</span> <span class="attr">column</span>=<span class="string">&quot;id&quot;</span> <span class="attr">property</span>=<span class="string">&quot;childList&quot;</span> <span class="attr">select</span>=<span class="string">&quot;getAppsByPid&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">resultMap</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;getAllWsAppList&quot;</span> <span class="attr">resultMap</span>=<span class="string">&quot;appsTree&quot;</span>&gt;</span></span><br><span class="line">        select id,parentid,name from flow_app_info where parentid=0</span><br><span class="line">    <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;getAppsByPid&quot;</span> <span class="attr">resultMap</span>=<span class="string">&quot;appsTree&quot;</span>&gt;</span></span><br><span class="line">        select id,parentid,name from flow_app_info where parentid=#&#123;id&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">mapper</span> <span class="meta-keyword">PUBLIC</span> <span class="meta-string">&quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;</span></span></span><br><span class="line"><span class="meta">        <span class="meta-string">&quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">mapper</span> <span class="attr">namespace</span>=<span class="string">&quot;com.example.learn.mapper.TreeMapper&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">resultMap</span> <span class="attr">id</span>=<span class="string">&quot;deptTree&quot;</span> <span class="attr">type</span>=<span class="string">&quot;com.example.learn.tree.Dep&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">id</span> <span class="attr">column</span>=<span class="string">&quot;id&quot;</span> <span class="attr">property</span>=<span class="string">&quot;id&quot;</span> <span class="attr">jdbcType</span>=<span class="string">&quot;INTEGER&quot;</span> /&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">&quot;name&quot;</span> <span class="attr">property</span>=<span class="string">&quot;name&quot;</span> <span class="attr">jdbcType</span>=<span class="string">&quot;VARCHAR&quot;</span> /&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">column</span>=<span class="string">&quot;parentId&quot;</span> <span class="attr">property</span>=<span class="string">&quot;parentId&quot;</span> <span class="attr">jdbcType</span>=<span class="string">&quot;INTEGER&quot;</span> /&gt;</span></span><br><span class="line">        <span class="comment">&lt;!--id作为参数递归调用getDeptTree，查询子节点--&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- property:java pojo属性，column: 查出来字段 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">collection</span> <span class="attr">property</span>=<span class="string">&quot;children&quot;</span> <span class="attr">column</span>=<span class="string">&quot;id&quot;</span> <span class="attr">select</span>=<span class="string">&quot;getDeptTree&quot;</span> <span class="attr">ofType</span>=<span class="string">&quot;com.example.learn.tree.Dep&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">collection</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">resultMap</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!--根据父id获取子节点--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;getDeptTree&quot;</span> <span class="attr">resultMap</span>=<span class="string">&quot;deptTree&quot;</span>&gt;</span></span><br><span class="line">        select * from dep where parentId = #&#123;id&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">mapper</span>&gt;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<ol>
+<li>sqlSessionFactory</li>
+<li>sqlSession   自定义mybatis和数据库交互的核心类   </li>
+<li>IuerDao<br> @select(“select * from name”)<br> List<user> findAll(); </li>
+</ol>
+<h3 id="二、类"><a href="#二、类" class="headerlink" title="二、类"></a>二、类</h3><ol>
+<li>class Resource  使用类加载器读取配置文件的类 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> inputstream <span class="title">getResourceStream</span><span class="params">(filePath)</span></span></span><br><span class="line"><span class="function">    return Resource.Class.getClassloader.<span class="title">getResourceAsStream</span><span class="params">(filePath)</span> <span class="comment">//获取字节码     获取字节码类加载器   根据类加载器读取配置</span></span></span><br></pre></td></tr></table></figure>
+</li>
+<li>class sqlSessionFactoryBuilder    //用于创建工厂对象  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> sqlSessionFactory <span class="title">build</span><span class="params">(Inputstream config)</span></span></span><br><span class="line"><span class="function">    configration cfg </span>=XMLConfigBuider.loadConfigration(config)</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> factory(config) </span><br></pre></td></tr></table></figure>
+</li>
+<li>class DefalutsqlSession impl sqlSession  创建代理对象，释放资源 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">pri configration cfg</span><br><span class="line">pri conn</span><br><span class="line"><span class="keyword">public</span> &lt;T&gt; <span class="function">T <span class="title">getMapper</span><span class="params">(class&lt;T&gt; daoInterClass)</span></span></span><br><span class="line"><span class="function">    proxy.<span class="title">newProxyInstace</span><span class="params">(daoInterClass.getClassloader()</span>,new Class[]</span>&#123;daoInterClass&#125;,<span class="keyword">new</span> MapperProxy(cfg.getmappers(),conn))          </span><br><span class="line">        <span class="comment">//proxy代理  ---&gt;  加载类   </span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">close</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    <span class="title">if</span><span class="params">(conn!=<span class="keyword">null</span>)</span></span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<ol start="4">
+<li><p>class configration       </p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">pri driver</span></span><br><span class="line"><span class="function">pri url</span></span><br><span class="line"><span class="function">pri username</span></span><br><span class="line"><span class="function">pri password</span></span><br><span class="line"><span class="function">pri Map&lt;String,Mapper&gt; mappers</span></span><br><span class="line"><span class="function">getter and <span class="title">setter</span><span class="params">(mappers)</span></span></span><br><span class="line"><span class="function">setMapper</span></span><br><span class="line"><span class="function">    <span class="keyword">this</span>.mappers.<span class="title">putAll</span><span class="params">(mappers)</span>  追加放入</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>class Mapper    用于封装sql语句和全限定类名resultType<br> pri resultType<br> pri sql</p>
+</li>
+<li><p>class factory implements sqlSessionFactory<br> pri configration cfg<br> openSession</p>
+</li>
+<li><p>class MapperProxy impl InvocationHandler   增强seletelist方法    —&gt; DefalutsqlSession</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">pri Map&lt;string,map&gt; mappers;</span><br><span class="line"><span class="function">pri conn</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(Object proxy,Method method,Object []args)</span></span></span><br><span class="line"><span class="function">    methodname </span>=method.getname                  获取方法名</span><br><span class="line">    classname=method.getdeclaringClass().getname(); 获取方法所在类名</span><br><span class="line">    key =classname+<span class="string">&#x27;.&#x27;</span>+methodname</span><br><span class="line">    mapper=mapper.get(key)</span><br><span class="line">    <span class="keyword">if</span>(mapper==<span class="keyword">null</span>) <span class="keyword">throw</span> <span class="function">out</span></span><br><span class="line"><span class="function">    return new <span class="title">Execute</span><span class="params">()</span>.<span class="title">selectlist</span><span class="params">(mapper,conn)</span></span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>class DatasourceUtil   创建数据源的类</p>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> conn <span class="title">getconnection</span><span class="params">(configration cfg)</span></span></span><br><span class="line"><span class="function">    <span class="keyword">try</span> class.<span class="title">forname</span><span class="params">(daoInterClass.getClassloader()</span>)</span></span><br><span class="line"><span class="function">    return DriverMpper.<span class="title">getconnection</span><span class="params">(cfg.geturl,cfg,getusername,cfg.getpassword)</span></span></span><br></pre></td></tr></table></figure>
+ <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">    </span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h3 id="三、配置文件"><a href="#三、配置文件" class="headerlink" title="三、配置文件"></a>三、配置文件</h3><h4 id="4-1-sqlMapConfig-xml"><a href="#4-1-sqlMapConfig-xml" class="headerlink" title="4.1 sqlMapConfig.xml"></a>4.1 sqlMapConfig.xml</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">conf</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">envs</span> <span class="attr">default</span>=<span class="string">&quot;mysql&quot;</span>&gt;</span>  <span class="comment">&lt;!--配置环境--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">env</span> <span class="attr">id</span>=<span class="string">&quot;mysql&quot;</span>&gt;</span>    <span class="comment">&lt;!--配置mysql环境--&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">transactionmanger</span> <span class="attr">type</span>=<span class="string">&quot;JDBC&quot;</span>&gt;</span><span class="comment">&lt;!--配置事物类型--&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">dataSource</span> <span class="attr">type</span>=<span class="string">&quot;POOLED&quot;</span>&gt;</span> <span class="comment">&lt;!--配置数据源--&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span> =<span class="string">&quot;driver&quot;</span> <span class="attr">value</span> <span class="attr">com.driver....</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">property</span> <span class="attr">url</span> &gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">property</span> <span class="attr">username</span> &gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">property</span> <span class="attr">password</span>&gt;</span></span><br><span class="line">             /&gt;   </span><br><span class="line">        /&gt;</span><br><span class="line">    /&gt;</span><br><span class="line">    <span class="tag">&lt;<span class="name">mappers</span>&gt;</span>   <span class="comment">&lt;!--指定映射文件--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">mapper</span> <span class="attr">resource</span> =<span class="string">&quot;iuserdao.xml&quot;</span>&gt;</span> <span class="comment">&lt;!--xml型--&gt;</span> </span><br><span class="line">        <span class="tag">&lt;<span class="name">mapper</span> <span class="attr">class</span> =<span class="string">&quot;com.wyg.dao.IuerDao&quot;</span>&gt;</span><span class="comment">&lt;!--注解型--&gt;</span></span><br><span class="line">    /&gt;</span><br><span class="line">/&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h4 id="4-2-mapper-xml"><a href="#4-2-mapper-xml" class="headerlink" title="4.2 mapper.xml"></a>4.2 mapper.xml</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">mapper</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;findAll&quot;</span> <span class="attr">resultType</span>=<span class="string">&quot;&quot;</span>&gt;</span>   <span class="comment">&lt;!--id 方法名  --&gt;</span></span><br><span class="line">    /&gt;</span><br><span class="line">/&gt;</span><br></pre></td></tr></table></figure>
+
+
+
+<ol start="2">
+<li></li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/24/%E5%88%86%E5%B8%83%E5%BC%8F/docker/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/04/24/%E5%88%86%E5%B8%83%E5%BC%8F/docker/" class="post-title-link" itemprop="url">docker</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-04-24 09:42:52" itemprop="dateCreated datePublished" datetime="2022-04-24T09:42:52+08:00">2022-04-24</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/04/24/%E5%88%86%E5%B8%83%E5%BC%8F/docker/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/24/%E5%88%86%E5%B8%83%E5%BC%8F/docker/" class="cy_cmt_count" data-xid="2022/04/24/分布式/docker/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="一、概念"><a href="#一、概念" class="headerlink" title="一、概念"></a>一、概念</h2><ol>
+<li>docker与虚拟机<ol>
+<li>虚拟机是创建一个新的操作系统，重量级</li>
+<li>docker是把递归找到各个依赖，环境，配置，然后打包，轻量级</li>
+</ol>
+</li>
+</ol>
+<h3 id="1-2-组件"><a href="#1-2-组件" class="headerlink" title="1.2 组件"></a>1.2 组件</h3><h4 id="1-2-1-镜像"><a href="#1-2-1-镜像" class="headerlink" title="1.2.1 镜像"></a>1.2.1 镜像</h4><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[<span class="symbol">repority</span>]:<span class="link">[tag] </span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>类：docker将所需要的环境，依赖，配置打包到一起，叫镜像。</p>
+</blockquote>
+<h4 id="1-2-2-容器"><a href="#1-2-2-容器" class="headerlink" title="1.2.2 容器"></a>1.2.2 容器</h4><blockquote>
+<p>实例：</p>
+</blockquote>
+<h4 id="1-2-3-数据卷"><a href="#1-2-3-数据卷" class="headerlink" title="1.2.3 数据卷"></a>1.2.3 数据卷</h4><blockquote>
+<p>类似共享内存 volume</p>
+<ol>
+<li>容器数据持久化</li>
+<li>外部机器和容器间通信</li>
+<li>容器之间通信</li>
+</ol>
+</blockquote>
+<ol>
+<li>数据卷是宿<strong>主机</strong>中的一个目录或文件</li>
+<li>当容器目录和数据卷目录绑定后，<strong>对方的修改会立即同步</strong></li>
+<li>一个数据卷可以被多个容器同时<strong>挂载</strong></li>
+<li>一个容器也可以被挂载多个数据卷</li>
+</ol>
+<h3 id="1-3-架构"><a href="#1-3-架构" class="headerlink" title="1.3 架构"></a>1.3 架构</h3><ol>
+<li>c/s架构</li>
+<li>clinet发送命令，server回应返回</li>
+</ol>
+<h2 id="二、操作"><a href="#二、操作" class="headerlink" title="二、操作"></a>二、操作</h2><h3 id="2-1-安装"><a href="#2-1-安装" class="headerlink" title="2.1 安装"></a>2.1 安装</h3><ol>
+<li><p>下载</p>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -fsSL <span class="keyword">https</span>://<span class="built_in">get</span>.docker.com | bash -s docker <span class="comment">--mirror Aliyun</span></span><br></pre></td></tr></table></figure></li>
+<li><p>镜像加速</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">sudo mkdir -p <span class="regexp">/etc/</span>docker</span><br><span class="line">sudo tee <span class="regexp">/etc/</span>docker/daemon.json &lt;&lt;-<span class="string">&#x27;EOF&#x27;</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;registry-mirrors&quot;</span>: [<span class="string">&quot;https://zck14spt.mirror.aliyuncs.com&quot;</span>]</span><br><span class="line">&#125;</span><br><span class="line">EOF</span><br><span class="line">sudo systemctl daemon-reload</span><br><span class="line">sudo systemctl restart docker</span><br></pre></td></tr></table></figure></li>
+<li><p>启动docker   systemctl start docker</p>
+</li>
+</ol>
+<h3 id="2-2-镜像"><a href="#2-2-镜像" class="headerlink" title="2.2 镜像"></a>2.2 镜像</h3><ol>
+<li><p>查看镜像</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker images</span><br></pre></td></tr></table></figure></li>
+<li><p>查找镜像</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker search 镜像名称</span><br></pre></td></tr></table></figure></li>
+<li><p>从docker.hub拉取远程镜像</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull redis:<span class="number">3.4</span></span><br></pre></td></tr></table></figure></li>
+<li><p>删除镜像</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker rmi 镜像id / 删除指定本地镜像</span><br></pre></td></tr></table></figure></li>
+<li><p>推送 docker push</p>
+</li>
+<li><p>保存  docker save -o test nginx:latest</p>
+</li>
+<li><p> 加载 docker load</p>
+</li>
+<li><p>构建 docker builder</p>
+</li>
+</ol>
+<h3 id="2-3-远程仓库"><a href="#2-3-远程仓库" class="headerlink" title="2.3 远程仓库"></a>2.3 远程仓库</h3><p>docker search mysql<br>docker pull mysql:5.7</p>
+<h3 id="2-4-容器"><a href="#2-4-容器" class="headerlink" title="2.4 容器"></a>2.4 容器</h3><ol>
+<li><p>创建/启动容器</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">docker run -it --name=c1 redis:5 /bin/bash</span> </span><br><span class="line">docker run -it -p 9000:8080 app </span><br><span class="line">docker run --name rds-d redis redis-server --save 60 1 --loglevel warning</span><br><span class="line">docker run --name rds -p 6379:6379 -d redis</span><br><span class="line"><span class="meta">#</span><span class="bash"> -p a:b 用a映射b  a可以任意一个服务器free的端口,b为镜像内容器的端口，比如tomcat默认是8080</span>        </span><br><span class="line"><span class="meta">#</span><span class="bash"> -d  后台运行</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -t 创建并进入</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -i 允许输入(交互式bash)</span></span><br></pre></td></tr></table></figure></li>
+<li><p>查看容器</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker ps # 查看正在运行的容器</span><br><span class="line">docker ps –a # 查看所有容器</span><br><span class="line">docker logs  name  查看name的日志</span><br></pre></td></tr></table></figure></li>
+<li><p>进入容器</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker exec -it name bash  <span class="comment">//执行命令;</span></span><br><span class="line">docker exec mycentos </span><br></pre></td></tr></table></figure></li>
+<li><p>暂停</p>
+<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker unpause  <span class="keyword">pause</span></span><br></pre></td></tr></table></figure></li>
+<li><p>停止/启动</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker stop name</span><br><span class="line">docker start name</span><br></pre></td></tr></table></figure></li>
+<li><p>删除</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker rm name</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="2-5-数据卷"><a href="#2-5-数据卷" class="headerlink" title="2.5 数据卷"></a>2.5 数据卷</h3><h4 id="数据卷操作"><a href="#数据卷操作" class="headerlink" title="数据卷操作"></a>数据卷操作</h4><p>docker volume+</p>
+<ol>
+<li>create 创建</li>
+<li>inspect 显示信息</li>
+<li>ls 列出</li>
+<li>rm 删除</li>
+<li>prune 删除未使用到的</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker run -it --name=c1 –v ~/java:/root/test imageName </span><br><span class="line"><span class="comment">//目录必须是绝对路径</span></span><br><span class="line"><span class="comment">// 如果目录不存在，会自动创建</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="数据卷容器"><a href="#数据卷容器" class="headerlink" title="数据卷容器"></a>数据卷容器</h4><p>映射数据卷 -v  a:b</p>
+<ol>
+<li><p>创建数据卷容器 -v /volume</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run –it --name=c3 –v /volume centos:<span class="number">7</span> /bin/bash </span><br></pre></td></tr></table></figure></li>
+<li><p>直接挂载</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -it --name=c1 –v <span class="regexp">/root/</span>java<span class="regexp">/test:/</span>root/test imageName </span><br></pre></td></tr></table></figure></li>
+<li><p>创建容器并挂载   –volumes-from c3</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker run –it --name=c1 --volumes-from c3 centos:<span class="number">7</span> /bin/bash</span><br><span class="line">docker run –it --name=c2 --volumes-from c3 centos:<span class="number">7</span> /bin/bash  </span><br></pre></td></tr></table></figure></li>
+</ol>
+<ol>
+<li><p>实例</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mkdir mysql</span><br><span class="line">cd mysql </span><br><span class="line">docker run -id -p 3307:3306 -v $PWD/conf:/etc/mysql/conf.d -v $PWD/logs:/logs \</span><br><span class="line">-v $PWD/data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=root mysql:5.7</span><br><span class="line"><span class="meta">#</span><span class="bash"> -v 映射</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="variable">$PWD</span>当前文件夹</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -e 参数</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="三、自定义镜像"><a href="#三、自定义镜像" class="headerlink" title="三、自定义镜像"></a>三、自定义镜像</h2><h3 id="3-1-镜像结构"><a href="#3-1-镜像结构" class="headerlink" title="3.1 镜像结构"></a>3.1 镜像结构</h3><blockquote>
+<p>linux基础–&gt; 环境变量–&gt; mysql的依赖—&gt; mysql —&gt; mysql配置 –&gt; entryPoint 入口脚本</p>
+<p>分层结构，这样的<strong>优点是其中一个变了只需要改变这个层</strong>，不需要全部更改</p>
+</blockquote>
+<h3 id="3-2dockerFile"><a href="#3-2dockerFile" class="headerlink" title="3.2dockerFile"></a>3.2dockerFile</h3><blockquote>
+<p>dockerFile，指令文件</p>
+<p>用于快速构建(build)镜像</p>
+</blockquote>
+<ol>
+<li><p>dockerfile语法</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span>：定制的镜像都是基于 <span class="keyword">FROM</span> 的镜像，这里的 nginx 就是定制需要的基础镜像。后续的操作都是基于 nginx。</span><br><span class="line"></span><br><span class="line">RUN：用于执行后面跟着的命令行命令,每一个run创建一层。有以下俩种格式：</span><br><span class="line">	<span class="builtin-name">RUN</span> [<span class="string">&quot;可执行文件&quot;</span>, <span class="string">&quot;参数1&quot;</span>, <span class="string">&quot;参数2&quot;</span>]</span><br><span class="line">	<span class="builtin-name">RUN</span> &lt;命令行命令&gt;</span><br></pre></td></tr></table></figure></li>
+<li><p>dickerfile 构建镜像</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker build -f app.jar -t appName:version</span><br><span class="line"># -f 指定df路径  -t指定新的镜像的名字和版本</span><br></pre></td></tr></table></figure></li>
+<li><p>镜像启动（创建容器）</p>
+</li>
+</ol>
+<h3 id="docker-compose-服务编排"><a href="#docker-compose-服务编排" class="headerlink" title="docker compose 服务编排"></a>docker compose 服务编排</h3><blockquote>
+<p>用于快速构建分布式集群项目</p>
+<p>按照一定规则批量管理容器</p>
+<p>比如 定义启动顺序，</p>
+</blockquote>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><ol>
+<li><p>容器转换成镜像</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker commit id name:version</span><br></pre></td></tr></table></figure></li>
+<li><p>压缩</p>
+<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">docker</span> </span><br></pre></td></tr></table></figure></li>
+</ol>
+<h4 id="docker镜像原理"><a href="#docker镜像原理" class="headerlink" title="docker镜像原理"></a>docker镜像原理</h4><ol>
+<li>docker镜像其实是一个文件层次系统</li>
+<li></li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/24/linux/linux%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/04/24/linux/linux%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4/" class="post-title-link" itemprop="url">linux高级命令</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-04-24 09:23:24" itemprop="dateCreated datePublished" datetime="2022-04-24T09:23:24+08:00">2022-04-24</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/os/" itemprop="url" rel="index"><span itemprop="name">os</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/04/24/linux/linux%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/24/linux/linux%E9%AB%98%E7%BA%A7%E5%91%BD%E4%BB%A4/" class="cy_cmt_count" data-xid="2022/04/24/linux/linux高级命令/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>·</p>
+<h2 id="Base"><a href="#Base" class="headerlink" title="Base"></a>Base</h2><h3 id="Sort"><a href="#Sort" class="headerlink" title="Sort"></a>Sort</h3><blockquote>
+<p>对文本文件中所有行进行排序。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>作用</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-n  -g</td>
+<td>根据数字</td>
+<td></td>
+</tr>
+<tr>
+<td>-r</td>
+<td>倒序</td>
+<td></td>
+</tr>
+<tr>
+<td>-R</td>
+<td>随机排序</td>
+<td></td>
+</tr>
+<tr>
+<td>-f</td>
+<td>忽略大小写</td>
+<td></td>
+</tr>
+<tr>
+<td>-k</td>
+<td>根据位置，第几个key</td>
+<td>ps -ef |sort -nk 2</td>
+</tr>
+<tr>
+<td>-u</td>
+<td>去重</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id="一、查看cpu-内存占用情况"><a href="#一、查看cpu-内存占用情况" class="headerlink" title="一、查看cpu/内存占用情况"></a>一、查看cpu/内存占用情况</h2><ol>
+<li><p>free -h 查看内存情况</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211111004922374.png" alt="image-20211111004922374"></p>
+<blockquote>
+<p>1.CPU占用最多的前10个进程：<br>ps auxw|head -1;ps auxw|sort -rn -k3|head -10<br>2.内存消耗最多的前10个进程<br>ps auxw|head -1;ps auxw|sort -rn -k4|head -10<br>3.虚拟内存使用最多的前10个进程</p>
+<p>ps auxw|head -1;ps auxw|sort -rn -k5|head -10</p>
+<p>%MEM 进程的内存占用率</p>
+<p>VSZ 进程所使用的虚存的大小</p>
+<p>RSS实际内存</p>
+</blockquote>
+</li>
+<li><p>具体进程</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat /proc/<span class="number">3664</span>(具体进程号)/status　</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>​        </p>
+<h2 id="二、硬件信息"><a href="#二、硬件信息" class="headerlink" title="二、硬件信息"></a>二、硬件信息</h2><h2 id="三、系统性能监控"><a href="#三、系统性能监控" class="headerlink" title="三、系统性能监控"></a>三、系统性能监控</h2><blockquote>
+<ol>
+<li>top找到进程</li>
+<li>top -p pid 然后按H 找到线程</li>
+<li>jstack pid </li>
+</ol>
+</blockquote>
+<ol>
+<li><p>top 系统信息</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">时间：top - 09:44:56 </span><br><span class="line">开机天数：up 16 days, 21:23,  </span><br><span class="line">连接人数：1 user, </span><br><span class="line">处理任务平均时间：load average: 9.59, 4.75, 1.92</span><br><span class="line">进程数：Tasks: 145 total,  </span><br><span class="line">正在运行进程数：2 running,</span><br><span class="line">睡眠进程数：143 sleeping,  </span><br><span class="line">停止进程数：0 stopped</span><br><span class="line">冻结进程数：0 zombie</span><br><span class="line">cpu占比：Cpu(s): 99.8%us, </span><br><span class="line">内核占比：0.1%sy, 0.0%ni,  0.2%id,  0.0%wa,  0.0%hi,  0.0%si,  0.0%st</span><br><span class="line">物理总内存Mem:   4147888k total, </span><br><span class="line">已用内存：2493092k used, </span><br><span class="line">空闲内存：1654796k free, </span><br><span class="line">缓存区内存：158188k buffers</span><br><span class="line">虚拟内存：Swap:  5144568k total,       56k used,  5144512k free,  2013180k cached</span><br></pre></td></tr></table></figure></li>
+<li><p>查看某个进程  top -p pid  然后按大写H</p>
+</li>
+</ol>
+<h2 id="四、内存、磁盘"><a href="#四、内存、磁盘" class="headerlink" title="四、内存、磁盘"></a>四、内存、磁盘</h2><ol>
+<li><p>free 显示内存使用信息</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">free -s 2 每两秒监控一次内存信息</span><br><span class="line">free -bkmh  以b,kb,mb方式显示 h:人类方式显示</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li><p>说明</p>
+<p>total：总物理内存</p>
+<p>Shared：表示多个进程共享的内存总额。</p>
+<p>Buffers/cached：表示 磁盘缓存的大小。</p>
+<p>swap: 交换区/虚拟内存</p>
+</li>
+</ol>
+</li>
+<li><p>fdisk、df</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">-b &lt;大小&gt;             扇区大小(512、1024、2048或4096)</span><br><span class="line">-c[=&lt;模式&gt;]           兼容模式：“dos”或“nondos”(默认)</span><br><span class="line">-h                    打印此帮助文本</span><br><span class="line">-u[=&lt;单位&gt;]           显示单位：“cylinders”(柱面)或“sectors”(扇区，默认)</span><br><span class="line">-v                    打印程序版本</span><br><span class="line">-C &lt;数字&gt;             指定柱面数</span><br><span class="line">-H &lt;数字&gt;             指定磁头数</span><br><span class="line">-S &lt;数字&gt;             指定每个磁道的扇区数</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="五、系统管理"><a href="#五、系统管理" class="headerlink" title="五、系统管理"></a>五、系统管理</h2><ol>
+<li><p>ps</p>
+<blockquote>
+<p>进程信息</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>作用</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-a</td>
+<td>所有程序</td>
+<td></td>
+</tr>
+<tr>
+<td>-A  -e</td>
+<td>所有程序</td>
+<td></td>
+</tr>
+<tr>
+<td>-u</td>
+<td>指定用户</td>
+<td>ps -u root</td>
+</tr>
+<tr>
+<td>u</td>
+<td>显示用户</td>
+<td>ps -e    u</td>
+</tr>
+<tr>
+<td>-f</td>
+<td>UID,PPIP,C,STIME</td>
+<td></td>
+</tr>
+<tr>
+<td>f   -H</td>
+<td>线程父子树状结构</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">ps axo pid,comm,pcpu <span class="comment"># 查看进程的PID、名称以及CPU 占用率</span></span><br><span class="line">ps aux | sort -rnk 4 <span class="comment"># 按内存资源的使用量对进程进行排序</span></span><br><span class="line">ps aux | sort -nk 3  <span class="comment"># 按 CPU 资源的使用量对进程进行排序</span></span><br><span class="line">ps -A <span class="comment"># 显示所有进程信息</span></span><br><span class="line">ps -u root <span class="comment"># 显示指定用户信息</span></span><br><span class="line">ps -efL <span class="comment"># 查看线程数</span></span><br><span class="line">ps -e -o <span class="string">&quot;%C : %p :%z : %a&quot;</span>|sort -k5 -nr <span class="comment"># 查看进程并按内存使用大小排列</span></span><br><span class="line">ps -ef <span class="comment"># 显示所有进程信息，连同命令行</span></span><br><span class="line">ps -ef | grep ssh <span class="comment"># ps 与grep 常用组合用法，查找特定进程</span></span><br><span class="line">ps -C nginx <span class="comment"># 通过名字或命令搜索进程</span></span><br><span class="line">ps aux --sort=-pcpu,+pmem <span class="comment"># CPU或者内存进行排序,-降序，+升序</span></span><br><span class="line">ps -f --forest -C nginx <span class="comment"># 用树的风格显示进程的层次关系</span></span><br><span class="line">ps -o pid,uname,comm -C nginx <span class="comment"># 显示一个父进程的子进程</span></span><br><span class="line">ps -e -o pid,uname=USERNAME,pcpu=CPU_USAGE,pmem,comm <span class="comment"># 重定义标签</span></span><br><span class="line">ps -e -o pid,comm,etime <span class="comment"># 显示进程运行的时间</span></span><br><span class="line">ps -aux | grep named <span class="comment"># 查看named进程详细信息</span></span><br><span class="line">ps -o <span class="built_in">command</span> -p 91730 | sed -n2p <span class="comment"># 通过进程id获取服务名称</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="六、进程"><a href="#六、进程" class="headerlink" title="六、进程"></a>六、进程</h2><ol>
+<li><p>jps查看java进程</p>
+</li>
+<li><p>lsof </p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">lsof</span> -i:<span class="number">8001</span> 产看<span class="number">8001</span>端口的进程</span><br><span class="line"></span><br></pre></td></tr></table></figure></li>
+<li><p>lsof</p>
+<figure class="highlight tcl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">lsof -p <span class="keyword">pid</span>    该<span class="keyword">pid</span>打开的文件</span><br><span class="line">lsof filePath   操作该文件的进程</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>含义说明<ol>
+<li>commend 进程名称</li>
+<li>pid 进程标识</li>
+<li>ppid 父进程id</li>
+<li>user 进程所有者</li>
+<li>fd 文件描述符，表示对该文件的行为  如：读，写，</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<h2 id="七、网络"><a href="#七、网络" class="headerlink" title="七、网络"></a>七、网络</h2><ol>
+<li><p>ifconfig 查看网络设备状态</p>
+</li>
+<li><p>netstat</p>
+</li>
+<li><p>查询内网地址：</p>
+<ol>
+<li>ifconfig </li>
+<li>ip a</li>
+<li>ip addr</li>
+</ol>
+</li>
+<li><p>查询外网地址</p>
+<ol>
+<li>curl cip.cc</li>
+<li>curl ifconfig.me </li>
+</ol>
+</li>
+</ol>
+<h2 id="八、cpu"><a href="#八、cpu" class="headerlink" title="八、cpu"></a>八、cpu</h2><h2 id="九、配置"><a href="#九、配置" class="headerlink" title="九、配置"></a>九、配置</h2><ol>
+<li><p>查看位数  uname -a</p>
+</li>
+<li><p>查看是ubantu还是centos</p>
+<ol>
+<li><p>cat /etc/issue</p>
+</li>
+<li><p>uname -n</p>
+</li>
+</ol>
+</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/23/%E7%BB%84%E4%BB%B6/ORM/mybatis/%E7%BC%93%E5%AD%98/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -384,643 +1050,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/23/%E7%BB%84%E4%BB%B6/ORM/mybatis/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/04/23/%E7%BB%84%E4%BB%B6/ORM/mybatis/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="post-title-link" itemprop="url">mybatis源码分析</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-04-23 00:45:20" itemprop="dateCreated datePublished" datetime="2022-04-23T00:45:20+08:00">2022-04-23</time>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/04/23/%E7%BB%84%E4%BB%B6/ORM/mybatis/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/23/%E7%BB%84%E4%BB%B6/ORM/mybatis/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="cy_cmt_count" data-xid="2022/04/23/组件/ORM/mybatis/源码分析/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>9.3k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>8 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>前置</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">session.selectOne(String statement, Object parameter); <span class="comment">//调用session</span></span><br><span class="line">MappedStatement ms = configuration.getMappedStatement(statement);<span class="comment">//获得mapperStatement</span></span><br><span class="line">executor.query(ms, wrapCollection(parameter), rowBounds, Executor.NO_RESULT_HANDLER);<span class="comment">//调用executor(baseExecutor or cacheExecutor)</span></span><br></pre></td></tr></table></figure>
-
-<p>baseExcutor</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//baseExecutor中</span></span><br><span class="line">BoundSql boundSql = ms.getBoundSql(parameter);<span class="comment">//得到绑定sql</span></span><br><span class="line">CacheKey key = createCacheKey(ms, parameter, rowBounds, boundSql);<span class="comment">//创建缓存Key</span></span><br><span class="line">list = resultHandler == <span class="keyword">null</span> ? (List&lt;E&gt;) localCache.getObject(key) : <span class="keyword">null</span>;<span class="comment">//一级缓存</span></span><br><span class="line"><span class="keyword">else</span>  list = queryFromDatabase(ms, parameter, rowBounds, resultHandler, key, boundSql);<span class="comment">//数据库查询</span></span><br><span class="line">list = doQuery(ms, parameter, rowBounds, resultHandler, boundSql);</span><br><span class="line"><span class="comment">//simpleExecutor中</span></span><br><span class="line">stmt = prepareStatement(handler, ms.getStatementLog());<span class="comment">//获得jdbc.stateMent</span></span><br><span class="line"><span class="comment">//simpleStateMentHandler中</span></span><br><span class="line">statement.execute(sql);</span><br><span class="line"><span class="comment">//defaultResultSetHandler中</span></span><br><span class="line"><span class="keyword">final</span> List&lt;Object&gt; multipleResults = <span class="keyword">new</span> ArrayList&lt;Object&gt;();</span><br><span class="line">rsw = getNextResultSet(stmt);</span><br><span class="line">handleResultSet(rsw, resultMap, multipleResults, <span class="keyword">null</span>);</span><br><span class="line">RETURN multipleResults</span><br></pre></td></tr></table></figure>
-
-<p>cacheExcutor</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//cacheExecutor.query1中</span></span><br><span class="line">BoundSql boundSql = ms.getBoundSql(parameterObject);</span><br><span class="line">CacheKey key = createCacheKey(ms, parameterObject, rowBounds, boundSql);<span class="comment">//query时传入一个cachekey参数</span></span><br><span class="line"><span class="keyword">return</span> query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);</span><br><span class="line"><span class="comment">//cacheExecutor.query2中</span></span><br><span class="line">Cache cache = ms.getCache();</span><br><span class="line">  </span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="session-selectOne"><a href="#session-selectOne" class="headerlink" title="session.selectOne"></a>session.selectOne</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;E&gt; <span class="function">List&lt;E&gt; <span class="title">selectList</span><span class="params">(String statement, Object parameter, RowBounds rowBounds)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="comment">//根据statement id找到对应的MappedStatement</span></span><br><span class="line">      MappedStatement ms = configuration.getMappedStatement(statement);</span><br><span class="line">      <span class="comment">//转而用执行器来查询结果,注意这里传入的ResultHandler是null</span></span><br><span class="line">      <span class="keyword">return</span> executor.query(ms, wrapCollection(parameter), rowBounds, Executor.NO_RESULT_HANDLER);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">      <span class="keyword">throw</span> ExceptionFactory.wrapException(<span class="string">&quot;Error querying database.  Cause: &quot;</span> + e, e);</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">      ErrorContext.instance().reset();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="session-doQuery"><a href="#session-doQuery" class="headerlink" title="session.doQuery()"></a>session.doQuery()</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;E&gt; <span class="function">List&lt;E&gt; <span class="title">doQuery</span><span class="params">(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">  Statement stmt = <span class="keyword">null</span>;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    Configuration configuration = ms.getConfiguration();</span><br><span class="line">    <span class="comment">//新建一个StatementHandler</span></span><br><span class="line">    <span class="comment">//这里看到ResultHandler传入了</span></span><br><span class="line">    StatementHandler handler = configuration.newStatementHandler(wrapper, ms, parameter, rowBounds, resultHandler, boundSql);</span><br><span class="line">    <span class="comment">//准备语句</span></span><br><span class="line">    stmt = prepareStatement(handler, ms.getStatementLog());</span><br><span class="line">    <span class="comment">//StatementHandler.query</span></span><br><span class="line">    <span class="keyword">return</span> handler.&lt;E&gt;query(stmt, resultHandler);</span><br><span class="line">  &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    closeStatement(stmt);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h3 id="BaseExcutor-query"><a href="#BaseExcutor-query" class="headerlink" title="BaseExcutor.query"></a>BaseExcutor.query</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;E&gt; <span class="function">List&lt;E&gt; <span class="title">query</span><span class="params">(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">    <span class="comment">//得到绑定sql</span></span><br><span class="line">    BoundSql boundSql = ms.getBoundSql(parameter);</span><br><span class="line">    <span class="comment">//创建缓存Key</span></span><br><span class="line">    CacheKey key = createCacheKey(ms, parameter, rowBounds, boundSql);</span><br><span class="line">    <span class="comment">//查询</span></span><br><span class="line">    <span class="keyword">return</span> query(ms, parameter, rowBounds, resultHandler, key, boundSql);</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> &lt;E&gt; <span class="function">List&lt;E&gt; <span class="title">query</span><span class="params">(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">    ErrorContext.instance().resource(ms.getResource()).activity(<span class="string">&quot;executing a query&quot;</span>).object(ms.getId());</span><br><span class="line">    <span class="comment">//如果已经关闭，报错</span></span><br><span class="line">    <span class="keyword">if</span> (closed) &#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> ExecutorException(<span class="string">&quot;Executor was closed.&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//先清局部缓存，再查询.但仅查询堆栈为0，才清。为了处理递归调用</span></span><br><span class="line">    <span class="keyword">if</span> (queryStack == <span class="number">0</span> &amp;&amp; ms.isFlushCacheRequired()) &#123;</span><br><span class="line">      clearLocalCache();</span><br><span class="line">    &#125;</span><br><span class="line">    List&lt;E&gt; list;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="comment">//加一,这样递归调用到上面的时候就不会再清局部缓存了</span></span><br><span class="line">      queryStack++;</span><br><span class="line">      <span class="comment">//先根据cachekey从localCache去查</span></span><br><span class="line">      list = resultHandler == <span class="keyword">null</span> ? (List&lt;E&gt;) localCache.getObject(key) : <span class="keyword">null</span>;</span><br><span class="line">      <span class="keyword">if</span> (list != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="comment">//若查到localCache缓存，处理localOutputParameterCache</span></span><br><span class="line">        handleLocallyCachedOutputParameters(ms, key, parameter, boundSql);</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">//从数据库查</span></span><br><span class="line">        list = queryFromDatabase(ms, parameter, rowBounds, resultHandler, key, boundSql);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">      <span class="comment">//清空堆栈</span></span><br><span class="line">      queryStack--;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (queryStack == <span class="number">0</span>) &#123;</span><br><span class="line">      <span class="comment">//延迟加载队列中所有元素</span></span><br><span class="line">      <span class="keyword">for</span> (DeferredLoad deferredLoad : deferredLoads) &#123;</span><br><span class="line">        deferredLoad.load();</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="comment">// issue #601</span></span><br><span class="line">      <span class="comment">//清空延迟加载队列</span></span><br><span class="line">      deferredLoads.clear();</span><br><span class="line">      <span class="keyword">if</span> (configuration.getLocalCacheScope() == LocalCacheScope.STATEMENT) &#123;</span><br><span class="line">        <span class="comment">// issue #482</span></span><br><span class="line">    	<span class="comment">//如果是STATEMENT，清本地缓存</span></span><br><span class="line">        clearLocalCache();</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> list;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="baseExecutor-queryFromDatabase"><a href="#baseExecutor-queryFromDatabase" class="headerlink" title="baseExecutor.queryFromDatabase"></a>baseExecutor.queryFromDatabase</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> &lt;E&gt; <span class="function">List&lt;E&gt; <span class="title">queryFromDatabase</span><span class="params">(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">    List&lt;E&gt; list;</span><br><span class="line">    <span class="comment">//先向缓存中放入占位符？？？</span></span><br><span class="line">    localCache.putObject(key, EXECUTION_PLACEHOLDER);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      list = doQuery(ms, parameter, rowBounds, resultHandler, boundSql);</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">      <span class="comment">//最后删除占位符</span></span><br><span class="line">      localCache.removeObject(key);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//加入缓存</span></span><br><span class="line">    localCache.putObject(key, list);</span><br><span class="line">    <span class="comment">//如果是存储过程，OUT参数也加入缓存</span></span><br><span class="line">    <span class="keyword">if</span> (ms.getStatementType() == StatementType.CALLABLE) &#123;</span><br><span class="line">      localOutputParameterCache.putObject(key, parameter);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> list;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="baseExecutor-doquery"><a href="#baseExecutor-doquery" class="headerlink" title="baseExecutor.doquery"></a>baseExecutor.doquery</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Configuration configuration = ms.getConfiguration();</span><br><span class="line"><span class="comment">//新建一个StatementHandler</span></span><br><span class="line"><span class="comment">//这里看到ResultHandler传入了</span></span><br><span class="line">StatementHandler handler = configuration.newStatementHandler(wrapper, ms, parameter, rowBounds, resultHandler, boundSql);</span><br><span class="line"><span class="comment">//准备语句</span></span><br><span class="line">stmt = prepareStatement(handler, ms.getStatementLog());</span><br><span class="line"><span class="comment">//StatementHandler.query</span></span><br><span class="line"><span class="keyword">return</span> handler.&lt;E&gt;query(stmt, resultHandler);</span><br></pre></td></tr></table></figure>
-
-<h3 id="statementHandler"><a href="#statementHandler" class="headerlink" title="statementHandler"></a>statementHandler</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;E&gt; <span class="function">List&lt;E&gt; <span class="title">query</span><span class="params">(Statement statement, ResultHandler resultHandler)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">  String sql = boundSql.getSql();</span><br><span class="line">  statement.execute(sql);<span class="comment">//关键</span></span><br><span class="line">  <span class="comment">//先执行Statement.execute，然后交给ResultSetHandler.handleResultSets</span></span><br><span class="line">  <span class="keyword">return</span> resultSetHandler.&lt;E&gt;handleResultSets(statement);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="resultSetHandler"><a href="#resultSetHandler" class="headerlink" title="resultSetHandler"></a>resultSetHandler</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> List&lt;Object&gt; <span class="title">handleResultSets</span><span class="params">(Statement stmt)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> List&lt;Object&gt; multipleResults = <span class="keyword">new</span> ArrayList&lt;Object&gt;();</span><br><span class="line">    <span class="keyword">int</span> resultSetCount = <span class="number">0</span>;</span><br><span class="line">    ResultSetWrapper rsw = getFirstResultSet(stmt);</span><br><span class="line"></span><br><span class="line">    List&lt;ResultMap&gt; resultMaps = mappedStatement.getResultMaps();</span><br><span class="line">    <span class="comment">//一般resultMaps里只有一个元素</span></span><br><span class="line">    <span class="keyword">int</span> resultMapCount = resultMaps.size();</span><br><span class="line">    validateResultMapsCount(rsw, resultMapCount);</span><br><span class="line">    <span class="keyword">while</span> (rsw != <span class="keyword">null</span> &amp;&amp; resultMapCount &gt; resultSetCount) &#123;</span><br><span class="line">      ResultMap resultMap = resultMaps.get(resultSetCount);</span><br><span class="line">      handleResultSet(rsw, resultMap, multipleResults, <span class="keyword">null</span>);</span><br><span class="line">      rsw = getNextResultSet(stmt);</span><br><span class="line">      cleanUpAfterHandlingResultSet();</span><br><span class="line">      resultSetCount++;</span><br><span class="line">    &#125;</span><br><span class="line">   String[] resultSets = mappedStatement.getResulSets();</span><br><span class="line">    <span class="keyword">if</span> (resultSets != <span class="keyword">null</span>) &#123;</span><br><span class="line">      <span class="keyword">while</span> (rsw != <span class="keyword">null</span> &amp;&amp; resultSetCount &lt; resultSets.length) &#123;</span><br><span class="line">        ResultMapping parentMapping = nextResultMaps.get(resultSets[resultSetCount]);</span><br><span class="line">        <span class="keyword">if</span> (parentMapping != <span class="keyword">null</span>) &#123;</span><br><span class="line">          String nestedResultMapId = parentMapping.getNestedResultMapId();</span><br><span class="line">          ResultMap resultMap = configuration.getResultMap(nestedResultMapId);</span><br><span class="line">          handleResultSet(rsw, resultMap, <span class="keyword">null</span>, parentMapping);</span><br><span class="line">        &#125;</span><br><span class="line">        rsw = getNextResultSet(stmt);</span><br><span class="line">        cleanUpAfterHandlingResultSet();</span><br><span class="line">        resultSetCount++;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> collapseSingleResultList(multipleResults);</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="CacheExecuty"><a href="#CacheExecuty" class="headerlink" title="CacheExecuty"></a>CacheExecuty</h3><h4 id="query1"><a href="#query1" class="headerlink" title="query1"></a>query1</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;E&gt; <span class="function">List&lt;E&gt; <span class="title">query</span><span class="params">(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">      BoundSql boundSql = ms.getBoundSql(parameterObject);</span><br><span class="line">      <span class="comment">//query时传入一个cachekey参数</span></span><br><span class="line">      CacheKey key = createCacheKey(ms, parameterObject, rowBounds, boundSql);</span><br><span class="line">      <span class="keyword">return</span> query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h4 id="query2"><a href="#query2" class="headerlink" title="query2"></a>query2</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">  <span class="keyword">public</span> &lt;E&gt; <span class="function">List&lt;E&gt; <span class="title">query</span><span class="params">(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql)</span></span></span><br><span class="line"><span class="function">      <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">    Cache cache = ms.getCache();</span><br><span class="line">    <span class="comment">//默认情况下是没有开启缓存的(二级缓存).要开启二级缓存,你需要在你的 SQL 映射文件中添加一行: &lt;cache/&gt;</span></span><br><span class="line">    <span class="comment">//简单的说，就是先查CacheKey，查不到再委托给实际的执行器去查</span></span><br><span class="line">    <span class="keyword">if</span> (cache != <span class="keyword">null</span>) &#123;</span><br><span class="line">      flushCacheIfRequired(ms);</span><br><span class="line">      <span class="keyword">if</span> (ms.isUseCache() &amp;&amp; resultHandler == <span class="keyword">null</span>) &#123;</span><br><span class="line">        ensureNoOutParams(ms, parameterObject, boundSql);</span><br><span class="line">        <span class="meta">@SuppressWarnings(&quot;unchecked&quot;)</span></span><br><span class="line">        List&lt;E&gt; list = (List&lt;E&gt;) tcm.getObject(cache, key);</span><br><span class="line">        <span class="keyword">if</span> (list == <span class="keyword">null</span>) &#123;</span><br><span class="line">          list = delegate.&lt;E&gt; query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);</span><br><span class="line">          tcm.putObject(cache, key, list); <span class="comment">// issue #578 and #116</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> list;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> delegate.&lt;E&gt; query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h2 id="AddMapper"><a href="#AddMapper" class="headerlink" title="AddMapper"></a>AddMapper</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//XMLConfigBuilder中</span></span><br><span class="line">parseConfiguration(parser.evalNode(<span class="string">&quot;/configuration&quot;</span>));<span class="comment">//找到configuration节点</span></span><br><span class="line">mapperElement(root.evalNode(<span class="string">&quot;mappers&quot;</span>));<span class="comment">//找到mappers节点</span></span><br><span class="line">String mapperPackage = child.getStringAttribute(<span class="string">&quot;name&quot;</span>);<span class="comment">//找到package，不重要</span></span><br><span class="line">configuration.addMappers(mapperPackage);<span class="comment">//开始加入</span></span><br><span class="line"><span class="comment">//mapperRegistry中</span></span><br><span class="line">addMappers(packageName, Object.class);<span class="comment">//找到mapper.class</span></span><br><span class="line">addMapper(mapperClass);</span><br><span class="line">    knownMappers.put(type, <span class="keyword">new</span> MapperProxyFactory&lt;T&gt;(type));<span class="comment">//临时加入代理，先加入再解析</span></span><br><span class="line">    MapperAnnotationBuilder parser = <span class="keyword">new</span> MapperAnnotationBuilder(config, type);</span><br><span class="line">    parser.parse();<span class="comment">//关键是里面的type</span></span><br><span class="line">    loadCompleted = <span class="keyword">true</span>;</span><br><span class="line"><span class="comment">//MapperAnnotationBuilder中</span></span><br><span class="line">parse();<span class="comment">//解析</span></span><br><span class="line">	parseCache();</span><br><span class="line">		CacheNamespace cacheDomain = type.getAnnotation(CacheNamespace.class);</span><br><span class="line">		assistant.useNewCache(eviction(), flushInterval , readWrite(),<span class="keyword">null</span>);</span><br><span class="line">			 Cache cache=<span class="keyword">new</span> Cache(上面的参数);</span><br><span class="line">		  	 configuration.addCache(cache);<span class="comment">//保存到configuration.caches  </span></span><br><span class="line">			 currentCache = cache;<span class="comment">//并且保存到当前的MapperAnnotationBuilder中</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h2 id="Add-ms"><a href="#Add-ms" class="headerlink" title="Add  ms"></a>Add  ms</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//MapperAnnotationBuilder中</span></span><br><span class="line">parseStatement(method);</span><br><span class="line">	<span class="keyword">boolean</span> isSelect = sqlCommandType == SqlCommandType.SELECT;</span><br><span class="line">     <span class="keyword">boolean</span> flushCache = !isSelect;</span><br><span class="line">    <span class="keyword">boolean</span> useCache = isSelect;</span><br><span class="line">	assistant.addMappedStatement(一众参数);</span><br><span class="line"><span class="comment">//assistant中</span></span><br><span class="line">addMappedStatement();</span><br><span class="line">setStatementCache(isSelect, flushCache, useCache, currentCache, statementBuilder);<span class="comment">//这个currentCache就是之前在AddMapper里面的mapper缓存，现在将引用赋予m</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-
-
-
-
-<h4 id="configuation-getCache-id"><a href="#configuation-getCache-id" class="headerlink" title="configuation.getCache(id)"></a>configuation.getCache(id)</h4><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
-
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/%E5%A4%8D%E6%9D%82sql/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/%E5%A4%8D%E6%9D%82sql/" class="post-title-link" itemprop="url">复杂的sql</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-04-10 17:45:04" itemprop="dateCreated datePublished" datetime="2022-04-10T17:45:04+08:00">2022-04-10</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/%E5%A4%8D%E6%9D%82sql/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/sql/%E5%A4%8D%E6%9D%82sql/" class="cy_cmt_count" data-xid="2022/04/10/数据库/sql/复杂sql/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>2.5k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <ol>
-<li><p>查询这个entity=PPmoney的前十的关键字</p>
-<blockquote>
-<p>sort + limit </p>
-</blockquote>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">count</span>(<span class="operator">*</span>) b, keyword <span class="keyword">FROM</span> article_kw <span class="keyword">where</span> article_id <span class="keyword">in</span>  (<span class="keyword">SELECT</span> article_id <span class="keyword">FROM</span> article_entity <span class="keyword">where</span> entity<span class="operator">=</span><span class="string">&#x27;PPmoney&#x27;</span> ) <span class="keyword">GROUP</span> <span class="keyword">BY</span> keyword <span class="keyword">ORDER</span> <span class="keyword">BY</span> b <span class="keyword">desc</span> LIMIT <span class="number">10</span>; </span><br></pre></td></tr></table></figure></li>
-<li><p>再选出上面的名字</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> keyword <span class="keyword">FROM</span>(<span class="keyword">SELECT</span> <span class="built_in">count</span>(<span class="operator">*</span>) b, keyword <span class="keyword">FROM</span> article_kw <span class="keyword">where</span> article_id <span class="keyword">in</span>  (<span class="keyword">SELECT</span> article_id <span class="keyword">FROM</span> article_entity <span class="keyword">where</span> entity<span class="operator">=</span><span class="string">&#x27;PPmoney&#x27;</span> ) <span class="keyword">GROUP</span> <span class="keyword">BY</span> keyword <span class="keyword">ORDER</span> <span class="keyword">BY</span> b <span class="keyword">desc</span> LIMIT <span class="number">10</span>) c; </span><br></pre></td></tr></table></figure></li>
-</ol>
-<h2 id="一、统计"><a href="#一、统计" class="headerlink" title="一、统计"></a>一、统计</h2><ol>
-<li><p>按月统计</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> DATE_FORMAT(<span class="type">date</span>,<span class="string">&#x27;%Y-%m&#x27;</span>) <span class="keyword">as</span> <span class="keyword">month</span>,<span class="built_in">sum</span>(money) <span class="keyword">as</span> money</span><br><span class="line"><span class="keyword">from</span> finance</span><br><span class="line"><span class="keyword">where</span> DATE_FORMAT(<span class="type">date</span>,<span class="string">&#x27;%Y&#x27;</span>)<span class="operator">=</span><span class="number">2010</span> <span class="keyword">group</span> <span class="keyword">by</span> <span class="keyword">month</span></span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span> <span class="keyword">month</span></span><br></pre></td></tr></table></figure></li>
-<li><p>按周统计</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> DATE_FORMAT(<span class="type">date</span>,<span class="string">&#x27;%x年-第%v周&#x27;</span>) <span class="keyword">as</span> week,<span class="built_in">sum</span>(money) <span class="keyword">as</span> money <span class="keyword">from</span> finance_base <span class="keyword">where</span> DATE_FORMAT(<span class="type">date</span>,<span class="string">&#x27;%Y&#x27;</span>)<span class="operator">=</span><span class="number">2010</span> <span class="keyword">group</span> <span class="keyword">by</span> week</span><br></pre></td></tr></table></figure></li>
-<li><!-- 按日查询 -->  
-<p>SELECT DATE_FORMAT(created_date,’%Y-%m-%d’) as time,sum(money) money FROM o_finance_detail where org_id = 1000  GROUP BY  time  </p>
-<!-- 按月查询 -->  
-<p>SELECT DATE_FORMAT(created_date,’%Y-%m’) as time,sum(money)  money FROM o_finance_detail where org_id = 1000  GROUP BY  time  </p>
-<!-- 按年查询 -->  
-<p>SELECT DATE_FORMAT(created_date,’%Y’) as time,sum(money)  money FROM o_finance_detail where org_id = 1000  GROUP BY  time   </p>
-<!-- 按周查询 -->  
-<p>SELECT DATE_FORMAT(created_date,’%Y-%u’) as time,sum(money)  money FROM o_finance_detail where org_id = 1000  GROUP BY  time</p>
-</li>
-</ol>
-<h2 id="二、重复数据"><a href="#二、重复数据" class="headerlink" title="二、重复数据"></a>二、重复数据</h2><h3 id="2-1-统计重复数据"><a href="#2-1-统计重复数据" class="headerlink" title="2.1 统计重复数据"></a>2.1 统计重复数据</h3><p>以下我们将统计表中 first_name 和 last_name的重复记录数：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mysql<span class="operator">&gt;</span> <span class="keyword">SELECT</span> <span class="built_in">COUNT</span>(<span class="operator">*</span>) <span class="keyword">as</span> repetitions, last_name, first_name</span><br><span class="line">    <span class="operator">-</span><span class="operator">&gt;</span> <span class="keyword">FROM</span> person_tbl</span><br><span class="line">    <span class="operator">-</span><span class="operator">&gt;</span> <span class="keyword">GROUP</span> <span class="keyword">BY</span> last_name, first_name</span><br><span class="line">    <span class="operator">-</span><span class="operator">&gt;</span> <span class="keyword">HAVING</span> repetitions <span class="operator">&gt;</span> <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-2-去重"><a href="#2-2-去重" class="headerlink" title="2.2 去重"></a>2.2 去重</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 去重保留最小的</span></span><br><span class="line"><span class="comment">-- 步骤</span></span><br><span class="line"><span class="comment">-- 前提：选出每个id最大的value</span></span><br><span class="line"><span class="comment">-- 选出count&gt;1 and not in (最大的value&amp;&amp;count&gt;1)</span></span><br><span class="line"><span class="keyword">DELETE</span></span><br><span class="line"><span class="keyword">FROM</span> testdelete</span><br><span class="line"><span class="keyword">WHERE</span> <span class="keyword">ONE</span> <span class="keyword">IN</span>(<span class="keyword">SELECT</span></span><br><span class="line">               <span class="keyword">ONE</span></span><br><span class="line">             <span class="keyword">FROM</span> (<span class="keyword">SELECT</span></span><br><span class="line">                     <span class="keyword">ONE</span></span><br><span class="line">                   <span class="keyword">FROM</span> testdelete</span><br><span class="line">                   <span class="keyword">GROUP</span> <span class="keyword">BY</span> <span class="keyword">ONE</span></span><br><span class="line">                   <span class="keyword">HAVING</span> <span class="built_in">COUNT</span>(<span class="keyword">ONE</span>) <span class="operator">&gt;</span> <span class="number">1</span>) a)</span><br><span class="line">    <span class="keyword">AND</span> id <span class="keyword">NOT</span> <span class="keyword">IN</span>(<span class="keyword">SELECT</span></span><br><span class="line">                    <span class="operator">*</span></span><br><span class="line">                  <span class="keyword">FROM</span> (<span class="keyword">SELECT</span></span><br><span class="line">                          <span class="built_in">MIN</span>(id)</span><br><span class="line">                        <span class="keyword">FROM</span> testdelete</span><br><span class="line">                        <span class="keyword">GROUP</span> <span class="keyword">BY</span> <span class="keyword">ONE</span></span><br><span class="line">                        <span class="keyword">HAVING</span> <span class="built_in">COUNT</span>(<span class="keyword">ONE</span>) <span class="operator">&gt;</span> <span class="number">1</span>) b)</span><br></pre></td></tr></table></figure>
-
-<h4 id="方式2-新建表"><a href="#方式2-新建表" class="headerlink" title="方式2 新建表"></a>方式2 新建表</h4><blockquote>
-<p>主要用于实时删除</p>
-</blockquote>
-<ol>
-<li><p>新建一个表进行迁移</p>
-</li>
-<li><p>代码解决</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> <span class="keyword">delete</span>  <span class="keyword">from</span> student <span class="keyword">where</span> id <span class="keyword">not</span> <span class="keyword">in</span> (selete id,<span class="built_in">max</span>(age) <span class="keyword">from</span> student <span class="keyword">group</span> <span class="keyword">by</span> (name) <span class="keyword">as</span> a)</span><br><span class="line"></span><br><span class="line"><span class="number">2.</span> <span class="keyword">DELETE</span> <span class="keyword">from</span> el_paper <span class="keyword">where</span> id <span class="keyword">not</span> <span class="keyword">in</span> (<span class="keyword">SELECT</span> id <span class="keyword">from</span> (<span class="keyword">SELECT</span> id,user_score <span class="keyword">FROM</span> el_paper <span class="keyword">GROUP</span> <span class="keyword">BY</span>(user_id)) <span class="keyword">as</span> a )</span><br></pre></td></tr></table></figure></li>
-<li><p>实时删除：先找到重复的数据，复制到新表，对新表逻辑去重，然后根据新表的is_delete字段删除旧表重复数据</p>
-</li>
-</ol>
-<h4 id="方式3-建立主键"><a href="#方式3-建立主键" class="headerlink" title="方式3 建立主键"></a>方式3 建立主键</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">ALTER</span> IGNORE <span class="keyword">TABLE</span> person_tbl <span class="keyword">ADD</span> <span class="keyword">PRIMARY</span> KEY (last_name, first_name);</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="三、聚合"><a href="#三、聚合" class="headerlink" title="三、聚合"></a>三、聚合</h2><h3 id="group-by"><a href="#group-by" class="headerlink" title="group by"></a>group by</h3><ol>
-<li><p>聚集user，exam选出用户每场考试的最高分和其他详细信息。</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> user_id,exam_id,depart_id,title,<span class="built_in">max</span>(qualify_score) <span class="keyword">from</span> el_paper <span class="keyword">group</span> <span class="keyword">by</span> user_id,exam_id;</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h2 id="四、子查询"><a href="#四、子查询" class="headerlink" title="四、子查询"></a>四、子查询</h2><h3 id="select-后面"><a href="#select-后面" class="headerlink" title="select 后面"></a>select 后面</h3><ol>
-<li><p>带外表的聚合数据， a.name,a.age, b. count(a.name)</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span></span><br><span class="line">a.dept_name,(<span class="keyword">SELECT</span> <span class="built_in">count</span>(<span class="operator">*</span>) <span class="keyword">FROM</span> dept_emp b <span class="keyword">WHERE</span> b.dept_no <span class="operator">=</span> a.dept_no) <span class="keyword">AS</span> 员工个数</span><br><span class="line"><span class="keyword">FROM</span> departments a;</span><br></pre></td></tr></table></figure></li>
-<li><p>普通的 类似于连接</p>
-<blockquote>
-<p>测试结果没有连接快</p>
-</blockquote>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> a.<span class="operator">*</span> ,(<span class="keyword">SELECT</span> b.dept_name <span class="keyword">from</span> departments b <span class="keyword">where</span> a.dept_no<span class="operator">=</span>b.dept_no) name <span class="keyword">FROM</span> dept_emp a LIMIT <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--  测试二</span></span><br><span class="line"><span class="comment">-- 大表 left join 小表   时间 0.6s </span></span><br><span class="line"><span class="keyword">SELECT</span> a.<span class="operator">*</span>,b.dept_name <span class="keyword">FROM</span> dept_emp a   <span class="keyword">LEFT</span> <span class="keyword">JOIN</span> departments  b <span class="keyword">on</span> a.dept_no<span class="operator">=</span>b.dept_no;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 大表 right join 小表   时间 0.7s </span></span><br><span class="line"><span class="keyword">SELECT</span> a.<span class="operator">*</span>,b.dept_name <span class="keyword">FROM</span> dept_emp a   R <span class="keyword">JOIN</span> departments  b <span class="keyword">on</span> a.dept_no<span class="operator">=</span>b.dept_no;</span><br></pre></td></tr></table></figure></li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%B0%83%E4%BC%982.0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%B0%83%E4%BC%982.0/" class="post-title-link" itemprop="url">数据库调优2</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-04-10 14:52:29" itemprop="dateCreated datePublished" datetime="2022-04-10T14:52:29+08:00">2022-04-10</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%B0%83%E4%BC%982.0/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%B0%83%E4%BC%982.0/" class="cy_cmt_count" data-xid="2022/04/10/数据库/数据库概念2.0/数据库调优2.0/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>4.4k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>4 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211223120007692.png" alt="image-20211223120007692"></p>
-<h2 id="一、优化维度"><a href="#一、优化维度" class="headerlink" title="一、优化维度"></a>一、优化维度</h2><h3 id="1-1-业务需求"><a href="#1-1-业务需求" class="headerlink" title="1.1 业务需求"></a>1.1 业务需求</h3><ol>
-<li>分页减少查询</li>
-<li>砍掉不必要的join(用详情代替join)</li>
-</ol>
-<h3 id="1-2-系统架构"><a href="#1-2-系统架构" class="headerlink" title="1.2  系统架构"></a>1.2  系统架构</h3><ol>
-<li>读写分离</li>
-<li>分库分表</li>
-<li>主从配置</li>
-<li>数据库选择,nosql,mysql,orcle,hbase</li>
-</ol>
-<h3 id="1-3-sql索引"><a href="#1-3-sql索引" class="headerlink" title="1.3 sql索引"></a>1.3 sql索引</h3><h3 id="1-4-表结构"><a href="#1-4-表结构" class="headerlink" title="1.4 表结构"></a>1.4 表结构</h3><h3 id="1-5-数据库配置参数"><a href="#1-5-数据库配置参数" class="headerlink" title="1.5 数据库配置参数"></a>1.5 数据库配置参数</h3><ol>
-<li>sort buffer</li>
-<li></li>
-</ol>
-<h3 id="1-6-系统配置"><a href="#1-6-系统配置" class="headerlink" title="1.6 系统配置"></a>1.6 系统配置</h3><h3 id="1-7-硬件"><a href="#1-7-硬件" class="headerlink" title="1.7 硬件"></a>1.7 硬件</h3><h2 id="数据源"><a href="#数据源" class="headerlink" title="数据源"></a>数据源</h2><p>mysq官网–&gt;document–&gt;more–&gt;employee data</p>
-<h2 id="二、慢查询与sql分析"><a href="#二、慢查询与sql分析" class="headerlink" title="二、慢查询与sql分析"></a>二、慢查询与sql分析</h2><h3 id="2-1-explain配置参数"><a href="#2-1-explain配置参数" class="headerlink" title="2.1 explain配置参数"></a>2.1 explain配置参数</h3><table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody><tr>
-<td>log_output</td>
-<td>慢查询日志文件类型,默认File</td>
-<td></td>
-</tr>
-<tr>
-<td>long_query_time</td>
-<td>进入日志的最短时间</td>
-<td></td>
-</tr>
-<tr>
-<td>slow_query_log_file</td>
-<td>日志路径，默认在mysql.slow_log</td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-</tbody></table>
-<h3 id="2-2-修改慢查询参数"><a href="#2-2-修改慢查询参数" class="headerlink" title="2.2 修改慢查询参数"></a>2.2 修改慢查询参数</h3><h4 id="2-2-1-方法1-修改my-conf"><a href="#2-2-1-方法1-修改my-conf" class="headerlink" title="2.2.1 方法1 修改my.conf"></a>2.2.1 方法1 修改my.conf</h4><blockquote>
-<p>永久配置，需要重启</p>
-</blockquote>
-<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">slow_query_log</span> = <span class="literal">ON</span></span><br><span class="line"><span class="attr">long_query_time</span> = <span class="number">0.1</span></span><br></pre></td></tr></table></figure>
-
-<h4 id="2-2-2-方法2-set-变量"><a href="#2-2-2-方法2-set-变量" class="headerlink" title="2.2.2 方法2 set 变量"></a>2.2.2 方法2 set 变量</h4><blockquote>
-<p>一次性，不要重启，但是需要重新连接session</p>
-</blockquote>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">set</span> global long_query_time = <span class="number">0</span>.<span class="number">1</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="2-3-explain参数"><a href="#2-3-explain参数" class="headerlink" title="2.3 explain参数"></a>2.3 explain参数</h3><table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody><tr>
-<td>id</td>
-<td>指定父子查询，id大的先执行，如果没有子查询，一般都是1</td>
-<td></td>
-</tr>
-<tr>
-<td>select_type</td>
-<td>查询类型(父查询，子查询，普通查询，联合查询)</td>
-<td></td>
-</tr>
-<tr>
-<td>table</td>
-<td>使用的表别名</td>
-<td></td>
-</tr>
-<tr>
-<td><strong>type</strong></td>
-<td>all: 全表扫描 index:遍历所引述 range:</td>
-<td></td>
-</tr>
-<tr>
-<td>ref做分界线</td>
-<td>system &gt; const &gt; eq_ref &gt; <strong>[ref]</strong> &gt; fulltext &gt; ref_or_null &gt; index_merge &gt; unique_subquery &gt; index_subquery &gt; range &gt; index &gt; ALL</td>
-<td></td>
-</tr>
-<tr>
-<td>possiable_keys</td>
-<td>可能使用的索引</td>
-<td></td>
-</tr>
-<tr>
-<td>key</td>
-<td>实际用的索引</td>
-<td></td>
-</tr>
-<tr>
-<td>key_len</td>
-<td>当前使用索引的长度</td>
-<td></td>
-</tr>
-<tr>
-<td>ref</td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td>rows</td>
-<td>需要扫描的行数</td>
-<td></td>
-</tr>
-<tr>
-<td>filtered</td>
-<td>表示符合条件条数占比</td>
-<td></td>
-</tr>
-<tr>
-<td>extra</td>
-<td>useTemp 使用临时表，useFileSory 使用文件排序(需要被优化)</td>
-<td></td>
-</tr>
-</tbody></table>
-<table>
-<thead>
-<tr>
-<th>名称</th>
-<th>描述</th>
-<th>例子</th>
-</tr>
-</thead>
-<tbody><tr>
-<td></td>
-<td><strong>查询</strong>时间 &lt; <strong>扫描</strong>时间</td>
-<td></td>
-</tr>
-<tr>
-<td><strong>system</strong></td>
-<td>查询系统表</td>
-<td>select * from mysql.time_zone</td>
-</tr>
-<tr>
-<td>const</td>
-<td>where主键索引或唯一索引，且为常量</td>
-<td>select * from user where id=1</td>
-</tr>
-<tr>
-<td>eq_ref</td>
-<td>用到了唯一索引 数量很多</td>
-<td></td>
-</tr>
-<tr>
-<td>ref</td>
-<td>用到了不唯一索引，join 索引=外键索引</td>
-<td>select * from u1,u2 where u1.name=u2.name</td>
-</tr>
-<tr>
-<td>range</td>
-<td>索引范围<strong>查询</strong>，避免了<strong>扫描</strong>索引</td>
-<td>select * from user where id &lt; 10</td>
-</tr>
-<tr>
-<td>index</td>
-<td>扫描全部索引文件，且不需要回表(<strong>索引覆盖</strong>)</td>
-<td>select count(*) from user</td>
-</tr>
-<tr>
-<td>all</td>
-<td>没命中索引全表扫描</td>
-<td>select * from user where age=10</td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td>select * from user limit 2</td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-</tbody></table>
-<h3 id="2-4-使用profiling分"><a href="#2-4-使用profiling分" class="headerlink" title="2.4 使用profiling分"></a>2.4 使用profiling分</h3><ol>
-<li>可以观察一条语句经历了几个阶段</li>
-<li>每个阶段消耗的时间</li>
-<li>每个阶段占用的内存</li>
-</ol>
-<h2 id="三、索引"><a href="#三、索引" class="headerlink" title="三、索引"></a>三、索引</h2><h3 id="3-1-索引数据结构"><a href="#3-1-索引数据结构" class="headerlink" title="3.1 索引数据结构"></a>3.1 索引数据结构</h3><h2 id="四、语句优化"><a href="#四、语句优化" class="headerlink" title="四、语句优化"></a>四、语句优化</h2><h2 id="五、mysql存储过程"><a href="#五、mysql存储过程" class="headerlink" title="五、mysql存储过程"></a>五、mysql存储过程</h2><blockquote>
-<p>存储例程是存储在数据库服务器中的一组sql语句，通过在查询中调用一个指定的名称来执行这些sql语句命令</p>
-</blockquote>
-<h3 id="存储过程的优点"><a href="#存储过程的优点" class="headerlink" title="存储过程的优点"></a>存储过程的优点</h3><ol>
-<li>减少网络通信量</li>
-<li>执行速度更快<ol>
-<li>在存储过程创建的时候，数据库已经对其进行了一次解析和优化</li>
-<li>存储过程会(备份)保存在内存中</li>
-</ol>
-</li>
-<li>更强的适应性</li>
-</ol>
-<h3 id="5-1-DELIMITER"><a href="#5-1-DELIMITER" class="headerlink" title="5.1 DELIMITER"></a>5.1 DELIMITER</h3><p> 声明自定义分隔符：DELIMITER //      </p>
-<h3 id="5-2-PROCEDURE"><a href="#5-2-PROCEDURE" class="headerlink" title="5.2 PROCEDURE"></a>5.2 PROCEDURE</h3><p>声明存储过程：CREATE PROCEDURE demo_in_parameter(IN p_in int) </p>
-<h3 id="5-3-IN、OUT"><a href="#5-3-IN、OUT" class="headerlink" title="5.3 IN、OUT"></a>5.3 IN、OUT</h3><ol>
-<li>IN  形式参数</li>
-<li>OUT 实际参数(会影响到外面的值)，传入为null</li>
-<li>INOUT 输入输出参数:调用时指定，并且可被改变和返回</li>
-</ol>
-<h3 id="5-4-BEGIN、END"><a href="#5-4-BEGIN、END" class="headerlink" title="5.4 BEGIN、END"></a>5.4 BEGIN、END</h3><p>存储过程开始和结束符号</p>
-<h3 id="5-5-SET-p-in-1-变量赋值"><a href="#5-5-SET-p-in-1-变量赋值" class="headerlink" title="5.5 SET @p_in=1 变量赋值"></a>5.5 SET @p_in=1 变量赋值</h3><h4 id="5-5-1-变量声明declare"><a href="#5-5-1-变量声明declare" class="headerlink" title="5.5.1 变量声明declare"></a>5.5.1 变量声明declare</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">declare</span> variable_name  datatype [<span class="keyword">DEFAULT</span> <span class="keyword">value</span>];</span><br></pre></td></tr></table></figure>
-
-<ol>
-<li><p>变量类型datatype</p>
-<p>int, float, date,varchar(length),datetim</p>
-</li>
-<li><p>例子</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DECLARE</span> l_int <span class="type">int</span> unsigned <span class="keyword">default</span> <span class="number">4000000</span>;</span><br><span class="line"><span class="keyword">DECLARE</span> l_numeric number(<span class="number">8</span>,<span class="number">2</span>) <span class="keyword">DEFAULT</span> <span class="number">9.95</span>;  </span><br><span class="line"><span class="keyword">DECLARE</span> l_date <span class="type">date</span> <span class="keyword">DEFAULT</span> <span class="string">&#x27;1999-12-31&#x27;</span>;  </span><br><span class="line"><span class="keyword">DECLARE</span> l_datetime datetime <span class="keyword">DEFAULT</span> <span class="string">&#x27;1999-12-31 23:59:59&#x27;</span>;  </span><br><span class="line"><span class="keyword">DECLARE</span> l_varchar <span class="type">varchar</span>(<span class="number">255</span>) <span class="keyword">DEFAULT</span> <span class="string">&#x27;This will not be padded&#x27;</span>; </span><br></pre></td></tr></table></figure></li>
-</ol>
-<h4 id="5-5-2-变量赋值set"><a href="#5-5-2-变量赋值set" class="headerlink" title="5.5.2 变量赋值set"></a>5.5.2 变量赋值set</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SET</span> <span class="variable">@x</span> <span class="operator">=</span> <span class="number">1</span><span class="operator">+</span><span class="number">2</span><span class="operator">+</span><span class="number">3</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="string">&#x27;Hello World&#x27;</span> <span class="keyword">into</span> <span class="variable">@x</span>;  </span><br></pre></td></tr></table></figure>
-
-<h3 id="5-6-call-调用存储过程"><a href="#5-6-call-调用存储过程" class="headerlink" title="5.6 call 调用存储过程"></a>5.6 call 调用存储过程</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="number">1.</span> delimiter <span class="operator">/</span><span class="operator">/</span></span><br><span class="line"><span class="number">2.</span> <span class="keyword">create</span> <span class="keyword">procedure</span> out_param(<span class="keyword">out</span> p_out <span class="type">int</span>)</span><br><span class="line">     <span class="keyword">begin</span></span><br><span class="line">       <span class="keyword">select</span> p_out;</span><br><span class="line">        <span class="keyword">set</span> p_out<span class="operator">=</span><span class="number">2</span>;</span><br><span class="line">        <span class="keyword">select</span> p_out;</span><br><span class="line">       <span class="keyword">end</span></span><br><span class="line">     <span class="operator">/</span><span class="operator">/</span></span><br><span class="line"><span class="number">3.</span> <span class="keyword">set</span> <span class="variable">@p</span>_out<span class="operator">=</span><span class="number">1</span>;</span><br><span class="line"><span class="number">4.</span> <span class="keyword">call</span> out_param(<span class="variable">@p</span>_out);</span><br></pre></td></tr></table></figure>
-
-<h3 id="5-7-条件-case-if-then-else"><a href="#5-7-条件-case-if-then-else" class="headerlink" title="5.7 条件 case-if-then-else"></a>5.7 条件 case-if-then-else</h3><h4 id=""><a href="#" class="headerlink" title=""></a></h4><h3 id="5-8-循环-while-lables"><a href="#5-8-循环-while-lables" class="headerlink" title="5.8 循环 while-lables"></a>5.8 循环 while-lables</h3><h3 id="存储函数"><a href="#存储函数" class="headerlink" title="存储函数"></a>存储函数</h3><p>见附录1.1 </p>
-<h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><h3 id="1-存储函数"><a href="#1-存储函数" class="headerlink" title="1. 存储函数"></a>1. 存储函数</h3><h4 id="1-1-字符串类"><a href="#1-1-字符串类" class="headerlink" title="1.1 字符串类"></a>1.1 字符串类</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">CHARSET(str) <span class="operator">/</span><span class="operator">/</span>返回字串字符集</span><br><span class="line">CONCAT (string2 [,... ]) <span class="operator">/</span><span class="operator">/</span>连接字串</span><br><span class="line">INSTR (string ,substring ) <span class="operator">/</span><span class="operator">/</span>返回substring首次在string中出现的位置,不存在返回<span class="number">0</span></span><br><span class="line">LCASE (string2 ) <span class="operator">/</span><span class="operator">/</span>转换成小写</span><br><span class="line"><span class="keyword">LEFT</span> (string2 ,length ) <span class="operator">/</span><span class="operator">/</span>从string2中的左边起取length个字符</span><br><span class="line">LENGTH (string ) <span class="operator">/</span><span class="operator">/</span>string长度</span><br><span class="line">LOAD_FILE (file_name ) <span class="operator">/</span><span class="operator">/</span>从文件读取内容</span><br><span class="line">LOCATE (substring , string [,start_position ] ) 同INSTR,但可指定开始位置</span><br><span class="line">LPAD (string2 ,length ,pad ) <span class="operator">/</span><span class="operator">/</span>重复用pad加在string开头,直到字串长度为length</span><br><span class="line">LTRIM (string2 ) <span class="operator">/</span><span class="operator">/</span>去除前端空格</span><br><span class="line">REPEAT (string2 ,count ) <span class="operator">/</span><span class="operator">/</span>重复count次</span><br><span class="line">REPLACE (str ,search_str ,replace_str ) <span class="operator">/</span><span class="operator">/</span>在str中用replace_str替换search_str</span><br><span class="line">RPAD (string2 ,length ,pad) <span class="operator">/</span><span class="operator">/</span>在str后用pad补充,直到长度为length</span><br><span class="line">RTRIM (string2 ) <span class="operator">/</span><span class="operator">/</span>去除后端空格</span><br><span class="line">STRCMP (string1 ,string2 ) <span class="operator">/</span><span class="operator">/</span>逐字符比较两字串大小,</span><br><span class="line"><span class="built_in">SUBSTRING</span> (str , position [,length ]) <span class="operator">/</span><span class="operator">/</span>从str的position开始,取length个字符,</span><br><span class="line"><span class="built_in">TRIM</span>([[<span class="keyword">BOTH</span><span class="operator">|</span><span class="keyword">LEADING</span><span class="operator">|</span><span class="keyword">TRAILING</span>][padding] <span class="keyword">FROM</span>]string2) <span class="operator">/</span><span class="operator">/</span>去除指定位置的指定字符</span><br><span class="line">UCASE (string2 ) <span class="operator">/</span><span class="operator">/</span>转换成大写</span><br><span class="line"><span class="keyword">RIGHT</span>(string2,length) <span class="operator">/</span><span class="operator">/</span>取string2最后length个字符</span><br><span class="line">SPACE(count) <span class="operator">/</span><span class="operator">/</span>生成count个空格</span><br></pre></td></tr></table></figure>
-
-<h4 id="1-2-数字类"><a href="#1-2-数字类" class="headerlink" title="1.2 数字类"></a>1.2 数字类</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">ABS</span> (number2 ) <span class="operator">/</span><span class="operator">/</span>绝对值</span><br><span class="line">BIN (decimal_number ) <span class="operator">/</span><span class="operator">/</span>十进制转二进制</span><br><span class="line"><span class="built_in">CEILING</span> (number2 ) <span class="operator">/</span><span class="operator">/</span>向上取整</span><br><span class="line">CONV(number2,from_base,to_base) <span class="operator">/</span><span class="operator">/</span>进制转换</span><br><span class="line"><span class="built_in">FLOOR</span> (number2 ) <span class="operator">/</span><span class="operator">/</span>向下取整</span><br><span class="line">FORMAT (number,decimal_places ) <span class="operator">/</span><span class="operator">/</span>保留小数位数</span><br><span class="line">HEX (DecimalNumber ) <span class="operator">/</span><span class="operator">/</span>转十六进制</span><br><span class="line">LEAST (number , number2 [,..]) <span class="operator">/</span><span class="operator">/</span>求最小值</span><br><span class="line"><span class="built_in">MOD</span> (numerator ,denominator ) <span class="operator">/</span><span class="operator">/</span>求余</span><br><span class="line"><span class="built_in">POWER</span> (number ,power ) <span class="operator">/</span><span class="operator">/</span>求指数</span><br><span class="line">RAND([seed]) <span class="operator">/</span><span class="operator">/</span>随机数</span><br><span class="line">ROUND (number [,decimals ]) <span class="operator">/</span><span class="operator">/</span>四舍五入,decimals为小数位数]</span><br></pre></td></tr></table></figure>
-
-<h4 id="1-4-日期时间类"><a href="#1-4-日期时间类" class="headerlink" title="1.4 日期时间类"></a>1.4 日期时间类</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">ADDTIME (date2 ,time_interval )<span class="operator">/</span><span class="operator">/</span>将time_interval加到date2</span><br><span class="line">CONVERT_TZ (datetime2 ,fromTZ ,toTZ ) <span class="operator">/</span><span class="operator">/</span>转换时区</span><br><span class="line"><span class="built_in">CURRENT_DATE</span> ( ) <span class="operator">/</span><span class="operator">/</span>当前日期</span><br><span class="line"><span class="built_in">CURRENT_TIME</span> ( ) <span class="operator">/</span><span class="operator">/</span>当前时间</span><br><span class="line"><span class="built_in">CURRENT_TIMESTAMP</span> ( ) <span class="operator">/</span><span class="operator">/</span>当前时间戳</span><br><span class="line"><span class="type">DATE</span> (datetime ) <span class="operator">/</span><span class="operator">/</span>返回datetime的日期部分</span><br><span class="line">DATE_ADD (date2 , <span class="type">INTERVAL</span> d_value d_type ) <span class="operator">/</span><span class="operator">/</span>在date2中加上日期或时间</span><br><span class="line">DATE_FORMAT (datetime ,FormatCodes ) <span class="operator">/</span><span class="operator">/</span>使用formatcodes格式显示datetime</span><br><span class="line">DATE_SUB (date2 , <span class="type">INTERVAL</span> d_value d_type ) <span class="operator">/</span><span class="operator">/</span>在date2上减去一个时间</span><br><span class="line">DATEDIFF (date1 ,date2 ) <span class="operator">/</span><span class="operator">/</span>两个日期差</span><br><span class="line"><span class="keyword">DAY</span> (<span class="type">date</span> ) <span class="operator">/</span><span class="operator">/</span>返回日期的天</span><br><span class="line">DAYNAME (<span class="type">date</span> ) <span class="operator">/</span><span class="operator">/</span>英文星期</span><br><span class="line">DAYOFWEEK (<span class="type">date</span> ) <span class="operator">/</span><span class="operator">/</span>星期(<span class="number">1</span><span class="number">-7</span>) ,<span class="number">1</span>为星期天</span><br><span class="line">DAYOFYEAR (<span class="type">date</span> ) <span class="operator">/</span><span class="operator">/</span>一年中的第几天</span><br><span class="line"><span class="built_in">EXTRACT</span> (interval_name <span class="keyword">FROM</span> <span class="type">date</span> ) <span class="operator">/</span><span class="operator">/</span>从<span class="type">date</span>中提取日期的指定部分</span><br><span class="line">MAKEDATE (<span class="keyword">year</span> ,<span class="keyword">day</span> ) <span class="operator">/</span><span class="operator">/</span>给出年及年中的第几天,生成日期串</span><br><span class="line">MAKETIME (<span class="keyword">hour</span> ,<span class="keyword">minute</span> ,<span class="keyword">second</span> ) <span class="operator">/</span><span class="operator">/</span>生成时间串</span><br><span class="line">MONTHNAME (<span class="type">date</span> ) <span class="operator">/</span><span class="operator">/</span>英文月份名</span><br><span class="line">NOW ( ) <span class="operator">/</span><span class="operator">/</span>当前时间</span><br><span class="line">SEC_TO_TIME (seconds ) <span class="operator">/</span><span class="operator">/</span>秒数转成时间</span><br><span class="line">STR_TO_DATE (string ,format ) <span class="operator">/</span><span class="operator">/</span>字串转成时间,以format格式显示</span><br><span class="line">TIMEDIFF (datetime1 ,datetime2 ) <span class="operator">/</span><span class="operator">/</span>两个时间差</span><br><span class="line">TIME_TO_SEC (<span class="type">time</span> ) <span class="operator">/</span><span class="operator">/</span>时间转秒数]</span><br><span class="line">WEEK (date_time [,start_of_week ]) <span class="operator">/</span><span class="operator">/</span>第几周</span><br><span class="line"><span class="keyword">YEAR</span> (datetime ) <span class="operator">/</span><span class="operator">/</span>年份</span><br><span class="line">DAYOFMONTH(datetime) <span class="operator">/</span><span class="operator">/</span>月的第几天</span><br><span class="line"><span class="keyword">HOUR</span>(datetime) <span class="operator">/</span><span class="operator">/</span>小时</span><br><span class="line">LAST_DAY(<span class="type">date</span>) <span class="operator">/</span><span class="operator">/</span><span class="type">date</span>的月的最后日期</span><br><span class="line">MICROSECOND(datetime) <span class="operator">/</span><span class="operator">/</span>微秒</span><br><span class="line"><span class="keyword">MONTH</span>(datetime) <span class="operator">/</span><span class="operator">/</span>月</span><br><span class="line"><span class="keyword">MINUTE</span>(datetime) <span class="operator">/</span><span class="operator">/</span>分返回符号,正负或<span class="number">0</span></span><br><span class="line"><span class="built_in">SQRT</span>(number2) <span class="operator">/</span><span class="operator">/</span>开平方</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-
-
-
-
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/26/">26</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/27/">27</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1088,14 +1121,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">128</span>
+          <span class="site-state-item-count">131</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-count">29</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>
@@ -1136,12 +1169,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">382k</span>
+    <span title="站点总字数">391k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">5:47</span>
+    <span title="站点阅读时长">5:55</span>
 </div>
 
         

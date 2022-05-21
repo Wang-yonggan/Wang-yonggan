@@ -185,6 +185,406 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/02/10/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/mysql%E4%B8%80%E6%9D%A1%E8%AF%AD%E5%8F%A5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/02/10/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/mysql%E4%B8%80%E6%9D%A1%E8%AF%AD%E5%8F%A5/" class="post-title-link" itemprop="url">mysql分析</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-02-10 14:35:22" itemprop="dateCreated datePublished" datetime="2022-02-10T14:35:22+08:00">2022-02-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-04-10 14:35:22" itemprop="dateModified" datetime="2022-04-10T14:35:22+08:00">2022-04-10</time>
+              </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/02/10/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/mysql%E4%B8%80%E6%9D%A1%E8%AF%AD%E5%8F%A5/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/02/10/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/mysql%E4%B8%80%E6%9D%A1%E8%AF%AD%E5%8F%A5/" class="cy_cmt_count" data-xid="2022/02/10/数据库/nosql/mysql一条语句/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="Buffer-pool"><a href="#Buffer-pool" class="headerlink" title="Buffer pool"></a>Buffer pool</h3><p>第一次在查询的时候会将查询的结果存到  Buffer Pool 中，这样后面再有请求的时候就会先从缓冲池中去查询，如果没有再去磁盘中查找，然后在放到  Buffer Pool 中</p>
+<h3 id="执行顺序"><a href="#执行顺序" class="headerlink" title="执行顺序"></a>执行顺序</h3><p>undo</p>
+<p>磁盘——–&gt;buffer Pool———&gt;在buffer中完成运算—&gt;结果写入到redo log buffer —-&gt;写入redo log —&gt;</p>
+<p>​      ——-&gt;将更新语句反句加载到undo</p>
+<ul>
+<li>准备更新一条 SQL 语句</li>
+<li>MySQL（innodb）会先去缓冲池（BufferPool）中去查找这条数据，没找到就会去磁盘中查找，如果查找到就会将这条数据加载到缓冲池（BufferPool）中</li>
+<li>在加载到 Buffer Pool 的同时，会将这条数据的原始记录保存到 undo 日志文件中</li>
+<li>innodb 会在 Buffer Pool 中执行更新操作</li>
+<li>更新后的数据会记录在 redo log buffer 中</li>
+<li>MySQL 提交事务的时候，会将 redo log buffer 中的数据写入到 redo 日志文件中 刷磁盘可以通过 innodb_flush_log_at_trx_commit 参数来设置<ul>
+<li>值为 0 表示不刷入磁盘</li>
+<li>值为 1 表示立即刷入磁盘</li>
+<li>值为 2 表示先刷到 os cache</li>
+</ul>
+</li>
+<li>myslq 重启的时候会将 redo 日志恢复到缓冲池中</li>
+</ul>
+<h4 id="当前读"><a href="#当前读" class="headerlink" title="当前读"></a>当前读</h4><blockquote>
+<p>当前读, 读取的是最新版本, 并且<strong>对读取的记录加锁, 阻塞其他事务同时改动相同</strong>记录，避免出现安全问题</p>
+</blockquote>
+<p>当前读的实现方式：next-key锁(行记录锁+Gap间隙锁)</p>
+<ol>
+<li>对主键或唯一索引，如果当前读时，where条件全部精确命中(=或者in)，这种场景本身就不会出现幻读，所以只会加行记录锁。</li>
+<li>没有索引的列，当前读操作时，会加全表gap锁，生产环境要注意。</li>
+<li>非唯一索引列，如果where条件部分命中(&gt;、&lt;、like等)或者全未命中，则会加附近Gap间隙锁。例如，某表数据如下，非唯一索引2,6,9,9,11,15。如下语句要操作非唯一索引列9的数据，gap锁将会锁定的列是(6,11]，该区间内无法插入数据。</li>
+</ol>
+<h4 id="快照读"><a href="#快照读" class="headerlink" title="快照读"></a>快照读</h4><blockquote>
+<p>readView  [未提交事务数组]、max_id</p>
+<p>执行DML才会给事务id</p>
+</blockquote>
+<blockquote>
+<p>版本链上适合自己的一个版本快照</p>
+<p>通过 </p>
+<p>生成时机：begin<strong>之后第一条</strong>语句</p>
+<p>作用范围：库的所有表，每个表都对应一个版本链，</p>
+</blockquote>
+<p>只读事务不分配trx_id（会分配一个假trx_id），只有涉及到数据更新才会分配事务ID。</p>
+<ul>
+<li>在事务隔离级别为<code>RR</code>时，在第一次进行<code>select</code>查询时生成<code>read view</code>;</li>
+<li>在事务隔离级别为<code>RC</code>时，每一次<code>select</code>查询都会生成<code>read view</code>;</li>
+</ul>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/lmlzww/article/details/119087426?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-0.pc_relevant_default&amp;spm=1001.2101.3001.4242.1&amp;utm_relevant_index=2">https://blog.csdn.net/lmlzww/article/details/119087426?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-0.pc_relevant_default&amp;spm=1001.2101.3001.4242.1&amp;utm_relevant_index=2</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_44823898/article/details/115718622">https://blog.csdn.net/qq_44823898/article/details/115718622</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/02/09/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%B3%BB%E7%BB%9F%E8%A1%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/02/09/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%B3%BB%E7%BB%9F%E8%A1%A8/" class="post-title-link" itemprop="url">mysql系统表</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-02-09 23:37:59" itemprop="dateCreated datePublished" datetime="2022-02-09T23:37:59+08:00">2022-02-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-04-09 23:37:59" itemprop="dateModified" datetime="2022-04-09T23:37:59+08:00">2022-04-09</time>
+              </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/02/09/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%B3%BB%E7%BB%9F%E8%A1%A8/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/02/09/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E7%B3%BB%E7%BB%9F%E8%A1%A8/" class="cy_cmt_count" data-xid="2022/02/09/数据库/mysql系统表/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>738</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>·</p>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><table>
+<thead>
+<tr>
+<th>库名</th>
+<th>表数量</th>
+<th>视图数量</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>information_schema</td>
+<td>61</td>
+<td>0</td>
+</tr>
+<tr>
+<td>mysql</td>
+<td>32</td>
+<td>0</td>
+</tr>
+<tr>
+<td>performance_schema</td>
+<td>87</td>
+<td>0</td>
+</tr>
+<tr>
+<td>sys</td>
+<td>1</td>
+<td>100</td>
+</tr>
+</tbody></table>
+<h2 id="一、infomation-schema"><a href="#一、infomation-schema" class="headerlink" title="一、infomation_schema"></a>一、infomation_schema</h2><blockquote>
+<p>信息数据库，保存着关于MySQL其他数据库的信息。如数据库名，数据库的表，表栏的数据类型与访问权限等</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>表名</th>
+<th>作用</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>数据库-表-字段-索引你</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>SCHEMATA</td>
+<td>数据库信息(名称，字符类型)</td>
+<td>show database</td>
+</tr>
+<tr>
+<td>TABLES</td>
+<td>表信息(属于哪个数据库，自增id，创建时间，行数，数据大小，字符，引擎)</td>
+<td>show tables</td>
+</tr>
+<tr>
+<td>columns</td>
+<td>行信息</td>
+<td>desc</td>
+</tr>
+<tr>
+<td>user_privileges</td>
+<td>用户权限</td>
+<td></td>
+</tr>
+<tr>
+<td>key_columns_usage</td>
+<td>表的索引信息</td>
+<td>show key</td>
+</tr>
+<tr>
+<td><strong>锁信息</strong></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>innodb_trx</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>innodb_locks</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>innodb_lock_wait</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>其他</strong></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>files</td>
+<td>mysql用到的文件</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id="二、mysql"><a href="#二、mysql" class="headerlink" title="二、mysql"></a>二、mysql</h2><blockquote>
+<p>主要是权限的信息</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>user</td>
+<td>用户列、权限列、安全列、资源控制列</td>
+<td></td>
+</tr>
+<tr>
+<td>innodb_table_stas</td>
+<td>表信息， 更新时间，行数</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id="三、performance-scheme"><a href="#三、performance-scheme" class="headerlink" title="三、performance_scheme"></a>三、performance_scheme</h2><blockquote>
+<p>PERFORMANCE_SCHEMA这个功能默认是关闭的。需要设置参数： performance_schema 才可以启动该功能，这个参数是静态参数，只能写在my.cnf 中 不能动态修改。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>表名</th>
+<th>作用</th>
+<th></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>users</td>
+<td>用户连接的次数，当前连接数</td>
+<td></td>
+</tr>
+<tr>
+<td>hosts</td>
+<td>类似于users表</td>
+<td></td>
+</tr>
+<tr>
+<td>accounts</td>
+<td>是users+hosts</td>
+<td></td>
+</tr>
+<tr>
+<td>threads</td>
+<td>当前存活线程(ip,username,状态)</td>
+<td></td>
+</tr>
+<tr>
+<td>gloable_variables</td>
+<td>全局变量</td>
+<td></td>
+</tr>
+</tbody></table>
+<h2 id="四、sys"><a href="#四、sys" class="headerlink" title="四、sys"></a>四、sys</h2><p>配置更改表</p>
+<ul>
+<li>variable ： 配置选项名称</li>
+<li>value ： 配置选项值</li>
+<li>set_time ： 该行配置修改的时间</li>
+<li>set_by ： 该行配置信息修改者，如果从被安装没有修改过，那么这个数据应该为NULL</li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/02/08/linux/linux--%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -267,7 +667,7 @@
 <figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">*</span> <span class="emphasis">* *</span> <span class="emphasis">* *</span> /bin/ls</span><br></pre></td></tr></table></figure></li>
 <li><p>在 12 月内, 每天的早上 6 点到 12 点，每隔 3 个小时 0 分钟执行一次 /usr/bin/backup：</p>
 <figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">0 </span><span class="number">6</span>-<span class="number">12</span>/<span class="number">3</span> * <span class="number">12</span> * /<span class="keyword">usr</span>/bin/backup</span><br></pre></td></tr></table></figure></li>
-<li><p>周一到周五每天下午 5:00 寄一封信给 <a href="mailto:&#97;&#108;&#101;&#120;&#64;&#100;&#111;&#109;&#x61;&#x69;&#110;&#x2e;&#110;&#x61;&#x6d;&#x65;">&#97;&#108;&#101;&#120;&#64;&#100;&#111;&#109;&#x61;&#x69;&#110;&#x2e;&#110;&#x61;&#x6d;&#x65;</a>：</p>
+<li><p>周一到周五每天下午 5:00 寄一封信给 <a href="mailto:&#97;&#x6c;&#101;&#x78;&#64;&#x64;&#111;&#109;&#x61;&#105;&#110;&#46;&#110;&#x61;&#109;&#101;">&#97;&#x6c;&#101;&#x78;&#64;&#x64;&#111;&#109;&#x61;&#105;&#110;&#46;&#110;&#x61;&#109;&#101;</a>：</p>
 <figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">0 </span><span class="number">17</span> * * <span class="number">1</span>-<span class="number">5</span> mail -s <span class="string">&quot;hi&quot;</span> alex@domain.<span class="keyword">name</span> &lt; /tmp/maildata</span><br></pre></td></tr></table></figure></li>
 <li><p>每月每天的午夜 0 点 20 分, 2 点 20 分, 4 点 20 分….执行 echo “haha”：</p>
 <figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">20 </span><span class="number">0</span>-<span class="number">23</span>/<span class="number">2</span> * * * echo <span class="string">&quot;haha&quot;</span></span><br></pre></td></tr></table></figure></li>
@@ -561,371 +961,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/02/07/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E8%B0%83%E4%BC%981/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/02/07/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E8%B0%83%E4%BC%981/" class="post-title-link" itemprop="url">mysql调优1</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-02-07 20:59:30" itemprop="dateCreated datePublished" datetime="2022-02-07T20:59:30+08:00">2022-02-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-04-07 20:59:30" itemprop="dateModified" datetime="2022-04-07T20:59:30+08:00">2022-04-07</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" itemprop="url" rel="index"><span itemprop="name">数据库</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/02/07/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E8%B0%83%E4%BC%981/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/02/07/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E8%B0%83%E4%BC%981/" class="cy_cmt_count" data-xid="2022/02/07/数据库/mysql调优1/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>734</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>[toc]</p>
-<h3 id="四大方面"><a href="#四大方面" class="headerlink" title="四大方面"></a>四大方面</h3><ol>
-<li><p>设计：存储引擎，字段类型，视图，范式与逆范式。</p>
-</li>
-<li><p>功能：索引，缓存，分区分表。</p>
-</li>
-<li><p>架构：主从复制，读写分离，负载均衡。</p>
-</li>
-<li><p>SQL语句：测试，经验。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/02/07/%E6%95%B0%E6%8D%AE%E5%BA%93/mysql%E8%B0%83%E4%BC%981/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/01/30/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/redis/reids%E5%91%BD%E4%BB%A4/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/01/30/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/redis/reids%E5%91%BD%E4%BB%A4/" class="post-title-link" itemprop="url">redis命令</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-01-30 00:41:11" itemprop="dateCreated datePublished" datetime="2022-01-30T00:41:11+08:00">2022-01-30</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-03-30 00:41:11" itemprop="dateModified" datetime="2022-03-30T00:41:11+08:00">2022-03-30</time>
-              </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/01/30/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/redis/reids%E5%91%BD%E4%BB%A4/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/01/30/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/redis/reids%E5%91%BD%E4%BB%A4/" class="cy_cmt_count" data-xid="2022/01/30/数据库/nosql/redis/reids命令/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.7k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <blockquote>
-<p>1.基于内存的key-value数据库<br>2.基于c语言编写的，可以支持多种语言的api //set每秒11万次，取get 81000次<br>3.支持数据持久化<br>4.value可以是string，hash， list， set, sorted set</p>
-<p>使用场景</p>
-<ol>
-<li>去最新n个数据的操作</li>
-<li>排行榜，取top n个数据 //最佳人气前10条</li>
-<li>精确的设置过期时间</li>
-<li>计数器</li>
-<li>实时系统， 反垃圾系统</li>
-<li>pub， sub发布订阅构建实时消息系统</li>
-<li>构建消息队列</li>
-<li>缓存</li>
-</ol>
-</blockquote>
-<h2 id="一、命令"><a href="#一、命令" class="headerlink" title="一、命令"></a>一、命令</h2><h3 id="1-1-启动-连接-停止"><a href="#1-1-启动-连接-停止" class="headerlink" title="1.1      启动 连接 停止"></a>1.1      启动 连接 停止</h3><p>启动</p>
-<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cd</span> src</span><br><span class="line"><span class="string">./redis-servie</span></span><br></pre></td></tr></table></figure>
-
-<p>连接客户端</p>
-<figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./redis-<span class="keyword">cli</span></span><br><span class="line">./redis-<span class="keyword">cli</span> -h <span class="built_in">ip</span>地址 -p 端口</span><br></pre></td></tr></table></figure>
-
-<p>停止/kill</p>
-<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">./redis-cli</span> <span class="keyword">shutdown</span></span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="二、操作"><a href="#二、操作" class="headerlink" title="二、操作"></a>二、操作</h2><h3 id="2-0-配置命令"><a href="#2-0-配置命令" class="headerlink" title="2.0 配置命令"></a>2.0 配置命令</h3><ol>
-<li><p>获得配置信息</p>
-<p>config get key</p>
-</li>
-</ol>
-<h3 id="2-1-全局"><a href="#2-1-全局" class="headerlink" title="2.1 全局"></a>2.1 全局</h3><h4 id="2-1-1-库操作"><a href="#2-1-1-库操作" class="headerlink" title="2.1.1  库操作"></a>2.1.1  库操作</h4><ol>
-<li>切换库 select 1</li>
-<li>dbsize数据库大小</li>
-<li>flushdb 清空库</li>
-</ol>
-<h4 id="2-1-2-key操作"><a href="#2-1-2-key操作" class="headerlink" title="2.1.2 key操作"></a>2.1.2 key操作</h4><blockquote>
-<p>注意每个单词要有空格分开</p>
-</blockquote>
-<ol>
-<li>查看所有 keys *   keys nam*  查看所有 nam开头的* </li>
-<li> 赋值 set k v </li>
-<li> 多赋值 mset k1 k2 v1 v2</li>
-<li> 获取值  get k</li>
-<li> 多取值 mget k1 k2</li>
-<li>检查是否存在  exists key</li>
-<li>key类型 type key </li>
-<li>删除key del key</li>
-<li>删除所有key flushdb</li>
-<li>设置过期时间秒 expire key  10  </li>
-<li>persist key 删除过期时间</li>
-<li>ttl  key 查看多少秒过期  -2 已经过期   -1 永不过期</li>
-</ol>
-<h3 id="2-2-string"><a href="#2-2-string" class="headerlink" title="2.2 string"></a>2.2 string</h3><ol>
-<li>set k str  get k</li>
-<li>append k 追加</li>
-<li>strlen k</li>
-<li>setnx  不存在则设置   返回0表示已经存在</li>
-<li>incr/decr k  增加/减少1 </li>
-<li>incrby/decrby k n  增加/减少n   原子性操作</li>
-<li>mset mget msetnx(都不存在才成功)</li>
-<li>getrange k begin end    —-&gt;substring</li>
-<li>setrange k begin  str       —-&gt;替换覆盖</li>
-<li>setex k 100 v  同时设置</li>
-<li>getset 取了就换 </li>
-</ol>
-<h4 id="2-3-list"><a href="#2-3-list" class="headerlink" title="2.3 list"></a>2.3 list</h4><ol>
-<li>push k v1 v2  左是头-头插法  v2 v1</li>
-<li>rpush k v1 v2 右是头头插法 v1 v2</li>
-<li>lrange k begin end 从左开始取</li>
-<li>lpop/rpop  从左/右吐出一个</li>
-<li>rpoplpush  右边吐一个放在左边 </li>
-<li>index k 0  按下标取</li>
-<li>llen</li>
-<li>linsert k before/after “str3”  “strn” 在str3 前面插入strn</li>
-<li>lrem k before/after “str3”  …</li>
-<li>lset k 0 “wang” 把第一个设置为”wang”</li>
-</ol>
-<h3 id="2-4-hash"><a href="#2-4-hash" class="headerlink" title="2.4 hash"></a>2.4 hash</h3><table>
-<thead>
-<tr>
-<th>1</th>
-<th>hdel hs key field1 [field2]        删除一个或多个哈希表字段</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>2</td>
-<td>hexisit hs key field 查看哈希表 key 中，指定的字段是否存在。</td>
-</tr>
-<tr>
-<td>3</td>
-<td>hget key field 获取存储在哈希表中指定字段的值。</td>
-</tr>
-<tr>
-<td>4</td>
-<td>hgetall hs  key 获取在哈希表中指定 key 的所有字段和值</td>
-</tr>
-<tr>
-<td>5</td>
-<td><a target="_blank" rel="noopener" href="https://www.runoob.com/redis/hashes-hincrby.html">HINCRBY key field increment</a> 为哈希表 key 中的指定字段的整数值加上增量 increment 。</td>
-</tr>
-<tr>
-<td>6</td>
-<td><a target="_blank" rel="noopener" href="https://www.runoob.com/redis/hashes-hincrbyfloat.html">HINCRBYFLOAT key field increment</a> 为哈希表 key 中的指定字段的浮点数值加上增量 increment 。</td>
-</tr>
-<tr>
-<td>7</td>
-<td><a target="_blank" rel="noopener" href="https://www.runoob.com/redis/hashes-hkeys.html">HKEYS key</a> 获取所有哈希表中的字段</td>
-</tr>
-<tr>
-<td>8</td>
-<td><a target="_blank" rel="noopener" href="https://www.runoob.com/redis/hashes-hlen.html">HLEN key</a> 获取哈希表中字段的数量</td>
-</tr>
-<tr>
-<td>9</td>
-<td>[HMGET key field1 <a target="_blank" rel="noopener" href="https://www.runoob.com/redis/hashes-hmget.html">field2]</a> 获取所有给定字段的值</td>
-</tr>
-<tr>
-<td>10</td>
-<td>[HMSET key field1 value1 <a target="_blank" rel="noopener" href="https://www.runoob.com/redis/hashes-hmset.html">field2 value2 ]</a> 同时将多个 field-value (域-值)对设置到哈希表 key 中。</td>
-</tr>
-<tr>
-<td>11</td>
-<td><a target="_blank" rel="noopener" href="https://www.runoob.com/redis/hashes-hset.html">HSET key field value</a> 将哈希表 key 中的字段 field 的值设为 value 。</td>
-</tr>
-<tr>
-<td>12</td>
-<td><a target="_blank" rel="noopener" href="https://www.runoob.com/redis/hashes-hsetnx.html">HSETNX key field value</a> 只有在字段 field 不存在时，设置哈希表字段的值。</td>
-</tr>
-<tr>
-<td>13</td>
-<td><a target="_blank" rel="noopener" href="https://www.runoob.com/redis/hashes-hvals.html">HVALS key</a> 获取哈希表中所有值。</td>
-</tr>
-<tr>
-<td>14</td>
-<td>[HSCAN key cursor <a target="_blank" rel="noopener" href="https://www.runoob.com/redis/hashes-hscan.html">MATCH pattern] [COUNT count]</a> 迭代哈希表中的键值对。</td>
-</tr>
-</tbody></table>
-<h3 id="2-5-set"><a href="#2-5-set" class="headerlink" title="2.5 set"></a>2.5 set</h3><ol>
-<li>sadd k v1 v2</li>
-<li>smembers k</li>
-<li>sismember k v v是否存在 1true</li>
-<li>scard k   返回个数</li>
-<li>spop 随机吐出一个</li>
-<li>srandmenber k  n随机取出n个</li>
-<li>smove k v k2   迁移</li>
-<li>交集</li>
-<li>并集</li>
-</ol>
-<h3 id="2-6-zset"><a href="#2-6-zset" class="headerlink" title="2.6 zset"></a>2.6 zset</h3>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/15/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/15/">15</a><span class="page-number current">16</span><a class="page-number" href="/page/17/">17</a><span class="space">&hellip;</span><a class="page-number" href="/page/26/">26</a><a class="extend next" rel="next" href="/page/17/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/15/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/15/">15</a><span class="page-number current">16</span><a class="page-number" href="/page/17/">17</a><span class="space">&hellip;</span><a class="page-number" href="/page/27/">27</a><a class="extend next" rel="next" href="/page/17/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -993,14 +1032,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">128</span>
+          <span class="site-state-item-count">131</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-count">29</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>
@@ -1041,12 +1080,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">382k</span>
+    <span title="站点总字数">391k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">5:47</span>
+    <span title="站点阅读时长">5:55</span>
 </div>
 
         

@@ -185,6 +185,575 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/31/spring/%E6%BA%90%E7%A0%81-%E5%8E%9F%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/31/spring/%E6%BA%90%E7%A0%81-%E5%8E%9F%E7%90%86/" class="post-title-link" itemprop="url">spring源码-原理</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-31 17:17:04" itemprop="dateCreated datePublished" datetime="2022-03-31T17:17:04+08:00">2022-03-31</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-05-05 11:57:33" itemprop="dateModified" datetime="2022-05-05T11:57:33+08:00">2022-05-05</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/31/spring/%E6%BA%90%E7%A0%81-%E5%8E%9F%E7%90%86/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/31/spring/%E6%BA%90%E7%A0%81-%E5%8E%9F%E7%90%86/" class="cy_cmt_count" data-xid="2022/03/31/spring/源码-原理/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>5k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>5 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="启动原理"><a href="#启动原理" class="headerlink" title="启动原理"></a>启动原理</h2><h3 id="main"><a href="#main" class="headerlink" title="main"></a>main</h3><p>@SpringBootApplication = (默认属性)@Configuration + @EnableAutoConfiguration + @ComponentScan</p>
+<h2 id="一、bean注入"><a href="#一、bean注入" class="headerlink" title="一、bean注入"></a>一、bean注入</h2><h3 id="Component的加载"><a href="#Component的加载" class="headerlink" title="@Component的加载"></a>@Component的加载</h3><blockquote>
+<p>@ComponentScan没指定会自动扫描本包下的Component，</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">loadClass</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="comment">//获得scan路径</span></span><br><span class="line">        <span class="keyword">final</span> ComponentScan annotation = LoginApplication.class.getAnnotation(ComponentScan.class);</span><br><span class="line">        String scanPath=annotation.value()[<span class="number">0</span>];</span><br><span class="line">        <span class="comment">//过的本jar的classLoder</span></span><br><span class="line">        ClassLoader classLoader=<span class="keyword">this</span>.getClass().getClassLoader();</span><br><span class="line">        <span class="comment">//获得资源</span></span><br><span class="line">        <span class="keyword">final</span> URL resource = classLoader.getResource(scanPath);</span><br><span class="line">        File file=<span class="keyword">new</span> File(resource.getFile());</span><br><span class="line">        <span class="keyword">final</span> File[] files = file.listFiles(f-&gt;f.getPath().endsWith(<span class="string">&quot;.class&quot;</span>));<span class="comment">//获得路径下的所有class文件</span></span><br><span class="line">        <span class="comment">//加载component;</span></span><br><span class="line">        <span class="keyword">for</span> (File f : files) &#123;</span><br><span class="line">            <span class="keyword">final</span> String path = f.getAbsoluteFile().getPath();</span><br><span class="line">            String className=path.substring(path.indexOf(<span class="string">&quot;com.wyg&quot;</span>),path.indexOf(<span class="string">&quot;.class&quot;</span>));</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="comment">//加载类</span></span><br><span class="line">                Class clazz =classLoader.loadClass(className);</span><br><span class="line">                <span class="comment">//判断是否为bean</span></span><br><span class="line">                <span class="keyword">if</span>(clazz.isAnnotationPresent(Component.class))&#123;</span><br><span class="line">                    putTypeToMap(clazz);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">catch</span> (ClassNotFoundException e) &#123;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="创建类型池—-beanDefinetionMap"><a href="#创建类型池—-beanDefinetionMap" class="headerlink" title="创建类型池—-beanDefinetionMap"></a>创建类型池—-beanDefinetionMap</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> ConcurrentHashMap&lt;String, BeanDefinition&gt; beanDefinitionMap = <span class="keyword">new</span> ConcurrentHashMap&lt;&gt;();</span><br><span class="line"> <span class="function"><span class="keyword">void</span> <span class="title">putTypeToMap</span><span class="params">(Class type)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">final</span> Component annotation = (Component) type.getAnnotation(Component.class);</span><br><span class="line">        String name = annotation.value();</span><br><span class="line">        BeanDefinition beanDefinition = <span class="keyword">new</span> BeanDefinition();</span><br><span class="line">        beanDefinition.setType(type);</span><br><span class="line">        beanDefinitionMap.put(name, beanDefinition);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="创建单例池"><a href="#创建单例池" class="headerlink" title="创建单例池"></a>创建单例池</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//获得单例池</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">putObjectToMap</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (String name : beanDefinitionMap.keySet()) &#123;</span><br><span class="line">        <span class="keyword">final</span> BeanDefinition beanDefinition = beanDefinitionMap.get(name);</span><br><span class="line">        <span class="keyword">if</span> (beanDefinition.getScope().equals(<span class="string">&quot;single&quot;</span>)) &#123;</span><br><span class="line">            <span class="keyword">final</span> Object bean = createBean(name,beanDefinition);</span><br><span class="line">            singleMap.put(name, bean);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="获得bean"><a href="#获得bean" class="headerlink" title="获得bean"></a>获得bean</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Object <span class="title">getBean</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">final</span> BeanDefinition beanDefinition = beanDefinitionMap.get(name);</span><br><span class="line">       <span class="keyword">if</span> (beanDefinition.getScope().equals(<span class="string">&quot;signle&quot;</span>)) &#123;</span><br><span class="line">           <span class="comment">//单例模式--&gt;</span></span><br><span class="line">           Object bean = singleMap.get(name);</span><br><span class="line">           <span class="keyword">if</span> (bean == <span class="keyword">null</span>) &#123;</span><br><span class="line">               bean = createBean(name,beanDefinition);</span><br><span class="line">               singleMap.put(name, bean);</span><br><span class="line">           &#125;</span><br><span class="line">           <span class="keyword">return</span> bean;</span><br><span class="line">       &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">           <span class="keyword">return</span> createBean(name,beanDefinition);</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="创建bean—单例模式"><a href="#创建bean—单例模式" class="headerlink" title="创建bean—单例模式"></a>创建bean—单例模式</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//创建单例bean</span></span><br><span class="line">    <span class="function">Object <span class="title">createBean</span><span class="params">(String beanName,BeanDefinition beanDefinition)</span> </span>&#123;</span><br><span class="line">        Class type = beanDefinition.getType();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">//依赖注入</span></span><br><span class="line">            <span class="keyword">final</span> Object bean = type.newInstance();</span><br><span class="line">            <span class="keyword">for</span> (Field field : type.getDeclaredFields()) &#123;</span><br><span class="line">                <span class="keyword">if</span>(field.isAnnotationPresent(Autowired.class))&#123;</span><br><span class="line">                    field.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">                    field.set(bean,getBean(field.getName()));<span class="comment">//注入bean</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span>(bean <span class="keyword">instanceof</span> BeanNameAware)</span><br><span class="line">                ((BeanNameAware)bean).setBeanName(beanName);</span><br><span class="line">            <span class="keyword">if</span>(bean <span class="keyword">instanceof</span> InitializingBean)&#123;</span><br><span class="line">                ((InitializingBean)bean).afterPropertiesSet();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> bean;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="依赖注入问题"><a href="#依赖注入问题" class="headerlink" title="依赖注入问题"></a>依赖注入问题</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//创建单例bean</span></span><br><span class="line"> <span class="function">Object <span class="title">createBean</span><span class="params">(BeanDefinition beanDefinition)</span> </span>&#123;</span><br><span class="line">     Class type = beanDefinition.getType();</span><br><span class="line">     <span class="keyword">try</span> &#123;</span><br><span class="line">         <span class="comment">//依赖注入</span></span><br><span class="line">         <span class="keyword">final</span> Object bean = type.newInstance();</span><br><span class="line">         <span class="keyword">for</span> (Field field : type.getDeclaredFields()) &#123;</span><br><span class="line">             <span class="keyword">if</span>(field.isAnnotationPresent(Autowired.class))&#123;</span><br><span class="line">                 field.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">                 field.set(bean,getBean(field.getName()));<span class="comment">//注入bean</span></span><br><span class="line">             &#125;</span><br><span class="line">         &#125;</span><br><span class="line">         <span class="keyword">return</span> bean;</span><br><span class="line">     &#125; <span class="keyword">catch</span> (InstantiationException | IllegalAccessException e) &#123;</span><br><span class="line">         e.printStackTrace();</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="初始化接口"><a href="#初始化接口" class="headerlink" title="初始化接口"></a>初始化接口</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">b</span> <span class="keyword">implements</span> <span class="title">InitializingBean</span></span>&#123;</span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">afterPropertiesSet</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220318173240631.png" alt="image-20220318173240339"></p>
+<h2 id="几种工厂"><a href="#几种工厂" class="headerlink" title="几种工厂"></a>几种工厂</h2><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/AnnotationConfigApplicationContext.png" alt="AnnotationConfigApplicationContext"></p>
+<h3 id="BeanFactory"><a href="#BeanFactory" class="headerlink" title="BeanFactory"></a>BeanFactory</h3><blockquote>
+<p>IOC的根接口,给除了的IOC容器的实现提供了规范</p>
+<p><strong>XMLBeanFactory</strong></p>
+<p><strong>ApplicationContext</strong> </p>
+<p><strong>ClassPathXmlApplicationContext</strong> </p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">getBean</span><span class="params">(String name)</span> <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">containsBean</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isSingleton</span><span class="params">(String name)</span> <span class="keyword">throws</span> NoSuchBeanDefinitionException </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> String[] getAliases(String name) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> String[<span class="number">0</span>];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="FactoryBean"><a href="#FactoryBean" class="headerlink" title="FactoryBean"></a>FactoryBean</h3><blockquote>
+<p>FactoryBean是一个可以生产bean的工厂(自身也是一个Bean)，有点类似工厂方法模式。</p>
+<p>它用来创建beanx工厂，工厂生产beanx，可以自定义Beanx是否为单例，只需要重写方法就ok</p>
+<p>这个接口的方法可以对比工厂方法模式(参考oneNode.设计模式.工厂方法模式)</p>
+</blockquote>
+<blockquote>
+<p>产生的bean也归spring管理，可以autowire</p>
+<p>和普通的@Component区别</p>
+<ol>
+<li>初始时机早于Spring的普通bean，所有不能依赖注入</li>
+<li>该的class方式可变，@Component是写死的</li>
+<li>提供了很多实现，比如ListFactoryBean,MapFactoryBean</li>
+</ol>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ListFactoryBean</span> <span class="keyword">extends</span> <span class="title">AbstractFactoryBean</span>&lt;<span class="title">List</span>&lt;<span class="title">Object</span>&gt;&gt; </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> List&lt;?&gt; sourceList;<span class="comment">//源list</span></span><br><span class="line">	<span class="keyword">private</span> Class&lt;? extends List&gt; targetListClass;<span class="comment">//class</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setSourceList</span><span class="params">(List&lt;?&gt; sourceList)</span> </span>&#123;<span class="keyword">this</span>.sourceList = sourceList;&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setTargetListClass</span><span class="params">(<span class="meta">@Nullable</span> Class&lt;? extends List&gt; targetListClass)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.targetListClass = targetListClass;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> Class&lt;List&gt; <span class="title">getObjectType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> List.class;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> List&lt;Object&gt; <span class="title">createInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		....</span><br><span class="line">		List&lt;Object&gt; result = <span class="keyword">null</span>;</span><br><span class="line">		<span class="keyword">if</span> (<span class="keyword">this</span>.targetListClass != <span class="keyword">null</span>) &#123;</span><br><span class="line">			result = BeanUtils.instantiateClass(<span class="keyword">this</span>.targetListClass);<span class="comment">//class.newInstance();</span></span><br><span class="line">		&#125;</span><br><span class="line">  		....</span><br><span class="line">		<span class="keyword">return</span> result;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="ApplicationContext"><a href="#ApplicationContext" class="headerlink" title="ApplicationContext"></a>ApplicationContext</h3><blockquote>
+<p>完善的BeanFactory，该IOC除了提供bean的基本管理还提供以下功能</p>
+<p>• MessageSource, 提供国际化的消息访问<br>• 资源访问，如URL和文件<br>• 事件传播<br>• 载入多个（有继承关系）上下文 ，使得每一个上下文都专注于一个特定的层次，比如应用的web层; </p>
+</blockquote>
+<h3 id="AnnotationConfigApplicationContext"><a href="#AnnotationConfigApplicationContext" class="headerlink" title="AnnotationConfigApplicationContext"></a>AnnotationConfigApplicationContext</h3>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/30/%E7%BB%84%E4%BB%B6/ORM/redisTemplate/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/30/%E7%BB%84%E4%BB%B6/ORM/redisTemplate/" class="post-title-link" itemprop="url">redisTemplata</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-30 18:19:15" itemprop="dateCreated datePublished" datetime="2022-03-30T18:19:15+08:00">2022-03-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-12-03 22:45:51" itemprop="dateModified" datetime="2021-12-03T22:45:51+08:00">2021-12-03</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%B8%AD%E9%97%B4%E4%BB%B6/" itemprop="url" rel="index"><span itemprop="name">中间件</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/30/%E7%BB%84%E4%BB%B6/ORM/redisTemplate/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/30/%E7%BB%84%E4%BB%B6/ORM/redisTemplate/" class="cy_cmt_count" data-xid="2022/03/30/组件/ORM/redisTemplate/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>11k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>10 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>[toc]</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/lydms/article/details/105224210">参考-原文</a></p>
+<h2 id="一、简介"><a href="#一、简介" class="headerlink" title="一、简介"></a>一、简介</h2><h3 id="1-1-Redis"><a href="#1-1-Redis" class="headerlink" title="1.1 Redis"></a>1.1 Redis</h3><p>​    redis是一款开源的Key-Value数据库，运行在内存中，由C语言编写。企业开发通常采用Redis来实现缓存。同类的产品还有memcache 、memcached 等。</p>
+<h3 id="1-2-Jedis"><a href="#1-2-Jedis" class="headerlink" title="1.2 Jedis"></a>1.2 Jedis</h3><p>​    Jedis是Redis官方推出的一款面向Java的客户端，提供了很多接口供Java语言调用。可以在Redis官网下载，当然还有一些开源爱好者提供的客户端，如Jredis、SRP等等，推荐使用Jedis。</p>
+<h3 id="1-3-Spring-Data-Redis"><a href="#1-3-Spring-Data-Redis" class="headerlink" title="1.3 Spring Data Redis"></a>1.3 Spring Data Redis</h3><p>​    Spring-data-redis是spring大家族的一部分，提供了在srping应用中通过简单的配置访问redis服务，对reids底层开发包(Jedis, JRedis, and RJC)进行了高度封装，RedisTemplate提供了redis各种操作、异常处理及序列化，支持发布订阅，并对spring 3.1 cache进行了实现。</p>
+<h3 id="1-4-spring-data-redis针对jedis提供了如下功能："><a href="#1-4-spring-data-redis针对jedis提供了如下功能：" class="headerlink" title="1.4 spring-data-redis针对jedis提供了如下功能："></a>1.4 spring-data-redis针对jedis提供了如下功能：</h3><ol>
+<li>连接池自动管理，提供了一个高度封装的“RedisTemplate”类</li>
+<li>针对jedis客户端中大量api进行了归类封装,将同一类型操作封装为operation接口<ol>
+<li>ValueOperations：简单K-V操作</li>
+<li>SetOperations：set类型数据操作</li>
+<li>ZSetOperations：zset类型数据操作</li>
+<li>HashOperations：针对map类型的数据操作</li>
+<li>ListOperations：针对list类型的数据操作</li>
+</ol>
+</li>
+<li>提供了对key的“bound”(绑定)便捷化操作API，可以通过bound封装指定的key，然后进行一系列的操作而无须“显式”的再次指定Key，即BoundKeyOperations：<ul>
+<li>BoundValueOperations</li>
+<li>BoundSetOperations</li>
+<li>BoundListOperations</li>
+<li>BoundSetOperations</li>
+<li>BoundHashOperations</li>
+</ul>
+</li>
+<li>将事务操作封装，有容器控制。</li>
+<li>针对数据的“序列化/反序列化”，提供了多种可选择策略(RedisSerializer)</li>
+</ol>
+<h3 id="1-5-三大类型"><a href="#1-5-三大类型" class="headerlink" title="1.5 三大类型"></a>1.5 三大类型</h3><h4 id="1-5-1-JdkSerializationRedisSerializer"><a href="#1-5-1-JdkSerializationRedisSerializer" class="headerlink" title="1.5.1 JdkSerializationRedisSerializer"></a>1.5.1 JdkSerializationRedisSerializer</h4><blockquote>
+<p>​    POJO对象的存取场景，使用JDK本身序列化机制，将pojo类通过ObjectInputStream/ObjectOutputStream进行序列化操作，最终redis-server中将存储字节序列。是目前最常用的序列化策略。</p>
+</blockquote>
+<h4 id="1-5-2-StringRedisSerializer"><a href="#1-5-2-StringRedisSerializer" class="headerlink" title="1.5.2 StringRedisSerializer"></a>1.5.2 StringRedisSerializer</h4><blockquote>
+<p>​    Key或者value为字符串的场景，根据指定的charset对数据的字节序列编码成string，是“new String(bytes, charset)”和“string.getBytes(charset)”的直接封装。是最轻量级和高效的策略。</p>
+</blockquote>
+<h4 id="JacksonJsonRedisSerializer"><a href="#JacksonJsonRedisSerializer" class="headerlink" title="JacksonJsonRedisSerializer"></a>JacksonJsonRedisSerializer</h4><blockquote>
+<p>​    jackson-json工具提供了javabean与json之间的转换能力，可以将pojo实例序列化成json格式存储在redis中，也可以将json格式的数据转换成pojo实例。因为jackson工具在序列化和反序列化时，需要明确指定Class类型，因此此策略封装起来稍微复杂。【需要jackson-mapper-asl工具支持】</p>
+</blockquote>
+<h2 id="二、API"><a href="#二、API" class="headerlink" title="二、API"></a>二、API</h2><h3 id="2-1-直接用法"><a href="#2-1-直接用法" class="headerlink" title="2.1 直接用法"></a>2.1 直接用法</h3><ol>
+<li><p>删除单个key   redisTemplate.delete(key);</p>
+</li>
+<li><p>删除多个key   redisTemplate.delete(keys);</p>
+</li>
+<li><p>指定key的失效时间</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">expire</span><span class="params">(String key,<span class="keyword">long</span> time)</span></span>&#123;</span><br><span class="line">    redisTemplate.expire(key,time,TimeUnit.MINUTES);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>根据key获取过期时间  Long expire = redisTemplate.getExpire(key);</p>
+</li>
+<li><p>判断key是否存在  redisTemplate.hasKey(key);</p>
+</li>
+</ol>
+<h3 id="2-2-String"><a href="#2-2-String" class="headerlink" title="2.2 String"></a>2.2 String</h3><ol>
+<li><p>添加缓存（2/3是1的递进值）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//1、通过redisTemplate设置值</span></span><br><span class="line">redisTemplate.boundValueOps(<span class="string">&quot;StringKey&quot;</span>).set(<span class="string">&quot;StringValue&quot;</span>);</span><br><span class="line">redisTemplate.boundValueOps(<span class="string">&quot;StringKey&quot;</span>).set(<span class="string">&quot;StringValue&quot;</span>,<span class="number">1</span>, TimeUnit.MINUTES);</span><br><span class="line"><span class="comment">//2、通过BoundValueOperations设置值</span></span><br><span class="line">BoundValueOperations stringKey = redisTemplate.boundValueOps(<span class="string">&quot;StringKey&quot;</span>);</span><br><span class="line">stringKey.set(<span class="string">&quot;StringVaule&quot;</span>);</span><br><span class="line">stringKey.set(<span class="string">&quot;StringValue&quot;</span>,<span class="number">1</span>, TimeUnit.MINUTES);</span><br><span class="line"><span class="comment">//3、通过ValueOperations设置值</span></span><br><span class="line">ValueOperations ops = redisTemplate.opsForValue();</span><br><span class="line">ops.set(<span class="string">&quot;StringKey&quot;</span>, <span class="string">&quot;StringVaule&quot;</span>);</span><br><span class="line">ops.set(<span class="string">&quot;StringValue&quot;</span>,<span class="string">&quot;StringVaule&quot;</span>,<span class="number">1</span>, TimeUnit.MINUTES);</span><br></pre></td></tr></table></figure></li>
+<li><p>设置过期时间(单独设置)<br>redisTemplate.boundValueOps(“StringKey”).expire(1,TimeUnit.MINUTES);<br>redisTemplate.expire(“StringKey”,1,TimeUnit.MINUTES);</p>
+</li>
+<li><p>获取缓存值（2/3是1的递进值）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//1、通过redisTemplate设置值</span></span><br><span class="line">String str1 = (String) redisTemplate.boundValueOps(<span class="string">&quot;StringKey&quot;</span>).get();</span><br><span class="line"><span class="comment">//2、通过BoundValueOperations获取值</span></span><br><span class="line">BoundValueOperations stringKey = redisTemplate.boundValueOps(<span class="string">&quot;StringKey&quot;</span>);</span><br><span class="line">String str2 = (String) stringKey.get();</span><br><span class="line"><span class="comment">//3、通过ValueOperations获取值</span></span><br><span class="line">ValueOperations ops = redisTemplate.opsForValue();</span><br><span class="line">String str3 = (String) ops.get(<span class="string">&quot;StringKey&quot;</span>);</span><br></pre></td></tr></table></figure></li>
+<li><p>删除key  Boolean result = redisTemplate.delete(“StringKey”)</p>
+</li>
+<li><p>顺序递增   redisTemplate.boundValueOps(“StringKey”).increment(3L);</p>
+</li>
+<li><p>顺序递减   redisTemplate.boundValueOps(“StringKey”).increment(-3L);</p>
+</li>
+</ol>
+<h3 id="2-3-Hash"><a href="#2-3-Hash" class="headerlink" title="2.3 Hash"></a>2.3 Hash</h3><ol>
+<li><p>添加缓存（2/3是1的递进值）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//1、通过redisTemplate设置值</span></span><br><span class="line">redisTemplate.boundHashOps(<span class="string">&quot;HashKey&quot;</span>).put(<span class="string">&quot;SmallKey&quot;</span>, <span class="string">&quot;HashVaue&quot;</span>);</span><br><span class="line"><span class="comment">//2、通过BoundValueOperations设置值</span></span><br><span class="line">BoundHashOperations hashKey = redisTemplate.boundHashOps(<span class="string">&quot;HashKey&quot;</span>);</span><br><span class="line">hashKey.put(<span class="string">&quot;SmallKey&quot;</span>, <span class="string">&quot;HashVaue&quot;</span>);</span><br><span class="line"><span class="comment">//3、通过ValueOperations设置值</span></span><br><span class="line">HashOperations hashOps = redisTemplate.opsForHash();</span><br><span class="line">hashOps.put(<span class="string">&quot;HashKey&quot;</span>, <span class="string">&quot;SmallKey&quot;</span>, <span class="string">&quot;HashVaue&quot;</span>);</span><br></pre></td></tr></table></figure></li>
+<li><p>设置过期时间(单独设置)<br>redisTemplate.boundValueOps(“HashKey”).expire(1,TimeUnit.MINUTES);<br>redisTemplate.expire(“HashKey”,1,TimeUnit.MINUTES);</p>
+</li>
+<li><p>添加一个Map集合<br>HashMap&lt;String, String&gt; hashMap = new HashMap&lt;&gt;();<br>redisTemplate.boundHashOps(“HashKey”).putAll(hashMap );</p>
+</li>
+<li><p>设置过期时间(单独设置)<br>redisTemplate.boundValueOps(“HashKey”).expire(1,TimeUnit.MINUTES);<br>redisTemplate.expire(“HashKey”,1,TimeUnit.MINUTES);</p>
+</li>
+<li><p>提取所有的小key</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//1、通过redisTemplate获取值</span></span><br><span class="line">Set keys1 = redisTemplate.boundHashOps(<span class="string">&quot;HashKey&quot;</span>).keys();</span><br><span class="line"><span class="comment">//2、通过BoundValueOperations获取值</span></span><br><span class="line">BoundHashOperations hashKey = redisTemplate.boundHashOps(<span class="string">&quot;HashKey&quot;</span>);</span><br><span class="line">Set keys2 = hashKey.keys();</span><br><span class="line"><span class="comment">//3、通过ValueOperations获取值</span></span><br><span class="line">HashOperations hashOps = redisTemplate.opsForHash();</span><br><span class="line">Set keys3 = hashOps.keys(<span class="string">&quot;HashKey&quot;</span>);</span><br></pre></td></tr></table></figure></li>
+<li><p>提取所有的value值</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//1、通过redisTemplate获取值</span></span><br><span class="line">List values1 = redisTemplate.boundHashOps(<span class="string">&quot;HashKey&quot;</span>).values();</span><br><span class="line"><span class="comment">//2、通过BoundValueOperations获取值</span></span><br><span class="line">BoundHashOperations hashKey = redisTemplate.boundHashOps(<span class="string">&quot;HashKey&quot;</span>);</span><br><span class="line">List values2 = hashKey.values();</span><br><span class="line"><span class="comment">//3、通过ValueOperations获取值</span></span><br><span class="line">HashOperations hashOps = redisTemplate.opsForHash();</span><br><span class="line">List values3 = hashOps.values(<span class="string">&quot;HashKey&quot;</span>);</span><br></pre></td></tr></table></figure></li>
+<li><p>根据key提取value值</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//1、通过redisTemplate获取</span></span><br><span class="line">String value1 = (String) redisTemplate.boundHashOps(<span class="string">&quot;HashKey&quot;</span>).get(<span class="string">&quot;SmallKey&quot;</span>);</span><br><span class="line"><span class="comment">//2、通过BoundValueOperations获取值</span></span><br><span class="line">BoundHashOperations hashKey = redisTemplate.boundHashOps(<span class="string">&quot;HashKey&quot;</span>);</span><br><span class="line">String value2 = (String) hashKey.get(<span class="string">&quot;SmallKey&quot;</span>);</span><br><span class="line"><span class="comment">//3、通过ValueOperations获取值</span></span><br><span class="line">HashOperations hashOps = redisTemplate.opsForHash();</span><br><span class="line">String value3 = (String) hashOps.get(<span class="string">&quot;HashKey&quot;</span>, <span class="string">&quot;SmallKey&quot;</span>);</span><br></pre></td></tr></table></figure></li>
+<li><p>获取所有的键值对集合</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//1、通过redisTemplate获取</span></span><br><span class="line">Map entries = redisTemplate.boundHashOps(<span class="string">&quot;HashKey&quot;</span>).entries();</span><br><span class="line"><span class="comment">//2、通过BoundValueOperations获取值</span></span><br><span class="line">BoundHashOperations hashKey = redisTemplate.boundHashOps(<span class="string">&quot;HashKey&quot;</span>);</span><br><span class="line">Map entries1 = hashKey.entries();</span><br><span class="line"><span class="comment">//3、通过ValueOperations获取值</span></span><br><span class="line">HashOperations hashOps = redisTemplate.opsForHash();</span><br><span class="line">Map entries2 = hashOps.entries(<span class="string">&quot;HashKey&quot;</span>);</span><br></pre></td></tr></table></figure></li>
+<li><p>删除<br>//删除小key<br>redisTemplate.boundHashOps(“HashKey”).delete(“SmallKey”);<br>//删除大key<br>redisTemplate.delete(“HashKey”);</p>
+</li>
+<li><p>判断Hash中是否含有该值<br>Boolean isEmpty = redisTemplate.boundHashOps(“HashKey”).hasKey(“SmallKey”);</p>
+</li>
+</ol>
+<h3 id="2-4-LIST类型相关操作"><a href="#2-4-LIST类型相关操作" class="headerlink" title="2.4 LIST类型相关操作"></a>2.4 LIST类型相关操作</h3><ol>
+<li><p>添加缓存（2/3是1的递进值）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//1、通过redisTemplate设置值</span></span><br><span class="line">redisTemplate.boundListOps(<span class="string">&quot;listKey&quot;</span>).leftPush(<span class="string">&quot;listLeftValue1&quot;</span>);</span><br><span class="line">redisTemplate.boundListOps(<span class="string">&quot;listKey&quot;</span>).rightPush(<span class="string">&quot;listRightValue2&quot;</span>);</span><br><span class="line"><span class="comment">//2、通过BoundValueOperations设置值</span></span><br><span class="line">BoundListOperations listKey = redisTemplate.boundListOps(<span class="string">&quot;listKey&quot;</span>);</span><br><span class="line">listKey.leftPush(<span class="string">&quot;listLeftValue3&quot;</span>);</span><br><span class="line">listKey.rightPush(<span class="string">&quot;listRightValue4&quot;</span>);</span><br><span class="line"><span class="comment">//3、通过ValueOperations设置值</span></span><br><span class="line">ListOperations opsList = redisTemplate.opsForList();</span><br><span class="line">opsList.leftPush(<span class="string">&quot;listKey&quot;</span>, <span class="string">&quot;listLeftValue5&quot;</span>);</span><br><span class="line">opsList.rightPush(<span class="string">&quot;listKey&quot;</span>, <span class="string">&quot;listRightValue6&quot;</span>);</span><br></pre></td></tr></table></figure></li>
+<li><p>将List放入缓存<br>ArrayList<String> list = new ArrayList&lt;&gt;();<br>redisTemplate.boundListOps(“listKey”).rightPushAll(list);<br>redisTemplate.boundListOps(“listKey”).leftPushAll(list);</p>
+</li>
+<li><p>设置过期时间(单独设置)<br>redisTemplate.boundValueOps(“listKey”).expire(1,TimeUnit.MINUTES);<br>redisTemplate.expire(“listKey”,1,TimeUnit.MINUTES);</p>
+</li>
+<li><p>获取List缓存全部内容（起始索引，结束索引）<br>List listKey1 = redisTemplate.boundListOps(“listKey”).range(0, 10); </p>
+</li>
+<li><p>从左或从右弹出一个元素<br>String listKey2 = (String) redisTemplate.boundListOps(“listKey”).leftPop();  //从左侧弹出一个元素<br>String listKey3 = (String) redisTemplate.boundListOps(“listKey”).rightPop(); //从右侧弹出一个元素</p>
+</li>
+<li><p>根据索引查询元素<br>String listKey4 = (String) redisTemplate.boundListOps(“listKey”).index(1);</p>
+</li>
+<li><p>获取List缓存的长度<br>Long size = redisTemplate.boundListOps(“listKey”).size();</p>
+</li>
+<li><p>根据索引修改List中的某条数据(key，索引，值)<br>redisTemplate.boundListOps(“listKey”).set(3L,”listLeftValue3”);</p>
+</li>
+<li><p>移除N个值为value(key,移除个数，值)<br>redisTemplate.boundListOps(“listKey”).remove(3L,”value”);</p>
+</li>
+</ol>
+<h2 id="三、其他"><a href="#三、其他" class="headerlink" title="三、其他"></a>三、其他</h2><h3 id="3-1-StringRedisTemplate和RedisTemplate的区别"><a href="#3-1-StringRedisTemplate和RedisTemplate的区别" class="headerlink" title="3.1 StringRedisTemplate和RedisTemplate的区别"></a>3.1 StringRedisTemplate和RedisTemplate的区别</h3><ol>
+<li><p>表面上</p>
+<ul>
+<li><p>写入上</p>
+<ul>
+<li><p>RedisTemplate会把value 带着”引号”加上转义字符写入</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(<span class="string">&quot;name&quot;</span>,<span class="string">&quot;wang&quot;</span>)--&gt;(<span class="string">&quot;name&quot;</span>,<span class="string">&quot;\&quot;wang&quot;</span>\<span class="string">&quot;&quot;</span>)</span><br></pre></td></tr></table></figure></li>
+<li><p>StringRedisTemplate 不带”引号写入”</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(<span class="string">&quot;name&quot;</span>,<span class="string">&quot;wang&quot;</span>)--&gt;(<span class="string">&quot;name&quot;</span>,<span class="string">&quot;wang&quot;</span>)</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li><p>读取上</p>
+<ul>
+<li><p>RedisTemplate只能读取带””+转义字符的k-v</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(<span class="string">&quot;name&quot;</span>,<span class="string">&quot;\&quot;wang&quot;</span>\<span class="string">&quot;&quot;</span>)-&gt;(<span class="string">&quot;name&quot;</span>,<span class="string">&quot;wang&quot;</span>)</span><br></pre></td></tr></table></figure></li>
+<li><p>StringRedisTemplate  就像原生的命令行一样。读取任意，且格式和原生的一样。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(<span class="string">&quot;name&quot;</span>,<span class="string">&quot;\&quot;wang&quot;</span>\<span class="string">&quot;&quot;</span>)-&gt;(<span class="string">&quot;name&quot;</span>,<span class="string">&quot;&quot;</span>wang<span class="string">&quot;&quot;</span>)</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>两者的关系是StringRedisTemplate继承RedisTemplate。</p>
+</li>
+</ol>
+<blockquote>
+<p>SDR默认采用的序列化策略有两种，一种是String的序列化策略，一种是JDK的序列化策略。</p>
+</blockquote>
+<ol start="3">
+<li><p>序列化策略上:</p>
+<ul>
+<li><p>StringRedisTemplate默认采用的是String的序列化策略，保存的key和value都是采用此策略序列化保存的。（JdkSerializationRedisSerializer）</p>
+</li>
+<li><p>RedisTemplate默认采用的是JDK的序列化策略，保存的key和value都是采用此策略序列化保存的。（StringRedisSerializer)</p>
+</li>
+</ul>
+</li>
+<li><p>使用上：</p>
+<ul>
+<li>StringRedisTemplate：当你的redis数据库里面本来存的是字符串数据或者你要存取的数据就是字符串类型数据的时候。</li>
+<li>RedisTemplate：但是如果你的数据是复杂的对象类型，而取出的时候又不想做任何的数据转换，直接从Redis里面取出一个对象。</li>
+</ul>
+</li>
+</ol>
+<p>二、StringRedistemplate的源码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">StringRedisTemplate</span> <span class="keyword">extends</span> <span class="title">RedisTemplate</span>&lt;<span class="title">String</span>, <span class="title">String</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">StringRedisTemplate</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.setKeySerializer(RedisSerializer.string());</span><br><span class="line">        <span class="keyword">this</span>.setValueSerializer(RedisSerializer.string());</span><br><span class="line">        <span class="keyword">this</span>.setHashKeySerializer(RedisSerializer.string());</span><br><span class="line">        <span class="keyword">this</span>.setHashValueSerializer(RedisSerializer.string());</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">StringRedisTemplate</span><span class="params">(RedisConnectionFactory connectionFactory)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>();</span><br><span class="line">        <span class="keyword">this</span>.setConnectionFactory(connectionFactory);</span><br><span class="line">        <span class="keyword">this</span>.afterPropertiesSet();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> RedisConnection <span class="title">preProcessConnection</span><span class="params">(RedisConnection connection, <span class="keyword">boolean</span> existingConnection)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> DefaultStringRedisConnection(connection);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>​    从上面创建StringRedisTemplate的无参构造方法可以看出，此时将keySerializer、valueSerializer、hashKeySerializer、hashValueSerializer的序列化方式为stringSerializer，也就是StringRedisSerializer序列化方式；此时执行完整个方法后，还需要接着执行setConnectionFactory()方法，然后转向他的父类RedisTemplate中的afterPropertiesSet方法，此时上述四个序列化方式已经设置；</p>
+<p>三、Redis使用的区别<br>    RedisTemplate使用的序列类在在操作数据的时候，比如说存入数据会将数据先序列化成字节数组然后在存入Redis数据库，这个时候打开Redis查看的时候，你会看到你的数据不是以可读的形式展现的，而是以字节数组显示，类似下面（RedisTemplate）</p>
+<p>​    当然从Redis获取数据的时候也会默认将数据当做字节数组转化，这样就会导致一个问题，当需要获取的数据不是以字节数组存在redis当中而是正常的可读的字符串的时候，比如说下面这种形式的数据（StringRedisTemplate）</p>
+<p>​    当Redis当中的数据值是以数组形式显示出来的时候，只能使用RedisTemplate才能获取到里面的数据。<br>当Redis当中的数据值是以可读的形式显示出来的时候，只能使用StringRedisTemplate才能获取到里面的数据。<br>所以当你使用RedisTemplate获取不到数据为NULL时，一般是获取的方式错误。检查一下数据是否可读即可。</p>
+<h2 id="四、例子"><a href="#四、例子" class="headerlink" title="四、例子"></a>四、例子</h2><h3 id="3-0-redis-java说明"><a href="#3-0-redis-java说明" class="headerlink" title="3.0 redis-java说明"></a>3.0 redis-java说明</h3><ol>
+<li> redisTemplate 写入的不是普通String,而是</li>
+</ol>
+<h3 id="3-1-RedisUtil"><a href="#3-1-RedisUtil" class="headerlink" title="3.1 RedisUtil"></a>3.1 RedisUtil</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Autowired</span></span><br><span class="line">RedisTemplate redisTemplate;</span><br><span class="line"><span class="meta">@ApiOperation(&quot;redisGet&quot;)</span></span><br><span class="line"><span class="meta">@GetMapping(&quot;redisGet&quot;)</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> ApiResult <span class="title">redisGet</span><span class="params">(<span class="meta">@RequestParam</span> String key)</span> </span>&#123;</span><br><span class="line">    key = StringUtils.isBlank(key) ? <span class="string">&quot;name&quot;</span> : key;</span><br><span class="line">    Object o = redisTemplate.opsForValue().get(key);</span><br><span class="line">    System.out.println(o);</span><br><span class="line">    <span class="keyword">return</span> ApiResult.ok(); </span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">@ApiOperation(&quot;set&quot;)</span></span><br><span class="line"><span class="meta">@GetMapping(&quot;set&quot;)</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> ApiResult <span class="title">set</span><span class="params">(<span class="meta">@RequestParam</span> String key, <span class="meta">@RequestParam</span> String value)</span> </span>&#123;</span><br><span class="line">    redisTemplate.opsForValue().set(key, value);</span><br><span class="line">    <span class="keyword">return</span> ApiResult.ok();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="3-2-测试"><a href="#3-2-测试" class="headerlink" title="3.2 测试"></a>3.2 测试</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> com.ccasd.redis.StringRedisUtils;</span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RequestBody;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RequestMapping;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RequestMethod;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RestController;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"></span><br><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@RequestMapping(&quot;/excel&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WordExcelController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> StringRedisUtils stringRedisUtils;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 测试_向Redis中插入数据</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@RequestMapping(value = &quot;/add&quot;, method = &#123;RequestMethod.POST&#125;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">(<span class="meta">@RequestBody</span> Map&lt;String, String&gt; en)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        String key = en.get(<span class="string">&quot;key&quot;</span>).toString();</span><br><span class="line">        String value = en.get(<span class="string">&quot;value&quot;</span>).toString();</span><br><span class="line">        stringRedisUtils.addRedis(key, value);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 测试_从Redis中查询数据</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@RequestMapping(value = &quot;/get&quot;, method = &#123;RequestMethod.POST&#125;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">get</span><span class="params">(<span class="meta">@RequestBody</span> Map&lt;String, Object&gt; en)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        String key = en.get(<span class="string">&quot;key&quot;</span>).toString();</span><br><span class="line">        String value = stringRedisUtils.getRedis(key);</span><br><span class="line">        <span class="keyword">return</span> value;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/30/java/javaSE/jvm/JMM-java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/30/java/javaSE/jvm/JMM-java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/" class="post-title-link" itemprop="url">java内存模型</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-30 14:09:51" itemprop="dateCreated datePublished" datetime="2022-03-30T14:09:51+08:00">2022-03-30</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/JVM/" itemprop="url" rel="index"><span itemprop="name">JVM</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/30/java/javaSE/jvm/JMM-java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/30/java/javaSE/jvm/JMM-java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/" class="cy_cmt_count" data-xid="2022/03/30/java/javaSE/jvm/JMM-java内存模型/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>991</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>[toc]</p>
+<h2 id="痛点-转载"><a href="#痛点-转载" class="headerlink" title="痛点-转载"></a><a target="_blank" rel="noopener" href="https://www.hollischuang.com/archives/2550">痛点-转载</a></h2><p>​    但是随着CPU技术的发展，CPU的执行速度越来越快。而由于内存的技术并没有太大的变化，所以从内存中读取和写入数据的过程和CPU的执行速度比起来差距就会越来越大,这就导致CPU每次操作内存都要耗费很多等待时间。</p>
+<ul>
+<li>所以，人们想出来了一个好的办法，就是在CPU和内存之间增加高速缓存。缓存的概念大家都知道，就是保存一份数据拷贝。他的特点是速度快，内存小，并且昂贵。</li>
+<li><strong>当程序在运行过程中，会将运算需要的数据从主存复制一份到CPU的高速缓存当中，那么CPU进行计算时就可以直接从它的高速缓存读取数据和向其中写入数据，当运算结束之后，再将高速缓存中的数据刷新到主存当中。</strong></li>
+<li>随着CPU能力的不断提升，一层缓存就慢慢的无法满足要求了，就逐渐的衍生出多级缓存。按照数据读取顺序和与CPU结合的紧密程度，CPU缓存可以分为一级缓存（L1），二级缓存（L3），部分高端CPU还具有三级缓存（L3），每一级缓存中所储存的全部数据都是下一级缓存的一部分</li>
+<li>当CPU要读取一个数据时，首先从一级缓存中查找，如果没有找到再从二级缓存中查找，如果还是没有就从三级缓存或内存中查找。</li>
+<li>单核CPU只含有一套L1，L2，L3缓存；如果CPU含有多个核心，即多核CPU，则每个核心都含有一套L1（甚至和L2）缓存，而共享L3（或者和L2）缓存。</li>
+</ul>
+<h4 id="计算机内存模型"><a href="#计算机内存模型" class="headerlink" title="计算机内存模型"></a>计算机内存模型</h4><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20211214014833316.png" alt="image-20211214014833316"></p>
+<h4 id="JMM"><a href="#JMM" class="headerlink" title="JMM"></a>JMM</h4><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220330140949648.png" alt="image-20220330140949648"></p>
+<h2 id="二、并发编程的三个问题"><a href="#二、并发编程的三个问题" class="headerlink" title="二、并发编程的三个问题"></a>二、并发编程的三个问题</h2><h3 id="2-1-原子性"><a href="#2-1-原子性" class="headerlink" title="2.1 原子性"></a>2.1 原子性</h3><blockquote>
+<p>和数据库的原子性一样，要么全成功，要么全失败</p>
+</blockquote>
+<p>jvm只保证了对8大基本类型(除了double,long)读、取操作时原子的</p>
+<h3 id="2-2-有序性"><a href="#2-2-有序性" class="headerlink" title="2.2 有序性"></a>2.2 有序性</h3><blockquote>
+<p>由于变量的读取经过 工作内存–&gt;缓存–&gt;主存 </p>
+<p>各个存储点存储变量的地址不一样，可能变量a，b的地址会近一些，所以操作完a会优先操作b</p>
+</blockquote>
+<blockquote>
+<p>指令重排不会影响单个线程的结果，但在多线程下就会变得不安全。</p>
+</blockquote>
+<p>例如</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//线程a:</span></span><br><span class="line">student = <span class="keyword">new</span> Student();   <span class="comment">//语句1</span></span><br><span class="line">inited = <span class="keyword">true</span>;             <span class="comment">//语句2</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//线程b:</span></span><br><span class="line"><span class="keyword">while</span>(!inited )&#123;</span><br><span class="line">  sleep()</span><br><span class="line">&#125;</span><br><span class="line">student.doWork();</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>如果线程a按照1、2顺序执行，那么线程b将永远不会在student初始化之前就doWork</li>
+</ul>
+<h3 id="2-3-可见性"><a href="#2-3-可见性" class="headerlink" title="2.3 可见性"></a>2.3 可见性</h3><blockquote>
+<p>该特性可以理解为值时直接访问主存的到的，大家看到的都一样</p>
+</blockquote>
+<h2 id="三、关键字"><a href="#三、关键字" class="headerlink" title="三、关键字"></a>三、关键字</h2><h3 id="3-1-关键字volatile"><a href="#3-1-关键字volatile" class="headerlink" title="3.1 关键字volatile"></a>3.1 关键字volatile</h3><blockquote>
+<p>易见的，易变的</p>
+</blockquote>
+<h4 id="解决两个问题"><a href="#解决两个问题" class="headerlink" title="解决两个问题"></a>解决两个问题</h4><ol>
+<li><p>可见性</p>
+<p>原理：面向主存读写</p>
+</li>
+<li><p>有序性</p>
+</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/30/408/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E8%BF%9B%E7%A8%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -491,670 +1060,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/27/java/javaSE/JUC/%E7%BA%BF%E7%A8%8B%E6%B1%A0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/27/java/javaSE/JUC/%E7%BA%BF%E7%A8%8B%E6%B1%A0/" class="post-title-link" itemprop="url">线程池</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-27 14:46:58" itemprop="dateCreated datePublished" datetime="2022-03-27T14:46:58+08:00">2022-03-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-05-12 04:34:51" itemprop="dateModified" datetime="2022-05-12T04:34:51+08:00">2022-05-12</time>
-              </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/27/java/javaSE/JUC/%E7%BA%BF%E7%A8%8B%E6%B1%A0/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/27/java/javaSE/JUC/%E7%BA%BF%E7%A8%8B%E6%B1%A0/" class="cy_cmt_count" data-xid="2022/03/27/java/javaSE/JUC/线程池/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.8k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="线程池的作用"><a href="#线程池的作用" class="headerlink" title="线程池的作用"></a>线程池的作用</h3><p>1.减少了创建和销毁线程的次数，每个工作线程都可以被重复利用，可执行多个任务。</p>
-<p>2.可以根据系统的承受能力，调整线程池中工作线线程的数目，防止因为消耗过多的内存，而把服务器累趴下(每个线程需要大约1MB内存，线程开的越多，消耗的内存也就越大，最后死机)。</p>
-<h4 id="submit与execute区别"><a href="#submit与execute区别" class="headerlink" title="submit与execute区别"></a>submit与execute区别</h4><ol>
-<li>summit 提交 callable，可以进行异常管理</li>
-<li>execute runable </li>
-</ol>
-<h3 id="参数-ThreadPoolExecutor"><a href="#参数-ThreadPoolExecutor" class="headerlink" title="参数 ThreadPoolExecutor"></a>参数 ThreadPoolExecutor</h3><table>
-<thead>
-<tr>
-<th>参数</th>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody><tr>
-<td>int corePoolSize</td>
-<td>常驻线程数量</td>
-<td></td>
-</tr>
-<tr>
-<td>int maximumPoolSize</td>
-<td>表示最大线程数，如当前任务较多，将核心线程数都用完了，此时就会创建新的线程，但线程池内线程总数不会超过最大线程数</td>
-<td></td>
-</tr>
-<tr>
-<td>long keepAliveTime</td>
-<td>空闲线程存活时间(减少到常驻数量)</td>
-<td></td>
-</tr>
-<tr>
-<td>TimeUnit unit</td>
-<td>时间类型</td>
-<td></td>
-</tr>
-<tr>
-<td>BlockingQueue<Runnable> workQueue</td>
-<td>多的线程进入–&gt;阻塞队列</td>
-<td></td>
-</tr>
-<tr>
-<td>ThreadFactory threadFactory</td>
-<td>线程工厂</td>
-<td></td>
-</tr>
-<tr>
-<td>RejectedExecutionHandler handler</td>
-<td>当队列满的时候，拒绝策略</td>
-<td></td>
-</tr>
-</tbody></table>
-<h2 id="二、类型"><a href="#二、类型" class="headerlink" title="二、类型"></a>二、类型</h2><table>
-<thead>
-<tr>
-<th>名称</th>
-<th>参数</th>
-<th>含义</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>newFixedThreadPool</td>
-<td>(x,x)  0   LinkedBlockingQueue</td>
-<td>前x个能运行，其余进入队列</td>
-</tr>
-<tr>
-<td>newSingleThreadExecutor</td>
-<td>(1,1)  0  LinkedBlockingQueue</td>
-<td>只能一个运行，其余进入队列</td>
-</tr>
-<tr>
-<td>newCachedThreadPool</td>
-<td>(0,N) 60s  SynchronousQueue</td>
-<td>无限长变化池，来一个运行一个</td>
-</tr>
-<tr>
-<td>newScheduledThreadPool</td>
-<td>(x,N) 0  DelayedWorkQueue</td>
-<td>无限长变化池，延迟运行</td>
-</tr>
-</tbody></table>
-<h4 id="2-1-定长线程池"><a href="#2-1-定长线程池" class="headerlink" title="2.1 定长线程池"></a>2.1 定长线程池</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ExecutorService pools = Executors.newFixedThreadPool(<span class="number">5</span>);<span class="comment">//一池5线程</span></span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>多出的线程进入LinkedBlockingQueue，</p>
-</blockquote>
-<h4 id="2-2-一池一线程"><a href="#2-2-一池一线程" class="headerlink" title="2.2 一池一线程"></a>2.2 一池一线程</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> ExecutorService singleExecutor = Executors.newSingleThreadExecutor();</span><br></pre></td></tr></table></figure>
-
-<h4 id="2-3-可扩容池"><a href="#2-3-可扩容池" class="headerlink" title="2.3 可扩容池"></a>2.3 可扩容池</h4><ul>
-<li>它比较适合处理执行时间比较小的任务；</li>
-</ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> ExecutorService cachedThreadPool = Executors.newCachedThreadPool();</span><br></pre></td></tr></table></figure>
-
-<h4 id="2-4-定长延迟线程池"><a href="#2-4-定长延迟线程池" class="headerlink" title="2.4 定长延迟线程池"></a>2.4 定长延迟线程池</h4><blockquote>
-<p>可周期性，延迟性</p>
-</blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(<span class="number">2</span>);<span class="comment">//2个线程</span></span><br><span class="line">scheduledThreadPool.schedule(()-&gt;sout,<span class="number">3</span>,TimeUtil.SECONDS);<span class="comment">//延迟性，3秒后执行</span></span><br><span class="line">scheduledThreadPool.schedule(()-&gt;sout,<span class="number">1</span>,<span class="number">3</span>,TimeUtil.SECONDS);<span class="comment">//周期性，延迟性，1秒后执行，每三秒执行一次</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="三、queue类型"><a href="#三、queue类型" class="headerlink" title="三、queue类型"></a>三、queue类型</h2><h3 id="SynchronousQueue"><a href="#SynchronousQueue" class="headerlink" title="SynchronousQueue"></a>SynchronousQueue</h3><blockquote>
-<p>没有容量，直接提交。</p>
-<p>SynchronousQueue阻塞队列一般要求maximumPoolSizes为无界，避免线程拒绝执行操作。</p>
-</blockquote>
-<h3 id="LinkedBlockingQueue"><a href="#LinkedBlockingQueue" class="headerlink" title="LinkedBlockingQueue"></a>LinkedBlockingQueue</h3><blockquote>
-<p>无界队列，多于corePoolSize的线程被放进来等待，maximumPoolSizess变为无效参数</p>
-</blockquote>
-<h3 id="ArrayBlockingQueue"><a href="#ArrayBlockingQueue" class="headerlink" title="ArrayBlockingQueue"></a>ArrayBlockingQueue</h3><blockquote>
-<p>有界队列，可以指定缓存队列的大小，当线程数量大于corePoolSize时，多余的任务会缓存在ArrayBlockingQueue队列中等待有空闲的线程时继续执行；当ArrayBlockingQueue满时，则又会开启新的线程去执行，直到线程数量达到maximumPoolSize；当线程数已经达到最大的maximumPoolSize时，再有新的任务到达时会执行拒绝执行策略</p>
-</blockquote>
-<h4 id="DelayedWorkQueue"><a href="#DelayedWorkQueue" class="headerlink" title="DelayedWorkQueue"></a>DelayedWorkQueue</h4><blockquote>
-<p>无界阻塞延迟队列，根据剩余时间进行堆排序，最先过期的在最前面</p>
-</blockquote>
-<h2 id="四、其他"><a href="#四、其他" class="headerlink" title="四、其他"></a>四、其他</h2><h3 id="4-2-拒绝策略"><a href="#4-2-拒绝策略" class="headerlink" title="4.2 拒绝策略"></a>4.2 拒绝策略</h3><table>
-<thead>
-<tr>
-<th>名称</th>
-<th>作用</th>
-<th></th>
-</tr>
-</thead>
-<tbody><tr>
-<td>CallerRunsPolicy</td>
-<td>使用调用线程直接运行任务</td>
-<td></td>
-</tr>
-<tr>
-<td>AbortPolicy</td>
-<td>丢弃</td>
-<td></td>
-</tr>
-<tr>
-<td>DiscardPolicy</td>
-<td>丢弃，抛出异常</td>
-<td></td>
-</tr>
-<tr>
-<td>DiscardOldestPolicy</td>
-<td>丢弃阻塞队列 workQueue 中最老的一个任务，并将新任务加入</td>
-<td></td>
-</tr>
-</tbody></table>
-<h3 id="4-2-ThreadFactory"><a href="#4-2-ThreadFactory" class="headerlink" title="4.2 ThreadFactory"></a>4.2 ThreadFactory</h3><blockquote>
-<p>线程池可选参数，在线程放入线程池前处理线程</p>
-</blockquote>
-<ol>
-<li>设置名称</li>
-<li>设置是否为守护线程</li>
-<li>设置优先级</li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/27/java/javaSE/JUC/JUC%E7%9A%84%E5%9F%BA%E7%A1%80/CSA/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/27/java/javaSE/JUC/JUC%E7%9A%84%E5%9F%BA%E7%A1%80/CSA/" class="post-title-link" itemprop="url">多线程CSA</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-27 11:59:59" itemprop="dateCreated datePublished" datetime="2022-03-27T11:59:59+08:00">2022-03-27</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/JUC/" itemprop="url" rel="index"><span itemprop="name">JUC</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/27/java/javaSE/JUC/JUC%E7%9A%84%E5%9F%BA%E7%A1%80/CSA/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/27/java/javaSE/JUC/JUC%E7%9A%84%E5%9F%BA%E7%A1%80/CSA/" class="cy_cmt_count" data-xid="2022/03/27/java/javaSE/JUC/JUC的基础/CSA/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>8.1k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>7 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/upcwanghaibo/p/8626802.html">转载1-多线程之CSA</a></p>
-<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/fb6e91b013cc">转载2-深入浅出CSA</a></p>
-<p>一、什么是CAS</p>
-<p>CAS,compare and swap的缩写，比较后交换。</p>
-<p>我们都知道，在java语言之前，并发就已经广泛存在并在服务器领域得到了大量的应用。所以硬件厂商老早就在芯片中加入了大量直至并发操作的原语，从而在硬件层面提升效率。在intel的CPU中，使用cmpxchg指令。</p>
-<p>在Java发展初期，java语言是不能够利用硬件提供的这些便利来提升系统的性能的。而随着java不断的发展,Java本地方法(JNI)的出现，使得java程序越过JVM直接调用本地方法提供了一种便捷的方式，因而java在并发的手段上也多了起来。而在Doug Lea提供的cucurenct包中，CAS理论是它实现整个java包的基石。</p>
-<p>CAS 操作包含三个操作数 —— 内存位置（V）、预期原值（A）和新值(B)。 如果内存位置的值与预期原值相匹配，那么处理器会自动将该位置值更新为新值 。否则，处理器不做任何操作。无论哪种情况，它都会在 CAS 指令之前返回该 位置的值。（在 CAS 的一些特殊情况下将仅返回 CAS 是否成功，而不提取当前 值。）CAS 有效地说明了“我认为位置 V 应该包含值 A；如果包含该值，则将 B 放到这个位置；否则，不要更改该位置，只告诉我这个位置现在的值即可。”</p>
-<p>通常将 CAS 用于同步的方式是从地址 V 读取值 A，执行多步计算来获得新 值 B，然后使用 CAS 将 V 的值从 A 改为 B。如果 V 处的值尚未同时更改，则 CAS 操作成功。</p>
-<p>类似于 CAS 的指令允许算法执行读-修改-写操作，而无需害怕其他线程同时 修改变量，因为如果其他线程修改变量，那么 CAS 会检测它（并失败），算法 可以对该操作重新计算。</p>
-<p>二、CAS的目的</p>
-<p>利用CPU的CAS指令，同时借助JNI来完成Java的非阻塞算法。其它原子操作都是利用类似的特性完成的。而整个J.U.C都是建立在CAS之上的，因此对于synchronized阻塞算法，J.U.C在性能上有了很大的提升。</p>
-<p>三、CAS存在的问题</p>
-<p>CAS虽然很高效的解决原子操作，但是CAS仍然存在三大问题。ABA问题，循环时间长开销大和只能保证一个共享变量的原子操作</p>
-<p>\1.  ABA问题。因为CAS需要在操作值的时候检查下值有没有发生变化，如果没有发生变化则更新，但是如果一个值原来是A，变成了B，又变成了A，那么使用CAS进行检查时会发现它的值没有发生变化，但是实际上却变化了。ABA问题的解决思路就是使用版本号。在变量前面追加上版本号，每次变量更新的时候把版本号加一，那么A－B－A 就会变成1A-2B－3A。</p>
-<p>从Java1.5开始JDK的atomic包里提供了一个类AtomicStampedReference来解决ABA问题。这个类的compareAndSet方法作用是首先检查当前引用是否等于预期引用，并且当前标志是否等于预期标志，如果全部相等，则以原子方式将该引用和该标志的值设置为给定的更新值。</p>
-<p>关于ABA问题参考文档: <a target="_blank" rel="noopener" href="http://blog.hesey.net/2011/09/resolve-aba-by-atomicstampedreference.html">http://blog.hesey.net/2011/09/resolve-aba-by-atomicstampedreference.html</a></p>
-<p>\2. 循环时间长开销大。自旋CAS如果长时间不成功，会给CPU带来非常大的执行开销。如果JVM能支持处理器提供的pause指令那么效率会有一定的提升，pause指令有两个作用，第一它可以延迟流水线执行指令（de-pipeline）,使CPU不会消耗过多的执行资源，延迟的时间取决于具体实现的版本，在一些处理器上延迟时间是零。第二它可以避免在退出循环的时候因内存顺序冲突（memory order violation）而引起CPU流水线被清空（CPU pipeline flush），从而提高CPU的执行效率。</p>
-<p>\3. 只能保证一个共享变量的原子操作。当对一个共享变量执行操作时，我们可以使用循环CAS的方式来保证原子操作，但是对多个共享变量操作时，循环CAS就无法保证操作的原子性，这个时候就可以用锁，或者有一个取巧的办法，就是把多个共享变量合并成一个共享变量来操作。比如有两个共享变量i＝2,j=a，合并一下ij=2a，然后用CAS来操作ij。从Java1.5开始JDK提供了AtomicReference类来保证引用对象之间的原子性，你可以把多个变量放在一个对象里来进行CAS操作。</p>
-<p>四、concurrent包的实现</p>
-<p>由于java的CAS同时具有 volatile 读和volatile写的内存语义，因此Java线程之间的通信现在有了下面四种方式：</p>
-<ol>
-<li>A线程写volatile变量，随后B线程读这个volatile变量。</li>
-<li>A线程写volatile变量，随后B线程用CAS更新这个volatile变量。</li>
-<li>A线程用CAS更新一个volatile变量，随后B线程用CAS更新这个volatile变量。</li>
-<li>A线程用CAS更新一个volatile变量，随后B线程读这个volatile变量。</li>
-</ol>
-<p>Java的CAS会使用现代处理器上提供的高效机器级别原子指令，这些原子指令以原子方式对内存执行读-改-写操作，这是在多处理器中实现同步的关键（从本质上来说，能够支持原子性读-改-写指令的计算机器，是顺序计算图灵机的异步等价机器，因此任何现代的多处理器都会去支持某种能对内存执行原子性读-改-写操作的原子指令）。同时，volatile变量的读/写和CAS可以实现线程之间的通信。把这些特性整合在一起，就形成了整个concurrent包得以实现的基石。如果我们仔细分析concurrent包的源代码实现，会发现一个通用化的实现模式：</p>
-<ol>
-<li>首先，声明共享变量为volatile；</li>
-<li>然后，使用CAS的原子条件更新来实现线程之间的同步；</li>
-<li>同时，配合以volatile的读/写和CAS所具有的volatile读和写的内存语义来实现线程之间的通信。</li>
-</ol>
-<p>AQS，非阻塞数据结构和原子变量类（java.util.concurrent.atomic包中的类），这些concurrent包中的基础类都是使用这种模式来实现的，而concurrent包中的高层类又是依赖于这些基础类来实现的。从整体来看，concurrent包的实现示意图如下：</p>
-<h2 id="二、"><a href="#二、" class="headerlink" title="二、"></a>二、</h2><h1 id="乐观锁和悲观锁？"><a href="#乐观锁和悲观锁？" class="headerlink" title="乐观锁和悲观锁？"></a>乐观锁和悲观锁？</h1><p>关于乐观锁和悲观锁的定义和使用场景，本质都是一样的，这里就不再赘述。</p>
-<p>关于悲观锁，下面再进行介绍，synchronized和Lock都属于悲观锁，下面我们来具体看看乐观锁。</p>
-<h1 id="乐观锁的实现-CAS"><a href="#乐观锁的实现-CAS" class="headerlink" title="乐观锁的实现-CAS"></a>乐观锁的实现-CAS</h1><p>乐观锁的核心就是CAS（Compare And Swap-比较与交换，是一种不抢占的同步方式），是一种无锁算法。CAS算法涉及三个操作数：</p>
-<ul>
-<li>需要读写的内存值V。</li>
-<li>进行比较的值A。</li>
-<li>要写入的新值B。</li>
-</ul>
-<p>当前仅当当前内存值V等于值A时，才进行写入新值B，有人会问我在比较相等后的同时更新了值V咋办？写入的新值B不是覆盖了别人刚写入的值吗？是的比较和写入需要保证是一个原子操作，这里通过CPU的cmpxchg指令，去比较寄存器中的A和内存中的值V，如果相等的话就写入B，如果不等的话就值V赋值给寄存器中的值A，如果想继续自旋就继续不想继续可以抛出相应错误。</p>
-<p>下面我们来看看常见的AtomicInteger是如何自旋的。</p>
-<h1 id="AtomicInteger"><a href="#AtomicInteger" class="headerlink" title="AtomicInteger"></a>AtomicInteger</h1><p>一个可以被原子更新的int值，关于原子变量属性描述具体可以参考{@link java.util.concurrent.automic}包。AutomicInteger用于原子递增计数器等应用程序中，不能被使用替代Integer。然而这个类扩展了Number允许被一些处理数值的工具或者公共代码统一访问。</p>
-<h1 id="字段和构造函数"><a href="#字段和构造函数" class="headerlink" title="字段和构造函数"></a>字段和构造函数</h1><figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">package java.util.concurrent.atomic;public class AtomicInteger extends Number implements java.io.Serializable &#123;   <span class="keyword"> private</span><span class="keyword"> static</span><span class="keyword"> final</span><span class="built_in"> long </span>serialVersionUID = 6214790243416807050<span class="class">L;</span>    // 设置使用Unsafe.compareAndSwapInt进行更新。   <span class="keyword"> private</span><span class="keyword"> static</span><span class="keyword"> final</span> Unsafe unsafe = Unsafe.getUnsafe();   <span class="keyword"> private</span><span class="keyword"> static</span><span class="keyword"> final</span><span class="built_in"> long </span>valueOffset;    // 获得value对象内存分布中的偏移量用于找到value   <span class="keyword"> static</span> &#123;        try &#123;            valueOffset = unsafe.objectFieldOffset                (AtomicInteger.class.getDeclaredField(<span class="string">&quot;value&quot;</span>));        &#125; catch (Exception ex) &#123;<span class="built_in"> throw </span>new Error(ex); &#125;    &#125;    // 保证内存可见效和禁止指令重排。   <span class="keyword"> private</span> volatile<span class="built_in"> int </span>value;   <span class="keyword"> public</span> AtomicInteger(int initialValue) &#123;        value = initialValue;    &#125;    /**     * 初始值为0     */   <span class="keyword"> public</span> AtomicInteger() &#123;    &#125;</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-<h1 id="incrementAndGet"><a href="#incrementAndGet" class="headerlink" title="incrementAndGet"></a>incrementAndGet</h1><figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**  * 以原子方式将当前值递增1  * @return 更新后的值  */</span><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">incrementAndGet</span><span class="params">()</span> </span>&#123;    <span class="keyword">return</span> unsafe.<span class="built_in">getAndAddInt</span>(<span class="keyword">this</span>, valueOffset, <span class="number">1</span>) + <span class="number">1</span>;&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-<p>var1：为AtomicInteger对象，用于unsafe结合valueOffset获得对象中的最新的value。<br>var2：value值在AtomicInteger对象中偏移量。<br>var4：增加的值为1。</p>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">package</span> sun.misc;public final int getAndAddInt(Object var<span class="number">1</span>, long var<span class="number">2</span>, int var<span class="number">4</span>) &#123;    int var<span class="number">5</span>;    do &#123;        //获得AutomicInteger的value值        var<span class="number">5</span> = this.getIntVolatile(var<span class="number">1</span>, var<span class="number">2</span>);    &#125; while(!this.compareAndSwapInt(var<span class="number">1</span>, var<span class="number">2</span>, var<span class="number">5</span>, var<span class="number">5</span> + var<span class="number">4</span>));    return var<span class="number">5</span>;&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-<h1 id="乐观锁的缺点"><a href="#乐观锁的缺点" class="headerlink" title="乐观锁的缺点"></a>乐观锁的缺点</h1><ul>
-<li>如果并发比较高，CAS一直比较自旋，将会一直占用CPU，如果自旋的线程多了CPU就会飙升。</li>
-<li>只能保证一个共享变量的原子操作。对一个共享变量执行操作时，CAS能保证原子操作，但是对多个共享变量操作时，CAS时无法保证操作的原子性的。 java从1.5开始JDK提供了AtomicReference类来保证引用之间的原子性，可以把多个变量放在一个对象中来进行CAS操作。</li>
-</ul>
-<h1 id="synchronized的底层是怎么实现的？"><a href="#synchronized的底层是怎么实现的？" class="headerlink" title="synchronized的底层是怎么实现的？"></a>synchronized的底层是怎么实现的？</h1><p>sychronized是通过对象头部的Mark Word中的锁标识+monitor实现的。</p>
-<h1 id="java对象头"><a href="#java对象头" class="headerlink" title="java对象头"></a>java对象头</h1><p><img src="https://pics2.baidu.com/feed/d0c8a786c9177f3e968abff920a73ecd9e3d567e.jpeg?token=a570314ffc55c706e4713b297fdabeed" alt="img"></p>
-<p>对象头由Mark Word和Klass组成，在没有压缩指针的时候都占8个字节。</p>
-<ul>
-<li><p>Mark Word：标记字段-运行时数据，如哈希码、GC信息以及锁信息。</p>
-<ul>
-<li><code>mark word</code>的位长度为JVM的一个Word大小，也就是说32位JVM的<code>Mark word</code>为32位，64位JVM为64位。   </li>
-</ul>
-</li>
-<li><p>Klass：对象锁代表的类的元数据指针。(32 bits) </p>
-</li>
-</ul>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220327115958164.png" alt="image-20220327115958164"></p>
-<p>锁标志位+是否是偏向锁（biased_lock）共同表示对象的几种状态</p>
-<p><img src="https://pics7.baidu.com/feed/4bed2e738bd4b31c107584cad6be22759f2ff8ec.jpeg?token=a91c9763fdb54859f443d07d4f105a8d" alt="img"></p>
-<h1 id="monitor"><a href="#monitor" class="headerlink" title="monitor"></a>monitor</h1><p>synchronized通过Monitor来实现线程同步和协作。</p>
-<ul>
-<li>同步依赖的是操作系统的Mutex（互斥锁量）只有拥有互斥量的线程才能进入临界区，不拥有的只能阻塞等待，会维护一个阻塞的队列。</li>
-</ul>
-<p><img src="https://pics1.baidu.com/feed/574e9258d109b3de207742529ed7698b810a4cb6.jpeg?token=6a0b50854d5ac5cb3751d6c976324a0e" alt="img"></p>
-<ul>
-<li>协作依赖的是synchronized持有的对象，对象可以让多个线程方便同步，还可以通过对象调用wait方法释放锁让线程进入等待队列，等其他线程调用对象的notify和notifyAll方法进行唤醒可以重新获取锁。</li>
-</ul>
-<p><img src="https://pics6.baidu.com/feed/8601a18b87d6277fedfb40a87f501a3ae824fc23.jpeg?token=9c5602cb9d020cf8db32c1a8502f4935" alt="img"></p>
-<p>Monitor用来进行监听锁的持有和调度锁的持有的。持有的对象可以理解为锁的一个媒介，可以使用它方便操作同步和协作。</p>
-<p>具体例子可以参考《Thread源码阅读及相关问题》中的例子。</p>
-<p>monitor这套监听锁和调度锁包括使用的互斥量其实都是比较消耗资源的，所以使用它的成为“重量级锁”。JDK 6中为了减少获得锁和释放锁带来的性能消耗，引入了“偏向锁”和“轻量级锁”，下面我们分别会进行分配介绍。</p>
-<h1 id="无锁"><a href="#无锁" class="headerlink" title="无锁"></a>无锁</h1><p>当对象头中锁标志位为01，是否偏向锁为0时表示使无锁的状态。想要在无锁的时候实现同步可以使用上面乐观锁中实现-CAS。</p>
-<h1 id="偏向锁"><a href="#偏向锁" class="headerlink" title="偏向锁"></a>偏向锁</h1><p>偏向锁是一个锁优化的产物，在对象头中进行标记，表示有线程进入了临界区，在只有一个线程访问的时候既不用使用CAS也不用引入较重的monitor。</p>
-<p>线程不会主动释放偏向锁，只有遇到其他线程进尝试竞争偏向锁时，需要等待全局安全点（在这个时间点上没有执行的字节码），它会首先暂停拥有偏向锁的的线程，判断它是否还活着，如果死亡了就恢复到无锁状态其他线程就可以占用，如果还在临界区就对锁进行升级成”轻量锁”。</p>
-<p><img src="https://pics5.baidu.com/feed/024f78f0f736afc3949dbe99e171eeceb645122f.jpeg?token=b9d61ce680a1c9d0babb6d04948013d0" alt="img"></p>
-<p>每个线程进入临界区的时候都会查看对象头锁标识是否是偏向锁，是偏向锁的话，会判断当前线程和对象头中的线程id是同一个线程则直接进入，如果不是则进行CAS看是不是能比较替换成功（防止马上就释放了），如果没成功就会暂停持有偏向锁的线程，看线程是否已经不再用锁了，如果没用就释放，给新进来的线程占用，如果在用就进行锁升级生成轻量锁”。</p>
-<p>可以通过JVM参数关闭偏向锁：-XX:-UseBiasedLocking=false，那么程序会默认进入轻量级锁状态。 <strong>笔者思考</strong></p>
-<p>可以发现在只有一个线程进入临界区的时候确实能避免使用互斥量带来的开销，但是可以发现线程不会主动释放偏向锁。为啥不当有偏向锁的时候离开临界区进行释放？还要等其他线程来的时候要等全局点的时候尝试对线程暂停之后再看该线程持有锁的状态？这些疑问我们考虑不全，可能是设计的问题，也可能是因为一些其他原因，我们对JVM源码不够熟悉的情况下会比较费解。或许后面迭代会进行优化。</p>
-<p><strong>所以我们只需要明白一点：偏量锁是一种锁的优化，它本质上不是锁，只是对象头中进行了标记，如果没有多线程并发访问临界区的时候可以减少开销，如果出现多并发的时候会进行升级。</strong></p>
-<h1 id="轻量级锁"><a href="#轻量级锁" class="headerlink" title="轻量级锁"></a>轻量级锁</h1><p>轻量锁发生在偏向锁升级或者-XX:-UseBiasedLocking=false的时候，线程在执行同步块之前，JVM会现在当前线程的栈帧中创建用于存储锁记录的空间，并将对象头中的Mark Word复制到锁记录中，官方称为Displaces Mark Word。然后线程尝试使用CAS将对头像中的Mark Word替换为之指向锁记录的指针。如果成功，当前线程获得锁，如果失败将通过自旋来进行同步。</p>
-<h1 id="重量级锁"><a href="#重量级锁" class="headerlink" title="重量级锁"></a>重量级锁</h1><p>重量锁的锁标志位为10，就是上面介绍的monitor机制，开销最大。</p>
-<p><img src="https://pics4.baidu.com/feed/32fa828ba61ea8d3bb69558dc4623544241f5865.jpeg?token=e752aa233669c05413dee5f9175f8174" alt="img"></p>
-<h1 id="synchronized锁升级？"><a href="#synchronized锁升级？" class="headerlink" title="synchronized锁升级？"></a>synchronized锁升级？</h1><p>如上面的synchronized的底层实现章节。</p>
-<h1 id="synchronized可重入是怎么实现的？"><a href="#synchronized可重入是怎么实现的？" class="headerlink" title="synchronized可重入是怎么实现的？"></a>synchronized可重入是怎么实现的？</h1><p>我们先用代码证明下：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SynchronizedReentrantTest</span> <span class="keyword">extends</span> <span class="title">Father</span> </span>&#123;    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">doSomeThing1</span><span class="params">()</span> </span>&#123;        System.out.println(<span class="string">&quot;doSomeThing1&quot;</span>);        doSomeThing2();    &#125;    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">doSomeThing2</span><span class="params">()</span> </span>&#123;        System.out.println(<span class="string">&quot;doSomeThing2&quot;</span>);        <span class="keyword">super</span>.fatherDoSomeThing();    &#125;    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;        SynchronizedReentrantTest synchronizedReentrantTest = <span class="keyword">new</span> SynchronizedReentrantTest();        synchronizedReentrantTest.doSomeThing1();    &#125;&#125;<span class="class"><span class="keyword">class</span> <span class="title">Father</span> </span>&#123;    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">fatherDoSomeThing</span><span class="params">()</span> </span>&#123;        System.out.println(<span class="string">&quot;fatherDoSomeThing&quot;</span>);    &#125;&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-<p>输出：</p>
-<figure class="highlight gcode"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">doSomeThi<span class="symbol">ng1</span>doSomeThi<span class="symbol">ng2</span>fatherDoSomeThi<span class="symbol">ng</span></span><br></pre></td></tr></table></figure>
-
-
-
-
-
-<p>说明synchronized是可重入的。</p>
-<p>重量级锁使用的是monitor对象中的计数字段来实现的，偏向锁应该没有只有表示当前被那个线程持有，轻量锁在每次进入的时候都会添加一个Lock Record来表示锁的重入次数。</p>
-<p><strong>笔者思考</strong></p>
-<p>为啥偏向锁不记录重入次数，重入的时候只需要看是否是当前线程，对象头中没有地方存放次数，所以偏向锁不会主动释放（应该是判断嵌套临界区比较麻烦），需要另外一个线程来判断当前线程是否活跃死亡了才释放还会尝试暂停持有的线程。这点其实不如轻量级锁和重量级锁。</p>
-<h1 id="synchronized是公平锁还是非公平锁？"><a href="#synchronized是公平锁还是非公平锁？" class="headerlink" title="synchronized是公平锁还是非公平锁？"></a>synchronized是公平锁还是非公平锁？</h1><p>非公平的，直接下面打饭的例子：</p>
-<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> lombok.SneakyThrows;<span class="built_in">public</span> <span class="keyword">class</span> SyncUnFairLockTest &#123;    //食堂    private static <span class="keyword">class</span> DiningRoom &#123;        //获取食物        @SneakyThrows        <span class="built_in">public</span> <span class="type">void</span> getFood() &#123;            <span class="keyword">System</span>.<span class="keyword">out</span>.println(Thread.currentThread().getName() + &quot;:排队中&quot;);            synchronized (this) &#123;                <span class="keyword">System</span>.<span class="keyword">out</span>.println(Thread.currentThread().getName() + &quot;:@@@@@@打饭中@@@@@@@&quot;);                Thread.sleep(<span class="number">200</span>);            &#125;        &#125;    &#125;    <span class="built_in">public</span> static <span class="type">void</span> main(String[] args) &#123;        DiningRoom diningRoom = <span class="built_in">new</span> DiningRoom();        //让<span class="number">5</span>个同学去打饭        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;            <span class="built_in">new</span> Thread(() -&gt; &#123;                diningRoom.getFood();            &#125;, &quot;同学编号:00&quot; + (i + <span class="number">1</span>)).<span class="keyword">start</span>();        &#125;    &#125;&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-<p>输出：</p>
-<figure class="highlight mel"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">同学编号:<span class="number">001</span>:排队中同学编号:<span class="number">001</span>:@@@@@@打饭中@@@@@@@同学编号:<span class="number">005</span>:排队中同学编号:<span class="number">003</span>:排队中同学编号:<span class="number">004</span>:排队中同学编号:<span class="number">002</span>:排队中同学编号:<span class="number">002</span>:@@@@@@打饭中@@@@@@@同学编号:<span class="number">004</span>:@@@@@@打饭中@@@@@@@同学编号:<span class="number">003</span>:@@@@@@打饭中@@@@@@@同学编号:<span class="number">005</span>:@@@@@@打饭中@@@@@@@</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-<p>注意到这里我加了sleep，因为对于公平锁来说无所谓，先来的肯定先执行，但是非公平锁时后面来的线程会先进行尝试获得锁，获取不到再进入队列，这样就能避免同一进入队列再被CPU唤醒，能提高效率，但是非公平锁会出现饿死的情况。</p>
-<h1 id="synchronized和volatile对比有什么区别？"><a href="#synchronized和volatile对比有什么区别？" class="headerlink" title="synchronized和volatile对比有什么区别？"></a>synchronized和volatile对比有什么区别？</h1><p>都能保证可见效，synchronized因为是锁所以能保证原子性。</p>
-<p>可见效主要指的是线程共享时工作内存和主内存能否及时同步。</p>
-<p><img src="https://pics1.baidu.com/feed/4d086e061d950a7b16bac8cf5fb967d3f3d3c9a4.jpeg?token=2e23c7e19378ed5bd70778eb0c6f866f" alt="img"></p>
-<p>JMM关于synchronized的两个规定：</p>
-<ul>
-<li>线程解锁前，必须把共享变量的最新值刷新到主内存中。</li>
-<li>线程加锁时，将清空工作内存中共享变量的值，从而使变量共享时，需要从主内存中重新读取最新的值。</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/26/spring/%E6%B3%A8%E8%A7%A3/schdule/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/26/spring/%E6%B3%A8%E8%A7%A3/schdule/" class="post-title-link" itemprop="url">schedule注解</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-26 12:59:12" itemprop="dateCreated datePublished" datetime="2022-03-26T12:59:12+08:00">2022-03-26</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-05-05 11:59:13" itemprop="dateModified" datetime="2022-05-05T11:59:13+08:00">2022-05-05</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/26/spring/%E6%B3%A8%E8%A7%A3/schdule/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/26/spring/%E6%B3%A8%E8%A7%A3/schdule/" class="cy_cmt_count" data-xid="2022/03/26/spring/注解/schdule/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>741</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <table>
-<thead>
-<tr>
-<th>注解</th>
-<th>作用</th>
-<th></th>
-</tr>
-</thead>
-<tbody><tr>
-<td>@EnableScheduling</td>
-<td>开启定时任务功能</td>
-<td>configuration</td>
-</tr>
-<tr>
-<td>@Scheduled(cron=”0/10 * * * * ? “)</td>
-<td>指定cron表达式</td>
-<td>method</td>
-</tr>
-<tr>
-<td>@Schedules</td>
-<td>指定多个周期</td>
-<td>method</td>
-</tr>
-<tr>
-<td>@EnableAsync</td>
-<td>开启异步支持</td>
-<td>Configuration</td>
-</tr>
-<tr>
-<td>@Async</td>
-<td>异步任务，spring自带的线程池(可以修改)调用该方法</td>
-<td>Method</td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-<tr>
-<td></td>
-<td></td>
-<td></td>
-</tr>
-</tbody></table>
-<h4 id="Scheduled"><a href="#Scheduled" class="headerlink" title="@Scheduled"></a>@Scheduled</h4><ol>
-<li>@Scheduled(fixedRate=2000)  // 每隔执行时间+2秒执行一次 </li>
-<li>@Scheduled(fixDelay=2000) //每隔2秒一次</li>
-<li>@Scheduled(cron=”0/10 * * * * ? “)  // 每隔10秒执行一次 </li>
-<li>@Scheduled(cron=”0 33/3 * * * ?”) //每小时的33分钟开始执行，每3分钟执行1次 </li>
-</ol>
-<h4 id="异步、-Async失效"><a href="#异步、-Async失效" class="headerlink" title="异步、@Async失效"></a>异步、@Async失效</h4><ol>
-<li>异步方法使用static修饰</li>
-<li>异步类没有使用@Component注解（或其他注解）导致spring无法扫描到异步类</li>
-<li>异步方法不能与异步方法在同一个类中</li>
-<li>类中需要使用@Autowired或@Resource等注解自动注入，不能自己手动new对象</li>
-<li>如果使用SpringBoot框架必须在启动类中增加@EnableAsync注解</li>
-<li>在Async 方法上标注@Transactional是没用的。 在Async 方法调用的方法上标注@Transactional 有效。</li>
-<li>调用被@Async标记的方法的调用者不能和被调用的方法在同一类中不然不会起作用！！！！！！！</li>
-<li>使用@Async时要求是不能有返回值的不然会报错的 因为异步要求是不关心结果的</li>
-</ol>
-<h3 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h3><ul>
-<li>使用简单。</li>
-<li>支持cron表达式，支持固定频率执行。</li>
-<li>代码侵入性低。</li>
-</ul>
-<h3 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h3><ul>
-<li>无法解决分布式调度问题。</li>
-<li>无法监控任务状态。</li>
-<li>无其他骚功能。如失败提醒，重试等等。</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/9/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><span class="page-number current">10</span><a class="page-number" href="/page/11/">11</a><span class="space">&hellip;</span><a class="page-number" href="/page/26/">26</a><a class="extend next" rel="next" href="/page/11/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/9/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><span class="page-number current">10</span><a class="page-number" href="/page/11/">11</a><span class="space">&hellip;</span><a class="page-number" href="/page/27/">27</a><a class="extend next" rel="next" href="/page/11/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1222,14 +1131,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">128</span>
+          <span class="site-state-item-count">131</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-count">29</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>
@@ -1270,12 +1179,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">382k</span>
+    <span title="站点总字数">391k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">5:47</span>
+    <span title="站点阅读时长">5:55</span>
 </div>
 
         

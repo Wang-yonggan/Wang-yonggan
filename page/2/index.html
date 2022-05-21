@@ -185,6 +185,454 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/05/15/%E6%9E%B6%E6%9E%84/%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/05/15/%E6%9E%B6%E6%9E%84/%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83/" class="post-title-link" itemprop="url">微服务配置中心</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-05-15 01:38:06" itemprop="dateCreated datePublished" datetime="2022-05-15T01:38:06+08:00">2022-05-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-05-15 11:04:35" itemprop="dateModified" datetime="2022-05-15T11:04:35+08:00">2022-05-15</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" itemprop="url" rel="index"><span itemprop="name">微服务</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/05/15/%E6%9E%B6%E6%9E%84/%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/05/15/%E6%9E%B6%E6%9E%84/%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83/" class="cy_cmt_count" data-xid="2022/05/15/架构/配置中心/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>896</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="一、概述"><a href="#一、概述" class="headerlink" title="一、概述"></a>一、概述</h2><h3 id="1-1-概念"><a href="#1-1-概念" class="headerlink" title="1.1 概念"></a>1.1 概念</h3><p>对于传统的单体应用而言，常使用配置文件来管理所有配置，比如SpringBoot的application.yml文件，但是在微服务架构中全部手动修改的话很麻烦而且不易维护。微服务的配置管理一般有以下需求：</p>
+<ul>
+<li><strong>集中</strong>配置管理，一个微服务架构中可能有成百上千个微服务，所以集中配置管理是很重要的。</li>
+<li><strong>不同环境</strong>不同配置，比如数据源配置在不同环境（开发，生产，测试）中是不同的。</li>
+<li><strong>运行期</strong>间可动态调整。例如，可根据各个微服务的负载情况，动态调整数据源连接池大小等</li>
+<li><strong>自动更新</strong>。如配置内容发生变化，微服务可以自动更新配置</li>
+</ul>
+<h3 id="1-2-常见的配置中心"><a href="#1-2-常见的配置中心" class="headerlink" title="1.2 常见的配置中心"></a>1.2 常见的配置中心</h3><ol>
+<li>Spring Cloud Config为分布式系统中的外部配置提供服务器和客户端支持。</li>
+<li>Apollo（阿波罗）是携程框架部门研发的分布式配置中心，能够集中化管理应用不同环境、不同集群的<br>配置，配置修改后能够实时推送到应用端，并且具备规范的权限、流程治理等特性，适用于微服务配置<br>管理场景</li>
+</ol>
+<h2 id="二、Spring-Cloud-Config"><a href="#二、Spring-Cloud-Config" class="headerlink" title="二、Spring Cloud Config"></a>二、Spring Cloud Config</h2><p>​    包含了Client和Server两个部分，server提供配置文件的存储、以接口的形式将配置文件的内容提供出去，client通过接口获取数据、并依据此数据初始化自己的应用。</p>
+<ul>
+<li>服务端特性：HTTP，为外部配置提供基于资源的API（键值对，或者等价的YAML内容）属性值的加密和解密（对称加密和非对称加密）通过使用@EnableConfigServer在Spring boot应用中非常简单的嵌入。</li>
+<li>客户端特性（特指Spring应用）绑定Config服务端，并使用远程的属性源初始化Spring环境。属性值的加密和解密（对称加密和非对称加密）</li>
+</ul>
+<h3 id="动态刷新"><a href="#动态刷新" class="headerlink" title="动态刷新"></a>动态刷新</h3><blockquote>
+<p>基于消息队列</p>
+</blockquote>
+<h3 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h3><h4 id="服务端"><a href="#服务端" class="headerlink" title="服务端"></a>服务端</h4><h4 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h4><h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><ol>
+<li>访问<a target="_blank" rel="noopener" href="http://localhost:10000/ep-file/default%E6%88%96%E8%80%85http://localhost:10000/ep-file-default.yml">http://localhost:10000/ep-file/default或者http://localhost:10000/ep-file-default.yml</a> 就可以看到<code>ep-file-default.yml</code>这个文件</li>
+<li>这正好对应client  bootstrap的name和profile</li>
+<li>没有eureka也可以配置注册中心，这两个没关系，eureka只是可以让配置中心高可用</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/05/14/%E6%9E%B6%E6%9E%84/springCloud%E7%B1%BB%E3%80%81%E6%B3%A8%E8%A7%A3%E4%B8%8E%E9%85%8D%E7%BD%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/05/14/%E6%9E%B6%E6%9E%84/springCloud%E7%B1%BB%E3%80%81%E6%B3%A8%E8%A7%A3%E4%B8%8E%E9%85%8D%E7%BD%AE/" class="post-title-link" itemprop="url">微服务各种配置</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-05-14 23:32:16" itemprop="dateCreated datePublished" datetime="2022-05-14T23:32:16+08:00">2022-05-14</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-05-17 22:22:22" itemprop="dateModified" datetime="2022-05-17T22:22:22+08:00">2022-05-17</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" itemprop="url" rel="index"><span itemprop="name">微服务</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/05/14/%E6%9E%B6%E6%9E%84/springCloud%E7%B1%BB%E3%80%81%E6%B3%A8%E8%A7%A3%E4%B8%8E%E9%85%8D%E7%BD%AE/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/05/14/%E6%9E%B6%E6%9E%84/springCloud%E7%B1%BB%E3%80%81%E6%B3%A8%E8%A7%A3%E4%B8%8E%E9%85%8D%E7%BD%AE/" class="cy_cmt_count" data-xid="2022/05/14/架构/springCloud类、注解与配置/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="eureka"><a href="#eureka" class="headerlink" title="eureka"></a>eureka</h3><p>@EnableEurekaServer: 注册中心的注解</p>
+<p>@EnableEurekaClient：服务客户端的注解，但用于eureka,现在不需要写了</p>
+<p>@EnableDiscoveryClient：@enableEurekaClient类似，用于开启各种注册中心</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#服务端</span></span><br><span class="line"><span class="attr">eureka:</span></span><br><span class="line">  <span class="attr">client:</span></span><br><span class="line">    <span class="attr">register-with-eureka:</span> <span class="literal">false</span> <span class="comment">#是否将自己注册到注册中心</span></span><br><span class="line">    <span class="attr">fetch-registry:</span> <span class="literal">false</span> <span class="comment">#是否从eureka中获取注册信息</span></span><br><span class="line">    <span class="attr">service-url:</span> <span class="comment">#配置暴露给Eureka Client的请求地址</span></span><br><span class="line">      <span class="attr">defaultZone:</span> <span class="string">http://127.0.0.1:7000/eureka/</span></span><br><span class="line">  <span class="attr">server:</span></span><br><span class="line">    <span class="attr">enable-self-preservation:</span> <span class="literal">false</span> <span class="comment">#关闭自我保护</span></span><br><span class="line">    <span class="attr">eviction-interval-timer-in-ms:</span> <span class="number">4000</span> <span class="comment">#剔除服务间隔</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#客户端</span></span><br><span class="line"><span class="attr">eureka:</span></span><br><span class="line">  <span class="attr">client:</span></span><br><span class="line">    <span class="attr">serviceUrl:</span></span><br><span class="line">      <span class="attr">defaultZone:</span> <span class="string">http://127.0.0.1:7000/eureka/</span></span><br><span class="line">  <span class="attr">instance:</span></span><br><span class="line">    <span class="attr">preferIpAddress:</span> <span class="literal">true</span></span><br><span class="line">    <span class="attr">instance-id:</span> <span class="string">$&#123;spring.cloud.client.ip-address&#125;:$&#123;server.port&#125;</span> <span class="comment">#spring.cloud.client.ip-address:获取ip地址</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="feign"><a href="#feign" class="headerlink" title="feign"></a>feign</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//开启fegin</span></span><br><span class="line"><span class="meta">@EnableFeignClients</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 用在远程调用<span class="class"><span class="keyword">interface</span>之上，指定<span class="title">id</span>和<span class="title">fallback</span>类</span></span><br><span class="line"><span class="class">@<span class="title">FeignClient</span>(<span class="title">name</span> </span>= <span class="string">&quot;ep-mail&quot;</span>, fallback = MailFeignBack.class)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">feign:</span></span><br><span class="line">  <span class="attr">hystrix:</span></span><br><span class="line">    <span class="attr">enabled:</span> <span class="literal">true</span>  <span class="comment">#开启熔断</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="ribbon"><a href="#ribbon" class="headerlink" title="ribbon"></a>ribbon</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//用在 restTemplate的bean之上，feign已经默认开启@LoadBalanced，不需要配置</span></span><br><span class="line"><span class="meta">@LoadBalanced</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="zuul"><a href="#zuul" class="headerlink" title="zuul"></a>zuul</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//开启服务,Main.class</span></span><br><span class="line"><span class="meta">@EnableZuulProxy</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//zuul过滤器接口，filterType方法返回四种类型</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestFilter</span> <span class="keyword">extends</span> <span class="title">ZuulFilter</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">zuul:</span></span><br><span class="line">  <span class="attr">routes:</span> <span class="comment">#基于map</span></span><br><span class="line">    <span class="attr">abc:</span></span><br><span class="line">      <span class="attr">path:</span> <span class="string">/ep-mail/**</span></span><br><span class="line">      <span class="attr">serviceId:</span> <span class="string">ep-mail</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="gateway"><a href="#gateway" class="headerlink" title="gateway"></a>gateway</h3><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">application:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">ep-gateway</span> <span class="comment">#指定服务名</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">gateway:</span></span><br><span class="line">      <span class="attr">routes:</span> <span class="comment">#基于l</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">id:</span> <span class="string">abc</span></span><br><span class="line">        <span class="attr">uri:</span> <span class="string">http://127.0.0.1:7001</span></span><br><span class="line">        <span class="attr">predicates:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">Path=/ep-email/**</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="config"><a href="#config" class="headerlink" title="config"></a>config</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@EnableConfigServer</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">application:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">ep-config</span> <span class="comment">#指定服务名</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">config:</span></span><br><span class="line">      <span class="attr">server:</span></span><br><span class="line">        <span class="attr">git:</span></span><br><span class="line">          <span class="attr">uri:</span> <span class="string">https://gitee.com/wang_yonggan/config.git</span> <span class="comment">#指定git路径</span></span><br><span class="line">          <span class="attr">username:</span> <span class="string">root</span></span><br><span class="line">          <span class="attr">password:</span> <span class="string">root</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/05/14/%E6%9E%B6%E6%9E%84/%E7%BD%91%E5%85%B3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/05/14/%E6%9E%B6%E6%9E%84/%E7%BD%91%E5%85%B3/" class="post-title-link" itemprop="url">网关</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-05-14 22:31:49" itemprop="dateCreated datePublished" datetime="2022-05-14T22:31:49+08:00">2022-05-14</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-05-20 19:15:29" itemprop="dateModified" datetime="2022-05-20T19:15:29+08:00">2022-05-20</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" itemprop="url" rel="index"><span itemprop="name">微服务</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/05/14/%E6%9E%B6%E6%9E%84/%E7%BD%91%E5%85%B3/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/05/14/%E6%9E%B6%E6%9E%84/%E7%BD%91%E5%85%B3/" class="cy_cmt_count" data-xid="2022/05/14/架构/网关/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>4.3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>[toc]</p>
+<h2 id="一、zuul"><a href="#一、zuul" class="headerlink" title="一、zuul"></a>一、zuul</h2><h3 id="1-1-概述"><a href="#1-1-概述" class="headerlink" title="1.1 概述"></a>1.1 概述</h3><p>​    API网关是一个服务器，是系统对外的唯一入口。API网关封装了系统内部架构，为每个客户端提供一个定制的API。API网关方式的核心要点是，所有的客户端和消费端都通过统一的网关接入微服务，在网关层处理所有的非业务功能。通常，网关也是提供REST/HTTP的访问API。服务端通过API-GW注册和管理服务。</p>
+<blockquote>
+<p>ZUUL是Netflix开源的微服务网关，本质是一系列的servlet+filter </p>
+</blockquote>
+<h4 id="1-1-2-zuul的缺点"><a href="#1-1-2-zuul的缺点" class="headerlink" title="1.1.2 zuul的缺点"></a>1.1.2 zuul的缺点</h4><ol>
+<li>性能问题<br>Zuul1x基于阻塞 IO ，本质上就是一个同步Servlet。每来一个请求，Servlet容器要为该请求分配一个线程专门负责处理这个请求，直到响应返回客户端这个线程才会被释放返回容器线程池。如果后台服务调用比较耗时，那么这个线程就会被阻塞，阻塞期间线程资源被占用，不能干其它事情。我们知道Servlet容器线程池的大小是有限制的，当前端请求量大，而后台慢服务比较多时，很容易耗尽容器线程池内的线程，造成容器无法接受新的请求。</li>
+<li>不支持任何长连接，如websocket</li>
+</ol>
+<p>​    直到 2018 年 5 月，Zuul 2.x（基于Netty，也是非阻塞的，支持长连接）才发布，但 Spring Cloud 暂时还没有整合计划。Spring Cloud</p>
+<p>​    Gateway 比 Zuul 1.x 系列的性能和功能整体要好</p>
+<h3 id="1-2-过滤器方法"><a href="#1-2-过滤器方法" class="headerlink" title="1.2 过滤器方法"></a>1.2 过滤器方法</h3><ol>
+<li>shouldFilter ：返回一个 Boolean 值，判断该过滤器是否需要执行。返回true执行，返回false不执行。</li>
+<li>run ：过滤器的具体业务逻辑。</li>
+<li>filterType ：返回字符串，代表过滤器的类型：就是那四种。</li>
+<li>filterOrder ：通过返回的int值来定义过滤器的执行顺序，数字越小优先级越高。</li>
+</ol>
+<h3 id="1-3-过滤器类型与生命周期"><a href="#1-3-过滤器类型与生命周期" class="headerlink" title="1.3 过滤器类型与生命周期"></a>1.3 过滤器类型与生命周期</h3><blockquote>
+<p>zuul 提供了4种过滤器，对应不同的场景</p>
+</blockquote>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220515005940111.png" alt="image-20220515005940111"></p>
+<h4 id="1-3-1-PRE"><a href="#1-3-1-PRE" class="headerlink" title="1.3.1 PRE"></a>1.3.1 PRE</h4><p>​    在<strong>请求被路由之前调用</strong>，我们可利用这种过滤器实现<strong>身份验证</strong>、在集群中选择请求的微服务、记录调试信息等。</p>
+<h4 id="1-3-2-ROUTING"><a href="#1-3-2-ROUTING" class="headerlink" title="1.3.2 ROUTING"></a>1.3.2 ROUTING</h4><p>​    服务过滤器，用于构建发送给微服务的请求，并使用Apache HttpClient或Netfilx Ribbon<strong>请求微服务</strong>。</p>
+<h4 id="1-3-3-POST"><a href="#1-3-3-POST" class="headerlink" title="1.3.3 POST"></a>1.3.3 POST</h4><p>​    在<strong>路由到微服务以后</strong>执行，可用来为<strong>响应</strong>添加标准的HTTP Header、收集统计信息和指标、将响应从微服务发送给客户端等。</p>
+<h4 id="1-3-4-ERROR"><a href="#1-3-4-ERROR" class="headerlink" title="1.3.4 ERROR"></a>1.3.4 ERROR</h4><p>​    在其他阶段发生<strong>错误时</strong>执行该过滤器</p>
+<h3 id="1-4-过滤器功能"><a href="#1-4-过滤器功能" class="headerlink" title="1.4 过滤器功能"></a>1.4 过滤器功能</h3><ol>
+<li>动态路由：动态将请求路由到不同后端集群</li>
+<li>压力测试：逐渐增加指向集群的流量，以了解性能</li>
+<li>负载分配：为每一种负载类型分配对应容量，并弃用超出限定值的请求</li>
+<li>静态响应处理：边缘位置进行响应，避免转发到内部集群</li>
+<li>身份认证和安全: 识别每一个资源的验证要求，并拒绝那些不符的请求。Spring Cloud对Zuul进行了整合和增强。Spring Cloud对Zuul进行了整合和增强</li>
+</ol>
+<h3 id="1-5-使用"><a href="#1-5-使用" class="headerlink" title="1.5 使用"></a>1.5 使用</h3><h4 id="请求转发"><a href="#请求转发" class="headerlink" title="请求转发"></a>请求转发</h4><blockquote>
+<p>基于alias（虚拟uri），请求 <a target="_blank" rel="noopener" href="http://localhost:8080/e-mail/test">http://localhost:8080/e-mail/test</a> 实际请求的是<a target="_blank" rel="noopener" href="http://localhost:7001/test">http://localhost:7001/test</a></p>
+</blockquote>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">zuul:</span></span><br><span class="line">  <span class="attr">routes:</span></span><br><span class="line">	<span class="comment"># 硬编码配置，url固定</span></span><br><span class="line">	<span class="attr">mail-service:</span></span><br><span class="line">      <span class="attr">path:</span> <span class="string">/e-mail/**</span></span><br><span class="line">      <span class="attr">url:</span> <span class="string">http://localhost:7001</span></span><br><span class="line">     <span class="comment"># 缺省路由配置，基于eureka+service_id获得url</span></span><br><span class="line">     <span class="attr">mail-sevice:</span></span><br><span class="line">        <span class="attr">path:</span> <span class="string">/e-mail/**</span></span><br><span class="line">        <span class="attr">serviceId:</span> <span class="string">ep-mail</span></span><br><span class="line">     <span class="comment"># 简化配置 ,现在报错，区别就是 之前访问的是e-mail/test  现在访问的是ep-mail/test</span></span><br><span class="line">	<span class="attr">mail-service:</span></span><br><span class="line">		<span class="attr">abc:</span> <span class="string">/ep-mail/**</span> </span><br></pre></td></tr></table></figure>
+
+<h4 id="过滤"><a href="#过滤" class="headerlink" title="过滤"></a>过滤</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestFilter</span> <span class="keyword">extends</span> <span class="title">ZuulFilter</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">shouldFilter</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">run</span><span class="params">()</span> <span class="keyword">throws</span> ZuulException </span>&#123;</span><br><span class="line">        RequestContext ctx = RequestContext.getCurrentContext();</span><br><span class="line">        System.out.println(ctx.getRequest().getRequestURI());</span><br><span class="line">        System.out.println(<span class="string">&quot;过滤&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">filterType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;pre&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">filterOrder</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="二、GateWay"><a href="#二、GateWay" class="headerlink" title="二、GateWay"></a>二、GateWay</h2><h3 id="2-1-概述"><a href="#2-1-概述" class="headerlink" title="2.1 概述"></a>2.1 概述</h3><h4 id="2-1-1-介绍"><a href="#2-1-1-介绍" class="headerlink" title="2.1.1 介绍"></a>2.1.1 介绍</h4><p>​    Spring Cloud Gateway 是 Spring 官方基于 Spring 5.0，Spring Boot 2.0 和 Project Reactor 等技术开发的网关，旨在为微服务架构提供一种简单而有效的统一的 API 路由管理方式，统一访问接口。SpringCloud Gateway 作为 Spring Cloud 生态系中的网关，目标是替代 Netflix ZUUL，其不仅提供统一的路由方式，并且基于 Filter 链的方式提供了网关基本的功能，例如：安全，监控/埋点，和限流等。它是基于Nttey的响应式开发模式。</p>
+<h4 id="2-1-2-注意"><a href="#2-1-2-注意" class="headerlink" title="2.1.2 注意"></a>2.1.2 <strong>注意</strong></h4><ol>
+<li><p>SpringCloud Gateway使用的web框架为webflux，和SpringMVC不兼容。所以一般gateway的父工程没有web-starter依赖，引入的限流组件是hystrix。redis底层不再使用jedis，而是lettuce</p>
+</li>
+<li><p>gateway的路由和Zuul有点不一样，</p>
+<ol>
+<li>基于<strong>list</strong>，而非Map</li>
+<li>基于<strong>root</strong> (真实url)，zuul基于alila</li>
+</ol>
+</li>
+</ol>
+<h3 id="2-2-核心概念"><a href="#2-2-核心概念" class="headerlink" title="2.2 核心概念"></a>2.2 核心概念</h3><blockquote>
+<p>GateWay提出了路由、断言和过滤器的概念，这些内容可以直接在<strong>yml配置文件中使用</strong></p>
+</blockquote>
+<h4 id="2-2-1-路由"><a href="#2-2-1-路由" class="headerlink" title="2.2.1 路由"></a>2.2.1 路由</h4><p>路由是网关最基础的部分，路由信息由一个ID、一个目的URL、一组断言工厂和一组Filter组成。如果断言为真，则说明请求URL和配置的路由匹配。</p>
+<h4 id="2-2-2-断言"><a href="#2-2-2-断言" class="headerlink" title="2.2.2 断言"></a>2.2.2 <strong>断言</strong></h4><p>Java8中的断言函数，Spring Cloud Gateway中的断言函数输入类型是Spring5.0框架中的ServerWebExchange。Spring Cloud Gateway中的断言函数<strong>允许开发者去定义匹配来自Http Request中的任何信息，比如请求头和参数等</strong>。</p>
+<h4 id="2-2-3-过滤器"><a href="#2-2-3-过滤器" class="headerlink" title="2.2.3 过滤器"></a>2.2.3 过滤器</h4><p> 一个标准的Spring webFilter，Spring Cloud Gateway中的Filter分为两种类型，分别是<strong>Gateway Filter</strong>和<strong>Global Filter</strong>。过滤器Filter可以对请求和响应进行处理。</p>
+<h3 id="2-3-过滤器"><a href="#2-3-过滤器" class="headerlink" title="2.3 过滤器"></a>2.3 过滤器</h3><blockquote>
+<p>相对于zuul，gateway提供两种过滤器 pre post，可以自己编写过滤器。</p>
+</blockquote>
+<blockquote>
+<p>作用范围上也可以分为</p>
+<ul>
+<li>GatewayFilter：应用到单个路由或者一个分组的路由上</li>
+<li>GlobalFilter：应用到所有的路由上</li>
+</ul>
+</blockquote>
+<h4 id="局部过滤器"><a href="#局部过滤器" class="headerlink" title="局部过滤器"></a>局部过滤器</h4><p>gateway提供了很多种类的过滤器</p>
+<p>作用：操作Requst，Responst，请求限流，重定向等</p>
+<h4 id="全局过滤器"><a href="#全局过滤器" class="headerlink" title="全局过滤器"></a>全局过滤器</h4><h4 id="自定义过滤器"><a href="#自定义过滤器" class="headerlink" title="自定义过滤器"></a>自定义过滤器</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//创建类</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestGatewayFilter</span> <span class="keyword">implements</span> <span class="title">GatewayFilter</span> , <span class="title">Ordered</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Mono&lt;Void&gt; <span class="title">filter</span><span class="params">(ServerWebExchange exchange, GatewayFilterChain chain)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;过滤&quot;</span>);</span><br><span class="line">        <span class="keyword">final</span> ServerHttpRequest request = exchange.getRequest();</span><br><span class="line">        <span class="keyword">if</span>(!request.getHeaders().get(<span class="string">&quot;token&quot;</span>).equals(<span class="string">&quot;abc&quot;</span>))</span><br><span class="line">            <span class="keyword">return</span> chain.filter(exchange);</span><br><span class="line">        <span class="keyword">return</span> exchange.getResponse().setComplete();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getOrder</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 注册</span></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FilterConfig</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> RouteLocator <span class="title">customerRouteLocator</span><span class="params">(RouteLocatorBuilder builder)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> builder.routes()</span><br><span class="line">                .route(</span><br><span class="line">                        r -&gt; r.path(<span class="string">&quot;/t/**&quot;</span>)</span><br><span class="line">                                .filters(f -&gt; f.filter(<span class="keyword">new</span> TestGatewayFilter()))</span><br><span class="line">                                .uri(<span class="string">&quot;http://localhots:7001&quot;</span>))</span><br><span class="line">                .build();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-4-其他功能"><a href="#2-4-其他功能" class="headerlink" title="2.4 其他功能"></a>2.4 其他功能</h3><h4 id="统一鉴权"><a href="#统一鉴权" class="headerlink" title="统一鉴权"></a>统一鉴权</h4><blockquote>
+<p>基于自定义过滤器设置统一鉴权</p>
+</blockquote>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220515130952178.png" alt="image-20220515130952178"></p>
+<h4 id="限流"><a href="#限流" class="headerlink" title="限流"></a>限流</h4><h3 id="2-5-使用"><a href="#2-5-使用" class="headerlink" title="2.5 使用"></a>2.5 使用</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-gateway<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">application:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">ep-gateway</span> <span class="comment">#指定服务名</span></span><br><span class="line">  <span class="attr">cloud:</span></span><br><span class="line">    <span class="attr">gateway:</span></span><br><span class="line">      <span class="attr">routes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">id:</span> <span class="string">abc</span></span><br><span class="line">        <span class="comment">#路由</span></span><br><span class="line">        <span class="attr">uri:</span> <span class="string">http://127.0.0.1:7001</span></span><br><span class="line">        <span class="comment">#动态路由 uri: lb://shop-service-product 前提是由注册中心</span></span><br><span class="line">       	<span class="comment">#断言</span></span><br><span class="line">        <span class="attr">predicates:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">Path=/t/**</span></span><br><span class="line">        <span class="comment">#过滤器,转发重写rewrite</span></span><br><span class="line">        <span class="attr">filters:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="string">RewritePath=/product-service/(?&lt;segment&gt;.*),/$\&#123;segment&#125;</span></span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/05/14/%E6%9E%B6%E6%9E%84/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -216,7 +664,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-05-18 22:00:53" itemprop="dateModified" datetime="2022-05-18T22:00:53+08:00">2022-05-18</time>
+                <time title="修改时间：2022-05-20 18:06:28" itemprop="dateModified" datetime="2022-05-20T18:06:28+08:00">2022-05-20</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -269,7 +717,8 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="一、微服务的概念"><a href="#一、微服务的概念" class="headerlink" title="一、微服务的概念"></a>一、微服务的概念</h2><h3 id="1-1-服务注册与发现"><a href="#1-1-服务注册与发现" class="headerlink" title="1.1 服务注册与发现"></a>1.1 服务注册与发现</h3><ul>
+          <p>[toc]</p>
+<h2 id="一、微服务的概念"><a href="#一、微服务的概念" class="headerlink" title="一、微服务的概念"></a>一、微服务的概念</h2><h3 id="1-1-服务注册与发现"><a href="#1-1-服务注册与发现" class="headerlink" title="1.1 服务注册与发现"></a>1.1 服务注册与发现</h3><ul>
 <li>服务注册：将自身服务信息注册到注册中心。{IP+Port，自身状态, 访问协议等信 }。</li>
 <li>服务发现:  服务实例通过注册中心，获取到注册到其中的服务实例的信息。</li>
 </ul>
@@ -625,817 +1074,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/05/07/408/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E5%86%85%E5%AD%98/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/05/07/408/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E5%86%85%E5%AD%98/" class="post-title-link" itemprop="url">内存</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-05-07 20:45:49" itemprop="dateCreated datePublished" datetime="2022-05-07T20:45:49+08:00">2022-05-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-05-16 22:33:33" itemprop="dateModified" datetime="2022-05-16T22:33:33+08:00">2022-05-16</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">操作系统</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/05/07/408/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E5%86%85%E5%AD%98/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/05/07/408/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E5%86%85%E5%AD%98/" class="cy_cmt_count" data-xid="2022/05/07/408/操作系统/内存/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.3k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="一、概念"><a href="#一、概念" class="headerlink" title="一、概念"></a>一、概念</h2><h3 id="1-1-虚拟内存"><a href="#1-1-虚拟内存" class="headerlink" title="1.1 虚拟内存"></a>1.1 虚拟内存</h3><blockquote>
-<p>虚拟网络的概念就是看着互联的网络其实并不直接<strong>物理互联</strong>，而是通过ip协议和路由器来<strong>逻辑互联</strong></p>
-<p>虚拟内存的概念类似。</p>
-<ol>
-<li>将<code>内存碎片</code>和部分<code>磁盘</code>逻辑组合，看着就像是连续的内存。也就是说实际的内存地址不是真正的物理内存地址，而可以通过映射来找到对应物理地址</li>
-<li>每个进程创建的时候都会被分配一个1G大小的虚拟内存，这个虚拟就是虚的意思。</li>
-<li></li>
-</ol>
-</blockquote>
-<h4 id="1-1-1-解决的问题"><a href="#1-1-1-解决的问题" class="headerlink" title="1.1.1 解决的问题"></a>1.1.1 解决的问题</h4><ol>
-<li>内存碎片问题：内存分段+内存分页+内存映射</li>
-<li>内存读写效率问题</li>
-<li>内存权限问题：界限寄存器</li>
-<li>内存空闲问题：内存读写也有二八定律，八成的内存都处于空闲，可以放进磁盘</li>
-</ol>
-<h4 id="1-1-2-内存管理"><a href="#1-1-2-内存管理" class="headerlink" title="1.1.2 内存管理"></a>1.1.2 内存管理</h4><blockquote>
-<p>物理地址 = 虚拟地址 + 基址（基址寄存器）</p>
-</blockquote>
-<ol>
-<li><p><strong>寻址</strong></p>
-<p>该功能由<strong>内存管理单元MMU</strong>完成，对用户透明。</p>
-</li>
-<li><p>权限</p>
-<p>该功能由<strong>界限寄存器</strong>完成，限制进程内存上限，一个进程最大内存为1G </p>
-</li>
-<li></li>
-</ol>
-<h3 id="1-2-内存分页"><a href="#1-2-内存分页" class="headerlink" title="1.2 内存分页"></a>1.2 内存分页</h3><p>虚拟地址=<strong>虚拟页号</strong> + <strong>页内偏移量</strong></p>
-<h4 id="1-2-1-页表"><a href="#1-2-1-页表" class="headerlink" title="1.2.1 页表"></a>1.2.1 页表</h4><blockquote>
-<p>20位页表项+12位页内地址=32位</p>
-</blockquote>
-<h5 id="1-2-1-1-大小计算"><a href="#1-2-1-1-大小计算" class="headerlink" title="1.2.1.1 大小计算"></a>1.2.1.1 大小计算</h5><ol>
-<li>页大小一般为4KB，4GB内存计算机需要记录1M个页</li>
-<li>页映射关系存储在<strong>页表</strong></li>
-<li>页表的每个映射关系叫<strong>页表项</strong></li>
-<li>页表项大小为4B，一个页表大小为1M*4B=4MB，</li>
-</ol>
-<h5 id="1-2-1-2-问题"><a href="#1-2-1-2-问题" class="headerlink" title="1.2.1.2 问题"></a>1.2.1.2 问题</h5><p>对进程而言</p>
-<ol>
-<li>每个进程都有自己的页表，所以100个进程就需要400MB的页表内存，造成了极大的浪费</li>
-<li>这也是切换进程效率低于线程的原因</li>
-</ol>
-<h4 id="1-2-2-多级页表"><a href="#1-2-2-多级页表" class="headerlink" title="1.2.2 多级页表"></a>1.2.2 多级页表</h4><blockquote>
-<p>10位页目录+10位页表项+12位页内地址=32位</p>
-</blockquote>
-<ol>
-<li>1K个页表目录，每个页表目录有1K个页表项，总共还是<strong>1M</strong>个页表项</li>
-<li>页目录大小：1K*4B=4KB，页表项大小还是4MB</li>
-<li>优势：只有当前进程使用到了对应的内存才创建该页目录的页表项，所以极限情况下只占4KB，也就是著有页表目录需要创建。</li>
-</ol>
-<h3 id="1-3-缺页"><a href="#1-3-缺页" class="headerlink" title="1.3 缺页"></a>1.3 缺页</h3><p>当数据存在虚拟内存存于磁盘的时候，就会发生缺页。有待商榷</p>
-<h2 id="二、linux"><a href="#二、linux" class="headerlink" title="二、linux"></a>二、linux</h2><h3 id="2-1-free"><a href="#2-1-free" class="headerlink" title="2.1 free"></a>2.1 free</h3><p>free -m</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">           total        used        free      shared  buff/cache   available</span><br><span class="line">Mem:           1723        1413          67           2         242         158</span><br><span class="line">Swap:             0           0           0</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>mem：表示物理内存统计</li>
-<li>buff/cache：表示物理内存的缓存统计</li>
-<li>swap：表示硬盘上交换分区的使用情况</li>
-</ul>
-<p>当Linux的物理内存快要被耗尽时，mem区  –&gt; swap 区，当物理内存被释放一部分时，swap 区—&gt; mem 区。</p>
-<p><strong>缓存（cached）</strong>是把读取过的数据保存起来，重新读取时若命中（找到需要的数据）就不要去读硬盘了，若没有命中就读硬盘。其中的数据会根据读取频率进行组织，把最频繁读取的内容放在最容易找到的位置，把不再读的内容不断往后排，直至从中删除。</p>
-<p><strong>缓冲（buffers）</strong>是根据磁盘的读写设计的，把分散的写操作集中进行，减少磁盘碎片和硬盘的反复寻道，从而提高系统性能。linux有一个守护进程定期清空缓冲内容（即写入磁盘），也可以通过sync命令手动清空缓冲。举个例子吧：我这里有一个ext2的U盘，我往里面cp一个3M的MP3，但U盘的灯没有跳动，过了一会儿（或者手动输入sync）U盘的灯就跳动起来了。卸载设备时会清空缓冲，所以有些时候卸载一个设备时要等上几秒钟。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/05/06/%E5%A4%A7%E6%95%B0%E6%8D%AE/%E5%A4%A7%E6%95%B0%E6%8D%AE%E5%AE%89%E8%A3%85/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/05/06/%E5%A4%A7%E6%95%B0%E6%8D%AE/%E5%A4%A7%E6%95%B0%E6%8D%AE%E5%AE%89%E8%A3%85/" class="post-title-link" itemprop="url">大数据安装</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-05-06 15:54:51" itemprop="dateCreated datePublished" datetime="2022-05-06T15:54:51+08:00">2022-05-06</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-05-13 12:33:18" itemprop="dateModified" datetime="2022-05-13T12:33:18+08:00">2022-05-13</time>
-              </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/05/06/%E5%A4%A7%E6%95%B0%E6%8D%AE/%E5%A4%A7%E6%95%B0%E6%8D%AE%E5%AE%89%E8%A3%85/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/05/06/%E5%A4%A7%E6%95%B0%E6%8D%AE/%E5%A4%A7%E6%95%B0%E6%8D%AE%E5%AE%89%E8%A3%85/" class="cy_cmt_count" data-xid="2022/05/06/大数据/大数据安装/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>5.3k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>5 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="一、Hadoop"><a href="#一、Hadoop" class="headerlink" title="一、Hadoop"></a>一、Hadoop</h2><h3 id="1-1-前提"><a href="#1-1-前提" class="headerlink" title="1.1 前提"></a>1.1 前提</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 安装java</span></span><br><span class="line">wget https://repo.huaweicloud.com/java/jdk/8u201-b09/jdk-8u201-linux-i586.tar.gz</span><br><span class="line"><span class="comment"># 配置环境变量</span></span><br><span class="line">vim /etc/profile </span><br><span class="line"><span class="built_in">source</span> /etc/profile</span><br><span class="line"><span class="comment"># 安装ssh  #目的就是可以免密ssh localhost</span></span><br><span class="line">sudo apt-get install ssh openssh-server</span><br><span class="line">ssh-keygen -t rsa</span><br><span class="line">cat ~/.ssh/id_rsa.pub &gt;&gt; authorized_keys</span><br><span class="line">ssh-copy-id -i /root/.ssh/id_rsa.pub root@localhost</span><br><span class="line">ssh localhost</span><br><span class="line"><span class="comment"># 其他</span></span><br><span class="line">yum install glibc.i686 </span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="1-2-安装"><a href="#1-2-安装" class="headerlink" title="1.2 安装"></a>1.2 安装</h3><ol>
-<li><p>wget <a target="_blank" rel="noopener" href="http://mirrors.hust.edu.cn/apache/hadoop/core/stable/hadoop-2.7.1.tar.gz">http://mirrors.hust.edu.cn/apache/hadoop/core/stable/hadoop-2.7.1.tar.gz</a></p>
-</li>
-<li><p>tar -zxvf hadoop-2.7.1.tar.gz</p>
-</li>
-<li><p>vim etc/hadoop/core-site.xml</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>hadoop.tmp.dir<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">value</span>&gt;</span>file:/root/data/hadoop<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">description</span>&gt;</span>Abase for other temporary directories.<span class="tag">&lt;/<span class="name">description</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>fs.defaultFS<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">value</span>&gt;</span>hdfs://localhost:9000<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-<li><p>vim mapred-site.xml.template </p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>mapred.job.tracker<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">value</span>&gt;</span>localhost:9001<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-<li><p>vim hdfs-site.xml </p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>dfs.replication<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">value</span>&gt;</span>1<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>dfs.namenode.name.dir<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">value</span>&gt;</span>file:/root/data/hadoop/dfs/name<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>dfs.datanode.data.dir<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">value</span>&gt;</span>file:/root/data/hadoop/dfs/data<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-<li><p>vim start-dfs.sh <strong>和</strong> stop-dfs.sh </p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">HDFS_DATANODE_USER=root</span><br><span class="line">HADOOP_SECURE_DN_USER=hdfs</span><br><span class="line">HDFS_NAMENODE_USER=root</span><br><span class="line">HDFS_SECONDARYNAMENODE_USER=root</span><br></pre></td></tr></table></figure></li>
-<li><p>vim start-yarn.sh <strong>和</strong> stop-yarn.sh文件 </p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">YARN_RESOURCEMANAGER_USER=root</span><br><span class="line">HADOOP_SECURE_DN_USER=yarn</span><br><span class="line">YARN_NODEMANAGER_USER=root</span><br></pre></td></tr></table></figure></li>
-<li><p>vim etc/hadoop/hadoop.env.sh </p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> JAVA_HOME=<span class="string">&quot;/root/config/jdk1.8.0_2&quot;</span></span><br></pre></td></tr></table></figure></li>
-<li><p>vim /etc/profile <strong>和</strong> hadoop-env.sh</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> HADOOP_HOME=/root/config/hadoop-3.1.0</span><br><span class="line"><span class="built_in">export</span> HADOOP_OPTS=<span class="string">&quot;-Djava.library.path=<span class="variable">$HADOOP_HOME</span>/lib:<span class="variable">$HADOOP_COMMON_LIB_NATIVE_DIR</span>&quot;</span></span><br><span class="line"><span class="built_in">export</span> HADOOP_COMMON_LIB_NATIVE_DIR=<span class="variable">$HADOOP_HOME</span>/lib/native</span><br><span class="line"><span class="built_in">export</span> HADOOP_OPTS=<span class="string">&quot;-Djava.library.path=<span class="variable">$HADOOP_HOME</span>/lib&quot;</span></span><br><span class="line"><span class="built_in">export</span> JAVA_LIBRARY_PATH=<span class="variable">$HADOOP_HOME</span>/lib/native</span><br></pre></td></tr></table></figure></li>
-<li><p>bin/hdfs namenode -format</p>
-</li>
-<li><p>启动datanode： ./sbin/hadoop-daemon.sh start datanode    </p>
-</li>
-</ol>
-<h3 id="1-3-验证"><a href="#1-3-验证" class="headerlink" title="1.3 验证"></a>1.3 验证</h3><ol>
-<li>yarn <a target="_blank" rel="noopener" href="http://c2:8088/cluster">http://c2:8088/cluster</a></li>
-<li>hdfs <a target="_blank" rel="noopener" href="http://c2:50070/">http://c2:50070</a>   hadoop3 改为9870</li>
-<li>spark 4040/jobs</li>
-</ol>
-<h3 id="1-4-更换版本"><a href="#1-4-更换版本" class="headerlink" title="1.4 更换版本"></a>1.4 更换版本</h3><blockquote>
-<p>目前方案就是重新下载，然后重新配置</p>
-</blockquote>
-<h2 id="二、Hbase"><a href="#二、Hbase" class="headerlink" title="二、Hbase"></a>二、Hbase</h2><h3 id="2-1-前提"><a href="#2-1-前提" class="headerlink" title="2.1 前提"></a>2.1 前提</h3><ol>
-<li>java</li>
-<li>hadoop 并启动</li>
-</ol>
-<h3 id="2-2-安装"><a href="#2-2-安装" class="headerlink" title="2.2 安装"></a>2.2 安装</h3><ol>
-<li><p>找到与Hadoop对应的版本 2.4.x</p>
-<p><a target="_blank" rel="noopener" href="https://hbase.apache.org/book.html#hadoop">https://hbase.apache.org/book.html#hadoop</a></p>
-</li>
-<li><p>找到镜像，解压</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://mirrors.cloud.tencent.com/apache/hbase/2.4.11/hbase-2.4.11-bin.tar.gz</span><br></pre></td></tr></table></figure></li>
-<li><p>vim hbase-env.sh</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> JAVA_HOME=/root/config/jdk1.8.0_201</span><br><span class="line"><span class="built_in">export</span> HBASE_MANAGES_ZK=<span class="literal">true</span> <span class="comment">#是否使用HBase自带的zookeeper环境</span></span><br><span class="line"><span class="built_in">export</span> HBASE_CLASSPATH=/root/config/hbase-2.4.11/conf   <span class="comment"># hbase 配置文件所在路径</span></span><br></pre></td></tr></table></figure></li>
-<li><p>vim hbase-site.xm</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- HBase数据在HDFS中的存放的路径 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>hbase.rootdir<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">value</span>&gt;</span>hdfs://localhost:9000/hb<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- Hbase的运行模式。false是单机模式，true是分布式模式。若为false,Hbase和Zookeeper会</span></span><br><span class="line"><span class="comment">运行在同一个JVM里面 --&gt;</span></span><br><span class="line">    </span><br><span class="line">    <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>hbase.cluster.distributed<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">value</span>&gt;</span>false<span class="tag">&lt;/<span class="name">value</span>&gt;</span><span class="comment">&lt;!--为false的话不会其他机器不能访问2181--&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- ZooKeeper的地址 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>hbase.zookeeper.quorum<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">value</span>&gt;</span>localhost<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!--远程地址--&gt;</span></span><br><span class="line">        <span class="comment">&lt;!--        &lt;value&gt;node1.itcast.cn,node2.itcast.cn,node3.itcast.cn&lt;/value&gt;--&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- ZooKeeper快照的存储位置 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>hbase.zookeeper.property.dataDir<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">value</span>&gt;</span>/root/data/zookpeer/data<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- V2.1版本，在分布式情况下, 设置为false --&gt;</span></span><br><span class="line"><span class="comment">&lt;!--    &lt;property&gt;--&gt;</span></span><br><span class="line"><span class="comment">&lt;!--        &lt;name&gt;hbase.unsafe.stream.capability.enforce&lt;/name&gt;--&gt;</span></span><br><span class="line"><span class="comment">&lt;!--        &lt;value&gt;false&lt;/value&gt;--&gt;</span></span><br><span class="line"><span class="comment">&lt;!--    &lt;/property&gt;--&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-<li><p>vim /etc/profile</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> HBASE_HOME=/root/config/hbase-2.4.11</span><br><span class="line"><span class="built_in">export</span> PATH=<span class="variable">$PATH</span>:<span class="variable">$&#123;HBASE_HOME&#125;</span>/bin:<span class="variable">$&#123;HBASE_HOME&#125;</span>/sbin</span><br></pre></td></tr></table></figure></li>
-<li><p>vim regionservers  </p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">localhost <span class="comment">#单机版</span></span><br></pre></td></tr></table></figure></li>
-</ol>
-<h3 id="2-3-启动"><a href="#2-3-启动" class="headerlink" title="2.3 启动"></a>2.3 启动</h3><ol>
-<li>./bin/start-hbase.sh</li>
-<li>jps查看</li>
-<li>./bin/hbase shell</li>
-<li>list</li>
-</ol>
-<h3 id="2-4-对于自己安装的zk"><a href="#2-4-对于自己安装的zk" class="headerlink" title="2.4 对于自己安装的zk"></a>2.4 对于自己安装的zk</h3><ol>
-<li><p>拷贝配置</p>
-<p>cp /zk/conf/zoo.cfg  hbase/conf</p>
-</li>
-<li><p>vim hbase-site.xml</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>hbase.cluster.distributed<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">value</span>&gt;</span>true<span class="tag">&lt;/<span class="name">value</span>&gt;</span><span class="comment">&lt;!--为false的话不会其他机器不能访问2181--&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- ZooKeeper的地址 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">name</span>&gt;</span>hbase.zookeeper.quorum<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">value</span>&gt;</span>主机名:2181<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!--远程地址--&gt;</span></span><br><span class="line">        <span class="comment">&lt;!--        &lt;value&gt;node1.itcast.cn,node2.itcast.cn,node3.itcast.cn&lt;/value&gt;--&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-<li><p>vim hbase-env.sh</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> HBASE_MANAGES_ZK=<span class="literal">false</span></span><br></pre></td></tr></table></figure></li>
-<li><p>zk清空hbase</p>
-</li>
-<li></li>
-</ol>
-<h2 id="三、Phoenix"><a href="#三、Phoenix" class="headerlink" title="三、Phoenix"></a>三、Phoenix</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://repo.huaweicloud.com/apache/phoenix/phoenix-5.1.2/phoenix-hbase-2.4-5.1.2-bin.tar.gz</span><br></pre></td></tr></table></figure>
-
-<p>p = /root/config/phoenix-hbase-2.4-5.1.2-bin</p>
-<ol>
-<li><p>复制</p>
-<p>cp p/phoenix-*.jar hbase-2.1.0/lib/</p>
-</li>
-<li><p>vim hbase-site.xml</p>
-</li>
-</ol>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line"> 	<span class="tag">&lt;<span class="name">name</span>&gt;</span>phoenix.schema.isNamespaceMappingEnabled<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">value</span>&gt;</span>false<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- 支持索引预写日志编码 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>hbase.regionserver.wal.codec<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">value</span>&gt;</span>org.apache.hadoop.hbase.regionserver.wal.IndexedWALEditCodec<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<h4 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h4><p>./bin/sqlline.py localhost:2181</p>
-<h2 id="四、zookeeper"><a href="#四、zookeeper" class="headerlink" title="四、zookeeper"></a>四、zookeeper</h2><h3 id="4-1-安装"><a href="#4-1-安装" class="headerlink" title="4.1 安装"></a>4.1 安装</h3><ol>
-<li><p>下载  -bin.tar.gz</p>
-<p>wget <a target="_blank" rel="noopener" href="https://repo.huaweicloud.com/apache/zookeeper/zookeeper-3.5.7/apache-zookeeper-3.5.7-bin.tar.gz">https://repo.huaweicloud.com/apache/zookeeper/zookeeper-3.5.7/apache-zookeeper-3.5.7-bin.tar.gz</a></p>
-</li>
-<li><p>配置</p>
-<ol>
-<li><p>cd conf</p>
-</li>
-<li><p>cp zoo_salmle.csg  zoo.cfg</p>
-</li>
-<li><p>vim zoo.cfg</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dataDir=/data/zookeeper  </span><br><span class="line">server.1=192.168.255.128:2887:3887 </span><br></pre></td></tr></table></figure></li>
-</ol>
-</li>
-<li><p>写入server.id</p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> 1 /data/zookeeper/myid </span><br></pre></td></tr></table></figure></li>
-</ol>
-<h3 id="启动验证"><a href="#启动验证" class="headerlink" title="启动验证"></a>启动验证</h3><p>zkServer.sh start</p>
-<p>zkCli.sh -server meip:2181</p>
-<p>[参考]</p>
-<ol>
-<li><a target="_blank" rel="noopener" href="https://m.php.cn/article/486140.html">hadoop</a> </li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/05/06/%E7%BB%84%E4%BB%B6/quartz%20/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/05/06/%E7%BB%84%E4%BB%B6/quartz%20/" class="post-title-link" itemprop="url">Quartz</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-05-06 11:47:18" itemprop="dateCreated datePublished" datetime="2022-05-06T11:47:18+08:00">2022-05-06</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-05-17 03:04:36" itemprop="dateModified" datetime="2022-05-17T03:04:36+08:00">2022-05-17</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%BB%84%E4%BB%B6/" itemprop="url" rel="index"><span itemprop="name">组件</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/05/06/%E7%BB%84%E4%BB%B6/quartz%20/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/05/06/%E7%BB%84%E4%BB%B6/quartz%20/" class="cy_cmt_count" data-xid="2022/05/06/组件/quartz /" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>12k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>11 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="一、Quartz介绍"><a href="#一、Quartz介绍" class="headerlink" title="一、Quartz介绍"></a>一、Quartz介绍</h2><ol>
-<li><p>优点</p>
-<p>quartz支持JTA事务、集群的支持。</p>
-</li>
-<li><p>Quartz运行环境</p>
-</li>
-</ol>
-<ul>
-<li>Quartz 可以运行嵌入在另一个独立式应用程序</li>
-<li>Quartz 可以在应用程序服务器(或servlet容器)内被实例化，并且参与事务</li>
-<li>Quartz 可以作为一个独立的程序运行(其自己的Java虚拟机内)，可以通过RMI使用</li>
-<li>Quartz 可以被实例化，作为独立的项目集群(负载平衡和故障转移功能)，用于作业的执行</li>
-</ul>
-<ol start="3">
-<li>Quartz设计模式</li>
-</ol>
-<ul>
-<li>Builder模式</li>
-<li>Factory模式</li>
-<li>组件模式</li>
-<li>链式编程</li>
-</ul>
-<p>官网：<a target="_blank" rel="noopener" href="http://www.quartz-scheduler.org/">http://www.quartz-scheduler.org/</a> </p>
-<h2 id="二、Quartz体系"><a href="#二、Quartz体系" class="headerlink" title="二、Quartz体系"></a>二、Quartz体系</h2><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/1.png" alt="0"></p>
-<h3 id="2-1-任务Job"><a href="#2-1-任务Job" class="headerlink" title="2.1 任务Job"></a>2.1 任务Job</h3><blockquote>
-<p>类似于线程</p>
-</blockquote>
-<p>Job就是你想要实现的任务类，每一个Job必须实现org.quartz.job接口，且只需实现接口定义的execute()方法。</p>
-<h3 id="2-2-触发器Trigger"><a href="#2-2-触发器Trigger" class="headerlink" title="2.2 触发器Trigger"></a>2.2 触发器Trigger</h3><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/6.png" alt="2"></p>
-<blockquote>
-<p>定时器</p>
-</blockquote>
-<p>Trigger为你执行任务的触发器，比如你想每天定时3点发送一份统计邮件，Trigger将会设置3点进行执行该任务。Trigger主要包含两种SimpleTrigger和CronTrigger两种。关于二者的区别的使用场景，后续的课程会进行讨论。</p>
-<h3 id="2-3-调度器Scheduler"><a href="#2-3-调度器Scheduler" class="headerlink" title="2.3 调度器Scheduler"></a>2.3 调度器Scheduler</h3><blockquote>
-<p>管家</p>
-</blockquote>
-<p>Scheduler为任务的调度器，它会将任务job及触发器Trigger整合起来，负责基于Trigger设定的时间来执行Job。</p>
-<h2 id="三、类"><a href="#三、类" class="headerlink" title="三、类"></a>三、类</h2><h3 id="3-1-JobExecutionContext"><a href="#3-1-JobExecutionContext" class="headerlink" title="3.1 JobExecutionContext"></a>3.1 JobExecutionContext</h3><blockquote>
-<p>Job能通过JobExecutionContext对象访问到Quartz运行时候的环境以及Job本身的明细数据</p>
-</blockquote>
-<p>可用获得</p>
-<ol>
-<li><p>JobDetail信息</p>
-</li>
-<li><p>执行信息：当前执行时间，下一次执行时间，</p>
-</li>
-<li><p>触发器信息</p>
-</li>
-</ol>
-<h3 id="3-2-JobDetail"><a href="#3-2-JobDetail" class="headerlink" title="3.2 JobDetail"></a>3.2 JobDetail</h3><blockquote>
-<p>内容：name，group，JobDataMap</p>
-</blockquote>
-<p>​    JobDetail为Job实例提供了许多设置属性，以及JobDataMap成员变量属性，它用来存储特定Job实例的状态信息，调度器需要借助JobDetail对象来添加Job实例。</p>
-<h3 id="3-3-JobDataMap"><a href="#3-3-JobDataMap" class="headerlink" title="3.3 JobDataMap"></a>3.3 JobDataMap</h3><ol>
-<li><p>无状态：每个任务在执行前都创建一个新的JobDataMap</p>
-</li>
-<li><p>有状态：@PersistJobDataAfterExecution</p>
-<p>每个任务都有一个全局的JobDataMap</p>
-</li>
-</ol>
-<h3 id="3-4-监听器"><a href="#3-4-监听器" class="headerlink" title="3.4 监听器"></a>3.4 监听器</h3><blockquote>
-<p>JobListener、TriggerListener、SchedulerListener三种监听器</p>
-<p>且有全局/非全局之分</p>
-<ol>
-<li>全局：全部的Job</li>
-<li>非全局：注册到该监听器的job</li>
-</ol>
-</blockquote>
-<h4 id="3-4-1-JobListener"><a href="#3-4-1-JobListener" class="headerlink" title="3.4.1 JobListener"></a>3.4.1 JobListener</h4><blockquote>
-<p>job开始要执行的提示; job执行完成的提示</p>
-</blockquote>
-<ol>
-<li><p>getName方法：用于获取该JobListener的名称。</p>
-</li>
-<li><p>jobToBeExecuted方法：Scheduler在JobDetail将要被执行时调用这个方法。</p>
-</li>
-<li><p>jobExecutionVetoed方法：Scheduler在JobDetail即将被执行，但又被TriggerListerner否决时会调用该方法</p>
-</li>
-<li><p>jobWasExecuted方法：Scheduler在JobDetail被执行之后调用这个方法</p>
-</li>
-</ol>
-<h4 id="3-4-2-TriggerListener"><a href="#3-4-2-TriggerListener" class="headerlink" title="3.4.2 TriggerListener"></a>3.4.2 TriggerListener</h4><blockquote>
-<p>触发器触发、触发器未正常触发、触发器完成等</p>
-</blockquote>
-<ol>
-<li>getName方法：用于获取触发器的名称</li>
-<li>triggerFired方法：当与监听器相关联的Trigger被触发，Job上的execute()方法将被执行时，Scheduler就调用该方法。</li>
-<li>vetoJobExecution方法：在 Trigger 触发后，Job 将要被执行时由 Scheduler 调用这个方法。TriggerListener 给了一个选择去否决 Job 的执行。假如这个方法返回 true，这个 Job 将不会为此次 Trigger 触发而得到执行。</li>
-<li>triggerMisfired方法：Scheduler 调用这个方法是在 Trigger 错过触发时。你应该关注此方法中持续时间长的逻辑：在出现许多错过触发的 Trigger 时，长逻辑会导致骨牌效应。你应当保持这上方法尽量的小。</li>
-<li>triggerComplete方法：Trigger 被触发并且完成了 Job 的执行时，Scheduler 调用这个方法。</li>
-</ol>
-<h4 id="3-4-3-SchedulerListener"><a href="#3-4-3-SchedulerListener" class="headerlink" title="3.4.3 SchedulerListener"></a>3.4.3 SchedulerListener</h4><blockquote>
-<p>增加一个job/trigger，删除一个job/trigger，scheduler发生严重错误，关闭scheduler等。</p>
-</blockquote>
-<ol>
-<li><p>jobScheduled方法：用于部署JobDetail时调用</p>
-</li>
-<li><p>jobUnscheduled方法：用于卸载JobDetail时调用</p>
-</li>
-<li><p>triggerFinalized方法：当一个 Trigger 来到了再也不会触发的状态时调用这个方法。除非这个 Job 已设置成了持久性，否则它就会从 Scheduler 中移除。</p>
-</li>
-<li><p>triggersPaused方法：Scheduler 调用这个方法是发生在一个 Trigger 或 Trigger 组被暂停时。假如是 Trigger 组的话，triggerName 参数将为 null。</p>
-</li>
-<li><p>triggersResumed方法：Scheduler 调用这个方法是发生成一个 Trigger 或 Trigger 组从暂停中恢复时。假如是 Trigger 组的话，假如是 Trigger 组的话，triggerName 参数将为 null。参数将为 null。</p>
-</li>
-<li><p>jobsPaused方法：当一个或一组 JobDetail 暂停时调用这个方法。</p>
-</li>
-<li><p>jobsResumed方法：当一个或一组 Job 从暂停上恢复时调用这个方法。假如是一个 Job 组，jobName 参数将为 null。</p>
-</li>
-<li><p>schedulerError方法：在 Scheduler 的正常运行期间产生一个严重错误时调用这个方法。</p>
-</li>
-<li><p>schedulerStarted方法：当Scheduler 开启时，调用该方法</p>
-</li>
-<li><p>schedulerInStandbyMode方法： 当Scheduler处于StandBy模式时，调用该方法</p>
-</li>
-<li><p>schedulerShutdown方法：当Scheduler停止时，调用该方法</p>
-</li>
-<li><p>schedulingDataCleared方法：当Scheduler中的数据被清除时，调用该方法。</p>
-</li>
-</ol>
-<h2 id="四、常用API"><a href="#四、常用API" class="headerlink" title="四、常用API"></a>四、常用API</h2><h3 id="4-1-Scheduler"><a href="#4-1-Scheduler" class="headerlink" title="4.1 Scheduler"></a>4.1 Scheduler</h3><ol>
-<li><p>启动：scheduler.start()</p>
-</li>
-<li><p>挂起：scheduler.standby();</p>
-</li>
-<li><p>关闭：scheduler..shutdown()</p>
-</li>
-<li><p>全局监听器</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scheduler.getListenerManager().addJobListener(<span class="keyword">new</span> MyJobListener(), EverythingMatcher.allJobs());</span><br></pre></td></tr></table></figure></li>
-<li><p>局部监听器</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">scheduler.getListenerManager().addJobListener(</span><br><span class="line">    newMyJobListener(),KeyMatcher.keyEquals(JobKey.jobKey(<span class="string">&quot;job1&quot;</span>, <span class="string">&quot;group1&quot;</span>)))；</span><br></pre></td></tr></table></figure></li>
-</ol>
-<ul>
-<li>Scheduler 用于与调度程序交互的主程序接口。<br>Scheduler 调度程序-任务执行计划表，只有安排进执行计划的任务Job（通过scheduler.scheduleJob方法安排进执行计划），当它预先定义的执行时间到了的时候（任务触发trigger），该任务才会执行。</li>
-<li>Job 我们预先定义的希望在未来时间能被调度程序执行的任务类，我们可以自定义。</li>
-<li>JobDetail 使用JobDetail来定义定时任务的实例，JobDetail实例是通过JobBuilder类创建的。</li>
-<li>JobDataMap 可以包含不限量的（序列化的）数据对象，在job实例执行的时候，可以使用<br>其中的数据；JobDataMap是Java Map接口的一个实现，额外增加了一些便于存取基本类型的数<br>据的方法。</li>
-<li>Trigger 触发器，Trigger对象是用来触发执行Job的。当调度一个job时，我们实例一个触发器然后调整它的属性来满足job执行的条件。表明任务在什么时候会执行。定义了一个已经被安排的任务将会在什么时候执行的时间条件，比如每2秒就执行一次。</li>
-<li>JobBuilder -用于声明一个任务实例，也可以定义关于该任务的详情比如任务名、组名等，这个声明的实例将会作为一个实际执行的任务。</li>
-<li>TriggerBuilder 触发器创建器，用于创建触发器trigger实例。</li>
-<li>JobListener、TriggerListener、SchedulerListener监听器，用于对组件的监听。</li>
-</ul>
-<h2 id="五、使用"><a href="#五、使用" class="headerlink" title="五、使用"></a>五、使用</h2><h3 id="5-1-Hello-World"><a href="#5-1-Hello-World" class="headerlink" title="5.1 Hello World"></a>5.1 Hello World</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.quartz-scheduler<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>quartz<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.3.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyJob</span> <span class="keyword">implements</span> <span class="title">Job</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">(JobExecutionContext jobExecutionContext)</span> <span class="keyword">throws</span> JobExecutionException </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;完成任务&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">// 1：从工厂中获取任务调度的实例</span></span><br><span class="line">        Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 2：定义一个任务调度实例，将该实例与HelloJob绑定，任务类需要实现Job接口</span></span><br><span class="line">        JobDetail job = JobBuilder.newJob(MyJob.class)</span><br><span class="line">                .withIdentity(<span class="string">&quot;job1&quot;</span>, <span class="string">&quot;group1&quot;</span>) <span class="comment">// 定义该实例唯一标识</span></span><br><span class="line">                .build();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 3：定义触发器 ，马上执行, 然后每5秒重复执行一次</span></span><br><span class="line">        Trigger trigger = TriggerBuilder.newTrigger()</span><br><span class="line">                .withIdentity(<span class="string">&quot;trigger1&quot;</span>, <span class="string">&quot;group2&quot;</span>) <span class="comment">// 定义该实例唯一标识</span></span><br><span class="line">                .startNow()  <span class="comment">// 马上执行</span></span><br><span class="line">                .withSchedule(SimpleScheduleBuilder</span><br><span class="line">                        .repeatSecondlyForever(<span class="number">2</span>)) <span class="comment">// 每5秒执行一次</span></span><br><span class="line">                .build();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 4：使用触发器调度任务的执行</span></span><br><span class="line">        scheduler.scheduleJob(job, trigger);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 5：开启</span></span><br><span class="line">        scheduler.start();</span><br><span class="line">        <span class="comment">// 关闭</span></span><br><span class="line">        <span class="comment">// scheduler.shutdown();</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">JobKey jobKey = context.getJobDetail().getKey();</span><br><span class="line">System.out.println(<span class="string">&quot;工作任务名称：&quot;</span>+jobKey.getName()+<span class="string">&quot;;工作任务组：&quot;</span>+jobKey.getGroup());</span><br><span class="line">System.out.println(<span class="string">&quot;任务类名称（带包名）：&quot;</span>+context.getJobDetail().getJobClass().getName());</span><br><span class="line">System.out.println(<span class="string">&quot;任务类名称：&quot;</span>+context.getJobDetail().getJobClass().getSimpleName());</span><br><span class="line">System.out.println(<span class="string">&quot;当前任务执行时间：&quot;</span>+context.getFireTime());</span><br><span class="line">System.out.println(<span class="string">&quot;下一任务执行时间：&quot;</span>+context.getNextFireTime());</span><br><span class="line">TriggerKey triggerKey = context.getTrigger().getKey();</span><br><span class="line">System.out.println(<span class="string">&quot;触发器名称：&quot;</span>+triggerKey.getName()+<span class="string">&quot;;触发器组：&quot;</span>+triggerKey.getGroup());</span><br><span class="line"></span><br><span class="line">JobDataMap jobDataMap = context.getJobDetail().getJobDataMap();</span><br><span class="line">String jobMessage = jobDataMap.getString(<span class="string">&quot;message&quot;</span>);</span><br><span class="line">System.out.println(<span class="string">&quot;任务参数消息值：&quot;</span>+jobMessage);</span><br><span class="line"></span><br><span class="line">JobDataMap triggerDataMap = context.getTrigger().getJobDataMap();</span><br><span class="line">String triggerMessage = triggerDataMap.getString(<span class="string">&quot;message&quot;</span>);</span><br><span class="line">System.out.println(<span class="string">&quot;触发器参数消息值：&quot;</span>+triggerMessage);</span><br></pre></td></tr></table></figure>
-
-<h3 id="5-2-SimpleTrigger触发器"><a href="#5-2-SimpleTrigger触发器" class="headerlink" title="5.2 SimpleTrigger触发器"></a>5.2 SimpleTrigger触发器</h3><p>SimpleTrigger对于设置和使用是最为简单的一种 QuartzTrigger。</p>
-<p>它是为那种需要在特定的日期/时间启动，且以一个可能的间隔时间重复执行 n 次的 Job 所设计的。</p>
-<p>案例一：表示在一个指定的时间段内，执行一次作业任务；</p>
-<p>HelloJobSimpleTrigger.java</p>
-<pre><code>// 定义任务类
-public class HelloJobSimpleTrigger implements Job &#123;
-
-
-    @Override
-    public void execute(JobExecutionContext context) throws JobExecutionException &#123;
-        // 定义时间
-        Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat(&quot;yyyy-MM-dd HH:mm:ss&quot;);
-        String dateString = dateFormat.format(date);
-        
-        // 定义工作任务内容
-        System.out.println(&quot;进行数据库备份操作。当前任务执行的时间：&quot;+dateString);
-    &#125;
-&#125;
-</code></pre>
-<p>HelloSchedulerDemoSimpleTrigger.java</p>
-<pre><code>public class HelloSchedulerDemoSimpleTrigger &#123;
-
-    public static void main(String[] args) throws Exception &#123;
-        // 1：从工厂中获取任务调度的实例
-        Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
-        
-        // 定义日期
-        Date startDate = new Date();
-        // 启动任务，任务在当前时间3秒后执行
-        startDate.setTime(startDate.getTime()+3000);
-
-        // 2：定义一个任务调度实例，将该实例与HelloJob绑定，任务类需要实现Job接口
-        JobDetail job = JobBuilder.newJob(HelloJobSimpleTrigger.class)
-                .withIdentity(&quot;job1&quot;, &quot;group1&quot;) // 定义该实例唯一标识
-                .build();
-
-        // 3：定义触发器 ，马上执行, 然后每5秒重复执行一次
-        Trigger trigger = TriggerBuilder.newTrigger()
-                .withIdentity(&quot;trigger1&quot;, &quot;group1&quot;) // 定义该实例唯一标识
-                .startAt(startDate)
-                .build();
-
-        // 4：使用触发器调度任务的执行
-        scheduler.scheduleJob(job, trigger);
-        
-        // 5：开启
-        scheduler.start();
-        // 关闭
-        // scheduler.shutdown();
-    &#125;
-&#125;
-</code></pre>
-<p>案例二：或在指定的时间间隔内多次执行作业任务。</p>
-<p>修改HelloSchedulerDemoSimpleTrigger.java</p>
-<pre><code>    // 3：定义触发器 ，马上执行, 然后每5秒重复执行一次
-    Trigger trigger = TriggerBuilder.newTrigger()
-            .withIdentity(&quot;trigger1&quot;, &quot;group1&quot;) // 定义该实例唯一标识
-            .startAt(startDate)
-            .withSchedule(SimpleScheduleBuilder.simpleSchedule().repeatSecondlyForever(5)
-                    .withRepeatCount(2)) // 每5秒执行一次，连续执行3次后停止，默认值是0
-            .build();
-</code></pre>
-<p>案例三：指定任务的结束时间。</p>
-<p>修改HelloSchedulerDemoSimpleTrigger.java</p>
-<pre><code>// 定义日期
-Date endDate = new Date();
-// 启动结束，任务在当前时间10秒后停止
-endDate.setTime(endDate.getTime()+10000);
-
-// 2：定义一个任务调度实例，将该实例与HelloJob绑定，任务类需要实现Job接口
-JobDetail job = JobBuilder.newJob(HelloJobSimpleTrigger.class)
-        .withIdentity(&quot;job1&quot;, &quot;group1&quot;) // 定义该实例唯一标识
-        .build();
-
-// 3：定义触发器 ，马上执行, 然后每5秒重复执行一次
-Trigger trigger = TriggerBuilder.newTrigger()
-        .withIdentity(&quot;trigger1&quot;, &quot;group1&quot;) // 定义该实例唯一标识
-        .startAt(startDate)
-        .endAt(endDate)
-        .withSchedule(SimpleScheduleBuilder.simpleSchedule().repeatSecondlyForever(5)
-                .withRepeatCount(3)) // 每5秒执行一次，连续执行3次后停止
-        .build();    
-</code></pre>
-<p>需要注意的点</p>
-<ul>
-<li>SimpleTrigger的属性有：开始时间、结束时间、重复次数和重复的时间间隔。</li>
-<li>重复次数属性的值可以为0、正整数、或常量 SimpleTrigger.REPEAT_INDEFINITELY。</li>
-<li>重复的时间间隔属性值必须为大于0或长整型的正整数，以毫秒作为时间单位，当重复的时间间隔为0时，意味着与Trigger同时触发执行。</li>
-<li>如果有指定结束时间属性值，则结束时间属性优先于重复次数属性，这样的好处在于：当我们需要创建一个每间隔10秒钟触发一次直到指定的结束时间的 Trigger，而无需去计算从开始到结束的所重复的次数，我们只需简单的指定结束时间和使用REPEAT_INDEFINITELY作为重复次数的属性 值即可。</li>
-</ul>
-<h3 id="5-3-CronTrigger触发器"><a href="#5-3-CronTrigger触发器" class="headerlink" title="5.3 CronTrigger触发器"></a>5.3 CronTrigger触发器</h3><p>如果你需要像日历那样按日程来触发任务，而不是像SimpleTrigger 那样每隔特定的间隔时间触发，CronTriggers通常比SimpleTrigger更有用,因为它是基于日历的作业调度器。</p>
-<p>使用CronTrigger，你可以指定诸如“每个周五中午”，或者“每个工作日的9:30”或者“从每个周一、周三、周五的上午9：00到上午10：00之间每隔五分钟”这样日程安排来触发。甚至，象SimpleTrigger一样，CronTrigger也有一个startTime以指定日程从什么时候开始，也有一个（可选的）endTime以指定何时日程不再继续。</p>
-<p>（1）Cron Expressions——Cron 表达式</p>
-<p>Cron表达式被用来配置CronTrigger实例。Cron表达式是一个由7个子表达式组成的字符串。每个子表达式都描述了一个单独的日程细节。这些子表达式用空格分隔，分别表示：</p>
-<ol>
-<li>Seconds 秒</li>
-<li>Minutes 分钟</li>
-<li>Hours 小时</li>
-<li>Day-of-Month 月中的天</li>
-<li>Month 月</li>
-<li>Day-of-Week 周中的天</li>
-<li>Year (optional field) 年（可选的域）</li>
-</ol>
-<p>取值：<br><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/7.png" alt="2"></p>
-<p>单个子表达式可以包含范围或者列表。例如：前面例子中的周中的天这个域（这里是”WED”）可以被替换为”MON-FRI”, “MON, WED, FRI”或者甚至”MON-WED,SAT”。</p>
-<p>所有的域中的值都有特定的合法范围，这些值的合法范围相当明显，例如：秒和分域的合法值为0到59，小时的合法范围是0到23，Day-of-Month中值得合法凡范围是1到31，但是需要注意不同的月份中的天数不同。月份的合法值是1到12。或者用字符串JAN,FEB MAR, APR, MAY, JUN, JUL, AUG, SEP, OCT, NOV 及DEC来表示。Days-of-Week可以用1到7来表示（1=星期日）或者用字符串SUN, MON, TUE, WED, THU, FRI 和SAT来表示.</p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/08.jpg" alt="img"></p>
-<p>练习一下：</p>
-<pre><code>*/1 * * * * ? 从任意时刻开始，每秒一次
-*/10 * * * * ? c每10秒一次
-&quot;0 0 10,14,16 * * ?&quot; 每天上午10点，下午2点，4点
-&quot;0 0/30 9-17 * * ?&quot;   朝九晚五工作时间内每半小时，从0分开始每隔30分钟发送一次
-&quot;0 0 12 ? * WED&quot; 表示每个星期三中午12点 
-&quot;0 0 12 * * ?&quot; 每天中午12点触发 
-&quot;0 15 10 ? * *&quot; 每天上午10:15触发 
-&quot;0 15 10 * * ?&quot; 每天上午10:15触发 
-&quot;0 15 10 * * ? *&quot; 每天上午10:15触发 
-&quot;0 15 10 * * ? 2005&quot; 2005年的每天上午10:15触发 
-&quot;0 * 14 * * ?&quot; 在每天下午2点到下午2:59期间的每1分钟触发 
-&quot;0 0/55 14 * * ?&quot; 在每天下午2点到下午2:55期间，从0开始到55分钟触发 
-&quot;0 0/55 14,18 * * ?&quot; 在每天下午2点到2:55期间和下午6点到6:55期间的，从0开始到55分钟触发 
-&quot;0 0-5 14 * * ?&quot; 在每天下午2点到下午2:05期间的每1分钟触发 
-&quot;0 10,44 14 ? 3 WED&quot; 每年三月的星期三的下午2:10和2:44触发 
-&quot;0 15 10 ? * MON-FRI&quot; 周一至周五的上午10:15触发 
-&quot;0 15 10 15 * ?&quot; 每月15日上午10:15触发 
-&quot;0 15 10 L * ?&quot; 每月最后一日的上午10:15触发 
-&quot;0 15 10 ? * 6L&quot; 每月的最后一个星期五上午10:15触发 
-&quot;0 15 10 ? * 6L 2002-2005&quot; 2002年至2005年的每月的最后一个星期五上午10:15触发 
-&quot;0 15 10 ? * 6#3&quot; 每月的第三个星期五上午10:15触发 
-</code></pre>
-<p>案例：</p>
-<p>HelloJobCronTrigger.java</p>
-<pre><code>// 定义任务类
-public class HelloJobCronTrigger implements Job &#123;
-
-
-    @Override
-    public void execute(JobExecutionContext context) throws JobExecutionException &#123;
-        // 定义时间
-        Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat(&quot;yyyy-MM-dd HH:mm:ss&quot;);
-        String dateString = dateFormat.format(date);
-        
-        // 定义工作任务内容
-        System.out.println(&quot;进行数据库备份操作。当前任务执行的时间：&quot;+dateString);
-    &#125;
-&#125;
-</code></pre>
-<p>HelloSchedulerDemoCronTrigger.java</p>
-<pre><code>public class HelloSchedulerDemoCronTrigger &#123;
-
-    public static void main(String[] args) throws Exception &#123;
-        // 1：从工厂中获取任务调度的实例
-        Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
-
-        // 2：定义一个任务调度实例，将该实例与HelloJob绑定，任务类需要实现Job接口
-        JobDetail job = JobBuilder.newJob(HelloJobCronTrigger.class)
-                .withIdentity(&quot;job1&quot;, &quot;group1&quot;) // 定义该实例唯一标识
-                .build();
-
-        // 3：定义触发器 ，马上执行, 然后每5秒重复执行一次
-        Trigger trigger = TriggerBuilder.newTrigger()
-                .withIdentity(&quot;trigger1&quot;, &quot;group1&quot;) // 定义该实例唯一标识
-                .withSchedule(CronScheduleBuilder.cronSchedule(&quot;0/5 * * 6 4 ?&quot;))// 定义表达式
-                .build();
-
-        // 4：使用触发器调度任务的执行
-        scheduler.scheduleJob(job, trigger);
-        
-        // 5：开启
-        scheduler.start();
-        // 关闭
-        // scheduler.shutdown();
-    &#125;
-&#125;
-</code></pre>
-<p>小提示：</p>
-<ul>
-<li>‘L’和‘W’可以一起使用。（企业可用在工资计算）</li>
-<li>‘#’可表示月中第几个周几。（企业可用在计算母亲节和父亲节）</li>
-<li>周字段英文字母不区分大小写，例如MON==mon。</li>
-<li>利用工具，在线生成。</li>
-</ul>
-<h2 id="六、配置"><a href="#六、配置" class="headerlink" title="六、配置"></a>六、配置</h2><figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#1.调度器属性</span></span><br><span class="line"><span class="comment">#调度器的实例名     </span></span><br><span class="line"><span class="meta">org.quartz.scheduler.instanceName</span> = <span class="string">QuartzScheduler     </span></span><br><span class="line"><span class="comment">#调度器的实例ID，大多数情况设置为auto即可  </span></span><br><span class="line"><span class="meta">org.quartz.scheduler.instanceId</span> = <span class="string">AUTO     </span></span><br><span class="line"><span class="comment"> </span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">#2. 线程池属性</span></span><br><span class="line"><span class="comment">#处理Job的线程个数，至少为1，但最多的话最好不要超过100，在多数机器上设置该值超过100的话就会显得相当不实用了，特别是在你的 Job 执行时间较长的情况下</span></span><br><span class="line"><span class="meta">org.quartz.threadPool.threadCount</span> =  <span class="string">5     </span></span><br><span class="line"><span class="comment">#线程的优先级，优先级别高的线程比级别低的线程优先得到执行。最小为1，最大为10，默认为5</span></span><br><span class="line"><span class="meta">org.quartz.threadPool.threadPriority</span> = <span class="string">5 </span></span><br><span class="line"><span class="comment">#一个实现了 org.quartz.spi.ThreadPool 接口的类，Quartz 自带的线程池实现类是 org.quartz.smpl.SimpleThreadPool      </span></span><br><span class="line"><span class="meta">org.quartz.threadPool.class</span> = <span class="string">org.quartz.simpl.SimpleThreadPool     </span></span><br><span class="line"><span class="comment"> </span></span><br><span class="line"><span class="comment"> </span></span><br><span class="line"><span class="comment">#3. Configure JobStore 作业存储设置 </span></span><br><span class="line"><span class="comment">#要使 Job 存储在内存中需通过设置  org.quartz.jobStrore.class 属性为 org.quartz.simpl.RAMJobStore </span></span><br><span class="line"><span class="meta">org.quartz.jobStore.class</span> = <span class="string">org.quartz.simpl.RAMJobStore     </span></span><br><span class="line"><span class="comment"> </span></span><br><span class="line"><span class="comment">#4. Configure Plugins    插件配置 </span></span><br><span class="line"><span class="meta">org.quartz.plugin.jobInitializer.class</span> =       <span class="string"></span></span><br><span class="line"><span class="meta">org.quartz.plugins.xml.JobInitializationPlugin</span>       <span class="string"></span></span><br><span class="line">      </span><br><span class="line"><span class="meta">org.quartz.plugin.jobInitializer.overWriteExistingJobs</span> = <span class="string">true      </span></span><br><span class="line"><span class="meta">org.quartz.plugin.jobInitializer.failOnFileNotFound</span> = <span class="string">true      </span></span><br><span class="line"><span class="meta">org.quartz.plugin.jobInitializer.validating</span>=<span class="string">false  </span></span><br></pre></td></tr></table></figure>
-
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/26/">26</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/27/">27</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -1503,14 +1145,14 @@ public class HelloJobCronTrigger implements Job &#123;
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">128</span>
+          <span class="site-state-item-count">131</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-count">29</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>
@@ -1551,12 +1193,12 @@ public class HelloJobCronTrigger implements Job &#123;
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">382k</span>
+    <span title="站点总字数">391k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">5:47</span>
+    <span title="站点阅读时长">5:55</span>
 </div>
 
         

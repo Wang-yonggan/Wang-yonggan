@@ -185,6 +185,375 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/22/java/javaSE/jvm/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/22/java/javaSE/jvm/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B/" class="post-title-link" itemprop="url">类加载</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-22 18:04:19" itemprop="dateCreated datePublished" datetime="2022-03-22T18:04:19+08:00">2022-03-22</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/java/JVM/" itemprop="url" rel="index"><span itemprop="name">JVM</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/22/java/javaSE/jvm/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/22/java/javaSE/jvm/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B/" class="cy_cmt_count" data-xid="2022/03/22/java/javaSE/jvm/类加载过程/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>[toc]</p>
+<h2 id="一、生命周期"><a href="#一、生命周期" class="headerlink" title="一、生命周期"></a>一、生命周期</h2><blockquote>
+<p>  JVM把class文件加载的内存，并对数据进行校验、转换解析和初始化，最终形成JVM可以直接使用的Java类型的过程就是加载机制。</p>
+</blockquote>
+<h3 id="1-1-加载-参考"><a href="#1-1-加载-参考" class="headerlink" title="1.1 加载-参考"></a>1.1 <a target="_blank" rel="noopener" href="https://my.oschina.net/winHerson/blog/114180?p=%7B%7BtotalPage%7D%7D">加载-参考</a></h3><ol>
+<li>通过一个类的权限定名从文件(.class、.jar、网络)中来获取定义此类的二进制字节流</li>
+<li>将这个字节流所代表的静态存储结构转化为方法去的运行时数据结构</li>
+<li>在java堆中生成一个代表这个类的java.lang.Class对象，作为方法去这些数据的访问入口。</li>
+</ol>
+<h3 id="1-2-连接"><a href="#1-2-连接" class="headerlink" title="1.2 连接"></a>1.2 连接</h3><h4 id="1-2-1-验证"><a href="#1-2-1-验证" class="headerlink" title="1.2.1 验证"></a>1.2.1 验证</h4><ol>
+<li><p>文件格式验证</p>
+<p>验证class文件格式规范，例如： class文件是否已魔术0xCAFEBABE开头 ， 主、次版本号是否在当前虚拟机处理范围之内等</p>
+</li>
+<li><p>元数据验证</p>
+<p>这个阶段是对字节码描述的信息进行语义分析，以保证起描述的信息符合java语言规范要求。验证点可能包括：这个类是否有父类(除了java.lang.Object之外，所有的类都应当有父类)、这个类是否继承了不允许被继承的类(被final修饰的)、如果这个类的父类是抽象类，是否实现了起父类或接口中要求实现的所有方法。</p>
+</li>
+<li><p>字节码验证</p>
+<p>进行数据流和控制流分析，这个阶段对类的方法体进行校验分析，这个阶段的任务是保证被校验类的方法在运行时不会做出危害虚拟机安全的行为.如：保证访法体中的类型转换有效，例如可以把一个子类对象赋值给父类数据类型，这是安全的，但不能把一个父类对象赋值给子类数据类型、保证跳转命令不会跳转到方法体以外的字节码命令上。</p>
+</li>
+<li><p>符号引用验证</p>
+<p>符号引用中通过字符串描述的全限定名是否能找到对应的类、符号引用类中的类，字段和方法的访问性(private、protected、public、default)是否可被当前类访问。</p>
+</li>
+</ol>
+<h4 id="1-2-1-准备"><a href="#1-2-1-准备" class="headerlink" title="1.2.1 准备"></a>1.2.1 准备</h4><blockquote>
+<p>为类变量分配内存并设置变量初始值(零值)的阶段，这些内存都将在方法去中进行分配。</p>
+</blockquote>
+<ol>
+<li><p>进行内存分配的仅包括类变量（被static修饰的变量），而不包括实例变量，实例变量将会在对象实例化时随着对象一起分配在java堆中</p>
+</li>
+<li><p>初始值是指数据类型为零值，主要是为了初始化内存，并不做逻辑代码</p>
+<ul>
+<li><p>public static int value = 123</p>
+<p>那么变量value在准备阶段过后的值是0，而不是123，因为这时候尚未开始执行任何java方法。</p>
+</li>
+<li><p>public static final int value = 123</p>
+<p>final修饰的字段，子啊准备阶段虚拟机就会根据赋值，value的值为123.</p>
+</li>
+</ul>
+</li>
+</ol>
+<h4 id="1-2-3-解析"><a href="#1-2-3-解析" class="headerlink" title="1.2.3 解析"></a>1.2.3 解析</h4><blockquote>
+<p> 虚拟机将常量池内的符号引用替换为直接引用的过程</p>
+</blockquote>
+<h5 id="1-2-3-1-符号、直接引用"><a href="#1-2-3-1-符号、直接引用" class="headerlink" title="1.2.3.1 符号、直接引用"></a>1.2.3.1 符号、直接引用</h5><ul>
+<li>符号引用：描述所引用的目标对象的符号，可以是任何形式的字面量，只要使用时能无歧义地定位到目标即可。引用的目标对象并不一定已经加载到内存中。</li>
+<li>直接引用：指向目标对象的指针、相对偏移量、一个能间接定位到目标的句柄。直接引用的目标必定已经在内存中存在。</li>
+<li>例如 String a=”str”; 这个a在解析阶段之前就是符号引用，解析之后就是直接引用</li>
+</ul>
+<h5 id="1-2-3-2-解析内容"><a href="#1-2-3-2-解析内容" class="headerlink" title="1.2.3.2 解析内容"></a>1.2.3.2 解析内容</h5><ol>
+<li><p>类或接口的解析</p>
+</li>
+<li><p>字段解析：解析出类的方法表的class_index项中索引的字段所属的类或接口的符号引用</p>
+</li>
+<li><p>类方法解析：首先解析出类的方法表的class_index项中索引的方法所属的类或接口的符号引用</p>
+</li>
+<li><p>接口方法解析：首先解析出类的方法表的class_index项中索引的方法所属的类或接口的符号引用。</p>
+</li>
+</ol>
+<h3 id="1-3-初始化"><a href="#1-3-初始化" class="headerlink" title="1.3 初始化"></a>1.3 初始化</h3><blockquote>
+<p>执行类中定义的java程序逻辑代码</p>
+</blockquote>
+<h4 id="1-3-1-触发条件"><a href="#1-3-1-触发条件" class="headerlink" title="1.3.1 触发条件"></a>1.3.1 触发条件</h4><p>以下四种情况触发执行类构造器clinit()方法</p>
+<ol>
+<li>new关键字实例化对象</li>
+<li>访问一个类的静态字段(被final修饰、已在编译器把结果放入常量池的静态字段除外)</li>
+<li>调用类的静态方法</li>
+<li>使用java.lang.reflect包的方法对类进行反射调用的时候</li>
+<li>jvm启动时，用户指定一个执行的主类(包含main方法的那个类)，虚拟机会先初始化这个类</li>
+<li>当初始化一个类的时候，如果发现其父类还没有进行过初始化、则需要先出发其父类的初始化</li>
+</ol>
+<h3 id="1-4-使用"><a href="#1-4-使用" class="headerlink" title="1.4 使用"></a>1.4 使用</h3><h3 id="1-5-卸载"><a href="#1-5-卸载" class="headerlink" title="1.5 卸载"></a>1.5 卸载</h3><h2 id="二、其他"><a href="#二、其他" class="headerlink" title="二、其他"></a>二、其他</h2><h3 id="2-1-双亲委派机制"><a href="#2-1-双亲委派机制" class="headerlink" title="2.1 双亲委派机制"></a>2.1 双亲委派机制</h3><h3 id="2-2-实例化对象的方式"><a href="#2-2-实例化对象的方式" class="headerlink" title="2.2 实例化对象的方式"></a>2.2 实例化对象的方式</h3><ol>
+<li>创建<ol>
+<li>new</li>
+<li>newInstance(要求有无参构造)</li>
+<li>clone</li>
+</ol>
+</li>
+<li>序列化<ol>
+<li>加载文件</li>
+<li>反序列化</li>
+<li>网络请求</li>
+</ol>
+</li>
+</ol>
+<h3 id="2-3-newInstance与new"><a href="#2-3-newInstance与new" class="headerlink" title="2.3 newInstance与new"></a>2.3 <a target="_blank" rel="noopener" href="https://www.cnblogs.com/zouxiangzhongyan/p/10722118.html">newInstance与new</a></h3><blockquote>
+<p>spring中有很多的newInstance</p>
+</blockquote>
+<ol>
+<li>newInstance要求<ol>
+<li>这个类已经加载</li>
+<li>这个类已经连接了</li>
+<li>这两步可用Class.forname完成</li>
+</ol>
+</li>
+<li>newInstance是通过反射创建对象的，在创建一个类的对象的时候，你可以对该类一无所知，一些开源框架比如Spring内部大都是通过反射来创建实例的，当然这种方法创建对象的时候必须拥有该类的句柄，甚至必要的时候还要有相关的权限设置（比如无参构造函数是私有的），而句柄是可以动态载入的，实际上JVM内部也是这样加载类的。该方法创建对象的时候，只会调用该类的无参数构造函数，不会调用其他的有参构造函数。</li>
+<li>new  后面接类名参数，是最常见的创建实例的方式。这是必须要知道一个明确的类才能使用</li>
+</ol>
+<h4 id="2-3-2-解耦"><a href="#2-3-2-解耦" class="headerlink" title="2.3.2 解耦"></a>2.3.2 解耦</h4><blockquote>
+<p>newInstance实际上是把new方式分解为两步</p>
+</blockquote>
+<ol>
+<li>首先调用Class加载方法加载某个类</li>
+<li>然后实例化。</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"> Class a1 = Class.forName(<span class="string">&quot;A&quot;</span>);</span><br><span class="line">BeanFactory a2 =  (BeanFactory) a1.newInstance();</span><br><span class="line">System.out.println(a2);</span><br><span class="line">Class b1 = Class.forName(<span class="string">&quot;B&quot;</span>);</span><br><span class="line">BeanFactory b2 =  (BeanFactory) b1.newInstance();</span><br><span class="line">System.out.println(b2); <span class="comment">//两个l</span></span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">String className = readfromXMlConfig;<span class="comment">//从xml 配置文件中获需要加载的类</span></span><br><span class="line">Class c = Class.forName（className）；</span><br><span class="line">factory = （AInterface）c.newInstance（）；<span class="comment">//这样，在不知道是实现类的类名的情况下创建到了实现类</span></span><br></pre></td></tr></table></figure>
+
+<p>可以在调用class.forName时获得更好的灵活性（获得更宽泛的类名），提供给了一种降耦(降低耦合度)的手段。</p>
+<h4 id="2-3-3-区别总结"><a href="#2-3-3-区别总结" class="headerlink" title="2.3.3  区别总结"></a>2.3.3  区别总结</h4><ul>
+<li>newInstance: 方法级别，弱类型。低效率。只能调用无参构造。</li>
+<li>new: 关键字级别，强类型。相对高效。能调用任何public构造。</li>
+</ul>
+<h4 id="2-3-4-newInstance用途"><a href="#2-3-4-newInstance用途" class="headerlink" title="2.3.4 newInstance用途"></a>2.3.4 newInstance用途</h4><p>是实现IOC、反射、依赖倒置 等技术方法的必然选择，new 只能实现具体类的实例化，不适合于接口编程。类里面就是经过这个类的默认构造函数构建了一个对象，若是没有默认构造函数就抛出InstantiationException, 若是没有访问默认构造函数的权限就抛出IllegalAccessException xml</p>
+<h2 id="三、类加载器"><a href="#三、类加载器" class="headerlink" title="三、类加载器"></a>三、类加载器</h2><h3 id="3-1-三级"><a href="#3-1-三级" class="headerlink" title="3.1 三级"></a>3.1 三级</h3><h4 id="3-1-1-Bootstrap类加载器"><a href="#3-1-1-Bootstrap类加载器" class="headerlink" title="3.1.1 Bootstrap类加载器"></a>3.1.1 Bootstrap类加载器</h4><ul>
+<li>作用：加载java.lib下面的核心类库<ul>
+<li>rt.jar</li>
+<li>resources.jar</li>
+</ul>
+</li>
+<li>获取：System.getProperty(“sun.boot.class.path”)</li>
+</ul>
+<h4 id="3-1-2-Extension类加载器"><a href="#3-1-2-Extension类加载器" class="headerlink" title="3.1.2 Extension类加载器"></a>3.1.2 Extension类加载器</h4><ul>
+<li>作用：加载java.lib.ext下的类</li>
+<li>System.getProperty(“java.ext.dirs”)</li>
+</ul>
+<h4 id="3-1-3-System类加载器"><a href="#3-1-3-System类加载器" class="headerlink" title="3.1.3 System类加载器"></a>3.1.3 System类加载器</h4><ul>
+<li>作用：加载javaclasspath下的类</li>
+</ul>
+<h3 id="3-2-双亲委派机制"><a href="#3-2-双亲委派机制" class="headerlink" title="3.2 双亲委派机制"></a>3.2 双亲委派机制</h3>
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/21/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E4%BA%8B%E5%8A%A1-MVCC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/03/21/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E4%BA%8B%E5%8A%A1-MVCC/" class="post-title-link" itemprop="url">事务-MVCC</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-03-21 00:51:22" itemprop="dateCreated datePublished" datetime="2022-03-21T00:51:22+08:00">2022-03-21</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-05-12 11:56:33" itemprop="dateModified" datetime="2022-05-12T11:56:33+08:00">2022-05-12</time>
+              </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/03/21/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E4%BA%8B%E5%8A%A1-MVCC/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/03/21/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E4%BA%8B%E5%8A%A1-MVCC/" class="cy_cmt_count" data-xid="2022/03/21/数据库/数据库概念2.0/事务-MVCC/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.9k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>`</p>
+<p>参考: <a target="_blank" rel="noopener" href="https://juejin.cn/post/7016165148020703246">掘金</a></p>
+<h2 id="一、锁"><a href="#一、锁" class="headerlink" title="一、锁"></a>一、锁</h2><h3 id="1-1-行锁"><a href="#1-1-行锁" class="headerlink" title="1.1 行锁"></a>1.1 行锁</h3><p>效率相对较低，但是并发度高</p>
+<h4 id="1-1-1-Record-Lock"><a href="#1-1-1-Record-Lock" class="headerlink" title="1.1.1 Record Lock"></a>1.1.1 Record Lock</h4><blockquote>
+<p>基本行锁</p>
+</blockquote>
+<h4 id="1-1-2-Gap-Lock"><a href="#1-1-2-Gap-Lock" class="headerlink" title="1.1.2 Gap Lock"></a>1.1.2 Gap Lock</h4><blockquote>
+<p>范围锁，单不包括本身，防止出现幻读</p>
+</blockquote>
+<h4 id="1-1-3-Next-Key-Lock"><a href="#1-1-3-Next-Key-Lock" class="headerlink" title="1.1.3 Next-Key Lock"></a>1.1.3 Next-Key Lock</h4><blockquote>
+<p>临键锁=行锁+间隙锁</p>
+</blockquote>
+<h3 id="1-2-表锁"><a href="#1-2-表锁" class="headerlink" title="1.2 表锁"></a>1.2 表锁</h3><p>效率高，但是并发度低</p>
+<h3 id="1-3-页级锁"><a href="#1-3-页级锁" class="headerlink" title="1.3 页级锁"></a>1.3 页级锁</h3><blockquote>
+<p>是表锁和行锁的折中，一次锁住这一页的数据</p>
+</blockquote>
+<ol>
+<li>可能出现死锁</li>
+</ol>
+<h3 id="1-加锁方式"><a href="#1-加锁方式" class="headerlink" title="1. 加锁方式"></a>1. 加锁方式</h3><h2 id="二、事务"><a href="#二、事务" class="headerlink" title="二、事务"></a>二、事务</h2><blockquote>
+<p>C是事务的根本追求数据一致性的破坏主要来自两个方面</p>
+<ol>
+<li>事务的并发执行    —&gt;  并发控制技术MVCC(也可以用锁,但是锁性能太低)–&gt;undo</li>
+<li>事务故障或系统故障   —&gt; 日志恢复技 –&gt;redo</li>
+</ol>
+</blockquote>
+<h3 id="2-1-ACID"><a href="#2-1-ACID" class="headerlink" title="2.1 ACID"></a>2.1 ACID</h3><ol>
+<li><p>Atomicity 原子性</p>
+<ol>
+<li>begin</li>
+<li>sql1</li>
+<li>sql2</li>
+<li>commit</li>
+<li>构成逻辑整体的这些数据库操作,要么全部执行成功,要么全部不执行。基于以事务为单位执行</li>
+</ol>
+</li>
+</ol>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/03/21/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E4%BA%8B%E5%8A%A1-MVCC/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/20/%E7%BB%84%E4%BB%B6/ORM/ORM%E6%A1%86%E6%9E%B6/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -598,303 +967,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/13/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/elasticsearch%E8%AF%AD%E6%B3%95/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/13/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/elasticsearch%E8%AF%AD%E6%B3%95/" class="post-title-link" itemprop="url">elasticSearch语法</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-13 21:43:37" itemprop="dateCreated datePublished" datetime="2022-03-13T21:43:37+08:00">2022-03-13</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-04-13 21:43:37" itemprop="dateModified" datetime="2022-04-13T21:43:37+08:00">2022-04-13</time>
-              </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/13/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/elasticsearch%E8%AF%AD%E6%B3%95/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/13/%E6%95%B0%E6%8D%AE%E5%BA%93/nosql/elasticsearch%E8%AF%AD%E6%B3%95/" class="cy_cmt_count" data-xid="2022/03/13/数据库/nosql/elasticsearch语法/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>2.4k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="Rest-Api"><a href="#Rest-Api" class="headerlink" title="Rest Api"></a>Rest Api</h2><p>122133</p>
-<h2 id="一、Rest-Api"><a href="#一、Rest-Api" class="headerlink" title="一、Rest Api"></a>一、Rest Api</h2><h3 id="1-1-索引的增删改查"><a href="#1-1-索引的增删改查" class="headerlink" title="1.1 索引的增删改查"></a>1.1 索引的增删改查</h3><h4 id="创建索引"><a href="#创建索引" class="headerlink" title="创建索引"></a>创建索引</h4><figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">put</span> /shopping</span><br></pre></td></tr></table></figure>
-
-<h4 id="删除索引"><a href="#删除索引" class="headerlink" title="删除索引"></a>删除索引</h4><figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">delete</span> /shopping</span><br></pre></td></tr></table></figure>
-
-<h4 id="获得所有的索引信息"><a href="#获得所有的索引信息" class="headerlink" title="获得所有的索引信息"></a>获得所有的索引信息</h4><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="regexp">/_cat/i</span>ndices?v</span><br></pre></td></tr></table></figure>
-
-<h3 id="1-2-文档的增删改查"><a href="#1-2-文档的增删改查" class="headerlink" title="1.2 文档的增删改查"></a>1.2 文档的增删改查</h3><h4 id="创建文档"><a href="#创建文档" class="headerlink" title="创建文档"></a>创建文档</h4><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">post <span class="regexp">/index1/</span>_doc/ +json</span><br><span class="line">post <span class="regexp">/index1/</span>_doc/id +json</span><br></pre></td></tr></table></figure>
-
-<h4 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h4><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">delete</span>     /index1</span><br><span class="line"><span class="keyword">delete</span>     <span class="regexp">/index1/</span>_doc/id</span><br></pre></td></tr></table></figure>
-
-<h4 id="更改"><a href="#更改" class="headerlink" title="更改"></a>更改</h4><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">全量更新 put  <span class="regexp">/index1/</span>_doc/id +json</span><br><span class="line">局部更新 post <span class="regexp">/index1/</span>_update/id +json</span><br></pre></td></tr></table></figure>
-
-<h4 id="根据id查询文档"><a href="#根据id查询文档" class="headerlink" title="根据id查询文档"></a>根据id查询文档</h4><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="regexp">/index1/</span>_doc/<span class="number">1001</span></span><br></pre></td></tr></table></figure>
-
-<h4 id="获得引的所有文档"><a href="#获得引的所有文档" class="headerlink" title="获得引的所有文档"></a>获得引的所有文档</h4><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="regexp">/index1/</span>_search</span><br></pre></td></tr></table></figure>
-
-<h4 id="批量"><a href="#批量" class="headerlink" title="批量"></a>批量</h4><pre><code>1. 插入
-1. 删除
-</code></pre>
-<h2 id="二、查询"><a href="#二、查询" class="headerlink" title="二、查询"></a>二、查询</h2><h3 id="2-0-两种"><a href="#2-0-两种" class="headerlink" title="2.0 两种"></a>2.0 两种</h3><h4 id="2-0-1-get-url"><a href="#2-0-1-get-url" class="headerlink" title="2.0.1 get+url"></a>2.0.1 get+url</h4><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ip:port<span class="regexp">/shopping/</span>_search?q=name:<span class="string">&quot;wyg&quot;</span></span><br></pre></td></tr></table></figure>
-
-<h4 id="2-0-2-get-json"><a href="#2-0-2-get-json" class="headerlink" title="2.0.2  get+json"></a>2.0.2  get+json</h4><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="comment">//条件查询</span></span><br><span class="line">    </span><br><span class="line">	<span class="attr">&quot;query&quot;</span>:&#123;</span><br><span class="line">		<span class="attr">&quot;match&quot;</span>:&#123;</span><br><span class="line">			<span class="attr">&quot;name&quot;</span>:<span class="string">&quot;wyg&quot;</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">     <span class="comment">//只需要特定字段</span></span><br><span class="line">    <span class="string">&quot;_source&quot;</span>:[<span class="string">&quot;name&quot;</span>,<span class="string">&quot;id&quot;</span>,<span class="string">&quot;age&quot;</span>],</span><br><span class="line">	<span class="comment">//排序</span></span><br><span class="line">	<span class="attr">&quot;sort&quot;</span>:&#123;  </span><br><span class="line">        <span class="attr">&quot;age&quot;</span>:&#123;</span><br><span class="line">            <span class="attr">&quot;order&quot;</span>:<span class="string">&quot;desc&quot;</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">	<span class="comment">//分页</span></span><br><span class="line">    <span class="attr">&quot;from&quot;</span>:<span class="number">3</span>,  <span class="comment">//当前页</span></span><br><span class="line">    <span class="attr">&quot;size&quot;</span>:<span class="number">10</span>  <span class="comment">//一页数量</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;   <span class="comment">//查询全部</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span>:&#123;</span><br><span class="line">		<span class="attr">&quot;match_all&quot;</span>:&#123;	</span><br><span class="line">		&#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
-
-<h3 id="2-1-base"><a href="#2-1-base" class="headerlink" title="2.1 base"></a>2.1 base</h3><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="comment">//条件查询</span></span><br><span class="line">	<span class="attr">&quot;query&quot;</span>:&#123;</span><br><span class="line">		<span class="attr">&quot;match&quot;</span>:&#123;</span><br><span class="line">			<span class="attr">&quot;name&quot;</span>:<span class="string">&quot;wyg&quot;</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-2-多条件查询"><a href="#2-2-多条件查询" class="headerlink" title="2.2 多条件查询"></a>2.2 多条件查询</h3><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">	<span class="attr">&quot;query&quot;</span>:&#123;</span><br><span class="line">		<span class="attr">&quot;bool&quot;</span>:&#123;  <span class="comment">//条件</span></span><br><span class="line">			<span class="attr">&quot;should&quot;</span>:[  <span class="comment">//多条件必须匹配,还有must</span></span><br><span class="line">                &#123; </span><br><span class="line">                    <span class="attr">&quot;match&quot;</span>:&#123;</span><br><span class="line">                        <span class="attr">&quot;name&quot;</span>:<span class="string">&quot;wyg&quot;</span></span><br><span class="line">                	&#125;</span><br><span class="line">                &#125;,</span><br><span class="line">                &#123;</span><br><span class="line">                	<span class="attr">&quot;mathch&quot;</span>:&#123;</span><br><span class="line">                	    <span class="attr">&quot;name&quot;</span>:<span class="string">&quot;abc&quot;</span></span><br><span class="line">                	&#125;</span><br><span class="line">                &#125;</span><br><span class="line">            ],</span><br><span class="line">            <span class="attr">&quot;filter&quot;</span>:&#123;  <span class="comment">//过滤条件</span></span><br><span class="line">                <span class="attr">&quot;range&quot;</span>:&#123; <span class="comment">//范围</span></span><br><span class="line">                    <span class="attr">&quot;age&quot;</span>:&#123;</span><br><span class="line">                        <span class="attr">&quot;gt&quot;</span>:<span class="number">20</span><span class="comment">//20岁以上</span></span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="2-3-模糊查询—-gt-基于倒排索引"><a href="#2-3-模糊查询—-gt-基于倒排索引" class="headerlink" title="2.3 模糊查询—&gt;基于倒排索引"></a>2.3 模糊查询—&gt;基于倒排索引</h3><h4 id="模糊"><a href="#模糊" class="headerlink" title="模糊"></a>模糊</h4><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">/ &#123;<span class="comment">//条件查询</span></span><br><span class="line">	<span class="attr">&quot;query&quot;</span>:&#123;</span><br><span class="line">		<span class="attr">&quot;match&quot;</span>:&#123;</span><br><span class="line">			<span class="attr">&quot;name&quot;</span>:<span class="string">&quot;wyg&quot;</span> <span class="comment">//拆解 w y g </span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h4 id="完全匹配"><a href="#完全匹配" class="headerlink" title="完全匹配"></a>完全匹配</h4><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">	<span class="attr">&quot;query&quot;</span>:&#123;</span><br><span class="line">		<span class="attr">&quot;match_phrase&quot;</span>:&#123;</span><br><span class="line">			<span class="attr">&quot;name&quot;</span>:<span class="string">&quot;wyg&quot;</span> <span class="comment">//拆解 w y g </span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;,</span><br><span class="line">    <span class="comment">//对字段高亮</span></span><br><span class="line">    <span class="attr">&quot;highlight&quot;</span>:&#123;</span><br><span class="line">        <span class="attr">&quot;fields&quot;</span>:&#123;</span><br><span class="line">            <span class="attr">&quot;name&quot;</span>:&#123;&#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="三、mapping"><a href="#三、mapping" class="headerlink" title="三、mapping"></a>三、mapping</h2><blockquote>
-<p>mapping 是对<strong>文档</strong>的约束， 类似于DDL，create table（）</p>
-<p>也用于es    index的创建</p>
-</blockquote>
-<table>
-<thead>
-<tr>
-<th>属性</th>
-<th>名称</th>
-<th>选项</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>type</td>
-<td>数据类型</td>
-<td>text（可拆分）  keyword  八大类型 date  object</td>
-</tr>
-<tr>
-<td>index</td>
-<td>释放创建倒排索引</td>
-<td>true  false</td>
-</tr>
-<tr>
-<td>analyzer</td>
-<td>分词器</td>
-<td></td>
-</tr>
-<tr>
-<td>properties</td>
-<td>字段</td>
-<td></td>
-</tr>
-</tbody></table>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">	<span class="attr">&quot;mapping&quot;</span>:&#123;</span><br><span class="line">        <span class="attr">&quot;properties&quot;</span>:&#123;</span><br><span class="line">            <span class="attr">&quot;name&quot;</span>:&#123;</span><br><span class="line">                type:<span class="string">&quot;keyword&quot;</span>,</span><br><span class="line">                index:<span class="string">&quot;false&quot;</span></span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="attr">&quot;info&quot;</span>:&#123;</span><br><span class="line">                <span class="attr">&quot;type&quot;</span>:<span class="string">&quot;text&quot;</span>,</span><br><span class="line">                <span class="attr">&quot;index&quot;</span>:<span class="string">&quot;true&quot;</span></span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="attr">&quot;edu&quot;</span>:&#123;</span><br><span class="line">                <span class="attr">&quot;type&quot;</span>:<span class="string">&quot;object&quot;</span>,</span><br><span class="line">                <span class="attr">&quot;properties&quot;</span>&#123;</span><br><span class="line">                </span><br><span class="line">            &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-
-
-<h2 id="四、elasticsearch-java"><a href="#四、elasticsearch-java" class="headerlink" title="四、elasticsearch-java"></a>四、elasticsearch-java</h2><blockquote>
-<p>操作elasticSearch的两种方式，通过restApi http:9200  通过tco:9300</p>
-</blockquote>
-<p><a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/java-rest-high-search.html">官网</a></p>
-<h3 id="三个组件"><a href="#三个组件" class="headerlink" title="三个组件"></a>三个组件</h3><ol>
-<li>api cilent</li>
-<li>json mapping</li>
-<li>传输层</li>
-<li>、、</li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/03/13/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/03/13/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/" class="post-title-link" itemprop="url">java常用工具类源码</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-03-13 03:52:56" itemprop="dateCreated datePublished" datetime="2022-03-13T03:52:56+08:00">2022-03-13</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/javay/" itemprop="url" rel="index"><span itemprop="name">javay</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/03/13/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/03/13/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/" class="cy_cmt_count" data-xid="2022/03/13/java/java源码解读/java源码解读/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.6k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="比较器Comparator"><a href="#比较器Comparator" class="headerlink" title="比较器Comparator"></a>比较器Comparator</h3><h3 id="一、比较器Comparator"><a href="#一、比较器Comparator" class="headerlink" title="一、比较器Comparator"></a>一、比较器Comparator</h3><ol>
-<li><p>Arrays.sort(users,new Comparator)</p>
-<p>-&gt;TimSort.sort(user,0,length,comparator)</p>
-<p>-&gt;if(len&lt;32)</p>
-<p>​    –&gt;i++找到合适开始index</p>
-<p>​    –&gt;2进制插入排序binarySort(a,index,length,c)</p>
-<p>​    –&gt;这是对少量元素进行排序的最佳方法，它需</p>
-</li>
-</ol>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2022/03/13/java/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/java%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/11/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/11/">11</a><span class="page-number current">12</span><a class="page-number" href="/page/13/">13</a><span class="space">&hellip;</span><a class="page-number" href="/page/26/">26</a><a class="extend next" rel="next" href="/page/13/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/11/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/11/">11</a><span class="page-number current">12</span><a class="page-number" href="/page/13/">13</a><span class="space">&hellip;</span><a class="page-number" href="/page/27/">27</a><a class="extend next" rel="next" href="/page/13/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 
@@ -962,14 +1038,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">128</span>
+          <span class="site-state-item-count">131</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-count">29</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>
@@ -1010,12 +1086,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">382k</span>
+    <span title="站点总字数">391k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">5:47</span>
+    <span title="站点阅读时长">5:55</span>
 </div>
 
         
