@@ -185,6 +185,279 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/26/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/auto2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/04/26/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/auto2/" class="post-title-link" itemprop="url">auth2.0</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-04-26 01:59:12" itemprop="dateCreated datePublished" datetime="2022-04-26T01:59:12+08:00">2022-04-26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-05-07 14:58:25" itemprop="dateModified" datetime="2022-05-07T14:58:25+08:00">2022-05-07</time>
+              </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/04/26/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/auto2/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/26/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/auto2/" class="cy_cmt_count" data-xid="2022/04/26/组件/登录/auto2/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>3.6k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><p>OAuth2 协议一共支持 4 种不同的授权模式：</p>
+<h4 id="授权码模式"><a href="#授权码模式" class="headerlink" title="授权码模式"></a>授权码模式</h4><p>常见的第三方平台登录功能基本都是使用这种模式。</p>
+<h4 id="简化模式"><a href="#简化模式" class="headerlink" title="简化模式"></a>简化模式</h4><p>简化模式是不需要客户端服务器参与，直接在浏览器中向授权服务器申请令牌（token），一般如果网站是纯静态页面则可以采用这种方式。</p>
+<h4 id="密码模式"><a href="#密码模式" class="headerlink" title="密码模式"></a>密码模式</h4><p>密码模式是用户把用户名密码直接告诉客户端，客户端使用说这些信息向授权服务器申请令牌（token）。这需要用户对客户端高度信任，例如客户端应用和服务提供商就是同一家公司，我们自己做前后端分离登录就可以采用这种模式。</p>
+<h4 id="客户端模式"><a href="#客户端模式" class="headerlink" title="客户端模式"></a>客户端模式</h4><p>客户端模式是指客户端使用自己的名义而不是用户的名义向服务提供者申请授权，严格来说，客户端模式并不能算作 OAuth 协议要解决的问题的一种解决方案，但是，对于开发者而言，在一些前后端分离应用或者为移动端提供的认证授权服务器上使用这种模式还是非常方便的。</p>
+<h3 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h3><blockquote>
+<p>base 申请应用认证的 client_id  client_secret</p>
+<p><a target="_blank" rel="noopener" href="https://justauth.wiki/guide/oauth/gitee/#_2-4-%E4%BB%A5%E4%B8%8A%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81%E5%A6%82%E4%B8%8B">justauth</a></p>
+</blockquote>
+<ol>
+<li><p><strong>用户</strong>请求gitee登录  <a target="_blank" rel="noopener" href="http://127.0.0.1:8443/oauth/render/gitee">http://127.0.0.1:8443/oauth/render/gitee</a></p>
+</li>
+<li><p>后端根据  <code>client_id</code>  +<code> callback</code> + 随机<code>state</code>      生成特殊<strong>Url</strong></p>
+<p>并把state    保存到redis</p>
+<p>让<strong>用户</strong> <strong>转到</strong>特殊 第一个gitee <strong>url</strong></p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://gitee.com/oauth/authorize">https://gitee.com/oauth/authorize</a>?<br><code>response_type</code>=code&amp;<br><code>client_id</code>=34c61d6a54926886f004&amp;<br><code>redirect_uri</code>=<a target="_blank" rel="noopener" href="http://127.0.0.1:8443/oauth/callback/gitee&amp;">http://127.0.0.1:8443/oauth/callback/gitee&amp;</a><br><code>state</code>=8a924&amp;<br><code>scope</code>=user_info</p>
+</blockquote>
+</li>
+<li><p>gitee这边</p>
+<blockquote>
+<p>有人用特殊<strong>url</strong> 访问我了，反正是自己的地盘，先让用户登陆了再说。</p>
+<p>然后就拿出他的<code>client_id</code>，再随机生成一个<code>code</code>，带上<code>state</code></p>
+<p>让<strong>用户</strong> <strong>转到</strong><code>redirect_uri</code></p>
+<p>并且在我的hashMap里面存一个<code>&#123;code: client_id，userInfo&#125;</code></p>
+</blockquote>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">code: gitee 提供的认证code  <span class="comment">//这个code是gitee通过client_id的，验证真伪需要用</span></span><br><span class="line">state: 之前随机生成的值</span><br></pre></td></tr></table></figure></li>
+<li><p>后端callback路径 认证code</p>
+<blockquote>
+<p>有人造访我我的callback，并且他给了我一个<code>code</code>，一个<code>state</code>，咦，</p>
+<p>我查下这个state是不是我发的，不是的话这就是恶意请求，想攻击我。</p>
+<p>redis中存在，那就对了。</p>
+<p>现在我需要根据code拿到用户的信息，</p>
+<p>我把 <code>code</code>，<code>client_id</code>，<code>client_secret</code>  一组和，gitee <code>第二个url</code>就出现了</p>
+<p>我拿着第二个url请求gitee 让他给我userinfo</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#第二个gitee  url</span></span><br><span class="line">https://gitee.com/oauth/token?code=18848b9a2e151f79ed94bdcf38f89e206b08a87a966ebc6f38decb4383d0&amp;</span><br><span class="line">client_id=3e9bf70483cccc65147eded006a80c3d8a511f5a965b61d4c61d6a54926886f0&amp;   client_secret=9698c0445da7a8f599b6b02b26897a2e6ea22243639ed22ffc3e8b7e7b50e4bc&amp;</span><br><span class="line">grant_type=authorization_code&amp;</span><br><span class="line">redirect_uri=http://<span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">8443</span>/oauth/callback/gitee</span><br></pre></td></tr></table></figure></li>
+<li><p>gitee的回应</p>
+<blockquote>
+<p><code>gitee的老板</code> 收到请求后，经过一系列认证，从hashmap中取到了userInfo，然后响应给我 </p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#x27;response&#x27;:&#123;</span><br><span class="line"> &#x27;code&#x27;:<span class="number">2000</span>,</span><br><span class="line"> &#x27;msg&#x27;:&#x27;没有消息&#x27;,</span><br><span class="line"> &#x27;data&#x27;:&#123;</span><br><span class="line">     &#x27;uuid&#x27;:&#x27;aaa&#x27;,</span><br><span class="line">     &#x27;username&#x27;:&#x27;wyg&#x27;,</span><br><span class="line">     &#x27;nickname&#x27;:&#x27;wyg&#x27;,</span><br><span class="line">     &#x27;avatar&#x27;:&#x27;头像地址&#x27;</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></blockquote>
+</li>
+<li><p>至此我拿到了gitee背书的userInfo，剩下的就是我和用户的事情了。</p>
+</li>
+<li><p>拿到username后（这个Username是不会变的，gitee虽然可以改nickname，无法修改username）</p>
+<p>我就去数据库查找有这个gitee_username的user，ok，就你了，大明，我就把</p>
+</li>
+<li><p>如果没找到，就是临时用户</p>
+</li>
+</ol>
+<h3 id="简化讲述"><a href="#简化讲述" class="headerlink" title="简化讲述"></a>简化讲述</h3><ol>
+<li><p>用户访问–&gt;服务器随机生成state，然后根据 p1 : {state，cilent_id，redirect_uri，<a target="_blank" rel="noopener" href="http://gitee.com/login">http://gitee.com/login</a> }等信息生成一个url1，并用response让用户浏览器转发到这个url1，用户输入信息p2{username,password}</p>
+</li>
+<li><p>gitee 官方接收到用户浏览器的请求后，保存请求信息p1，p2 ，随机生成一个code，保存p3{code: userInfo}</p>
+<p>带着p4{ code , state} 访问 p1.redirect_uri，</p>
+</li>
+<li><p>服务器根据p5{code，cilent_id，client_secret，redirect_uri，，<a target="_blank" rel="noopener" href="http://gitee.com/auth/token%7D">http://gitee.com/auth/token}</a> 生成url2，访问url2等到authToken</p>
+</li>
+<li><p>服务器根据authToken生成url3 访问url3得到userInfo</p>
+</li>
+</ol>
+<h4 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h4><ol>
+<li><p>url1</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">https</span>://gitee.com/oauth/authorize?response_type=code&amp;client_id=<span class="number">3</span>e<span class="number">9</span>bf<span class="number">70483</span>cccc<span class="number">65147</span>eded<span class="number">006</span>a<span class="number">80</span>c<span class="number">3</span>d<span class="number">8</span>a<span class="number">5</span>f<span class="number">5</span>a<span class="number">965</span>b<span class="number">661</span>d<span class="number">6</span>a<span class="number">54926886</span>f<span class="number">004</span>&amp;redirect_uri=http://<span class="number">127.0.0.1:8443</span>/oauth/callback/gitee&amp;state=<span class="number">32</span>ca<span class="number">6594</span>d<span class="number">002</span>e<span class="number">6</span>f<span class="number">2</span>f<span class="number">7</span>d<span class="number">9</span>ee<span class="number">1</span>a<span class="number">12</span>b<span class="number">6</span>f<span class="number">5</span>a<span class="number">5</span>&amp;scope=user_info</span><br></pre></td></tr></table></figure></li>
+<li><p>p4</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="attr">&quot;code&quot;</span>:<span class="string">&quot;53732710f7337894000f5f3ff9a453d99b88daca8267162c2b92a75fe6e726aa&quot;</span>,<span class="attr">&quot;state&quot;</span>:<span class="string">&quot;32ca6594d002e6f2f7d9ee1a12b6f5a5&quot;</span>&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>url2</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">https</span>://gitee.com/oauth/token?code=<span class="number">1488557</span>e<span class="number">82</span>c<span class="number">1</span>bf<span class="number">1</span>fdd<span class="number">8</span>c<span class="number">29</span>c<span class="number">6</span>b<span class="number">653</span>c<span class="number">62</span>e<span class="number">511</span>be<span class="number">2</span>c<span class="number">7</span>fc<span class="number">3</span>e<span class="number">7</span>d<span class="number">78013</span>b<span class="number">4</span>f<span class="number">32</span>d<span class="number">0157</span>d<span class="number">8</span>d&amp;client_id=<span class="number">3</span>e<span class="number">9</span>bf<span class="number">70483</span>cccc<span class="number">65147</span>eded<span class="number">006</span>a<span class="number">80</span>c<span class="number">3</span>d<span class="number">8</span>a<span class="number">5</span>f<span class="number">5</span>a<span class="number">965</span>b<span class="number">61</span>d<span class="number">4</span>c<span class="number">61</span>d<span class="number">6</span>a<span class="number">54886</span>f&amp;client_secret=<span class="number">96</span>c<span class="number">045</span>da<span class="number">7</span>a<span class="number">8</span>f<span class="number">599</span>b<span class="number">6</span>b<span class="number">02</span>b<span class="number">26897</span>a<span class="number">2</span>e<span class="number">6</span>ea<span class="number">43639</span>ed<span class="number">22</span>ffc<span class="number">3</span>e<span class="number">8</span>b<span class="number">7</span>e<span class="number">7</span>b<span class="number">5</span>f<span class="number">1</span>c<span class="number">0</span>e<span class="number">4</span>&amp;grant_type=authorization_code&amp;redirect_uri=http://<span class="number">127.0.0.1:8443</span>/oauth/callback/gitee</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">https</span>://gitee.com/oauth/token?code=eb<span class="number">5181</span>da<span class="number">1</span>f<span class="number">225000</span>d<span class="number">0</span>fa<span class="number">220</span>a<span class="number">896</span>a<span class="number">8</span>eda<span class="number">81</span>d<span class="number">8</span>d<span class="number">0385</span>fe<span class="number">269</span>ee<span class="number">5</span>fa<span class="number">2</span>aa<span class="number">19</span>d<span class="number">0054</span>d<span class="number">7</span>e&amp;client_id=e<span class="number">2</span>c<span class="number">295</span>ef<span class="number">1</span>c<span class="number">1</span>aa<span class="number">096</span>e<span class="number">4</span>f<span class="number">0</span>d<span class="number">2</span>a<span class="number">30590</span>ef<span class="number">91</span>e<span class="number">35</span>d<span class="number">3</span>a<span class="number">7</span>e<span class="number">2971</span>acdf<span class="number">82</span>fc<span class="number">837</span>b<span class="number">55439</span>fb<span class="number">1</span>&amp;client_secret=<span class="number">4</span>cda<span class="number">46</span>d<span class="number">4432</span>bf<span class="number">77</span>dd<span class="number">865002</span>c<span class="number">91</span>eb<span class="number">8232756607</span>f<span class="number">60</span>fb<span class="number">8</span>bfb<span class="number">2</span>f<span class="number">46</span>cf<span class="number">0</span>f<span class="number">92</span>d<span class="number">4339</span>ac&amp;grant_type=authorization_code&amp;redirect_uri=http://<span class="number">127.0.0.1:8001</span>/auth/gitee</span><br></pre></td></tr></table></figure></li>
+<li><p>url3</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">https</span>://gitee.com/api/v<span class="number">5</span>/user?access_token=f<span class="number">8119934124</span>cb<span class="number">931</span>bd<span class="number">8</span>de<span class="number">62</span>e<span class="number">838</span>d<span class="number">6</span>ef<span class="number">2</span>f</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220507145823512.png" alt="image-20220507145823512"></p>
+</li>
+</ol>
+<h2 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h2><ol>
+<li><p>url</p>
+<figure class="highlight isbl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">utils.HttpUtils</span> <span class="number">35</span>行 <span class="function"><span class="title">post</span>(<span class="variable">url</span>)</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/25/%E7%BB%84%E4%BB%B6/http%E8%AF%B7%E6%B1%82/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/04/25/%E7%BB%84%E4%BB%B6/http%E8%AF%B7%E6%B1%82/" class="post-title-link" itemprop="url">http请求</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-04-25 18:34:24" itemprop="dateCreated datePublished" datetime="2022-04-25T18:34:24+08:00">2022-04-25</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/04/25/%E7%BB%84%E4%BB%B6/http%E8%AF%B7%E6%B1%82/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/25/%E7%BB%84%E4%BB%B6/http%E8%AF%B7%E6%B1%82/" class="cy_cmt_count" data-xid="2022/04/25/组件/http请求/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="HttpClient"><a href="#HttpClient" class="headerlink" title="HttpClient"></a>HttpClient</h2><h4 id="get请求"><a href="#get请求" class="headerlink" title="get请求"></a>get请求</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//创建cilent对象</span></span><br><span class="line">CloseableHttpClient httpClient = HttpClientBuilder.create().build();</span><br><span class="line"><span class="comment">//创建一个get对象</span></span><br><span class="line">HttpGet request = <span class="keyword">new</span> HttpGet(uri);</span><br><span class="line"><span class="comment">//execute 得到 response</span></span><br><span class="line">CloseableHttpResponse response = httpClient.execute(request, HttpClientContext.create());</span><br><span class="line"><span class="comment">///取得响应结果并处理</span></span><br><span class="line">service(response);</span><br><span class="line"><span class="comment">//关闭HttpClient</span></span><br><span class="line">response.close();</span><br><span class="line">client.close();</span><br></pre></td></tr></table></figure>
+
+<h4 id="post请求"><a href="#post请求" class="headerlink" title="post请求"></a>post请求</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//创建httpclient对象</span></span><br><span class="line">CloseableHttpClient client = HttpClients.createDefault();</span><br><span class="line"><span class="comment">//创建post方式请求对象</span></span><br><span class="line">HttpPost httpPost = <span class="keyword">new</span> HttpPost(url);</span><br><span class="line"><span class="comment">//装填参数</span></span><br><span class="line">StringEntity postBody = <span class="keyword">new</span> StringEntity(<span class="string">&quot;[&quot;</span> + jsonObject.toString() + <span class="string">&quot;]&quot;</span>, <span class="string">&quot;UTF-8&quot;</span>);</span><br><span class="line">postBody.setContentType(<span class="keyword">new</span> BasicHeader(HTTP.CONTENT_TYPE,<span class="string">&quot;application/json;charset=utf-8&quot;</span>));</span><br><span class="line"><span class="comment">//设置参数到请求对象中</span></span><br><span class="line">httpPost.setEntity(postBody);</span><br><span class="line"><span class="comment">//设置header信息</span></span><br><span class="line"><span class="comment">//指定报文头【Content-type】、【User-Agent】</span></span><br><span class="line">httpPost.setHeader(<span class="string">&quot;Content-type&quot;</span>, <span class="string">&quot;application/json;charset=utf-8&quot;</span>);</span><br><span class="line"><span class="comment">//执行请求操作，并拿到结果（同步阻塞）</span></span><br><span class="line">CloseableHttpResponse response = <span class="keyword">null</span>;</span><br><span class="line"><span class="comment">//关闭</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="依赖"><a href="#依赖" class="headerlink" title="依赖"></a>依赖</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.httpcomponents<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>httpclient<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>4.5.3<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="Spring-RestTemplate"><a href="#Spring-RestTemplate" class="headerlink" title="Spring RestTemplate"></a>Spring RestTemplate</h2><h3 id="get"><a href="#get" class="headerlink" title="get"></a>get</h3><h3 id="post"><a href="#post" class="headerlink" title="post"></a>post</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"> String uri=<span class="string">&quot;http://114.55.253.244:8001/user/login&quot;</span>;</span><br><span class="line">Map&lt;String,String&gt;params=<span class="keyword">new</span> HashMap&lt;&gt;();<span class="comment">//也可以用fastjson</span></span><br><span class="line">params.put(<span class="string">&quot;username&quot;</span>,<span class="string">&quot;test1&quot;</span>);</span><br><span class="line">params.put(<span class="string">&quot;password&quot;</span>,<span class="string">&quot;test2&quot;</span>);</span><br><span class="line"><span class="keyword">final</span> String s = restTemplate.postForObject(uri, params, String.class);</span><br><span class="line"><span class="keyword">final</span> ResponseEntity&lt;String&gt; entity = restTemplate.postForEntity(uri, params, String.class);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//</span></span><br><span class="line">restTemplate.postForObject(uri, params, String.class);</span><br><span class="line"><span class="comment">//进入  RestTemplate</span></span><br><span class="line">RequestCallback requestCallback = httpEntityCallback(request, responseType);<span class="comment">//封装requst(对应params)</span></span><br><span class="line"><span class="comment">//这里 Object的parms被封装成了HttpEntity--&gt;requestEntity = new HttpEntity&lt;&gt;(requestBody);</span></span><br><span class="line"><span class="keyword">return</span> execute(url, HttpMethod.POST, requestCallback, responseExtractor, uriVariables);</span><br><span class="line"><span class="comment">//进入 RestTemplate</span></span><br><span class="line">URI expanded = getUriTemplateHandler().expand(url, uriVariables);</span><br><span class="line"><span class="keyword">return</span> doExecute(expanded, method, requestCallback, responseExtractor);</span><br><span class="line"><span class="comment">//进入 RestTemplate</span></span><br><span class="line">ClientHttpRequest request = createRequest(url, method);</span><br><span class="line">requestCallback.doWithRequest(request)<span class="comment">// ::核心</span></span><br><span class="line">	<span class="comment">//进入RestTemplate.HttpEntityRequestCallback</span></span><br><span class="line">    -&gt;</span><br><span class="line">response = request.execute();<span class="comment">//拿到结果</span></span><br><span class="line">handleResponse(url, method, response);<span class="comment">//封装，处理结果</span></span><br><span class="line"><span class="comment">//进入</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//进入</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//进入</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//进入</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//进入</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//进入</span></span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/24/%E7%BB%84%E4%BB%B6/ORM/mybatis/mybatis/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -216,7 +489,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-05-13 14:38:07" itemprop="dateModified" datetime="2022-05-13T14:38:07+08:00">2022-05-13</time>
+                <time title="修改时间：2022-05-24 12:00:19" itemprop="dateModified" datetime="2022-05-24T12:00:19+08:00">2022-05-24</time>
               </span>
 
           
@@ -241,14 +514,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>4.8k</span>
+              <span>6k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>4 分钟</span>
+              <span>5 分钟</span>
             </span>
 
         </div>
@@ -322,11 +595,10 @@
 
 <h4 id="4-2-mapper-xml"><a href="#4-2-mapper-xml" class="headerlink" title="4.2 mapper.xml"></a>4.2 mapper.xml</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">mapper</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;findAll&quot;</span> <span class="attr">resultType</span>=<span class="string">&quot;&quot;</span>&gt;</span>   <span class="comment">&lt;!--id 方法名  --&gt;</span></span><br><span class="line">    /&gt;</span><br><span class="line">/&gt;</span><br></pre></td></tr></table></figure>
 
+<h3 id="四、mapper"><a href="#四、mapper" class="headerlink" title="四、mapper"></a>四、mapper</h3><h4 id="4-1-insert"><a href="#4-1-insert" class="headerlink" title="4.1 insert"></a>4.1 insert</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">EmployeeMapper</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 保存</span></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">save</span><span class="params">(EmployeePO employeePO)</span></span>;</span><br><span class="line">    <span class="comment">//返回值不是id，EmployeePO会自己加上id</span></span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">saveReturn</span><span class="params">(EmployeePO employeePO)</span></span>;</span><br><span class="line">    <span class="comment">// 批量保存</span></span><br><span class="line">    <span class="function"><span class="keyword">long</span> <span class="title">batchSave</span><span class="params">(List&lt;EmployeePO&gt; employeePOList)</span></span>;   </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- useGeneratedKeys是使用自增键的意思，传入null就能生成，需要指定keyProperty  --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">insert</span> <span class="attr">id</span>=<span class="string">&quot;save&quot;</span> <span class="attr">useGeneratedKeys</span>=<span class="string">&quot;true&quot;</span> <span class="attr">keyProperty</span>=<span class="string">&quot;id&quot;</span>&gt;</span></span><br><span class="line">    insert into t_employee(id, name, sex, age, entryDate) values (null, #&#123;name&#125;, #&#123;sex&#125;, #&#123;age&#125;, #&#123;entryDate&#125;)</span><br><span class="line"><span class="tag">&lt;/<span class="name">insert</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">insert</span> <span class="attr">id</span>=<span class="string">&quot;saveReturn&quot;</span> <span class="attr">useGeneratedKeys</span>=<span class="string">&quot;true&quot;</span> <span class="attr">keyProperty</span>=<span class="string">&quot;id&quot;</span>&gt;</span></span><br><span class="line">    insert into t_employee(id, name, sex, age, entryDate) values (null, #&#123;name&#125;, #&#123;sex&#125;, #&#123;age&#125;, #&#123;entryDate&#125;)</span><br><span class="line"><span class="tag">&lt;/<span class="name">insert</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- mysql 批量新增 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">insert</span> <span class="attr">id</span>=<span class="string">&quot;batchSave&quot;</span> <span class="attr">useGeneratedKeys</span>=<span class="string">&quot;true&quot;</span> <span class="attr">keyProperty</span>=<span class="string">&quot;id&quot;</span>&gt;</span></span><br><span class="line">    insert into t_employee(id, name, sex, age, entryDate)</span><br><span class="line">    values</span><br><span class="line">    <span class="tag">&lt;<span class="name">foreach</span> <span class="attr">collection</span>=<span class="string">&quot;list&quot;</span> <span class="attr">separator</span>=<span class="string">&quot;,&quot;</span> <span class="attr">item</span>=<span class="string">&quot;emp&quot;</span>&gt;</span></span><br><span class="line">        (null, #&#123;emp.name&#125;, #&#123;emp.sex&#125;, #&#123;emp.age&#125;, #&#123;emp.entryDate&#125;)</span><br><span class="line">    <span class="tag">&lt;/<span class="name">foreach</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">insert</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
-<ol start="2">
-<li></li>
-</ol>
 
       
     </div>
@@ -847,209 +1119,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/23/%E7%BB%84%E4%BB%B6/ORM/mybatis/%E7%BC%93%E5%AD%98/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/04/23/%E7%BB%84%E4%BB%B6/ORM/mybatis/%E7%BC%93%E5%AD%98/" class="post-title-link" itemprop="url">mybatis缓存</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-04-23 12:13:41" itemprop="dateCreated datePublished" datetime="2022-04-23T12:13:41+08:00">2022-04-23</time>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/04/23/%E7%BB%84%E4%BB%B6/ORM/mybatis/%E7%BC%93%E5%AD%98/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/23/%E7%BB%84%E4%BB%B6/ORM/mybatis/%E7%BC%93%E5%AD%98/" class="cy_cmt_count" data-xid="2022/04/23/组件/ORM/mybatis/缓存/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.9k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="一级缓存"><a href="#一级缓存" class="headerlink" title="一级缓存"></a>一级缓存</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Configuration</span> </span>&#123;</span><br><span class="line">  <span class="comment">//protected boolean cacheEnabled = true;//开启缓存</span></span><br><span class="line">  <span class="keyword">protected</span> LocalCacheScope localCacheScope = LocalCacheScope.SESSION;<span class="comment">//范围</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//交予BaseExecutor保存localCache</span></span><br></pre></td></tr></table></figure>
-
-<h4 id="一级缓存失效"><a href="#一级缓存失效" class="headerlink" title="一级缓存失效"></a>一级缓存失效</h4><ol>
-<li>不同session</li>
-<li></li>
-</ol>
-<h3 id="二级缓存"><a href="#二级缓存" class="headerlink" title="二级缓存"></a>二级缓存</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Configuration</span> </span>&#123;</span><br><span class="line">  <span class="keyword">protected</span> <span class="keyword">boolean</span> cacheEnabled = <span class="keyword">true</span>;<span class="comment">//开启缓存</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//mapper.xml中、mapperStateMent级别</span></span><br><span class="line"><span class="comment">//&lt;select userCache=&quot;true&quot;   flushCache=&quot;false&quot;  /&gt;</span></span><br><span class="line"><span class="comment">//表示这个select使用二级缓存并且删除这个缓存。</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//原理</span></span><br><span class="line"><span class="comment">/* 1:1:1  session:Executor</span></span><br><span class="line"><span class="comment">1. cacheExecutor:	TransactionalCacheManager,(Executor)delegate</span></span><br><span class="line"><span class="comment">2. TransactionalCacheManager:	HashMap&lt;Cache,TransactionalCache&gt;</span></span><br><span class="line"><span class="comment">3. TransactionalCache: (cache)delegate，(Map)entriesToAddOnCommit，(Set)entriesMissedInCache</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">SqlSession.close()会将tcm放到二级缓存ms.cache中</span></span><br><span class="line"><span class="comment">SqlSession.commit()会将tcm放到二级缓存ms.cache中,并清空tcm</span></span><br><span class="line"><span class="comment">当对SqlSession执行更新操作（update、delete、insert）时，只会清空其自身的一级缓存，不影响二级缓存</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//查询</span></span><br><span class="line">cacheExecutor.query()</span><br><span class="line">    -&gt;ms.getCache; <span class="keyword">return</span> tcm.getObject(cache, key);</span><br><span class="line">TransactionalCacheManager.getObject(Cache cache, CacheKey key)</span><br><span class="line">    -&gt;<span class="keyword">return</span> getTransactionalCache(cache).getObject(key);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//put</span></span><br><span class="line">cache=ms.getCache();</span><br><span class="line">tcm.putObject(cache, key, list);</span><br><span class="line">	-&gt;getTransactionalCache(cache).putObject(key, value);</span><br><span class="line">getTransactionalCache(cache)</span><br><span class="line">	-&gt;txCache = <span class="keyword">new</span> TransactionalCache(cache::<span class="meta">@ms</span>.getCache::delegate::forCommit);<span class="comment">//关键</span></span><br><span class="line">	-&gt;transactionalCaches.put(cache, txCache);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//commit</span></span><br><span class="line">cacheExecutor.commit()</span><br><span class="line">    -&gt; delegate.commit(required);tcm.commit();</span><br><span class="line">tcm.commit()</span><br><span class="line">    -&gt;<span class="keyword">for</span> (TransactionalCache txCache : transactionalCaches.values()) </span><br><span class="line">    	  txCache.commit();</span><br><span class="line">txCache.commit()</span><br><span class="line">    -&gt;flushPendingEntries();reset();</span><br><span class="line">txCache.flushPendingEntries()</span><br><span class="line">    -&gt;<span class="keyword">for</span> (Map.Entry&lt;Object, Object&gt; entry : entriesToAddOnCommit.entrySet()) </span><br><span class="line">     	 delegate.putObject(entry.getKey(), entry.getValue());</span><br><span class="line">    </span><br></pre></td></tr></table></figure>
-
-
-
-<h4 id="二级缓存失效"><a href="#二级缓存失效" class="headerlink" title="二级缓存失效"></a>二级缓存失效</h4><ol>
-<li>sqlSession没有close</li>
-<li>cacheKey不同</li>
-<li>select –&gt; update –&gt; select</li>
-</ol>
-<h4 id="SerializedCache"><a href="#SerializedCache" class="headerlink" title="SerializedCache"></a>SerializedCache</h4><blockquote>
-<p>如果readOnly=false,可读写的缓存 会返回缓存对象的拷贝(通过序列化) 。这会慢一些,但是安全,因此默认是 false。</p>
-</blockquote>
-<h4 id="SynchronizedCache"><a href="#SynchronizedCache" class="headerlink" title="SynchronizedCache"></a>SynchronizedCache</h4><blockquote>
-<p>同步缓存, 3.2.6以后这个类已经没用了，考虑到Hazelcast, EhCache已经有锁机制了，所以这个锁就画蛇添足了。</p>
-</blockquote>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/23/%E7%BB%84%E4%BB%B6/ORM/mybatis/TypeHandler/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/04/23/%E7%BB%84%E4%BB%B6/ORM/mybatis/TypeHandler/" class="post-title-link" itemprop="url">mybatis-TypeHandler</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-04-23 01:33:45" itemprop="dateCreated datePublished" datetime="2022-04-23T01:33:45+08:00">2022-04-23</time>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/04/23/%E7%BB%84%E4%BB%B6/ORM/mybatis/TypeHandler/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/23/%E7%BB%84%E4%BB%B6/ORM/mybatis/TypeHandler/" class="cy_cmt_count" data-xid="2022/04/23/组件/ORM/mybatis/TypeHandler/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>2.6k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">/</span><br><span class="line"><span class="comment">// 该注解限定了只对jdbctype=tinyint类型起作用</span></span><br><span class="line"><span class="meta">@MappedJdbcTypes(JdbcType.TINYINT)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SexHandler</span> <span class="keyword">extends</span> <span class="title">BaseTypeHandler</span>&lt;<span class="title">String</span>&gt; </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setNonNullParameter</span><span class="params">(PreparedStatement ps, <span class="keyword">int</span> i, String parameter, JdbcType jdbcType)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="string">&quot;女&quot;</span>.equals(parameter)) &#123;</span><br><span class="line">            ps.setInt(i, <span class="number">2</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span>  &#123;</span><br><span class="line">            ps.setInt(i, <span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getNullableResult</span><span class="params">(ResultSet rs, String columnName)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> tansSex(rs.getInt(columnName));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> String <span class="title">tansSex</span><span class="params">(<span class="keyword">int</span> sex)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (sex == <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="string">&quot;男&quot;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;女&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getNullableResult</span><span class="params">(ResultSet rs, <span class="keyword">int</span> columnIndex)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> tansSex(rs.getInt(columnIndex));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getNullableResult</span><span class="params">(CallableStatement cs, <span class="keyword">int</span> columnIndex)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> tansSex(cs.getInt(columnIndex));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">//配置</span></span><br><span class="line"><span class="attr">mybatis:</span></span><br><span class="line">  <span class="attr">configuration:</span></span><br><span class="line">    <span class="attr">default-enum-type-handler:</span> <span class="string">com.wyg.e.SexHandler</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">//使用</span><br><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">mapper</span> <span class="meta-keyword">PUBLIC</span> <span class="meta-string">&quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;</span> <span class="meta-string">&quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">mapper</span> <span class="attr">namespace</span>=<span class="string">&quot;single.mybatis.mapper.dao.MybatisUserinfoMapper&quot;</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">resultMap</span> <span class="attr">type</span>=<span class="string">&quot;single.mybatis.mapper.entity.MybatisUserinfoModel&quot;</span> <span class="attr">id</span>=<span class="string">&quot;MybatisUserinfoMap&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">property</span>=<span class="string">&quot;id&quot;</span> <span class="attr">column</span>=<span class="string">&quot;id&quot;</span> <span class="attr">jdbcType</span>=<span class="string">&quot;INTEGER&quot;</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">property</span>=<span class="string">&quot;username&quot;</span> <span class="attr">column</span>=<span class="string">&quot;username&quot;</span> <span class="attr">jdbcType</span>=<span class="string">&quot;VARCHAR&quot;</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">property</span>=<span class="string">&quot;age&quot;</span> <span class="attr">column</span>=<span class="string">&quot;age&quot;</span> <span class="attr">jdbcType</span>=<span class="string">&quot;INTEGER&quot;</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">property</span>=<span class="string">&quot;sex&quot;</span> <span class="attr">column</span>=<span class="string">&quot;sex&quot;</span> <span class="attr">jdbcType</span>=<span class="string">&quot;TINYINT&quot;</span> <span class="attr">typeHandler</span>=<span class="string">&quot;single.mybatis.mapper.typehandle.SexHandler&quot;</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">property</span>=<span class="string">&quot;createTime&quot;</span> <span class="attr">column</span>=<span class="string">&quot;create_time&quot;</span> <span class="attr">jdbcType</span>=<span class="string">&quot;TIMESTAMP&quot;</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">property</span>=<span class="string">&quot;updateTime&quot;</span> <span class="attr">column</span>=<span class="string">&quot;update_time&quot;</span> <span class="attr">jdbcType</span>=<span class="string">&quot;TIMESTAMP&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">resultMap</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;selectList&quot;</span> <span class="attr">resultMap</span>=<span class="string">&quot;MybatisUserinfoMap&quot;</span>&gt;</span></span><br><span class="line">        select * from mybatis_userinfo</span><br><span class="line">    <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">insert</span> <span class="attr">id</span>=<span class="string">&quot;insert&quot;</span> <span class="attr">parameterType</span>=<span class="string">&quot;single.mybatis.mapper.entity.MybatisUserinfoModel&quot;</span>&gt;</span></span><br><span class="line">        INSERT INTO</span><br><span class="line">        mybatis_userinfo(`username`, `age`, `sex`, `create_time`, `update_time`)</span><br><span class="line">        VALUES</span><br><span class="line">        (#&#123;username&#125;, #&#123;age&#125;, #&#123;sex,typeHandler=single.mybatis.mapper.typehandle.SexHandler&#125;, #&#123;createTime&#125;, #&#123;updateTime&#125;);</span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;/<span class="name">insert</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">mapper</span>&gt;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1121,7 +1190,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">132</span>
+          <span class="site-state-item-count">134</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1169,12 +1238,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">391k</span>
+    <span title="站点总字数">396k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">5:55</span>
+    <span title="站点阅读时长">6:01</span>
 </div>
 
         

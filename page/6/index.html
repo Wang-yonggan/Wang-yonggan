@@ -185,6 +185,209 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/23/%E7%BB%84%E4%BB%B6/ORM/mybatis/%E7%BC%93%E5%AD%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/04/23/%E7%BB%84%E4%BB%B6/ORM/mybatis/%E7%BC%93%E5%AD%98/" class="post-title-link" itemprop="url">mybatis缓存</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-04-23 12:13:41" itemprop="dateCreated datePublished" datetime="2022-04-23T12:13:41+08:00">2022-04-23</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/04/23/%E7%BB%84%E4%BB%B6/ORM/mybatis/%E7%BC%93%E5%AD%98/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/23/%E7%BB%84%E4%BB%B6/ORM/mybatis/%E7%BC%93%E5%AD%98/" class="cy_cmt_count" data-xid="2022/04/23/组件/ORM/mybatis/缓存/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.9k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="一级缓存"><a href="#一级缓存" class="headerlink" title="一级缓存"></a>一级缓存</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Configuration</span> </span>&#123;</span><br><span class="line">  <span class="comment">//protected boolean cacheEnabled = true;//开启缓存</span></span><br><span class="line">  <span class="keyword">protected</span> LocalCacheScope localCacheScope = LocalCacheScope.SESSION;<span class="comment">//范围</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//交予BaseExecutor保存localCache</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="一级缓存失效"><a href="#一级缓存失效" class="headerlink" title="一级缓存失效"></a>一级缓存失效</h4><ol>
+<li>不同session</li>
+<li></li>
+</ol>
+<h3 id="二级缓存"><a href="#二级缓存" class="headerlink" title="二级缓存"></a>二级缓存</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Configuration</span> </span>&#123;</span><br><span class="line">  <span class="keyword">protected</span> <span class="keyword">boolean</span> cacheEnabled = <span class="keyword">true</span>;<span class="comment">//开启缓存</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//mapper.xml中、mapperStateMent级别</span></span><br><span class="line"><span class="comment">//&lt;select userCache=&quot;true&quot;   flushCache=&quot;false&quot;  /&gt;</span></span><br><span class="line"><span class="comment">//表示这个select使用二级缓存并且删除这个缓存。</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//原理</span></span><br><span class="line"><span class="comment">/* 1:1:1  session:Executor</span></span><br><span class="line"><span class="comment">1. cacheExecutor:	TransactionalCacheManager,(Executor)delegate</span></span><br><span class="line"><span class="comment">2. TransactionalCacheManager:	HashMap&lt;Cache,TransactionalCache&gt;</span></span><br><span class="line"><span class="comment">3. TransactionalCache: (cache)delegate，(Map)entriesToAddOnCommit，(Set)entriesMissedInCache</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">SqlSession.close()会将tcm放到二级缓存ms.cache中</span></span><br><span class="line"><span class="comment">SqlSession.commit()会将tcm放到二级缓存ms.cache中,并清空tcm</span></span><br><span class="line"><span class="comment">当对SqlSession执行更新操作（update、delete、insert）时，只会清空其自身的一级缓存，不影响二级缓存</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//查询</span></span><br><span class="line">cacheExecutor.query()</span><br><span class="line">    -&gt;ms.getCache; <span class="keyword">return</span> tcm.getObject(cache, key);</span><br><span class="line">TransactionalCacheManager.getObject(Cache cache, CacheKey key)</span><br><span class="line">    -&gt;<span class="keyword">return</span> getTransactionalCache(cache).getObject(key);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//put</span></span><br><span class="line">cache=ms.getCache();</span><br><span class="line">tcm.putObject(cache, key, list);</span><br><span class="line">	-&gt;getTransactionalCache(cache).putObject(key, value);</span><br><span class="line">getTransactionalCache(cache)</span><br><span class="line">	-&gt;txCache = <span class="keyword">new</span> TransactionalCache(cache::<span class="meta">@ms</span>.getCache::delegate::forCommit);<span class="comment">//关键</span></span><br><span class="line">	-&gt;transactionalCaches.put(cache, txCache);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//commit</span></span><br><span class="line">cacheExecutor.commit()</span><br><span class="line">    -&gt; delegate.commit(required);tcm.commit();</span><br><span class="line">tcm.commit()</span><br><span class="line">    -&gt;<span class="keyword">for</span> (TransactionalCache txCache : transactionalCaches.values()) </span><br><span class="line">    	  txCache.commit();</span><br><span class="line">txCache.commit()</span><br><span class="line">    -&gt;flushPendingEntries();reset();</span><br><span class="line">txCache.flushPendingEntries()</span><br><span class="line">    -&gt;<span class="keyword">for</span> (Map.Entry&lt;Object, Object&gt; entry : entriesToAddOnCommit.entrySet()) </span><br><span class="line">     	 delegate.putObject(entry.getKey(), entry.getValue());</span><br><span class="line">    </span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="二级缓存失效"><a href="#二级缓存失效" class="headerlink" title="二级缓存失效"></a>二级缓存失效</h4><ol>
+<li>sqlSession没有close</li>
+<li>cacheKey不同</li>
+<li>select –&gt; update –&gt; select</li>
+</ol>
+<h4 id="SerializedCache"><a href="#SerializedCache" class="headerlink" title="SerializedCache"></a>SerializedCache</h4><blockquote>
+<p>如果readOnly=false,可读写的缓存 会返回缓存对象的拷贝(通过序列化) 。这会慢一些,但是安全,因此默认是 false。</p>
+</blockquote>
+<h4 id="SynchronizedCache"><a href="#SynchronizedCache" class="headerlink" title="SynchronizedCache"></a>SynchronizedCache</h4><blockquote>
+<p>同步缓存, 3.2.6以后这个类已经没用了，考虑到Hazelcast, EhCache已经有锁机制了，所以这个锁就画蛇添足了。</p>
+</blockquote>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/23/%E7%BB%84%E4%BB%B6/ORM/mybatis/TypeHandler/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/04/23/%E7%BB%84%E4%BB%B6/ORM/mybatis/TypeHandler/" class="post-title-link" itemprop="url">mybatis-TypeHandler</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-04-23 01:33:45" itemprop="dateCreated datePublished" datetime="2022-04-23T01:33:45+08:00">2022-04-23</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/04/23/%E7%BB%84%E4%BB%B6/ORM/mybatis/TypeHandler/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/23/%E7%BB%84%E4%BB%B6/ORM/mybatis/TypeHandler/" class="cy_cmt_count" data-xid="2022/04/23/组件/ORM/mybatis/TypeHandler/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.6k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">/</span><br><span class="line"><span class="comment">// 该注解限定了只对jdbctype=tinyint类型起作用</span></span><br><span class="line"><span class="meta">@MappedJdbcTypes(JdbcType.TINYINT)</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SexHandler</span> <span class="keyword">extends</span> <span class="title">BaseTypeHandler</span>&lt;<span class="title">String</span>&gt; </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setNonNullParameter</span><span class="params">(PreparedStatement ps, <span class="keyword">int</span> i, String parameter, JdbcType jdbcType)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="string">&quot;女&quot;</span>.equals(parameter)) &#123;</span><br><span class="line">            ps.setInt(i, <span class="number">2</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span>  &#123;</span><br><span class="line">            ps.setInt(i, <span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getNullableResult</span><span class="params">(ResultSet rs, String columnName)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> tansSex(rs.getInt(columnName));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> String <span class="title">tansSex</span><span class="params">(<span class="keyword">int</span> sex)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (sex == <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="string">&quot;男&quot;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;女&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getNullableResult</span><span class="params">(ResultSet rs, <span class="keyword">int</span> columnIndex)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> tansSex(rs.getInt(columnIndex));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getNullableResult</span><span class="params">(CallableStatement cs, <span class="keyword">int</span> columnIndex)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> tansSex(cs.getInt(columnIndex));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">//配置</span></span><br><span class="line"><span class="attr">mybatis:</span></span><br><span class="line">  <span class="attr">configuration:</span></span><br><span class="line">    <span class="attr">default-enum-type-handler:</span> <span class="string">com.wyg.e.SexHandler</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">//使用</span><br><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">mapper</span> <span class="meta-keyword">PUBLIC</span> <span class="meta-string">&quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;</span> <span class="meta-string">&quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">mapper</span> <span class="attr">namespace</span>=<span class="string">&quot;single.mybatis.mapper.dao.MybatisUserinfoMapper&quot;</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">resultMap</span> <span class="attr">type</span>=<span class="string">&quot;single.mybatis.mapper.entity.MybatisUserinfoModel&quot;</span> <span class="attr">id</span>=<span class="string">&quot;MybatisUserinfoMap&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">property</span>=<span class="string">&quot;id&quot;</span> <span class="attr">column</span>=<span class="string">&quot;id&quot;</span> <span class="attr">jdbcType</span>=<span class="string">&quot;INTEGER&quot;</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">property</span>=<span class="string">&quot;username&quot;</span> <span class="attr">column</span>=<span class="string">&quot;username&quot;</span> <span class="attr">jdbcType</span>=<span class="string">&quot;VARCHAR&quot;</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">property</span>=<span class="string">&quot;age&quot;</span> <span class="attr">column</span>=<span class="string">&quot;age&quot;</span> <span class="attr">jdbcType</span>=<span class="string">&quot;INTEGER&quot;</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">property</span>=<span class="string">&quot;sex&quot;</span> <span class="attr">column</span>=<span class="string">&quot;sex&quot;</span> <span class="attr">jdbcType</span>=<span class="string">&quot;TINYINT&quot;</span> <span class="attr">typeHandler</span>=<span class="string">&quot;single.mybatis.mapper.typehandle.SexHandler&quot;</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">property</span>=<span class="string">&quot;createTime&quot;</span> <span class="attr">column</span>=<span class="string">&quot;create_time&quot;</span> <span class="attr">jdbcType</span>=<span class="string">&quot;TIMESTAMP&quot;</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">result</span> <span class="attr">property</span>=<span class="string">&quot;updateTime&quot;</span> <span class="attr">column</span>=<span class="string">&quot;update_time&quot;</span> <span class="attr">jdbcType</span>=<span class="string">&quot;TIMESTAMP&quot;</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">resultMap</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;selectList&quot;</span> <span class="attr">resultMap</span>=<span class="string">&quot;MybatisUserinfoMap&quot;</span>&gt;</span></span><br><span class="line">        select * from mybatis_userinfo</span><br><span class="line">    <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">insert</span> <span class="attr">id</span>=<span class="string">&quot;insert&quot;</span> <span class="attr">parameterType</span>=<span class="string">&quot;single.mybatis.mapper.entity.MybatisUserinfoModel&quot;</span>&gt;</span></span><br><span class="line">        INSERT INTO</span><br><span class="line">        mybatis_userinfo(`username`, `age`, `sex`, `create_time`, `update_time`)</span><br><span class="line">        VALUES</span><br><span class="line">        (#&#123;username&#125;, #&#123;age&#125;, #&#123;sex,typeHandler=single.mybatis.mapper.typehandle.SexHandler&#125;, #&#123;createTime&#125;, #&#123;updateTime&#125;);</span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;/<span class="name">insert</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">mapper</span>&gt;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/23/%E7%BB%84%E4%BB%B6/ORM/mybatis/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -814,262 +1017,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%97%A5%E5%BF%97/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%97%A5%E5%BF%97/" class="post-title-link" itemprop="url">mysql-log</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-04-10 14:43:32" itemprop="dateCreated datePublished" datetime="2022-04-10T14:43:32+08:00">2022-04-10</time>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%97%A5%E5%BF%97/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%97%A5%E5%BF%97/" class="cy_cmt_count" data-xid="2022/04/10/数据库/日志/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>4k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>4 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/cswiki/p/15816371.html">转载</a></p>
-<h2 id="binlog-持久化"><a href="#binlog-持久化" class="headerlink" title="binlog 持久化"></a>binlog 持久化</h2><p>这里引入了一个新的概念：binlog cache</p>
-<p>从名字就能看出来，binlog cache 其实就是一片内存区域，充当缓存的作用。</p>
-<p>每个线程都有自己 binlog cache 区域，<strong>在事务运行的过程中，MySQL 会先把日志写到 binlog cache 中，等到事务真正提交的时候，再统一把 binlog cache 中的数据写到 binlog 文件中</strong>。（binlog cache 有很多个，binlog 文件只有一个！）</p>
-<p>事实上，这个从 binlog cache 写到 binlog 文件中的操作，并<strong>不</strong>就是落盘操作了，这里仅仅是把 binlog 写到了文件系统的 page cache 上（这一步对应下图中的 <code>write</code> 操作）。</p>
-<blockquote>
-<p>简单解释下文件系统的 page cache：</p>
-<p>CPU 如果要访问外部磁盘上的文件，需要首先将这些文件的内容拷贝到内存中，由于硬件的限制，从磁盘到内存的数据传输速度是很慢的，如果现在物理内存有空余，干嘛不用这些空闲内存来缓存一些磁盘的文件内容呢，<strong>这部分用作缓存磁盘文件的内存就叫做 page cache</strong>。</p>
-<p>很多同学看到这里可能觉得特别特别熟悉，是的，和 CPU 里的高速缓存是不是很像？两者其实都是利用的局部性原理，只不过<strong>高速缓存是 CPU 缓存内存的数据，而 page cache 是内存缓存磁盘的数据</strong>，这也体现了操作系统内存层次结构分级的思想。</p>
-</blockquote>
-<p>所以，最后需要把 page cache 中的数据同步到磁盘上，才算真正完成了 binlog 的持久化（这一步对应下图中的 <code>fsync</code> 操作）。一般情况下，我们认为 <code>fsync</code> 才占磁盘的 IOPS (Input/Output Operations Per Second)</p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220410143626228.png" alt="image-20220410143626228"></p>
-<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">write 和 fsync 的时机，是由参数 sync_binlog 控制的：</span><br><span class="line"></span><br><span class="line">sync_binlog = <span class="number">0</span>，每次提交事务的时候，只进行 write，不进行 fsync</span><br><span class="line">sync_binlog = <span class="number">1</span>候，每次提交事务的时候，执行 write 和 fsync</span><br><span class="line">sync_binlog = N(N&gt;<span class="number">1</span>)，每次提交事务的时候，执行 write，累积 N 个事务后再执行 fsync</span><br><span class="line">可以看出来，如果业务场景涉及到的 IO 操作很多的话，可以适当增大 sync_binlog 的值，提高性能。但是也存在一定的风险，比如你设置成 <span class="number">100</span>，万一在第 <span class="number">80</span> 个事务提交的时候数据库宕机了，那这些事务的 binlog 日志由于没有执行 fsync，也就丢失了。</span><br></pre></td></tr></table></figure>
-
-<h2 id="redolog-持久化"><a href="#redolog-持久化" class="headerlink" title="redolog 持久化"></a>redolog 持久化</h2><p>类比 binlog，在事务执行过程中，binlog 都是存在 binlog cache 中，redolog 也有这样一块内存区域，叫作 <strong>redolog buffer</strong>。</p>
-<p><strong>在事务运行的过程中，MySQL 会先把日志写到 redolog buffer 中，等到事务真正提交的时候，再统一把 redolog buffer 中的数据写到 redolog 文件中</strong>。和 binlog 的落盘操作一样，这个从 redolog buffer 写到 redolog 文件中的操作，并<strong>不</strong>就是落盘操作了，这里仅仅是把 redolog 写到了文件系统的 page cache 上，最后还需要执行 <code>fsync</code> 才能够实现真正的落盘。</p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220410143800256.png" alt="image-20220410143800256"></p>
-<p>解释下 redo log buffer？</p>
-<p>在一个事务的更新过程中，日志是要写多次的。比如下面这个事务：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">begin</span>;</span><br><span class="line">	<span class="keyword">insert</span> <span class="keyword">into</span> table1 ...</span><br><span class="line">	<span class="keyword">insert</span> <span class="keyword">into</span> table2 ...</span><br><span class="line"><span class="keyword">commit</span>;</span><br></pre></td></tr></table></figure>
-
-<p>这个事务要往两个表 table1 和 table2 中插入记录，为了确保这个事务不被拆开，一次性的完整写入日志文件中，在插入数据的过程中，我们需要把生成的日志都先保存起来。redolog buffer 就是这么一个用来先存 redo 日志的地方。</p>
-<p>也就是说，在执行第一条 insert 语句的时候，redolog buffer 也就写入了这条记录的日志。</p>
-<p>不同于 binlog cache 每个线程都有一个，<strong>redolog buffer 只有那么一个</strong>。</p>
-<p>事实上，日志写到 redolog buffer 是很快的，wirte 到 page cache 也差不多，但是 fsync 持久化到磁盘的速度就慢多了，为了控制 redo log 的写入策略，InnoDB 提供了 <code>innodb_flush_log_at_trx_commit</code> 参数，它有三种可能取值：</p>
-<ul>
-<li><code>innodb_flush_log_at_trx_commit = 0</code>，每次事务提交的时候，都只是把 redolog 留在 redolog buffer 中</li>
-<li><code>innodb_flush_log_at_trx_commit = 1</code>，每次事务提交的时候，都执行 fsync 将 redolog 直接持久化到磁盘</li>
-<li><code>innodb_flush_log_at_trx_commit = 2</code>，每次事务提交的时候，都只执行 write 将 redolog 写到文件系统的 page cache 中</li>
-</ul>
-<p>说了这么多，各位小伙伴们对 binlog 和 redolog 的持久化机制想必都有所了解了，我们来看文题：<strong>事务还没提交的时候，redolog 能不能被持久化到磁盘呢</strong>？</p>
-<p>先说答案，答案就是<strong>有可能</strong>。</p>
-<p>分析下 redolog 可能存在的三种状态（binlog 也差不多）：</p>
-<ul>
-<li>事务执行过程中，存在 MySQL 的进程内存中的 redolog buffer 中</li>
-<li>事务提交，执行 write 操作存在文件系统的 page cache 中，但是没有执行 fsync 操作持久化到磁盘</li>
-<li>事务提交，执行 fsync 操作持久化到磁盘</li>
-</ul>
-<p>至于为什么说事务还没提交的时候，redolog 也有可能被持久化到磁盘呢？</p>
-<p>InnoDB 有一个后台线程，每隔 1 秒轮询一次，具体的操作是这样的：</p>
-<ol>
-<li>调用 write 将 redolog buffer 中的日志写到文件系统的 page cache，</li>
-<li>然后调用 fsync 持久化到磁盘。而在事务执行中间过程的 redolog 都是直接写在 redolog buffer 中的，也就是说，一个没有提交的事务的 redolog，也是有可能会被后台线程一起持久化到磁盘的。</li>
-</ol>
-<p>另外，除了后台线程每秒一次的轮询操作外，还有两种场景会让一个没有提交的事务的 redolog 写盘：</p>
-<ol>
-<li><p>innodb_flush_log_at_trx_commit 设置是 1，这样并行的某个事务提交的时候，就会顺带将这个事务的 redolog buffer 持久化到磁盘</p>
-<p>举个例子，假设事务 A 执行到一半，已经写了一些 redolog 到 redolog buffer 中，这时候有另外一个事务 B 提交，按照 innodb_flush_log_at_trx_commit = 1 的逻辑，事务 B 要把 redolog buffer 里的日志全部持久化到磁盘，这时候，就会带上事务 A 在 redolog buffer 里的日志一起持久化到磁盘</p>
-</li>
-<li><p>redo log buffer 占用的空间达到 redolo buffer 大小（由参数 <code>innodb_log_buffer_size</code> 控制，默认是 8MB）一半的时候，后台线程会主动写盘。不过由于这个事务并没有提交，所以这个写盘动作只是 write 到了文件系统的 page cache，仍然是在内存中，并没有调用 fsync 真正落盘</p>
-</li>
-</ol>
-<hr>
-<p>最后放上这道题的背诵版：</p>
-<blockquote>
-<p>🥸 <strong>面试官</strong>：</p>
-<ul>
-<li>问题：事务还没提交的时候，redo log 能不能被持久化到磁盘呢？</li>
-<li>相关问题：MySQL 是如何保证数据不丢失的呢？</li>
-</ul>
-<p>😎 <strong>小牛肉</strong>：事务还没有提交的时候，redo log 是有可能被持久化到磁盘的。</p>
-<p>redolog 的具体落盘操作是这样的：在事务运行的过程中，MySQL 会先把日志写到 redolog buffer 中，等到事务真正提交的时候，再统一把 redolog buffer 中的数据写到 redolog 文件中。不过这个从 redolog buffer 写到 redolog 文件中的操作也就是 write 并不就是落盘操作了，这里仅仅是把 redolog 写到了文件系统的 page cache 上，最后还需要执行 fsync 才能够实现真正的落盘。</p>
-<p>也就是说，redolog 其实存在三种状态：</p>
-<ul>
-<li>事务执行过程中，存在 MySQL 的进程内存中的 redolog buffer 中</li>
-<li>事务提交，执行 write 操作存在文件系统的 page cache 中，但是没有执行 fsync 操作持久化到磁盘</li>
-<li>事务提交，执行 fsync 操作持久化到磁盘</li>
-</ul>
-<p>额为什么说事务还没提交的时候，redolog 也有可能被持久化到磁盘呢？</p>
-<p>主要有三种可能的原因：</p>
-<ol>
-<li>第一种情况：InnoDB 有一个后台线程，每隔 1 秒轮询一次，具体的操作是这样的：调用 write 将 redolog buffer 中的日志写到文件系统的 page cache，然后调用 fsync 持久化到磁盘。而在事务执行中间过程的 redolog 都是直接写在 redolog buffer 中的，也就是说，一个没有提交的事务的 redolog，也是有可能会被后台线程一起持久化到磁盘的。</li>
-<li>第二种情况：innodb_flush_log_at_trx_commit 设置是 1，这个参数的意思就是，每次事务提交的时候，都执行 fsync 将 redolog 直接持久化到磁盘（还有 0 和 2 的选择，0 表示每次事务提交的时候，都只是把 redolog 留在 redolog buffer 中；2 表示每次事务提交的时候，都只执行 write 将 redolog 写到文件系统的 page cache 中）。举个例子，假设事务 A 执行到一半，已经写了一些 redolog 到 redolog buffer 中，这时候有另外一个事务 B 提交，按照 innodb_flush_log_at_trx_commit = 1 的逻辑，事务 B 要把 redolog buffer 里的日志全部持久化到磁盘，这时候，就会带上事务 A 在 redolog buffer 里的日志一起持久化到磁盘</li>
-<li>第二种情况：redo log buffer 占用的空间达到 redolog buffer 大小（由参数 <code>innodb_log_buffer_size</code> 控制，默认是 8MB）一半的时候，后台线程会主动写盘。不过由于这个事务并没有提交，所以这个写盘动作只是 write 到了文件系统的 page cache，仍然是在内存中，并没有调用 fsync 真正落盘</li>
-</ol>
-</blockquote>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/10/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/%E5%9F%BA%E4%BA%8E%E6%8B%A6%E6%88%AA%E5%99%A8%E7%9A%84/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/04/10/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/%E5%9F%BA%E4%BA%8E%E6%8B%A6%E6%88%AA%E5%99%A8%E7%9A%84/" class="post-title-link" itemprop="url">基于拦截器的</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-04-10 14:06:31" itemprop="dateCreated datePublished" datetime="2022-04-10T14:06:31+08:00">2022-04-10</time>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/04/10/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/%E5%9F%BA%E4%BA%8E%E6%8B%A6%E6%88%AA%E5%99%A8%E7%9A%84/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/10/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/%E5%9F%BA%E4%BA%8E%E6%8B%A6%E6%88%AA%E5%99%A8%E7%9A%84/" class="cy_cmt_count" data-xid="2022/04/10/组件/登录/基于拦截器的/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>2.3k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h4 id="配置类"><a href="#配置类" class="headerlink" title="配置类"></a>配置类</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MvcConfig</span> <span class="keyword">implements</span> <span class="title">WebMvcConfigurer</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Resource</span></span><br><span class="line">    <span class="keyword">private</span> StringRedisTemplate stringRedisTemplate;</span><br><span class="line">	<span class="comment">//注册拦截器</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addInterceptors</span><span class="params">(InterceptorRegistry registry)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 登录拦截器</span></span><br><span class="line">        registry.addInterceptor(<span class="keyword">new</span> LoginInterceptor())</span><br><span class="line">                .excludePathPatterns(</span><br><span class="line">                        <span class="string">&quot;/shop/**&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;/voucher/**&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;/shop-type/**&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;/upload/**&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;/blog/hot&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;/user/code&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;/user/login&quot;</span></span><br><span class="line">                ).order(<span class="number">1</span>);</span><br><span class="line">        <span class="comment">// token刷新的拦截器</span></span><br><span class="line">        registry.addInterceptor(<span class="keyword">new</span> RefreshTokenInterceptor(stringRedisTemplate)).addPathPatterns(<span class="string">&quot;/**&quot;</span>).order(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h4 id="自制拦截器"><a href="#自制拦截器" class="headerlink" title="自制拦截器"></a>自制拦截器</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//r</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LoginInterceptor</span> <span class="keyword">implements</span> <span class="title">HandlerInterceptor</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">preHandle</span><span class="params">(HttpServletRequest request, HttpServletResponse response, Object handler)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">// 1.判断是否需要拦截（ThreadLocal中是否有用户）</span></span><br><span class="line">        <span class="keyword">if</span> (UserHolder.getUser() == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">// 没有，需要拦截，设置状态码</span></span><br><span class="line">            response.setStatus(<span class="number">401</span>);</span><br><span class="line">            <span class="comment">// 拦截</span></span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 有用户，则放行</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//①根据token保存User到ThreadLocal</span></span><br><span class="line"><span class="comment">//②刷新token时间  </span></span><br><span class="line"><span class="keyword">import</span> <span class="keyword">static</span> com.hmdp.utils.RedisConstants.LOGIN_USER_KEY;</span><br><span class="line"><span class="keyword">import</span> <span class="keyword">static</span> com.hmdp.utils.RedisConstants.LOGIN_USER_TTL;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RefreshTokenInterceptor</span> <span class="keyword">implements</span> <span class="title">HandlerInterceptor</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> StringRedisTemplate stringRedisTemplate;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">RefreshTokenInterceptor</span><span class="params">(StringRedisTemplate stringRedisTemplate)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.stringRedisTemplate = stringRedisTemplate;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">preHandle</span><span class="params">(HttpServletRequest request, HttpServletResponse response, Object handler)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">// 1.获取请求头中的token</span></span><br><span class="line">        String token = request.getHeader(<span class="string">&quot;authorization&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (StrUtil.isBlank(token)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 2.基于TOKEN获取redis中的用户</span></span><br><span class="line">        String key  = LOGIN_USER_KEY + token;</span><br><span class="line">        Map&lt;Object, Object&gt; userMap = stringRedisTemplate.opsForHash().entries(key);</span><br><span class="line">        <span class="comment">// 3.判断用户是否存在</span></span><br><span class="line">        <span class="keyword">if</span> (userMap.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 5.将查询到的hash数据转为UserDTO</span></span><br><span class="line">        UserDTO userDTO = BeanUtil.fillBeanWithMap(userMap, <span class="keyword">new</span> UserDTO(), <span class="keyword">false</span>);</span><br><span class="line">        <span class="comment">// 6.存在，保存用户信息到 ThreadLocal</span></span><br><span class="line">        UserHolder.saveUser(userDTO);</span><br><span class="line">        <span class="comment">// 7.刷新token有效期</span></span><br><span class="line">        stringRedisTemplate.expire(key, LOGIN_USER_TTL, TimeUnit.MINUTES);</span><br><span class="line">        <span class="comment">// 8.放行</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">afterCompletion</span><span class="params">(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">// 移除用户</span></span><br><span class="line">        UserHolder.removeUser();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1141,7 +1088,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">132</span>
+          <span class="site-state-item-count">134</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1189,12 +1136,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">391k</span>
+    <span title="站点总字数">396k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">5:55</span>
+    <span title="站点阅读时长">6:01</span>
 </div>
 
         

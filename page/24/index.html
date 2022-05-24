@@ -185,6 +185,474 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/11/22/spring/spring%E6%A0%B8%E5%BF%83/springIOC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/11/22/spring/spring%E6%A0%B8%E5%BF%83/springIOC/" class="post-title-link" itemprop="url">springIOC</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-11-22 23:28:29" itemprop="dateCreated datePublished" datetime="2021-11-22T23:28:29+08:00">2021-11-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-03-22 23:28:29" itemprop="dateModified" datetime="2022-03-22T23:28:29+08:00">2022-03-22</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/spring/" itemprop="url" rel="index"><span itemprop="name">spring</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2021/11/22/spring/spring%E6%A0%B8%E5%BF%83/springIOC/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2021/11/22/spring/spring%E6%A0%B8%E5%BF%83/springIOC/" class="cy_cmt_count" data-xid="2021/11/22/spring/spring核心/springIOC/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.9k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>[toc]</p>
+<h2 id="IOC概念"><a href="#IOC概念" class="headerlink" title="IOC概念"></a>IOC概念</h2><h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><ol>
+<li>解决的问题<ol>
+<li><p>原来一个对象使用另一个对象，只能new </p>
+<ul>
+<li>只能new,加入我改变了new 的参数,<font color='red'>那我要在很多代码里面改</font>那我要在很多代码里面改，耦合度太高 ，所以创建一个工厂统一管理对象的创建，用到的地方不需要知道怎么new，只需要过去就行了</li>
+<li>每次都New 很浪费资源，所以<font color='red'>改为</font>通过xml解析获得</li>
+<li>Class.forName获取,进一步获取bean，进一步降低耦合度</li>
+</ul>
+</li>
+<li><p>实际解决问题</p>
+<ol>
+<li><p>注入bean，，setter等方式</p>
+</li>
+<li><p>@bean放到方法上，并且这个方法有参数，那么spring就能帮我们从ioc中找到这个参数</p>
+<blockquote>
+<p>如果是我们自己创建的，ioc根本无法不知道有哪些类被创建了</p>
+</blockquote>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>技术<ul>
+<li>xml解析</li>
+<li>工厂模式</li>
+<li>反射技术</li>
+<li>DI技术</li>
+</ul>
+</li>
+</ol>
+<h2 id="bean注册"><a href="#bean注册" class="headerlink" title="bean注册"></a>bean注册</h2><h3 id="1-sping-xml注册"><a href="#1-sping-xml注册" class="headerlink" title="1. sping.xml注册"></a>1. sping.xml注册</h3><ol>
+<li><p>注意</p>
+<ul>
+<li>默认无参构造,也可以有参</li>
+<li>注入属性是基于DI</li>
+</ul>
+</li>
+<li><p>属性注入方法</p>
+<ol>
+<li><p>set方法&lt;properity&gt;</p>
+</li>
+<li><p>构造函数</p>
+</li>
+<li><p>p命名空间 基于set</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">xmlns:p=&quot;http://www.springframework.org/schema/p&quot;</span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">&quot;s2&quot;</span> <span class="attr">class</span>=<span class="string">&quot;com.wyg.epidemicsituation.entity.vo.Student&quot;</span> <span class="attr">p:age</span>=<span class="string">&quot;20&quot;</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+<li><p>属性注入特殊情况</p>
+<ol>
+<li><p>null  &lt;null&gt;&lt;/null&gt;</p>
+</li>
+<li><p>大于小于号;lt</p>
+</li>
+<li><p>外部bean</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;name&quot;</span> <span class="attr">ref</span>=<span class="string">&quot;testID&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>内部bean,作用和外部bean一样，就是形式不一样</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;name&quot;</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">&quot;aa&quot;</span>&gt;</span> <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;&quot;</span>&lt;/<span class="attr">bean</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+<li><p>注册bean</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">&quot;http://www.springframework.org/schema/beans&quot;</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xmlns:xsi</span>=<span class="string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xsi:schemaLocation</span>=<span class="string">&quot;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd&quot;</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">&quot;s2&quot;</span> <span class="attr">class</span>=<span class="string">&quot;com.wyg.epidemicsituation.entity.vo.Student&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">&quot;age&quot;</span> <span class="attr">value</span>=<span class="string">&quot;20&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">constructor-arg</span> <span class="attr">name</span>=<span class="string">&quot;name&quot;</span> <span class="attr">value</span>=<span class="string">&quot;wang&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">constructor-arg</span>&gt;</span>//有参</span><br><span class="line">    <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>getBean</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ApplicationContext ioc=<span class="keyword">new</span> ClassPathXmlApplicationContext(<span class="string">&quot;/config/beans.xml&quot;</span>);</span><br><span class="line">Student student= (Student) ioc.getBean(<span class="string">&quot;s2&quot;</span>) ;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="2-注解配置"><a href="#2-注解配置" class="headerlink" title="2.  注解配置"></a>2.  注解配置</h3><h2 id="二-获取bean"><a href="#二-获取bean" class="headerlink" title="二 获取bean"></a>二 获取bean</h2><ol>
+<li>i</li>
+</ol>
+<h3 id="注解"><a href="#注解" class="headerlink" title="注解"></a>注解</h3><ol>
+<li><p>qualifier要小写,且要和@autowire一起使用</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">@Qualifier(&quot;companyIntroServiceImpl&quot;)</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="spring中两种Bean"><a href="#spring中两种Bean" class="headerlink" title="spring中两种Bean"></a>spring中两种Bean</h3><ul>
+<li>普通bean<ul>
+<li>定义Student 返回就是Student</li>
+</ul>
+</li>
+<li>工厂bean<ul>
+<li>定义为Student，返回可能是其他类型</li>
+<li>接口FactoryBean</li>
+</ul>
+</li>
+</ul>
+<h3 id="Bean的作用域"><a href="#Bean的作用域" class="headerlink" title="Bean的作用域"></a>Bean的作用域</h3><p>spring里面bean默认为单例，可以设置为单例和多例</p>
+<ol>
+<li><p>设置为多例 </p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean  <span class="attribute">scope</span>=<span class="string">&quot;prototype&quot;</span>&gt; 多例</span><br><span class="line"> <span class="attribute">scope</span>=<span class="string">&quot;session&quot;</span>   保存在session中</span><br></pre></td></tr></table></figure></li>
+<li><p>多例规则：懒加载</p>
+</li>
+<li><p>单例规则：饿汉式</p>
+</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/11/21/utils/python/python%E7%88%AC%E8%99%AB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/11/21/utils/python/python%E7%88%AC%E8%99%AB/" class="post-title-link" itemprop="url">python爬虫</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-11-21 18:40:51" itemprop="dateCreated datePublished" datetime="2021-11-21T18:40:51+08:00">2021-11-21</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/utils/" itemprop="url" rel="index"><span itemprop="name">utils</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2021/11/21/utils/python/python%E7%88%AC%E8%99%AB/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2021/11/21/utils/python/python%E7%88%AC%E8%99%AB/" class="cy_cmt_count" data-xid="2021/11/21/utils/python/python爬虫/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>5k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>5 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>[toc]</p>
+<h2 id="BS4-以下内容参考自官方文档"><a href="#BS4-以下内容参考自官方文档" class="headerlink" title="BS4-以下内容参考自官方文档"></a><a target="_blank" rel="noopener" href="https://beautifulsoup.readthedocs.io/zh_CN/v4.4.0/">BS4-以下内容参考自官方文档</a></h2><h3 id="2-1-语法"><a href="#2-1-语法" class="headerlink" title="2.1 语法"></a>2.1 语法</h3><ol>
+<li><p>基本</p>
+<ul>
+<li>找到第一个: find</li>
+<li>找到所有的: find_all</li>
+</ul>
+</li>
+<li><p>属性</p>
+<ul>
+<li>name  就是&lt;&gt;中间的  比如&lt;a&gt; 就是a</li>
+</ul>
+</li>
+<li><p>获取链接</p>
+<ol>
+<li><p>从文档中找到所有<a>标签的链接:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> link <span class="keyword">in</span> soup.find_all(<span class="string">&#x27;a&#x27;</span>):</span><br><span class="line">    <span class="built_in">print</span>(link.get(<span class="string">&#x27;href&#x27;</span>))</span><br></pre></td></tr></table></figure></li>
+<li><p>所有内容  print(soup.get_text())</p>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="2-2-遍历文档树"><a href="#2-2-遍历文档树" class="headerlink" title="2.2 遍历文档树"></a>2.2 遍历文档树</h3><h4 id="2-2-1-通过名字"><a href="#2-2-1-通过名字" class="headerlink" title="2.2.1 通过名字"></a>2.2.1 通过名字</h4><p>​    tag[‘class’] –&gt; # u’boldest’</p>
+<p>​    tag.a  -&gt;# &lt;a class=”sister” href=”<a target="_blank" rel="noopener" href="http://example.com/elsie&quot;">http://example.com/elsie&quot;</a> id=”link1”&gt;Elsie</a></p>
+<blockquote>
+<p>这种方法只能获得第一个,若要多个 用get_all</p>
+</blockquote>
+<h4 id="2-2-2-contents-descendants"><a href="#2-2-2-contents-descendants" class="headerlink" title="2.2.2 contents descendants"></a>2.2.2 contents descendants</h4><p>tag的contents属性可以将tag的子节点以列表的方式输出</p>
+<p>descendants包括子孙节点</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">head_tag = soup.head</span><br><span class="line">head_tag</span><br><span class="line"><span class="comment"># &lt;head&gt;&lt;title&gt;The Dormouse&#x27;s story&lt;/title&gt;&lt;/head&gt;</span></span><br><span class="line">head_tag.contents</span><br><span class="line">[&lt;title&gt;The Dormouse<span class="string">&#x27;s story&lt;/title&gt;]</span></span><br><span class="line"><span class="string">title_tag = head_tag.contents[0]</span></span><br><span class="line"><span class="string">title_tag</span></span><br><span class="line"><span class="string"># &lt;title&gt;The Dormouse&#x27;</span>s story&lt;/title&gt;</span><br><span class="line">title_tag.contents</span><br><span class="line"><span class="comment"># [u&#x27;The Dormouse&#x27;s story&#x27;]</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="2-2-3-children-parent"><a href="#2-2-3-children-parent" class="headerlink" title="2.2.3 children parent"></a>2.2.3 children parent</h4><h4 id="2-2-4-next-sibling-previous-sibling-兄弟节点"><a href="#2-2-4-next-sibling-previous-sibling-兄弟节点" class="headerlink" title="2.2.4 next_sibling previous_sibling  兄弟节点"></a>2.2.4 next_sibling previous_sibling  兄弟节点</h4><p>​    .next_siblings 和 .previous_siblings 兄弟节点们</p>
+<h4 id="2-2-1"><a href="#2-2-1" class="headerlink" title="2.2.1"></a>2.2.1</h4><h3 id="2-3-搜索文档树"><a href="#2-3-搜索文档树" class="headerlink" title="2.3 搜索文档树"></a>2.3 搜索文档树</h3><blockquote>
+<p>​    记住: <code>find_all()</code> 和 <code>find()</code> 只搜索当前节点的所有子节点,孙子节点等. <code>find_parents()</code> 和 <code>find_parent()</code> 用来搜索当前节点的父辈节点,搜索方法与普通tag的搜索方法相同,搜索文档搜索文档包含的内容. 我们从一个文档中的一个叶子节点开始:</p>
+</blockquote>
+<h4 id="2-3-1-find"><a href="#2-3-1-find" class="headerlink" title="2.3.1 find"></a>2.3.1 find</h4><h4 id="2-3-2-find-all"><a href="#2-3-2-find-all" class="headerlink" title="2.3.2 find_all()"></a>2.3.2 find_all()</h4><blockquote>
+<p>find_all( <a target="_blank" rel="noopener" href="https://beautifulsoup.readthedocs.io/zh_CN/v4.4.0/#id35">name</a> , <a target="_blank" rel="noopener" href="https://beautifulsoup.readthedocs.io/zh_CN/v4.4.0/#css">attrs</a> , <a target="_blank" rel="noopener" href="https://beautifulsoup.readthedocs.io/zh_CN/v4.4.0/#recursive">recursive</a> , <a target="_blank" rel="noopener" href="https://beautifulsoup.readthedocs.io/zh_CN/v4.4.0/#id36">string</a> , <a target="_blank" rel="noopener" href="https://beautifulsoup.readthedocs.io/zh_CN/v4.4.0/#keyword">**kwargs</a> )</p>
+</blockquote>
+<ol>
+<li><p>name=[String]</p>
+</li>
+<li><p>string</p>
+<blockquote>
+<p>stirng=re,String,lambda-bool</p>
+<p>搜索text用到,常与正则和lambda使用</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">soup.find_all(string=re.<span class="built_in">compile</span>(<span class="string">&quot;Dormouse&quot;</span>)) <span class="comment">#包含Dormouse的text</span></span><br><span class="line">[<span class="string">u&quot;The Dormouse&#x27;s story&quot;</span>, <span class="string">u&quot;The Dormouse&#x27;s story&quot;</span>]</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">is_the_only_string_within_a_tag</span>(<span class="params">s</span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;</span>Return <span class="literal">True</span> <span class="keyword">if</span> this string <span class="keyword">is</span> the only child of its parent tag.<span class="string">&quot;&quot;</span></span><br><span class="line">    <span class="keyword">return</span> (s == s.parent.string)</span><br><span class="line">soup.find_all(string=is_the_only_string_within_a_tag)</span><br><span class="line"><span class="comment"># [u&quot;The Dormouse&#x27;s story&quot;, u&quot;The Dormouse&#x27;s story&quot;, u&#x27;Elsie&#x27;, u&#x27;Lacie&#x27;, u&#x27;Tillie&#x27;, u&#x27;...&#x27;]</span></span><br></pre></td></tr></table></figure></li>
+<li><p>kewords</p>
+<blockquote>
+<p>kewords:   1. href id link 等tag.name   2. limit=2取两条 3. recursive=False 只搜子节点</p>
+<p>=String、正则、列表、boolean</p>
+</blockquote>
+<ol>
+<li><p>String–正则</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">soup.find_all(href=re.<span class="built_in">compile</span>(<span class="string">&quot;elsie&quot;</span>), <span class="built_in">id</span>=<span class="string">&#x27;link1&#x27;</span>)<span class="comment"># 找到 包含elsie且id为link1的href</span></span><br></pre></td></tr></table></figure></li>
+<li><p>boolean</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">soup.find_all(<span class="built_in">id</span>=<span class="literal">True</span>)<span class="comment">#找到包含id的tags</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+<li></li>
+</ol>
+<h4 id="2-3-3-正则表达式"><a href="#2-3-3-正则表达式" class="headerlink" title="2.3.3 正则表达式"></a>2.3.3 正则表达式</h4><blockquote>
+<p>如果传入正则表达式作为参数,Beautiful Soup会通过正则表达式的 <code>match()</code> 来匹配内容.</p>
+</blockquote>
+<p>找出所有以b开头的标签,这表示<body>和<b>标签都应该被找到:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="keyword">for</span> tag <span class="keyword">in</span> soup.find_all(re.<span class="built_in">compile</span>(<span class="string">&quot;^b&quot;</span>)):</span><br><span class="line">    <span class="built_in">print</span>(tag.name)       <span class="comment"># body  # b</span></span><br></pre></td></tr></table></figure>
+
+<p>找出所有名字中包含”t”的标签:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> tag <span class="keyword">in</span> soup.find_all(re.<span class="built_in">compile</span>(<span class="string">&quot;t&quot;</span>)):</span><br><span class="line">    <span class="built_in">print</span>(tag.name)  <span class="comment"># html  # title</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="2-3-4-基础参数-：String、正则、列表、boolean"><a href="#2-3-4-基础参数-：String、正则、列表、boolean" class="headerlink" title="2.3.4 基础参数 ：String、正则、列表、boolean"></a>2.3.4 基础参数 ：String、正则、列表、boolean</h4><ol>
+<li><p>boolean–lambda</p>
+<p>下面方法校验了当前元素,如果包含 <code>class</code> 属性却不包含 <code>id</code> 属性,那么将返回 <code>True</code>:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">has_class_but_no_id</span>(<span class="params">tag</span>):</span></span><br><span class="line">    <span class="keyword">return</span> tag.has_attr(<span class="string">&#x27;class&#x27;</span>) <span class="keyword">and</span> <span class="keyword">not</span> tag.has_attr(<span class="string">&#x27;id&#x27;</span>)</span><br><span class="line">soup.find_all(has_class_but_no_id)</span><br><span class="line"><span class="comment"># [&lt;p class=&quot;title&quot;&gt;&lt;b&gt;The Dormouse&#x27;s story&lt;/b&gt;&lt;/p&gt;,</span></span><br><span class="line"><span class="comment">#  &lt;p class=&quot;story&quot;&gt;Once upon a time there were...&lt;/p&gt;,</span></span><br><span class="line"><span class="comment">#  &lt;p class=&quot;story&quot;&gt;...&lt;/p&gt;]</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h4 id="2-3-5-keyword"><a href="#2-3-5-keyword" class="headerlink" title="2.3.5 keyword"></a>2.3.5 keyword</h4><ol>
+<li>id</li>
+<li>href</li>
+</ol>
+<h4 id="2-3-6-keyword-值"><a href="#2-3-6-keyword-值" class="headerlink" title="2.3.6 keyword 值"></a>2.3.6 keyword 值</h4><ol>
+<li><p>正则      href=re.compile(“elsie”)</p>
+</li>
+<li><p>string   id=”testEle”</p>
+</li>
+<li><p>bool</p>
+</li>
+<li><p>列表</p>
+<p>如果传入列表参数,Beautiful Soup会将与列表中任一元素匹配的内容返回.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">soup.find_all([<span class="string">&quot;a&quot;</span>, <span class="string">&quot;b&quot;</span>])</span><br><span class="line"><span class="comment"># [&lt;b&gt;The Dormouse&#x27;s story&lt;/b&gt;,</span></span><br><span class="line"><span class="comment">#  &lt;a class=&quot;sister&quot; href=&quot;http://example.com/elsie&quot; id=&quot;link1&quot;&gt;Elsie&lt;/a&gt;,</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<h4 id="2-3-7-attrs"><a href="#2-3-7-attrs" class="headerlink" title="2.3.7 attrs"></a>2.3.7 attrs</h4><blockquote>
+<p>对于keyword没有的key，那么用attr字典</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">data_soup.find_all(attrs=&#123;<span class="string">&quot;data-foo&quot;</span>: <span class="string">&quot;value&quot;</span>&#125;)</span><br><span class="line"><span class="comment"># [&lt;div data-foo=&quot;value&quot;&gt;foo!&lt;/div&gt;]</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-5-四种对象"><a href="#2-5-四种对象" class="headerlink" title="2.5 四种对象"></a>2.5 四种对象</h3><blockquote>
+<p>Beautiful Soup将复杂HTML文档转换成一个复杂的树形结构,每个节点都是Python对象,所有对象可以归纳为4种: <code>Tag</code> , <code>NavigableString</code> , <code>BeautifulSoup</code> , <code>Comment</code> .</p>
+</blockquote>
+<h4 id="2-5-1-Tag-tag-soup-b"><a href="#2-5-1-Tag-tag-soup-b" class="headerlink" title="2.5.1 Tag  tag = soup.b"></a>2.5.1 Tag  tag = soup.b</h4><p>​    BeautifulSoup中的所有标签都是Tag类型,并且BeautifulSoup的对象Beautiful的对象其实本质上也是一个Tag类型,tag的属性可以被添加,删除或修改. 再说一次, tag的属性操作方法与字典一样。</p>
+<h4 id="2-5-2-NavigableString"><a href="#2-5-2-NavigableString" class="headerlink" title="2.5.2 NavigableString"></a>2.5.2 NavigableString</h4><p>​    继承自python中的str,用起来就跟使用python的str是一样的。</p>
+<h4 id="2-5-2-BeautifulSoup"><a href="#2-5-2-BeautifulSoup" class="headerlink" title="2.5.2 BeautifulSoup"></a>2.5.2 BeautifulSoup</h4><p>​    继承自Tag,用来生成BeautifulSoup树的。对于一些查找方法,比如find,select这些,其实还是Tag的</p>
+<h4 id="2-5-2-Comment"><a href="#2-5-2-Comment" class="headerlink" title="2.5.2 Comment"></a>2.5.2 Comment</h4><p>​    继承NavigableString</p>
+<h3 id="2-6-对象方法"><a href="#2-6-对象方法" class="headerlink" title="2.6 对象方法"></a>2.6 对象方法</h3><h4 id="2-6-1-tag"><a href="#2-6-1-tag" class="headerlink" title="2.6.1 tag"></a>2.6.1 tag</h4><ol>
+<li>通过tag的名字获取属性 tag.title     <title>The Dormouse’s story</title> </li>
+<li>tag.title.name   title   </li>
+<li>获取有效字符串 tag.title.string    The Dormouse’s story</li>
+<li>替换有效字符串 tag.string.replace_with(“No longer bold”)</li>
+<li>tag.title.parent.name   head</li>
+<li>获取所有属性tag.attrs   –&gt; # {u’class’:  u’boldest’}</li>
+<li>获取特定属性 tag[‘class’] –&gt; # u’boldest’</li>
+</ol>
+<h3 id="2-7-其他"><a href="#2-7-其他" class="headerlink" title="2.7 其他"></a>2.7 其他</h3><h4 id="2-7-1-解析器"><a href="#2-7-1-解析器" class="headerlink" title="2.7.1 解析器"></a>2.7.1 解析器</h4><table>
+<thead>
+<tr>
+<th>解析器</th>
+<th>使用方法</th>
+<th>优势</th>
+<th>劣势</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Python标准库</td>
+<td>BeautifulSoup(markup, “html.parser”)</td>
+<td>Python的内置标准库执行速度适中文档容错能力强</td>
+<td>Python 2.7.3 or 3.2.2)前 的版本中文档容错能力差</td>
+</tr>
+<tr>
+<td>lxml HTML 解析器</td>
+<td>BeautifulSoup(markup, “lxml”)</td>
+<td>速度快文档容错能力强</td>
+<td>需要安装C语言库</td>
+</tr>
+<tr>
+<td>lxml XML 解析器</td>
+<td><code>BeautifulSoup(markup, [&quot;lxml-xml&quot;])``BeautifulSoup(markup, &quot;xml&quot;)</code></td>
+<td>速度快唯一支持XML的解析器</td>
+<td>需要安装C语言库</td>
+</tr>
+<tr>
+<td>html5lib</td>
+<td><code>BeautifulSoup(markup, &quot;html5lib&quot;)</code></td>
+<td>最好的容错性以浏览器的方式解析文档生成HTML5格式的文档</td>
+<td>速度慢不依赖外部扩展</td>
+</tr>
+</tbody></table>
+<h4 id="2-7-2-等价代码"><a href="#2-7-2-等价代码" class="headerlink" title="2.7.2 等价代码"></a>2.7.2 等价代码</h4><ol>
+<li><p> soup.find_all(“a”) = soup(“a”)</p>
+</li>
+<li><p>soup.title.find_all(string=True) = soup.title(string=True)</p>
+</li>
+<li><p>soup.find_all(‘title’, limit=1) = soup.find(‘title’)</p>
+</li>
+<li><p>soup.head.title = soup.find(“head”).find(“title”) # <title>The Dormouse’s story</title></p>
+</li>
+</ol>
+<h3 id="2-8-神技"><a href="#2-8-神技" class="headerlink" title="2.8 神技"></a>2.8 神技</h3><blockquote>
+<p>tag的三大基本类型  attr,string,child</p>
+</blockquote>
+<h4 id="2-8-1-find-all"><a href="#2-8-1-find-all" class="headerlink" title="2.8.1 find_all"></a>2.8.1 find_all</h4><h4 id="2-8-1-自定义过滤"><a href="#2-8-1-自定义过滤" class="headerlink" title="2.8.1 自定义过滤"></a>2.8.1 自定义过滤</h4><ol>
+<li><p>基于attr</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">atags=[tag <span class="keyword">for</span> tag <span class="keyword">in</span> tags <span class="keyword">if</span> tag.has_attr(<span class="string">&#x27;name&#x27;</span>) <span class="keyword">and</span> tag.attrs[<span class="string">&#x27;name&#x27;</span>]==<span class="string">&#x27;周六&#x27;</span>]</span><br></pre></td></tr></table></figure></li>
+<li><p>基于string</p>
+</li>
+<li></li>
+</ol>
+<h4 id="2-8-3-tag获取attr-用"><a href="#2-8-3-tag获取attr-用" class="headerlink" title="2.8.3 tag获取attr  用[]"></a>2.8.3 tag获取attr  用[]</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">tag[<span class="string">&#x27;id&#x27;</span>]</span><br><span class="line"><span class="comment"># &#x27;id1&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="2-8-4-tag获取child用’-‘-children用"><a href="#2-8-4-tag获取child用’-‘-children用" class="headerlink" title="2.8.4 tag获取child用’ . ‘  children用()"></a>2.8.4 tag获取child用’ . ‘  children用()</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">tag.div</span><br><span class="line"><span class="comment"># &lt;div&gt;aaaa&lt;/div&gt;</span></span><br><span class="line">tag(<span class="string">&#x27;div&#x27;</span>)</span><br><span class="line"><span class="comment"># [&lt;div class=&quot;top_adimg&quot; id=&quot;dv_top_adimg&quot; style=&quot;margin: 0 auto; clear: both;width: 1000px;&quot;&gt;&lt;a href=&quot;http://www.310win.com/Recommend/RecommendIndex.aspx?t=1&amp;amp;bt=1&quot; target=&quot;_blank&quot;&gt;&lt;img height=&quot;40&quot; src=&quot;/Files/ff/fc_637196007271076151.jpg&quot; width=&quot;1000&quot;/&gt;&lt;/a&gt;&lt;/div&gt;]</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/11/18/spring/spring%E6%A0%B8%E5%BF%83/aop/springAOP/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -683,233 +1151,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/11/12/java/java8/java8%E6%96%B0%E7%89%B9%E6%80%A7/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/11/12/java/java8/java8%E6%96%B0%E7%89%B9%E6%80%A7/" class="post-title-link" itemprop="url">java8新特性</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-11-12 19:04:59" itemprop="dateCreated datePublished" datetime="2021-11-12T19:04:59+08:00">2021-11-12</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-04-12 19:04:59" itemprop="dateModified" datetime="2022-04-12T19:04:59+08:00">2022-04-12</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java%E9%AB%98%E9%98%B6/" itemprop="url" rel="index"><span itemprop="name">java高阶</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2021/11/12/java/java8/java8%E6%96%B0%E7%89%B9%E6%80%A7/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2021/11/12/java/java8/java8%E6%96%B0%E7%89%B9%E6%80%A7/" class="cy_cmt_count" data-xid="2021/11/12/java/java8/java8新特性/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>3.9k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>4 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="java8新特性"><a href="#java8新特性" class="headerlink" title="java8新特性"></a>java8新特性</h1><h3 id="一、lambda-参数式函数-代码更少"><a href="#一、lambda-参数式函数-代码更少" class="headerlink" title="一、lambda(参数式函数) 代码更少"></a>一、lambda(参数式函数) 代码更少</h3><blockquote>
-<p>lambda含义：Runnable runnable=()-&gt; System.out.println(“”);</p>
-<p>创建一个类，并new出来，看成一个方法对象</p>
-</blockquote>
-<p>fun1(fun2())</p>
-<ol>
-<li><p>参数式函数，参数式lambda。</p>
-</li>
-<li><p>java中 lambda是实现了函数的对象，而不像其他语言一样是一个函数。一般用于接口，这个接口只有一个函数需要重写。这个接口的实例就是lambda。</p>
-</li>
-<li><p>但是用到的lambda还是写的那个重写的函数，也就是说我们需要某个功能的时候，我们可以根据四大函数式接口写出自己的函数，将这个接口传入，就完成了一个功能器。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/11/12/java/java8/java8%E6%96%B0%E7%89%B9%E6%80%A7/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2021/11/12/javaWeb/web%E6%A0%B8%E5%BF%83%E7%BB%84%E4%BB%B6/servlet/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2021/11/12/javaWeb/web%E6%A0%B8%E5%BF%83%E7%BB%84%E4%BB%B6/servlet/" class="post-title-link" itemprop="url">servlet</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2021-11-12 01:21:30" itemprop="dateCreated datePublished" datetime="2021-11-12T01:21:30+08:00">2021-11-12</time>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2021/11/12/javaWeb/web%E6%A0%B8%E5%BF%83%E7%BB%84%E4%BB%B6/servlet/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2021/11/12/javaWeb/web%E6%A0%B8%E5%BF%83%E7%BB%84%E4%BB%B6/servlet/" class="cy_cmt_count" data-xid="2021/11/12/javaWeb/web核心组件/servlet/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.7k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>[toc]</p>
-<h2 id="一、Servlet概述"><a href="#一、Servlet概述" class="headerlink" title="一、Servlet概述"></a>一、Servlet概述</h2><ol>
-<li><p>server applet——&gt;运行在服务器的小程序</p>
-</li>
-<li><p>动态资源：java类若要一直运行在tomcat，那么它就得实现servlet规范(接口)，这样才能被tomcat识别。</p>
-</li>
-<li><p>servlet接口方法</p>
-<ol>
-<li><p>init: serlvet创建的时候运行，只运行一次,不是启动的时候，而是第一次访问的时候。</p>
-</li>
-<li><p>service:提供服务的方法，运行多次</p>
-<figure class="highlight coq"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">访问mapping的</span><br><span class="line"><span class="number">8080</span>+虚拟目录+url-<span class="built_in">pattern</span></span><br><span class="line">就会运行该函数</span><br></pre></td></tr></table></figure>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2021/11/12/javaWeb/web%E6%A0%B8%E5%BF%83%E7%BB%84%E4%BB%B6/servlet/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -981,7 +1222,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">132</span>
+          <span class="site-state-item-count">134</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1029,12 +1270,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">391k</span>
+    <span title="站点总字数">396k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">5:55</span>
+    <span title="站点阅读时长">6:01</span>
 </div>
 
         

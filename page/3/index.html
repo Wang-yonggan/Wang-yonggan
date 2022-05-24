@@ -185,6 +185,290 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/05/12/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E5%88%B7%E7%9B%98/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/05/12/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E5%88%B7%E7%9B%98/" class="post-title-link" itemprop="url">mysql刷盘</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-05-12 03:04:23" itemprop="dateCreated datePublished" datetime="2022-05-12T03:04:23+08:00">2022-05-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-05-23 16:34:55" itemprop="dateModified" datetime="2022-05-23T16:34:55+08:00">2022-05-23</time>
+              </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/05/12/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E5%88%B7%E7%9B%98/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/05/12/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%A6%82%E5%BF%B52.0/%E5%88%B7%E7%9B%98/" class="cy_cmt_count" data-xid="2022/05/12/数据库/数据库概念2.0/刷盘/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>918</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="redo-log"><a href="#redo-log" class="headerlink" title="redo log"></a>redo log</h3><blockquote>
+<p>物理日志，将磁盘的A区，B磁道，C位置更改为0011010010</p>
+</blockquote>
+<p>每次事务提交都会先把log存到 redo log buffer，redo log buffer由一个个512字节的block组成，对应一个磁盘的扇区。</p>
+<ol start="3">
+<li></li>
+</ol>
+<h3 id="bin-log"><a href="#bin-log" class="headerlink" title="bin log"></a>bin log</h3><blockquote>
+<p>bin log 是逻辑日志+二进制，比如小明增加100元就是  update set money=money+100 where name =”小明”，</p>
+</blockquote>
+<ol>
+<li>文件追加方式</li>
+</ol>
+<h3 id="bin-与redo区别"><a href="#bin-与redo区别" class="headerlink" title="bin 与redo区别"></a>bin 与redo区别</h3><ol>
+<li>bin 是server层，redo是存储引擎层</li>
+<li>存储内容</li>
+<li>写入方式：追加与循环写</li>
+</ol>
+<h3 id="redo-log两阶段提交"><a href="#redo-log两阶段提交" class="headerlink" title="redo log两阶段提交"></a>redo log两阶段提交</h3><blockquote>
+<p>这种策略保证了redo log 和 binlog的一致性，也就是保证了主从一致性</p>
+</blockquote>
+<p>每次commit 有三步走策略</p>
+<ol>
+<li>先将更改写到redo log 并且标记为prepare</li>
+<li>再写到bin log</li>
+<li>最后将redo log  标记为commit（表示可提交）</li>
+</ol>
+<h2 id="redo-log-1"><a href="#redo-log-1" class="headerlink" title="redo log"></a>redo log</h2><blockquote>
+<p>WAL write ahead log 先写日志，再写磁盘，写入到日志就表明事务commit成功</p>
+</blockquote>
+<blockquote>
+<p>存储的内容是：第x页的第offset位置被修改为newNum</p>
+</blockquote>
+<blockquote>
+<p>由于存储内容的原因：所以redo log</p>
+<ol>
+<li>不能用于主从复制，因为这台服务器的页和另一台服务器的页不一样</li>
+<li>存储的内容很小</li>
+<li>可以顺序刷盘</li>
+<li>强有效性，就是<ol>
+<li>无论redo log存的日志和磁盘中的数据有多大的差距，redo log都是有效的最新数据</li>
+<li>无论redo log对第x页修改了多少回，redo log都是有效的</li>
+</ol>
+</li>
+</ol>
+</blockquote>
+<blockquote>
+<p>由于强一致性的原因：所以redo log可以进行循环写，某一时刻进行check point，将buffer pool的内容刷新到磁盘中，那么也就相当于redo log被刷到了磁盘，那就可以将redo log全部删除了，所以redo log不会一直增大</p>
+</blockquote>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220523161817920.png" alt="image-20220523161817920"></p>
+<h4 id="基本原因"><a href="#基本原因" class="headerlink" title="基本原因"></a>基本原因</h4><ol>
+<li>commit后的数据保存在缓存中，通过chechPoint 机制定时刷盘</li>
+<li>但是在刷盘之前数据库宕机就会造成数据丢失</li>
+<li>快的原因是 bit格式+顺序io</li>
+</ol>
+<h4 id="刷盘策略"><a href="#刷盘策略" class="headerlink" title="刷盘策略"></a>刷盘策略</h4><p>配置innodb_flush_log_at_trx_commit</p>
+<ol>
+<li>每一秒刷一次redo log buffer到磁盘（效率中等）</li>
+<li>每次事务提交都会刷盘（默认，最安全）</li>
+<li>基于 Page Cache：每次都把redo log buffer刷到Page Cache ，到一定程度刷新Page cache到磁盘</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/05/10/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%88%86%E5%B8%83%E5%BC%8F%E5%AE%89%E8%A3%85/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/05/10/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%88%86%E5%B8%83%E5%BC%8F%E5%AE%89%E8%A3%85/" class="post-title-link" itemprop="url">分布式安装</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-05-10 01:03:33" itemprop="dateCreated datePublished" datetime="2022-05-10T01:03:33+08:00">2022-05-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-05-24 02:23:15" itemprop="dateModified" datetime="2022-05-24T02:23:15+08:00">2022-05-24</time>
+              </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/05/10/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%88%86%E5%B8%83%E5%BC%8F%E5%AE%89%E8%A3%85/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/05/10/%E5%88%86%E5%B8%83%E5%BC%8F/%E5%88%86%E5%B8%83%E5%BC%8F%E5%AE%89%E8%A3%85/" class="cy_cmt_count" data-xid="2022/05/10/分布式/分布式安装/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>1 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="一、Kafka"><a href="#一、Kafka" class="headerlink" title="一、Kafka"></a>一、Kafka</h2><h3 id="1-1-前提"><a href="#1-1-前提" class="headerlink" title="1.1 前提"></a>1.1 前提</h3><ol>
+<li>java</li>
+<li>ssh</li>
+</ol>
+<h3 id="1-2-单机安装"><a href="#1-2-单机安装" class="headerlink" title="1.2 单机安装"></a>1.2 单机安装</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://repo.huaweicloud.com/apache/kafka/2.4.1/kafka_2.12-2.4.1.tgz</span><br></pre></td></tr></table></figure>
+
+<p>vim server.properties</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">listeners=PLAINTEXT://:9092</span><br><span class="line">host.name= 192.168.100.3</span><br><span class="line">advertised.listeners=PLAINTEXT://192.168.100.3:9092</span><br></pre></td></tr></table></figure>
+
+<p>export KAFKA_HOME=/root/config/kafka_2.12-2.4.1<br>export PATH=:$PATH:${KAFKA_HOME}</p>
+<h3 id="1-3-集群安装"><a href="#1-3-集群安装" class="headerlink" title="1.3 集群安装"></a>1.3 集群安装</h3><ol>
+<li><p>下载安装包</p>
+<p>wget <a target="_blank" rel="noopener" href="https://repo.huaweicloud.com/apache/kafka/2.4.1/kafka_2.12-2.4.1.tgz">https://repo.huaweicloud.com/apache/kafka/2.4.1/kafka_2.12-2.4.1.tgz</a></p>
+</li>
+<li><p>vim server.properties</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 指定broker的id</span></span><br><span class="line"><span class="attribute">broker</span>.id=<span class="number">0</span></span><br><span class="line"><span class="comment"># 指定Kafka数据的位置</span></span><br><span class="line"><span class="attribute">log</span>.dirs=/data/kafka/data</span><br><span class="line"><span class="comment"># 配置zk的三个节点</span></span><br><span class="line"><span class="attribute">zookeeper</span>.connect=ip<span class="number">1</span>:<span class="number">2181</span>,ip<span class="number">2</span>:<span class="number">2181</span>,ip<span class="number">3</span>:<span class="number">2181</span></span><br></pre></td></tr></table></figure></li>
+<li><p>将安装好的kafka复制到另外两台服务器</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">scp</span> -r kafka_<span class="number">2</span>.<span class="number">12</span>-<span class="number">2</span>.<span class="number">4</span>.<span class="number">1</span>/ ip<span class="number">1</span>:$PWD</span><br><span class="line"><span class="attribute">scp</span> -r kafka_<span class="number">2</span>.<span class="number">12</span>-<span class="number">2</span>.<span class="number">4</span>.<span class="number">1</span>/ ip<span class="number">2</span>:$PWD</span><br></pre></td></tr></table></figure></li>
+<li><p>修改ip1 2服务器的broker</p>
+<p>broker.id=1 broker.id=2</p>
+</li>
+<li><p>vim /etc/profile</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> KAFKA_HOME=/root/config/kafka_2.12-2.4.1</span><br><span class="line"><span class="built_in">export</span> PATH=:<span class="variable">$PATH</span>:<span class="variable">$&#123;KAFKA_HOME&#125;</span></span><br><span class="line">分发到各个节点</span><br><span class="line">scp /etc/profile ip1:<span class="variable">$PWD</span></span><br><span class="line">scp /etc/profile ip2:<span class="variable">$PWD</span></span><br><span class="line"><span class="built_in">source</span> /etc/profile</span><br></pre></td></tr></table></figure></li>
+<li><p>启动</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 启动ZooKeeper</span></span><br><span class="line">nohup bin/zookeeper-server-start.sh config/zookeeper.properties &amp;</span><br><span class="line"><span class="comment"># 启动Kafka</span></span><br><span class="line">nohup bin/kafka-server-start.sh config/server.properties &amp;</span><br><span class="line"><span class="comment"># 测试Kafka集群是否启动成功</span></span><br><span class="line">bin/kafka-topics.sh --bootstrap-server node1.itcast.cn:9092 --lis</span><br></pre></td></tr></table></figure></li>
+<li><h2 id="二、单机kafka集群"><a href="#二、单机kafka集群" class="headerlink" title="二、单机kafka集群"></a>二、单机kafka集群</h2><ol>
+<li><p>下载zk并解压到/root/config/kf1 kf2 kf3</p>
+</li>
+<li><p>vim /config/server.properties</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">broker.id=1</span><br><span class="line">listeners=PLAINTEXT://localhost:9092 </span><br><span class="line">log.dirs=/tmp/kafka1/<span class="built_in">log</span></span><br><span class="line">zookeeper.connect=localhost:2181,localhost:2182,localhost:2183</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">broker.id=2</span><br><span class="line">listeners=PLAINTEXT://localhost:9093</span><br><span class="line">log.dirs=/root/data/kf2/<span class="built_in">log</span></span><br><span class="line">zookeeper.connect=localhost:2181,localhost:2182,localhost:2183</span><br></pre></td></tr></table></figure></li>
+</ol>
+</li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/05/07/408/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E5%86%85%E5%AD%98/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -381,7 +665,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-05-13 12:33:18" itemprop="dateModified" datetime="2022-05-13T12:33:18+08:00">2022-05-13</time>
+                <time title="修改时间：2022-05-24 11:23:07" itemprop="dateModified" datetime="2022-05-24T11:23:07+08:00">2022-05-24</time>
               </span>
 
           
@@ -406,14 +690,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>5.3k</span>
+              <span>6.8k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>5 分钟</span>
+              <span>6 分钟</span>
             </span>
 
         </div>
@@ -425,17 +709,22 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="一、Hadoop"><a href="#一、Hadoop" class="headerlink" title="一、Hadoop"></a>一、Hadoop</h2><h3 id="1-1-前提"><a href="#1-1-前提" class="headerlink" title="1.1 前提"></a>1.1 前提</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 安装java</span></span><br><span class="line">wget https://repo.huaweicloud.com/java/jdk/8u201-b09/jdk-8u201-linux-i586.tar.gz</span><br><span class="line"><span class="comment"># 配置环境变量</span></span><br><span class="line">vim /etc/profile </span><br><span class="line"><span class="built_in">source</span> /etc/profile</span><br><span class="line"><span class="comment"># 安装ssh  #目的就是可以免密ssh localhost</span></span><br><span class="line">sudo apt-get install ssh openssh-server</span><br><span class="line">ssh-keygen -t rsa</span><br><span class="line">cat ~/.ssh/id_rsa.pub &gt;&gt; authorized_keys</span><br><span class="line">ssh-copy-id -i /root/.ssh/id_rsa.pub root@localhost</span><br><span class="line">ssh localhost</span><br><span class="line"><span class="comment"># 其他</span></span><br><span class="line">yum install glibc.i686 </span><br></pre></td></tr></table></figure>
+          <h2 id="base"><a href="#base" class="headerlink" title="base"></a>base</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> PATH=<span class="string">&quot;<span class="variable">$PATH</span>:/usr/local/nginx/sbin&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">export</span> PATH=<span class="string">&quot;<span class="variable">$PATH</span>:/root/script&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#java</span></span><br><span class="line"><span class="built_in">export</span> PATH=<span class="string">&quot;<span class="variable">$PATH</span>:/root/config/jdk1.8.0_201/bin&quot;</span></span><br><span class="line"><span class="built_in">export</span> JAVA_HOME=/root/config/jdk1.8.0_201</span><br><span class="line"></span><br><span class="line"><span class="comment">#hadoop</span></span><br><span class="line"><span class="built_in">export</span> HADOOP_HOME=/root/config/hadoop-2.10.0</span><br><span class="line"><span class="built_in">export</span> HADOOP_COMMON_LIB_NATIVE_DIR=<span class="variable">$HADOOP_HOME</span>/lib/native</span><br><span class="line"><span class="built_in">export</span> HADOOP_OPTS=<span class="string">&quot;-Djava.library.path=<span class="variable">$HADOOP_HOME</span>/lib&quot;</span></span><br><span class="line"><span class="built_in">export</span> JAVA_LIBRARY_PATH=<span class="variable">$HADOOP_HOME</span>/lib/native</span><br><span class="line"></span><br><span class="line"><span class="comment">#hbase</span></span><br><span class="line"><span class="built_in">export</span> HBASE_HOME=/root/config/hbase-2.4.11</span><br><span class="line"><span class="built_in">export</span> PATH=<span class="variable">$PATH</span>:<span class="variable">$&#123;HBASE_HOME&#125;</span>/bin:<span class="variable">$&#123;HBASE_HOME&#125;</span>/sbin</span><br><span class="line"></span><br><span class="line"><span class="comment">#kafka</span></span><br><span class="line"><span class="built_in">export</span> KAFKA_HOME=/root/config/kafka_2.12-2.4.1</span><br><span class="line"><span class="built_in">export</span> PATH=:<span class="variable">$PATH</span>:<span class="variable">$&#123;KAFKA_HOME&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#zookeeper</span></span><br><span class="line"><span class="built_in">export</span> ZOOKEEPER_HOME=/root/config/zk </span><br><span class="line"><span class="built_in">export</span> PATH=<span class="variable">$PATH</span>:<span class="variable">$ZOOKEEPER_HOME</span>/bin</span><br></pre></td></tr></table></figure>
+
+
+
+
+<h2 id="一、Hadoop"><a href="#一、Hadoop" class="headerlink" title="一、Hadoop"></a>一、Hadoop</h2><h3 id="1-1-前提"><a href="#1-1-前提" class="headerlink" title="1.1 前提"></a>1.1 前提</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 安装java</span></span><br><span class="line">wget https://repo.huaweicloud.com/java/jdk/8u201-b09/jdk-8u201-linux-i586.tar.gz</span><br><span class="line"></span><br><span class="line"><span class="comment"># 配置环境变量</span></span><br><span class="line">vim /etc/profile </span><br><span class="line"><span class="built_in">export</span> JAVA_HOME=/usr/<span class="built_in">local</span>/java/jdk</span><br><span class="line"><span class="built_in">export</span> JRE_HOME=&#123;JAVA_HOME&#125;jre</span><br><span class="line"><span class="built_in">export</span> CLASS_PATH=.:<span class="variable">$JAVA_HOME</span>/lib:<span class="variable">$JRE_HOME</span>/lib</span><br><span class="line"><span class="built_in">export</span> PATH=<span class="variable">$PATH</span>:<span class="variable">$JAVA_HOME</span>/bin:<span class="variable">$JRE_HOME</span>/bin</span><br><span class="line"><span class="built_in">source</span> /etc/profile</span><br><span class="line"><span class="comment"># 安装ssh  #目的就是可以免密ssh localhost</span></span><br><span class="line">sudo apt-get install ssh openssh-server</span><br><span class="line">ssh-keygen -t rsa</span><br><span class="line">cat ~/.ssh/id_rsa.pub &gt;&gt; authorized_keys</span><br><span class="line">ssh-copy-id -i /root/.ssh/id_rsa.pub root@localhost</span><br><span class="line">ssh localhost</span><br><span class="line"><span class="comment"># 其他</span></span><br><span class="line">yum install glibc.i686 </span><br></pre></td></tr></table></figure>
 
 
 
 <h3 id="1-2-安装"><a href="#1-2-安装" class="headerlink" title="1.2 安装"></a>1.2 安装</h3><ol>
-<li><p>wget <a target="_blank" rel="noopener" href="http://mirrors.hust.edu.cn/apache/hadoop/core/stable/hadoop-2.7.1.tar.gz">http://mirrors.hust.edu.cn/apache/hadoop/core/stable/hadoop-2.7.1.tar.gz</a></p>
+<li><p>wget <a target="_blank" rel="noopener" href="https://repo.huaweicloud.com/apache/hadoop/core/hadoop-2.10.0/hadoop-2.10.0.tar.gz">https://repo.huaweicloud.com/apache/hadoop/core/hadoop-2.10.0/hadoop-2.10.0.tar.gz</a></p>
 </li>
 <li><p>tar -zxvf hadoop-2.7.1.tar.gz</p>
 </li>
 <li><p>vim etc/hadoop/core-site.xml</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>hadoop.tmp.dir<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">value</span>&gt;</span>file:/root/data/hadoop<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">description</span>&gt;</span>Abase for other temporary directories.<span class="tag">&lt;/<span class="name">description</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>fs.defaultFS<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">value</span>&gt;</span>hdfs://localhost:9000<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>hadoop.tmp.dir<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">value</span>&gt;</span>file:/root/data/hadoop<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">description</span>&gt;</span>Abase for other temporary directories.<span class="tag">&lt;/<span class="name">description</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>fs.defaultFS<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">value</span>&gt;</span>hdfs://localhost:9000<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
 <li><p>vim mapred-site.xml.template </p>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">name</span>&gt;</span>mapred.job.tracker<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">value</span>&gt;</span>localhost:9001<span class="tag">&lt;/<span class="name">value</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
 <li><p>vim hdfs-site.xml </p>
@@ -480,6 +769,7 @@
 <li><p>vim regionservers  </p>
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">localhost <span class="comment">#单机版</span></span><br></pre></td></tr></table></figure></li>
 </ol>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220524112259780.png" alt="image-20220524112259780"></p>
 <h3 id="2-3-启动"><a href="#2-3-启动" class="headerlink" title="2.3 启动"></a>2.3 启动</h3><ol>
 <li>./bin/start-hbase.sh</li>
 <li>jps查看</li>
@@ -513,8 +803,7 @@
 <h4 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h4><p>./bin/sqlline.py localhost:2181</p>
 <h2 id="四、zookeeper"><a href="#四、zookeeper" class="headerlink" title="四、zookeeper"></a>四、zookeeper</h2><h3 id="4-1-安装"><a href="#4-1-安装" class="headerlink" title="4.1 安装"></a>4.1 安装</h3><ol>
 <li><p>下载  -bin.tar.gz</p>
-<p>wget <a target="_blank" rel="noopener" href="https://repo.huaweicloud.com/apache/zookeeper/zookeeper-3.5.7/apache-zookeeper-3.5.7-bin.tar.gz">https://repo.huaweicloud.com/apache/zookeeper/zookeeper-3.5.7/apache-zookeeper-3.5.7-bin.tar.gz</a></p>
-</li>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://repo.huaweicloud.com/apache/zookeeper/zookeeper-3.5.7/apache-zookeeper-3.5.7-bin.tar.gz</span><br></pre></td></tr></table></figure></li>
 <li><p>配置</p>
 <ol>
 <li><p>cd conf</p>
@@ -530,6 +819,20 @@
 </ol>
 <h3 id="启动验证"><a href="#启动验证" class="headerlink" title="启动验证"></a>启动验证</h3><p>zkServer.sh start</p>
 <p>zkCli.sh -server meip:2181</p>
+<h2 id="五、zk单机安装集群"><a href="#五、zk单机安装集群" class="headerlink" title="五、zk单机安装集群"></a>五、zk单机安装集群</h2><ol>
+<li><p>下载zk并解压到/root/config/zk1 </p>
+</li>
+<li><p>创建zk的数据文件夹 </p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">/root/data/zk1/data</span><br><span class="line">/root/data/zk1/<span class="built_in">log</span></span><br><span class="line"><span class="built_in">echo</span> 1 /root/data/zk1/data/myid</span><br><span class="line"></span><br><span class="line">/root/data/zk2/data</span><br><span class="line">/root/data/zk2/<span class="built_in">log</span></span><br><span class="line"><span class="built_in">echo</span> 2 /root/data/zk2/data/myid</span><br><span class="line"></span><br><span class="line">/root/data/zk3/data</span><br><span class="line">/root/data/zk3/<span class="built_in">log</span></span><br><span class="line"><span class="built_in">echo</span> 3 /root/data/zk3/data/myid</span><br></pre></td></tr></table></figure></li>
+<li><p>vim conf/zoo.cfg</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">dataDir=/root/data/zk1/data</span><br><span class="line">dataLogDir=/root/data/zk1/<span class="built_in">log</span></span><br><span class="line">clientPort=2181</span><br><span class="line">server.1=localhost:2287:3387</span><br><span class="line">server.2=localhost:2288:3388</span><br><span class="line">server.3=localhost:2289:3389</span><br></pre></td></tr></table></figure></li>
+<li><p>拷贝zk1  –&gt;  zk2 zk3</p>
+</li>
+<li><p>修改对应的zoo.cfg</p>
+</li>
+<li><p>三者启动</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/root/config/zk1/bin/zkServer.sh start</span><br><span class="line">zk2/bin/zkServer.sh start</span><br><span class="line">zk3/bin/zkServer.sh start</span><br></pre></td></tr></table></figure></li>
+</ol>
 <p>[参考]</p>
 <ol>
 <li><a target="_blank" rel="noopener" href="https://m.php.cn/article/486140.html">hadoop</a> </li>
@@ -988,458 +1291,6 @@ public class HelloJobCronTrigger implements Job &#123;
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/05/06/%E5%A4%A7%E6%95%B0%E6%8D%AE/Hbase/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/05/06/%E5%A4%A7%E6%95%B0%E6%8D%AE/Hbase/" class="post-title-link" itemprop="url">Hbase</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-05-06 00:07:35" itemprop="dateCreated datePublished" datetime="2022-05-06T00:07:35+08:00">2022-05-06</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-05-17 22:21:11" itemprop="dateModified" datetime="2022-05-17T22:21:11+08:00">2022-05-17</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%A4%A7%E6%95%B0%E6%8D%AE/" itemprop="url" rel="index"><span itemprop="name">大数据</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/05/06/%E5%A4%A7%E6%95%B0%E6%8D%AE/Hbase/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/05/06/%E5%A4%A7%E6%95%B0%E6%8D%AE/Hbase/" class="cy_cmt_count" data-xid="2022/05/06/大数据/Hbase/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.1k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="一、概述"><a href="#一、概述" class="headerlink" title="一、概述"></a>一、概述</h2><p><a target="_blank" rel="noopener" href="https://hbase.apache.org/book.html">https://hbase.apache.org/book.html</a></p>
-<h3 id="1-1-Hbase"><a href="#1-1-Hbase" class="headerlink" title="1.1 Hbase"></a>1.1 Hbase</h3><p>​    HBase是BigTable的开源java版本。是建立在HDFS之上，提供高可靠性、高性能、列存储、可伸缩、实时读写，主用来存储结构化和半结构化的松散数据，NoSQL的数据库系统。</p>
-<p>​    Hadoop擅长于存储各种格式的庞大的数据，任意的格式甚至非结构化的处理，要查找数据必须搜索整个数据集， 如果要进行随机读取数据，效率较低。</p>
-<p>​    2007年开始，2010成为Apache项目</p>
-<h3 id="1-2-性质"><a href="#1-2-性质" class="headerlink" title="1.2 性质"></a>1.2 性质</h3><ol>
-<li>HBase仅能通过主键(row key)和主键的range来检索数据</li>
-<li>支持单行事务，不支持ACID</li>
-<li>支持分布式，支持HDFS</li>
-<li>原生支持计算引擎</li>
-<li>Hbase中支持的数据类型：byte[]</li>
-<li>面向列蔟的kv数据库</li>
-</ol>
-<h3 id="1-3-特点"><a href="#1-3-特点" class="headerlink" title="1.3 特点"></a>1.3 特点</h3><ol>
-<li>大：一个表可以有上十亿行，上百万列</li>
-<li>面向列:面向列(族)的存储和权限控制，列(族)独立检索</li>
-<li>稀疏:对于为空(null)的列，并不占用存储空间，因此，表可以设计的非常稀疏</li>
-<li></li>
-</ol>
-<h3 id="1-4-场景"><a href="#1-4-场景" class="headerlink" title="1.4 场景"></a>1.4 场景</h3><ol>
-<li>新闻、网页、图片存储在HBase之中</li>
-<li>时序数据(OpenTSDB模块)</li>
-<li>用户画像，是一个比较大的稀疏矩阵</li>
-<li>轨迹、气象网格之类，滴滴打车的轨迹数据等时空数据</li>
-<li>爬虫数据</li>
-<li>数据备份</li>
-</ol>
-<h2 id="二、核心概念"><a href="#二、核心概念" class="headerlink" title="二、核心概念"></a>二、核心概念</h2><h3 id="2-1-数据模型"><a href="#2-1-数据模型" class="headerlink" title="2.1 数据模型"></a>2.1 数据模型</h3><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220510154140056.png" alt="image-20220510154140056"></p>
-<p>表</p>
-<p>行  rowkey ：</p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220510155452822.png" alt="image-20220510155452822"></p>
-<ul>
-<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/elizabethxxy/article/details/109280185">https://blog.csdn.net/elizabethxxy/article/details/109280185</a></li>
-<li>RowKey：用于唯一标识Hbase中的一条数据（记录），不可重复，按照字典顺序排序，只能存储64k的<strong>字节数据</strong>，因此一般要求设计RowKey要简短。</li>
-<li>TimeStamp：HBase自动赋值时间戳(也可自己实现)，作为版本号，64位整型。Hbase每个cell存储单元（k:v）对同一份数据有多个版本，通过实践戳来区分版本之间的差异，按时间倒叙排序。</li>
-<li>CF(ColumnFamily):列族，可包含多列。权限控制，存储以及调优都是在列族层面进行的。HBase把同一列族里面的数据存储在同一目录下，由几个文件保存（StoreFile）。</li>
-<li>Column:列，对应key，一列可以在多个版本中维护不同数据。</li>
-<li>Value:数据。</li>
-<li>Cell:是未解析的<strong>字节数组</strong>。由{rowkey, column(=<family>+<qualifier>),version}唯一确定的单元。由rowkey，列族，列，版本唯一确定一个单元。中的数据，没有类型，全部是字节码形式存储。</li>
-</ul>
-<p>​    </p>
-<h2 id="三、shell"><a href="#三、shell" class="headerlink" title="三、shell"></a>三、shell</h2><p><a target="_blank" rel="noopener" href="https://www.yiibai.com/hbase/hbase_shell.html">教程</a></p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">./start-dfs.sh</span><br><span class="line">./start-hbase.sh</span><br><span class="line">hhase shellf</span><br></pre></td></tr></table></figure>
-
-<p><a target="_blank" rel="noopener" href="http://c2:16010/master-status">http://c2:16010/master-status</a></p>
-<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># hbase-shell中</span></span><br><span class="line">status</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h2 id="四、phoenix"><a href="#四、phoenix" class="headerlink" title="四、phoenix"></a>四、phoenix</h2><h2 id="五、java"><a href="#五、java" class="headerlink" title="五、java"></a>五、java</h2>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/05/04/%E5%A4%A7%E6%95%B0%E6%8D%AE/Hadoop%E6%A6%82%E8%BF%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/05/04/%E5%A4%A7%E6%95%B0%E6%8D%AE/Hadoop%E6%A6%82%E8%BF%B0/" class="post-title-link" itemprop="url">hadoop概述</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-05-04 18:17:57" itemprop="dateCreated datePublished" datetime="2022-05-04T18:17:57+08:00">2022-05-04</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-05-11 00:35:54" itemprop="dateModified" datetime="2022-05-11T00:35:54+08:00">2022-05-11</time>
-              </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/05/04/%E5%A4%A7%E6%95%B0%E6%8D%AE/Hadoop%E6%A6%82%E8%BF%B0/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/05/04/%E5%A4%A7%E6%95%B0%E6%8D%AE/Hadoop%E6%A6%82%E8%BF%B0/" class="cy_cmt_count" data-xid="2022/05/04/大数据/Hadoop概述/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>2.2k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="一、概念"><a href="#一、概念" class="headerlink" title="一、概念"></a>一、概念</h2><h3 id="1-1-数据分析"><a href="#1-1-数据分析" class="headerlink" title="1.1 数据分析"></a>1.1 数据分析</h3><blockquote>
-<p>大数据：体量volume、种类variety、低价值密度、速度快、具有可靠性</p>
-</blockquote>
-<h4 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h4><ol>
-<li>当下分析、现状分析、实时分析、streaming</li>
-<li>过去分析，原因分析、离线分析、批处理</li>
-<li>未来分析，预测分析、机器学习、ML</li>
-</ol>
-<h4 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h4><ol>
-<li>明确目的<ol>
-<li>数据分析方法论</li>
-</ol>
-</li>
-<li>数据收集<ol>
-<li>业务数据</li>
-<li>日志</li>
-<li>爬虫</li>
-<li>公开数据，excel</li>
-</ol>
-</li>
-<li>数据处理<ol>
-<li>数据清洗</li>
-<li>准换、计算、提取</li>
-<li>变成干净、规则、结构化的数据</li>
-</ol>
-</li>
-<li>数据分析<ol>
-<li>数据分析方法</li>
-<li>专门软件</li>
-</ol>
-</li>
-<li>数据展现<ol>
-<li>数据可视化</li>
-<li>数据挖掘</li>
-</ol>
-</li>
-<li>报告编写</li>
-</ol>
-<h3 id="1-2-分布式"><a href="#1-2-分布式" class="headerlink" title="1.2 分布式"></a>1.2 分布式</h3><blockquote>
-<p>分布式：多台机器、每台机器部署不同机器</p>
-<p>集群：多台机器、每台机器部署相同组件</p>
-</blockquote>
-<h3 id="1-3-资源调度策略"><a href="#1-3-资源调度策略" class="headerlink" title="1.3 资源调度策略"></a>1.3 资源调度策略</h3><blockquote>
-<p>YARN资源调度器为Scheduler，以在yarn-site.xml中的yarn.resourcemanager.scheduler.class进行配置策略</p>
-</blockquote>
-<ol>
-<li>FIFO，先来先服务</li>
-<li>Capacity(默认)，权重</li>
-<li>Fair，时间片</li>
-</ol>
-<h2 id="二、Hadoop"><a href="#二、Hadoop" class="headerlink" title="二、Hadoop"></a>二、Hadoop</h2><blockquote>
-<p>狭义：Hadoop软件</p>
-<p>广义：Hadoop生态</p>
-<p>起源：谷歌三篇论文，捐给apache、2008开源</p>
-</blockquote>
-<h3 id="2-1-组件"><a href="#2-1-组件" class="headerlink" title="2.1 组件"></a>2.1 组件</h3><h4 id="2-1-1-HDFS集群"><a href="#2-1-1-HDFS集群" class="headerlink" title="2.1.1 HDFS集群"></a>2.1.1 HDFS集群</h4><blockquote>
-<p>，HDFS使用多台计算机存储文件, 并且提供统一的访问接口, 像是访问一个普通文件系统一样使用分布式文件系统</p>
-</blockquote>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220504191146557.png" alt="image-20220504191146557"></p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220504171122154.png" alt="image-20220504171122154"></p>
-<p>分布式文件系统</p>
-<ol>
-<li><p>主角色 NameNode</p>
-<ol>
-<li>用于维护、管理文件系统元数据</li>
-<li>用户hdfs dfs访问的就是这个角色</li>
-<li>基于内存+磁盘持久化</li>
-</ol>
-</li>
-<li><p>从角色 DataNode</p>
-<ol>
-<li>真正存储数据的地方</li>
-<li>随时向NN汇报自己负责的块列表</li>
-</ol>
-</li>
-<li><p>主角色辅助角色 SecondaryNameNode，辅助NameNode完成大任务。</p>
-</li>
-</ol>
-<h5 id="上传流程"><a href="#上传流程" class="headerlink" title="上传流程"></a>上传流程</h5><ol>
-<li>客户端创建DistributedFileSystem对象</li>
-<li>调用create方法，发送RPC请求，让NameNode创建文件</li>
-<li>NameNode接收到请求并响应，客户端将结果封装成FSDataOutputStream输出流</li>
-<li>客户端向FSDataOutputStream写出数据</li>
-<li>开始流式传输  客户端—-&gt;第一个DataNode—-&gt;第二个DataNode—-&gt;第三个DataNode</li>
-<li>ACK数据校验  客户端&lt;—-第一个DataNode&lt;—-第二个DataNode&lt;—-第三个DataNode</li>
-<li>客户端FSDataOutputStream.close()</li>
-</ol>
-<h5 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h5><ol>
-<li><p>pipeline，管道实时传输，而非复制</p>
-</li>
-<li><p>ACK应答机制</p>
-</li>
-<li><p>默认三副本</p>
-</li>
-</ol>
-<h4 id="2-1-2-YARM"><a href="#2-1-2-YARM" class="headerlink" title="2.1.2 YARM"></a>2.1.2 YARM</h4><blockquote>
-<p>8081端口</p>
-</blockquote>
-<p>分布式资源管理、资源调度系统</p>
-<h5 id="组件"><a href="#组件" class="headerlink" title="组件"></a>组件</h5><ol>
-<li><p>主角色 ResouceManage  RM，集群层面</p>
-<ol>
-<li>决定系统中所有应用程序之间资源分配的最终权限，即最终仲裁</li>
-<li>接收用户的作业提交，并通过NM分配、管理各个机器上的计算资源</li>
-</ol>
-</li>
-<li><p>从角色  NodeManager NM ， 集群层面</p>
-<ol>
-<li>负责管理本机器上的计算资源。</li>
-</ol>
-</li>
-<li><p>应用 ApplicationMaster  AM   ，应用层面</p>
-<ol>
-<li>应用程序内的“老大”，负责程序内部各阶段的资源申请，监督程序的执行情况</li>
-<li>用户提交的每个应用程序均包含一个AM</li>
-</ol>
-</li>
-<li><p>客户端 Client ，引用层面</p>
-</li>
-<li><p>容器 Container，资源的抽象</p>
-</li>
-</ol>
-<h5 id="作业提交流程"><a href="#作业提交流程" class="headerlink" title="作业提交流程"></a>作业提交流程</h5><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220504183246347.png" alt="image-20220504183246347"></p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220504185350484.png" alt="image-20220504185350484"></p>
-<ol>
-<li>MR作业提交 Client–&gt;RM <ol>
-<li>用户提交作业jar包（下面的描述：MR==jar==作业）</li>
-</ol>
-</li>
-<li>资源的申请 MrAppMaster–&gt;RM<ol>
-<li>RM找到一个可用的Container，</li>
-<li>RM让这个Container的NM在Container中运行这个jar的ApplicationMaster（AM是前置处理，任何一个程序作业都有对应的AM）</li>
-</ol>
-</li>
-<li>MR作业状态汇报 Container（Map|Reduce Task）–&gt;Container（MrAppMaster） <ol>
-<li>AM启动成功，向RM注册信息（现在可在web上看到信息了）</li>
-<li>AM向RM申请资源</li>
-<li>mapTask，reduceTask 运行</li>
-</ol>
-</li>
-<li>节点的状态汇报 NM–&gt;RM<ol>
-<li>NM–&gt;MR 汇报</li>
-<li>MR–&gt;RM 汇报</li>
-</ol>
-</li>
-</ol>
-<h4 id="2-1-3-MapReduce"><a href="#2-1-3-MapReduce" class="headerlink" title="2.1.3 MapReduce"></a>2.1.3 MapReduce</h4><blockquote>
-<p>8088端口 MR</p>
-</blockquote>
-<p>分布式计算引擎、分而治之思想</p>
-<h5 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h5><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220504183156480.png" alt="image-20220504183156480"></p>
-<h5 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h5><ol>
-<li>易于变成</li>
-<li>方便扩展</li>
-<li>高容错性</li>
-<li>适合离线处理</li>
-</ol>
-<h5 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h5><ol>
-<li>实时计算差</li>
-<li>不能流式计算</li>
-</ol>
-<h5 id="实例进程"><a href="#实例进程" class="headerlink" title="实例进程"></a>实例进程</h5><ol>
-<li>MPAppMaster,负责整个MR程序的协调</li>
-<li>MapTask，负责map阶段的处理</li>
-<li>ReduceTask 负责reduce阶段处理</li>
-</ol>
-<h5 id="阶段组成"><a href="#阶段组成" class="headerlink" title="阶段组成"></a>阶段组成</h5><p>(map,reduce)串行化：[(map,reduce)，(map,reduce)，(map,reduce)]</p>
-<h3 id="2-2-特点"><a href="#2-2-特点" class="headerlink" title="2.2 特点"></a>2.2 特点</h3><ol>
-<li>扩容能力</li>
-<li>效率高</li>
-<li>成本低</li>
-<li>可靠性</li>
-<li>技术与业务解耦、技术就有通用性、具体到应用需要用户自行操作</li>
-<li></li>
-</ol>
-<h3 id="2-3-版本变迁"><a href="#2-3-版本变迁" class="headerlink" title="2.3 版本变迁"></a>2.3 版本变迁</h3><h4 id="开源版本"><a href="#开源版本" class="headerlink" title="开源版本"></a>开源版本</h4><ol>
-<li>更新快</li>
-<li>2.0提出YARM</li>
-<li>3.0主要是性能优化</li>
-</ol>
-<h4 id="商业版"><a href="#商业版" class="headerlink" title="商业版"></a>商业版</h4><ol>
-<li>稳定</li>
-</ol>
-<h3 id="2-4-生态圈"><a href="#2-4-生态圈" class="headerlink" title="2.4 生态圈"></a>2.4 生态圈</h3><p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220504171948802.png" alt="image-20220504171948802"></p>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220504121903697.png" alt="image-20220504121903697"></p>
-<ol>
-<li>Spark</li>
-</ol>
-<h2 id="三、实例"><a href="#三、实例" class="headerlink" title="三、实例"></a>三、实例</h2><h3 id="3-1-wordCount"><a href="#3-1-wordCount" class="headerlink" title="3.1 wordCount"></a>3.1 wordCount</h3><blockquote>
-<p>三个阶段</p>
-</blockquote>
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/Word-count-program-flow-executed-with-MapReduce.png" alt="Word-count-program-flow-executed-with-MapReduce"></p>
-<h4 id="map"><a href="#map" class="headerlink" title="map"></a>map</h4><p>将单词切分</p>
-<h4 id="shuffle"><a href="#shuffle" class="headerlink" title="shuffle"></a>shuffle</h4><p>根据默认排序将数据打乱分配</p>
-<h4 id="reduce"><a href="#reduce" class="headerlink" title="reduce"></a>reduce</h4><p>合并结果</p>
-<h2 id="四、命令"><a href="#四、命令" class="headerlink" title="四、命令"></a>四、命令</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"> HDFS集群</span><br><span class="line">start-dfs.sh </span><br><span class="line">stop-dfs.sh </span><br><span class="line"> YARN集群</span><br><span class="line">start-yarn.sh</span><br><span class="line">stop-yarn.sh</span><br><span class="line"> Hadoop集群</span><br><span class="line">start-all.sh</span><br><span class="line">stop-all.sh </span><br></pre></td></tr></table></figure>
-
-<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220504204148494.png" alt="image-20220504204148494"></p>
-<p>[官方命令](<a target="_blank" rel="noopener" href="https://hadoop.apache.org/docs/r3.3.0/hadoop-project-dist/hadoop-common/FileSystemShell.html">Apache Hadoop 3.3.0 – Overview</a>)</p>
-<h3 id="hdfs"><a href="#hdfs" class="headerlink" title="hdfs"></a>hdfs</h3><ol>
-<li>创建文件夹   hadoop fs -mkdir /itcast</li>
-<li>上传文件 hadoop fs -put zookeeper.out /itcast </li>
-<li>下载 hadoop fs -get /itcast/zookeeper.out /. </li>
-<li>查看文件列表 hadoop fs -ls /</li>
-<li>查看文件 hadoop fs -cat a.txt</li>
-<li>拷贝 cp</li>
-<li>追加 appendToFile</li>
-<li>移动 mv</li>
-</ol>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1511,7 +1362,7 @@ public class HelloJobCronTrigger implements Job &#123;
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">132</span>
+          <span class="site-state-item-count">134</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1559,12 +1410,12 @@ public class HelloJobCronTrigger implements Job &#123;
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">391k</span>
+    <span title="站点总字数">396k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">5:55</span>
+    <span title="站点阅读时长">6:01</span>
 </div>
 
         

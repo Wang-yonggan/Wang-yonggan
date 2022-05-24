@@ -185,6 +185,262 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%97%A5%E5%BF%97/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%97%A5%E5%BF%97/" class="post-title-link" itemprop="url">mysql-log</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-04-10 14:43:32" itemprop="dateCreated datePublished" datetime="2022-04-10T14:43:32+08:00">2022-04-10</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%97%A5%E5%BF%97/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/10/%E6%95%B0%E6%8D%AE%E5%BA%93/%E6%97%A5%E5%BF%97/" class="cy_cmt_count" data-xid="2022/04/10/数据库/日志/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>4 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/cswiki/p/15816371.html">转载</a></p>
+<h2 id="binlog-持久化"><a href="#binlog-持久化" class="headerlink" title="binlog 持久化"></a>binlog 持久化</h2><p>这里引入了一个新的概念：binlog cache</p>
+<p>从名字就能看出来，binlog cache 其实就是一片内存区域，充当缓存的作用。</p>
+<p>每个线程都有自己 binlog cache 区域，<strong>在事务运行的过程中，MySQL 会先把日志写到 binlog cache 中，等到事务真正提交的时候，再统一把 binlog cache 中的数据写到 binlog 文件中</strong>。（binlog cache 有很多个，binlog 文件只有一个！）</p>
+<p>事实上，这个从 binlog cache 写到 binlog 文件中的操作，并<strong>不</strong>就是落盘操作了，这里仅仅是把 binlog 写到了文件系统的 page cache 上（这一步对应下图中的 <code>write</code> 操作）。</p>
+<blockquote>
+<p>简单解释下文件系统的 page cache：</p>
+<p>CPU 如果要访问外部磁盘上的文件，需要首先将这些文件的内容拷贝到内存中，由于硬件的限制，从磁盘到内存的数据传输速度是很慢的，如果现在物理内存有空余，干嘛不用这些空闲内存来缓存一些磁盘的文件内容呢，<strong>这部分用作缓存磁盘文件的内存就叫做 page cache</strong>。</p>
+<p>很多同学看到这里可能觉得特别特别熟悉，是的，和 CPU 里的高速缓存是不是很像？两者其实都是利用的局部性原理，只不过<strong>高速缓存是 CPU 缓存内存的数据，而 page cache 是内存缓存磁盘的数据</strong>，这也体现了操作系统内存层次结构分级的思想。</p>
+</blockquote>
+<p>所以，最后需要把 page cache 中的数据同步到磁盘上，才算真正完成了 binlog 的持久化（这一步对应下图中的 <code>fsync</code> 操作）。一般情况下，我们认为 <code>fsync</code> 才占磁盘的 IOPS (Input/Output Operations Per Second)</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220410143626228.png" alt="image-20220410143626228"></p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">write 和 fsync 的时机，是由参数 sync_binlog 控制的：</span><br><span class="line"></span><br><span class="line">sync_binlog = <span class="number">0</span>，每次提交事务的时候，只进行 write，不进行 fsync</span><br><span class="line">sync_binlog = <span class="number">1</span>候，每次提交事务的时候，执行 write 和 fsync</span><br><span class="line">sync_binlog = N(N&gt;<span class="number">1</span>)，每次提交事务的时候，执行 write，累积 N 个事务后再执行 fsync</span><br><span class="line">可以看出来，如果业务场景涉及到的 IO 操作很多的话，可以适当增大 sync_binlog 的值，提高性能。但是也存在一定的风险，比如你设置成 <span class="number">100</span>，万一在第 <span class="number">80</span> 个事务提交的时候数据库宕机了，那这些事务的 binlog 日志由于没有执行 fsync，也就丢失了。</span><br></pre></td></tr></table></figure>
+
+<h2 id="redolog-持久化"><a href="#redolog-持久化" class="headerlink" title="redolog 持久化"></a>redolog 持久化</h2><p>类比 binlog，在事务执行过程中，binlog 都是存在 binlog cache 中，redolog 也有这样一块内存区域，叫作 <strong>redolog buffer</strong>。</p>
+<p><strong>在事务运行的过程中，MySQL 会先把日志写到 redolog buffer 中，等到事务真正提交的时候，再统一把 redolog buffer 中的数据写到 redolog 文件中</strong>。和 binlog 的落盘操作一样，这个从 redolog buffer 写到 redolog 文件中的操作，并<strong>不</strong>就是落盘操作了，这里仅仅是把 redolog 写到了文件系统的 page cache 上，最后还需要执行 <code>fsync</code> 才能够实现真正的落盘。</p>
+<p><img src="https://job-wyg.oss-cn-beijing.aliyuncs.com/image-20220410143800256.png" alt="image-20220410143800256"></p>
+<p>解释下 redo log buffer？</p>
+<p>在一个事务的更新过程中，日志是要写多次的。比如下面这个事务：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">begin</span>;</span><br><span class="line">	<span class="keyword">insert</span> <span class="keyword">into</span> table1 ...</span><br><span class="line">	<span class="keyword">insert</span> <span class="keyword">into</span> table2 ...</span><br><span class="line"><span class="keyword">commit</span>;</span><br></pre></td></tr></table></figure>
+
+<p>这个事务要往两个表 table1 和 table2 中插入记录，为了确保这个事务不被拆开，一次性的完整写入日志文件中，在插入数据的过程中，我们需要把生成的日志都先保存起来。redolog buffer 就是这么一个用来先存 redo 日志的地方。</p>
+<p>也就是说，在执行第一条 insert 语句的时候，redolog buffer 也就写入了这条记录的日志。</p>
+<p>不同于 binlog cache 每个线程都有一个，<strong>redolog buffer 只有那么一个</strong>。</p>
+<p>事实上，日志写到 redolog buffer 是很快的，wirte 到 page cache 也差不多，但是 fsync 持久化到磁盘的速度就慢多了，为了控制 redo log 的写入策略，InnoDB 提供了 <code>innodb_flush_log_at_trx_commit</code> 参数，它有三种可能取值：</p>
+<ul>
+<li><code>innodb_flush_log_at_trx_commit = 0</code>，每次事务提交的时候，都只是把 redolog 留在 redolog buffer 中</li>
+<li><code>innodb_flush_log_at_trx_commit = 1</code>，每次事务提交的时候，都执行 fsync 将 redolog 直接持久化到磁盘</li>
+<li><code>innodb_flush_log_at_trx_commit = 2</code>，每次事务提交的时候，都只执行 write 将 redolog 写到文件系统的 page cache 中</li>
+</ul>
+<p>说了这么多，各位小伙伴们对 binlog 和 redolog 的持久化机制想必都有所了解了，我们来看文题：<strong>事务还没提交的时候，redolog 能不能被持久化到磁盘呢</strong>？</p>
+<p>先说答案，答案就是<strong>有可能</strong>。</p>
+<p>分析下 redolog 可能存在的三种状态（binlog 也差不多）：</p>
+<ul>
+<li>事务执行过程中，存在 MySQL 的进程内存中的 redolog buffer 中</li>
+<li>事务提交，执行 write 操作存在文件系统的 page cache 中，但是没有执行 fsync 操作持久化到磁盘</li>
+<li>事务提交，执行 fsync 操作持久化到磁盘</li>
+</ul>
+<p>至于为什么说事务还没提交的时候，redolog 也有可能被持久化到磁盘呢？</p>
+<p>InnoDB 有一个后台线程，每隔 1 秒轮询一次，具体的操作是这样的：</p>
+<ol>
+<li>调用 write 将 redolog buffer 中的日志写到文件系统的 page cache，</li>
+<li>然后调用 fsync 持久化到磁盘。而在事务执行中间过程的 redolog 都是直接写在 redolog buffer 中的，也就是说，一个没有提交的事务的 redolog，也是有可能会被后台线程一起持久化到磁盘的。</li>
+</ol>
+<p>另外，除了后台线程每秒一次的轮询操作外，还有两种场景会让一个没有提交的事务的 redolog 写盘：</p>
+<ol>
+<li><p>innodb_flush_log_at_trx_commit 设置是 1，这样并行的某个事务提交的时候，就会顺带将这个事务的 redolog buffer 持久化到磁盘</p>
+<p>举个例子，假设事务 A 执行到一半，已经写了一些 redolog 到 redolog buffer 中，这时候有另外一个事务 B 提交，按照 innodb_flush_log_at_trx_commit = 1 的逻辑，事务 B 要把 redolog buffer 里的日志全部持久化到磁盘，这时候，就会带上事务 A 在 redolog buffer 里的日志一起持久化到磁盘</p>
+</li>
+<li><p>redo log buffer 占用的空间达到 redolo buffer 大小（由参数 <code>innodb_log_buffer_size</code> 控制，默认是 8MB）一半的时候，后台线程会主动写盘。不过由于这个事务并没有提交，所以这个写盘动作只是 write 到了文件系统的 page cache，仍然是在内存中，并没有调用 fsync 真正落盘</p>
+</li>
+</ol>
+<hr>
+<p>最后放上这道题的背诵版：</p>
+<blockquote>
+<p>🥸 <strong>面试官</strong>：</p>
+<ul>
+<li>问题：事务还没提交的时候，redo log 能不能被持久化到磁盘呢？</li>
+<li>相关问题：MySQL 是如何保证数据不丢失的呢？</li>
+</ul>
+<p>😎 <strong>小牛肉</strong>：事务还没有提交的时候，redo log 是有可能被持久化到磁盘的。</p>
+<p>redolog 的具体落盘操作是这样的：在事务运行的过程中，MySQL 会先把日志写到 redolog buffer 中，等到事务真正提交的时候，再统一把 redolog buffer 中的数据写到 redolog 文件中。不过这个从 redolog buffer 写到 redolog 文件中的操作也就是 write 并不就是落盘操作了，这里仅仅是把 redolog 写到了文件系统的 page cache 上，最后还需要执行 fsync 才能够实现真正的落盘。</p>
+<p>也就是说，redolog 其实存在三种状态：</p>
+<ul>
+<li>事务执行过程中，存在 MySQL 的进程内存中的 redolog buffer 中</li>
+<li>事务提交，执行 write 操作存在文件系统的 page cache 中，但是没有执行 fsync 操作持久化到磁盘</li>
+<li>事务提交，执行 fsync 操作持久化到磁盘</li>
+</ul>
+<p>额为什么说事务还没提交的时候，redolog 也有可能被持久化到磁盘呢？</p>
+<p>主要有三种可能的原因：</p>
+<ol>
+<li>第一种情况：InnoDB 有一个后台线程，每隔 1 秒轮询一次，具体的操作是这样的：调用 write 将 redolog buffer 中的日志写到文件系统的 page cache，然后调用 fsync 持久化到磁盘。而在事务执行中间过程的 redolog 都是直接写在 redolog buffer 中的，也就是说，一个没有提交的事务的 redolog，也是有可能会被后台线程一起持久化到磁盘的。</li>
+<li>第二种情况：innodb_flush_log_at_trx_commit 设置是 1，这个参数的意思就是，每次事务提交的时候，都执行 fsync 将 redolog 直接持久化到磁盘（还有 0 和 2 的选择，0 表示每次事务提交的时候，都只是把 redolog 留在 redolog buffer 中；2 表示每次事务提交的时候，都只执行 write 将 redolog 写到文件系统的 page cache 中）。举个例子，假设事务 A 执行到一半，已经写了一些 redolog 到 redolog buffer 中，这时候有另外一个事务 B 提交，按照 innodb_flush_log_at_trx_commit = 1 的逻辑，事务 B 要把 redolog buffer 里的日志全部持久化到磁盘，这时候，就会带上事务 A 在 redolog buffer 里的日志一起持久化到磁盘</li>
+<li>第二种情况：redo log buffer 占用的空间达到 redolog buffer 大小（由参数 <code>innodb_log_buffer_size</code> 控制，默认是 8MB）一半的时候，后台线程会主动写盘。不过由于这个事务并没有提交，所以这个写盘动作只是 write 到了文件系统的 page cache，仍然是在内存中，并没有调用 fsync 真正落盘</li>
+</ol>
+</blockquote>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/10/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/%E5%9F%BA%E4%BA%8E%E6%8B%A6%E6%88%AA%E5%99%A8%E7%9A%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/t2.png">
+      <meta itemprop="name" content="勇敢">
+      <meta itemprop="description" content="学无止境">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="MySoul">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/04/10/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/%E5%9F%BA%E4%BA%8E%E6%8B%A6%E6%88%AA%E5%99%A8%E7%9A%84/" class="post-title-link" itemprop="url">基于拦截器的</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-04-10 14:06:31" itemprop="dateCreated datePublished" datetime="2022-04-10T14:06:31+08:00">2022-04-10</time>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Changyan：</span>
+    
+    
+      <a title="changyan" href="/2022/04/10/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/%E5%9F%BA%E4%BA%8E%E6%8B%A6%E6%88%AA%E5%99%A8%E7%9A%84/#SOHUCS" itemprop="discussionUrl">
+        <span id="url::https://wang-yonggan.github.io/2022/04/10/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/%E5%9F%BA%E4%BA%8E%E6%8B%A6%E6%88%AA%E5%99%A8%E7%9A%84/" class="cy_cmt_count" data-xid="2022/04/10/组件/登录/基于拦截器的/" itemprop="commentCount"></span>
+      </a>
+    
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h4 id="配置类"><a href="#配置类" class="headerlink" title="配置类"></a>配置类</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MvcConfig</span> <span class="keyword">implements</span> <span class="title">WebMvcConfigurer</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Resource</span></span><br><span class="line">    <span class="keyword">private</span> StringRedisTemplate stringRedisTemplate;</span><br><span class="line">	<span class="comment">//注册拦截器</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addInterceptors</span><span class="params">(InterceptorRegistry registry)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 登录拦截器</span></span><br><span class="line">        registry.addInterceptor(<span class="keyword">new</span> LoginInterceptor())</span><br><span class="line">                .excludePathPatterns(</span><br><span class="line">                        <span class="string">&quot;/shop/**&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;/voucher/**&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;/shop-type/**&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;/upload/**&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;/blog/hot&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;/user/code&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;/user/login&quot;</span></span><br><span class="line">                ).order(<span class="number">1</span>);</span><br><span class="line">        <span class="comment">// token刷新的拦截器</span></span><br><span class="line">        registry.addInterceptor(<span class="keyword">new</span> RefreshTokenInterceptor(stringRedisTemplate)).addPathPatterns(<span class="string">&quot;/**&quot;</span>).order(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="自制拦截器"><a href="#自制拦截器" class="headerlink" title="自制拦截器"></a>自制拦截器</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//r</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LoginInterceptor</span> <span class="keyword">implements</span> <span class="title">HandlerInterceptor</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">preHandle</span><span class="params">(HttpServletRequest request, HttpServletResponse response, Object handler)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">// 1.判断是否需要拦截（ThreadLocal中是否有用户）</span></span><br><span class="line">        <span class="keyword">if</span> (UserHolder.getUser() == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">// 没有，需要拦截，设置状态码</span></span><br><span class="line">            response.setStatus(<span class="number">401</span>);</span><br><span class="line">            <span class="comment">// 拦截</span></span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 有用户，则放行</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//①根据token保存User到ThreadLocal</span></span><br><span class="line"><span class="comment">//②刷新token时间  </span></span><br><span class="line"><span class="keyword">import</span> <span class="keyword">static</span> com.hmdp.utils.RedisConstants.LOGIN_USER_KEY;</span><br><span class="line"><span class="keyword">import</span> <span class="keyword">static</span> com.hmdp.utils.RedisConstants.LOGIN_USER_TTL;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RefreshTokenInterceptor</span> <span class="keyword">implements</span> <span class="title">HandlerInterceptor</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> StringRedisTemplate stringRedisTemplate;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">RefreshTokenInterceptor</span><span class="params">(StringRedisTemplate stringRedisTemplate)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.stringRedisTemplate = stringRedisTemplate;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">preHandle</span><span class="params">(HttpServletRequest request, HttpServletResponse response, Object handler)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">// 1.获取请求头中的token</span></span><br><span class="line">        String token = request.getHeader(<span class="string">&quot;authorization&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (StrUtil.isBlank(token)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 2.基于TOKEN获取redis中的用户</span></span><br><span class="line">        String key  = LOGIN_USER_KEY + token;</span><br><span class="line">        Map&lt;Object, Object&gt; userMap = stringRedisTemplate.opsForHash().entries(key);</span><br><span class="line">        <span class="comment">// 3.判断用户是否存在</span></span><br><span class="line">        <span class="keyword">if</span> (userMap.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 5.将查询到的hash数据转为UserDTO</span></span><br><span class="line">        UserDTO userDTO = BeanUtil.fillBeanWithMap(userMap, <span class="keyword">new</span> UserDTO(), <span class="keyword">false</span>);</span><br><span class="line">        <span class="comment">// 6.存在，保存用户信息到 ThreadLocal</span></span><br><span class="line">        UserHolder.saveUser(userDTO);</span><br><span class="line">        <span class="comment">// 7.刷新token有效期</span></span><br><span class="line">        stringRedisTemplate.expire(key, LOGIN_USER_TTL, TimeUnit.MINUTES);</span><br><span class="line">        <span class="comment">// 8.放行</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">afterCompletion</span><span class="params">(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">// 移除用户</span></span><br><span class="line">        UserHolder.removeUser();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/10/java/javaSE/JUC/JUC%E7%9A%84%E5%9F%BA%E7%A1%80/AQS/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -604,357 +860,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/08/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/shiro/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/04/08/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/shiro/" class="post-title-link" itemprop="url">shiro</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-04-08 14:14:18" itemprop="dateCreated datePublished" datetime="2022-04-08T14:14:18+08:00">2022-04-08</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E4%B8%AD%E9%97%B4%E4%BB%B6/" itemprop="url" rel="index"><span itemprop="name">中间件</span></a>
-                </span>
-            </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/04/08/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/shiro/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/08/%E7%BB%84%E4%BB%B6/%E7%99%BB%E5%BD%95/shiro/" class="cy_cmt_count" data-xid="2022/04/08/组件/登录/shiro/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>2.4k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>2 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>[toc]</p>
-<h2 id="一、功能"><a href="#一、功能" class="headerlink" title="一、功能"></a>一、功能</h2><ol>
-<li>认证</li>
-<li>授权</li>
-<li>方法加权</li>
-<li>自定义过滤</li>
-<li>会话管理：Session Manager  一次登录，所有信息保存在session中</li>
-<li>加密</li>
-</ol>
-<h3 id="1-1-Authentication-用户密码认证"><a href="#1-1-Authentication-用户密码认证" class="headerlink" title="1.1 Authentication 用户密码认证"></a>1.1 Authentication 用户密码认证</h3><h3 id="1-2-Authorization-验证是否有权限访问该方法"><a href="#1-2-Authorization-验证是否有权限访问该方法" class="headerlink" title="1.2 Authorization 验证是否有权限访问该方法"></a>1.2 Authorization 验证是否有权限访问该方法</h3><ol>
-<li><p>MyRealm extends AuthorizingRealm</p>
-<blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span><span class="comment">//授权</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> AuthorizationInfo <span class="title">doGetAuthorizationInfo</span><span class="params">(PrincipalCollection principalCollection)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//获得令牌/用户</span></span><br><span class="line">    User user=(User)principalCollection.asList().get(<span class="number">0</span>);</span><br><span class="line">    SimpleAuthorizationInfo authorizationInfo=<span class="keyword">new</span> SimpleAuthorizationInfo();</span><br><span class="line">    authorizationInfo.addRoles(user.getUserRoles());<span class="comment">//添加用户-授权</span></span><br><span class="line">    authorizationInfo.addStringPermissions(user.getUserPerms());<span class="comment">//添加权限-授权</span></span><br><span class="line">    <span class="keyword">return</span> authorizationInfo;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></blockquote>
-</li>
-</ol>
-<h3 id="1-3-其他功能"><a href="#1-3-其他功能" class="headerlink" title="1.3 其他功能"></a>1.3 其他功能</h3><h4 id="1-3-1-方法加权"><a href="#1-3-1-方法加权" class="headerlink" title="1.3.1 方法加权"></a>1.3.1 方法加权</h4><ol>
-<li><p>硬编码</p>
-<p>在每个方法体里面进行手动获取当前用户权限，然后和该方法的权限进行对比。</p>
-</li>
-<li><p>ShiroConfig添加路径</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">filterFactoryBean.setUnauthorizedUrl(<span class="string">&quot;/wq.html&quot;</span>);<span class="comment">//无权限跳到指定路径</span></span><br></pre></td></tr></table></figure></li>
-<li><p>注解</p>
-<ol>
-<li>@RequiresAuthentication 需要登录</li>
-<li>@RequiresUser 需要reamberMe</li>
-<li>@RequiresPermissions 需要权限</li>
-</ol>
-<ul>
-<li>没权限会直接报500错误</li>
-<li>需要异常处理机制</li>
-</ul>
-</li>
-</ol>
-<h4 id="1-3-2-自定义过滤"><a href="#1-3-2-自定义过滤" class="headerlink" title="1.3.2 自定义过滤"></a>1.3.2 自定义过滤</h4><ol>
-<li><p>@Componet注册过滤器</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">F1</span> <span class="keyword">implements</span> <span class="title">Filter</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doFilter</span><span class="params">(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)</span> <span class="keyword">throws</span> IOException, ServletException </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;自定义过滤开始&quot;</span>);</span><br><span class="line">        filterChain.doFilter(servletRequest,servletResponse);</span><br><span class="line">        System.out.println(<span class="string">&quot;自定义过滤结束&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li><p>加入到请求过滤器</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">filters.put(<span class="string">&quot;oauth2&quot;</span>, <span class="keyword">new</span> F1());</span><br><span class="line">filterFactoryBean.setFilters(filters);</span><br></pre></td></tr></table></figure></li>
-<li></li>
-</ol>
-<h4 id="1-3-3-获取当前线程用户"><a href="#1-3-3-获取当前线程用户" class="headerlink" title="1.3.3 获取当前线程用户"></a>1.3.3 获取当前线程用户</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Subject subject = SecurityUtils.getSubject();</span><br></pre></td></tr></table></figure>
-
-<ol>
-<li><p>认证</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">UsernamePasswordToken token = <span class="keyword">new</span> UsernamePasswordToken(user.getUsername(), user.getPassword());</span><br><span class="line">subject.login(token);</span><br></pre></td></tr></table></figure></li>
-<li><p>登录设置令牌</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">subject.getSession().setAttribute(<span class="string">&quot;currentUser&quot;</span>, subject.getPrincipal());</span><br></pre></td></tr></table></figure></li>
-<li><p>登出</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">subject.logout();<span class="comment">//或者在过滤器中配置   filterMap.put(&quot;/aaa&quot;,&quot;logout&quot;);</span></span><br></pre></td></tr></table></figure></li>
-</ol>
-<h2 id="二、组件"><a href="#二、组件" class="headerlink" title="二、组件"></a>二、组件</h2><h3 id="2-1-核心组件"><a href="#2-1-核心组件" class="headerlink" title="2.1 核心组件"></a>2.1 核心组件</h3><ol>
-<li>Subjetc： 当前进程obj</li>
-<li>Shiro SecurityManager</li>
-<li>Realm ：安全中心，提供认证授权服务</li>
-<li>ShiroFilterFactoryBean：请求过滤器<ol>
-<li>设置Map&lt;路径，权限&gt;的过滤器Map</li>
-<li>设置自定义过滤器</li>
-<li>设置无权路径</li>
-</ol>
-</li>
-</ol>
-<h3 id="2-2-注解模式"><a href="#2-2-注解模式" class="headerlink" title="2.2 注解模式"></a>2.2 注解模式</h3><blockquote>
-<p>对于Map&lt;路径，权限&gt;</p>
-</blockquote>
-<ol>
-<li>@RequiresAuthentication 需登录</li>
-<li>@RequiresPermissions(“b”)  需b权限</li>
-<li>@RequiresRoles(“admin”)  需admin角色</li>
-</ol>
-<h3 id="2-3-user"><a href="#2-3-user" class="headerlink" title="2.3 user"></a>2.3 user</h3><ol>
-<li>user<ol>
-<li>userName</li>
-<li>pasword</li>
-<li>List&lt;String&gt;roles</li>
-<li>List&lt;String&gt;perms</li>
-</ol>
-</li>
-</ol>
-<h2 id="三、原理"><a href="#三、原理" class="headerlink" title="三、原理"></a>三、原理</h2><h3 id="3-1-基于token"><a href="#3-1-基于token" class="headerlink" title="3.1 基于token"></a>3.1 基于token</h3><h3 id="3-2-安全中心-MyRealm"><a href="#3-2-安全中心-MyRealm" class="headerlink" title="3.2 安全中心 MyRealm"></a>3.2 安全中心 MyRealm</h3><ul>
-<li><p>认证中心  AuthenticationInfo(username,password)</p>
-<ul>
-<li>登录的时候会用有一次</li>
-<li>传入账号信息，通过数据库获得用户信息，返回token(user，passwod，Nmae)</li>
-</ul>
-</li>
-<li><p>权限中心  AuthorizationInfo(user)</p>
-<ul>
-<li><p>每次访问需要权限的地方会用到</p>
-</li>
-<li><p>格式化user的权限</p>
-</li>
-<li><p>然后根据user权限对比[需要访问的方法]的权限，如果有权限，就退回到对应界面</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">filterFactoryBean.setLoginUrl(<span class="string">&quot;/login.html&quot;</span>);<span class="comment">//登录页面</span></span><br><span class="line">filterFactoryBean.setUnauthorizedUrl(<span class="string">&quot;/wq.html&quot;</span>);<span class="comment">//无权限</span></span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-</ul>
-<h2 id="四、集成-改进"><a href="#四、集成-改进" class="headerlink" title="四、集成-改进"></a>四、集成-改进</h2><h3 id="5-1-shiro-redis集成"><a href="#5-1-shiro-redis集成" class="headerlink" title="5.1 shiro+redis集成"></a>5.1 shiro+redis集成</h3><h2 id="五、其他"><a href="#五、其他" class="headerlink" title="五、其他"></a>五、其他</h2><ol>
-<li><p>过滤顺序问题</p>
-<blockquote>
-<p>过滤设置规则是从上到下，详细的规则配在前面，大范围的配在后面。</p>
-</blockquote>
-</li>
-</ol>
-<h2 id="六、RDBC模型-role-based-access-control"><a href="#六、RDBC模型-role-based-access-control" class="headerlink" title="六、RDBC模型 role based access control"></a>六、RDBC模型 role based access control</h2><h3 id="依赖"><a href="#依赖" class="headerlink" title="依赖"></a>依赖</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">shiro-core</span><br><span class="line">shiro-spring</span><br><span class="line"></span><br><span class="line">f</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-
-
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://wang-yonggan.github.io/2022/04/08/java/javaSE/JUC/%E9%94%81/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/t2.png">
-      <meta itemprop="name" content="勇敢">
-      <meta itemprop="description" content="学无止境">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="MySoul">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/04/08/java/javaSE/JUC/%E9%94%81/" class="post-title-link" itemprop="url">锁</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2022-04-08 04:05:01" itemprop="dateCreated datePublished" datetime="2022-04-08T04:05:01+08:00">2022-04-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-05-12 11:58:03" itemprop="dateModified" datetime="2022-05-12T11:58:03+08:00">2022-05-12</time>
-              </span>
-
-          
-  
-  <span class="post-meta-item">
-    
-      <span class="post-meta-item-icon">
-        <i class="far fa-comment"></i>
-      </span>
-      <span class="post-meta-item-text">Changyan：</span>
-    
-    
-      <a title="changyan" href="/2022/04/08/java/javaSE/JUC/%E9%94%81/#SOHUCS" itemprop="discussionUrl">
-        <span id="url::https://wang-yonggan.github.io/2022/04/08/java/javaSE/JUC/%E9%94%81/" class="cy_cmt_count" data-xid="2022/04/08/java/javaSE/JUC/锁/" itemprop="commentCount"></span>
-      </a>
-    
-  </span>
-  
-  <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>1.4k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>·</p>
-<h2 id="一、Lock的使用"><a href="#一、Lock的使用" class="headerlink" title="一、Lock的使用"></a>一、Lock的使用</h2><blockquote>
-<p><code>ReentrantLock</code>的实现是基于其内部类<code>FairSync</code>(公平锁)和<code>NonFairSync</code>(非公平锁)实现的。 其可重入性是基于<code>Thread.currentThread()</code>实现的: 如果当前线程已经获得了执行序列中的锁， 那执行序列之后的所有方法都可以获得这个锁。</p>
-</blockquote>
-<blockquote>
-<p>自增 lock上锁，condition 状态转换</p>
-</blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">Lock lock = <span class="keyword">new</span> ReentrantLock();<span class="comment">//可重入锁，lock.lock()上锁 unlock解锁</span></span><br><span class="line">Condition condition = lock.newCondition();<span class="comment">//状态监视-转换器 await 等待， signalAll 唤醒全部</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">int</span> num;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">increment</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    lock.lock();<span class="comment">//上锁</span></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">while</span> (num != <span class="number">0</span>) &#123;</span><br><span class="line">            condition.await();<span class="comment">//等待</span></span><br><span class="line">        &#125;</span><br><span class="line">        num++;</span><br><span class="line">        condition.signal();<span class="comment">//唤醒</span></span><br><span class="line">    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line"></span><br><span class="line">    &#125;<span class="keyword">finally</span>&#123;</span><br><span class="line">    	lock.unlock();<span class="comment">//解锁</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-<h4 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h4><blockquote>
-<p>基于AQS+CSA</p>
-</blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (compareAndSetState(<span class="number">0</span>, <span class="number">1</span>))</span><br><span class="line">    setExclusiveOwnerThread(Thread.currentThread());</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    acquire(<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
-
-
-
-<h4 id="精准唤醒"><a href="#精准唤醒" class="headerlink" title="精准唤醒"></a>精准唤醒</h4><h2 id="synchonized"><a href="#synchonized" class="headerlink" title="synchonized"></a>synchonized</h2><h3 id="内存语义"><a href="#内存语义" class="headerlink" title="内存语义"></a>内存语义</h3><h3 id="synchonized和Lock区别"><a href="#synchonized和Lock区别" class="headerlink" title="synchonized和Lock区别"></a>synchonized和Lock区别</h3><ol>
-<li>synchonized是一个关键字，Lock是一个类</li>
-<li>synchonized是隐式锁，自动上锁解锁，Lock是显式锁，手动操作</li>
-<li>synchonized无法获得所得状态，Lock可以判断是否获得了锁，更灵活</li>
-<li>synchonized是<code>非公平锁</code>，Lock默认是<code>非公平锁</code>，可设置</li>
-<li>synchonized适合锁少量的代码，Lock是否大量代码<ol>
-<li>conditon可以精准唤醒，可以灵活调整获得锁的顺序</li>
-</ol>
-</li>
-</ol>
-<h3 id="乐观锁"><a href="#乐观锁" class="headerlink" title="乐观锁"></a>乐观锁</h3><blockquote>
-<p>基于版本</p>
-</blockquote>
-<ol>
-<li><p>支持并发</p>
-</li>
-<li><p>在提交任务之前比较版本号，不一致就放弃，再申请提交，知道提交完成</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">update t_goods </span><br><span class="line"><span class="keyword">set</span> status<span class="operator">=</span><span class="number">2</span>,version<span class="operator">=</span>version<span class="operator">+</span><span class="number">1</span></span><br><span class="line"><span class="keyword">where</span> id<span class="operator">=</span>#&#123;id&#125; <span class="keyword">and</span> version<span class="operator">=</span>#&#123;version&#125;;</span><br></pre></td></tr></table></figure></li>
-</ol>
-<h3 id="悲观锁"><a href="#悲观锁" class="headerlink" title="悲观锁"></a>悲观锁</h3><ol>
-<li>串行化</li>
-</ol>
-<h3 id="表锁"><a href="#表锁" class="headerlink" title="表锁"></a>表锁</h3><h3 id="行锁"><a href="#行锁" class="headerlink" title="行锁"></a>行锁</h3><h3 id="读锁、共享锁、S锁、"><a href="#读锁、共享锁、S锁、" class="headerlink" title="读锁、共享锁、S锁、"></a>读锁、共享锁、S锁、</h3><blockquote>
-<p>如果事务T对数据A加上共享锁后，则其他事务只能对A再加共享锁，不能加排他锁。获准共享锁的事务只能读数据，不能修改数据。</p>
-</blockquote>
-<h3 id="写锁、独占锁、排他锁、T锁"><a href="#写锁、独占锁、排他锁、T锁" class="headerlink" title="写锁、独占锁、排他锁、T锁"></a>写锁、独占锁、排他锁、T锁</h3><blockquote>
-<p>如果事务T对数据A加上排他锁后，则其他事务不能再对A加任任何类型的封锁。获准排他锁的事务既能读数据，又能修改数据。</p>
-</blockquote>
-<h3 id="公平锁，非公平锁"><a href="#公平锁，非公平锁" class="headerlink" title="公平锁，非公平锁"></a>公平锁，非公平锁</h3><blockquote>
-<p>最早请求的锁最早获得锁，需要队列实现，影响性能</p>
-</blockquote>
-<h3 id="对写锁"><a href="#对写锁" class="headerlink" title="对写锁"></a>对写锁</h3><blockquote>
-<p>有独占锁，也有共享锁</p>
-</blockquote>
-<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">Book</span>&#123;</span><br><span class="line">	<span class="keyword">private</span> Lock=<span class="keyword">new</span> ReetranWriteReadLock();</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">read</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">		<span class="keyword">lock</span>.writeLock().<span class="keyword">lock</span>();</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">wirte</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">		<span class="keyword">lock</span>.rLock().<span class="keyword">lock</span>();</span><br><span class="line">	</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1026,7 +931,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">132</span>
+          <span class="site-state-item-count">134</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1074,12 +979,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">391k</span>
+    <span title="站点总字数">396k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">5:55</span>
+    <span title="站点阅读时长">6:01</span>
 </div>
 
         
